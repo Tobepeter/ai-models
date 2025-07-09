@@ -1,0 +1,9 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+
+# 技术框架
+
+tailwind shadcn ts react vite
