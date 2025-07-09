@@ -5,6 +5,9 @@ import { ChatInput } from './components/chat-input'
 import { ChatLoadingMsg } from './components/chat-loading-msg'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
+/**
+ * 聊天页面主组件
+ */
 export const Chat = () => {
 	const { 
 		messages, 

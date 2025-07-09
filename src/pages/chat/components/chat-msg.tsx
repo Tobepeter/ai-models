@@ -3,6 +3,9 @@ import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ChatMedia } from './chat-media'
 
+/**
+ * 聊天消息组件
+ */
 export const ChatMsg = (props: ChatMsgProps) => {
 	const { message } = props
 	const isUser = message.type === 'user'

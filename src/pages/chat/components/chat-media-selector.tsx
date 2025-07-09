@@ -15,6 +15,9 @@ const mediaTypeConfig = {
 	video: { icon: Film, label: '视频' },
 }
 
+/**
+ * 媒体类型选择器组件
+ */
 export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 	const { value, onChange } = props
 	const currentConfig = mediaTypeConfig[value]

@@ -1,6 +1,9 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Loader2 } from 'lucide-react'
 
+/**
+ * 聊天加载消息组件
+ */
 export const ChatLoadingMsg = () => {
 	return (
 		<div className="flex w-full mb-4 justify-start">

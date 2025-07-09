@@ -27,6 +27,7 @@ interface ChatStore {
 	addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void
 	setLoading: (loading: boolean) => void
 	clearMessages: () => void
+	reset: () => void
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -46,8 +47,14 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	},
 	
 	setLoading: (loading) => set({ isLoading: loading }),
-	
+
 	clearMessages: () => set({ messages: [] }),
+
+	reset: () => set({
+		messages: [],
+		currentMediaType: 'text',
+		isLoading: false
+	}),
 }))
 
 // 模拟AI响应的函数

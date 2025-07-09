@@ -33,3 +33,7 @@ page component，store都放到对应的page下
 # jsdoc
 
 每个组件上方增加一个jsdoc，就一个中文描述就行了
+
+# shdcn的代码
+
+shdcn的代码不要改动，如 src/components/ui
