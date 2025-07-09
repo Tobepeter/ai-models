@@ -9,12 +9,14 @@ export interface Message {
 	mediaType: MediaType
 	timestamp: number
 	// 模拟的媒体数据
-	mediaData?: {
-		url?: string
-		filename?: string
-		size?: string
-		duration?: string
-	}
+	mediaData?: MediaData
+}
+
+export type MediaData = {
+	url?: string
+	filename?: string
+	size?: string
+	duration?: string
 }
 
 interface ChatStore {

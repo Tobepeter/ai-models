@@ -1,10 +1,14 @@
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Send } from 'lucide-react'
-import { ChatMediaSelector } from './chat-media-selector'
 import { MediaType } from '@/pages/chat/chat-store'
+import { useMount } from 'ahooks'
+import { Send } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ChatMediaSelector } from './chat-media-selector'
 
+/**
+ * 聊天输入框组件
+ */
 export const ChatInput = (props: ChatInputProps) => {
 	const { 
 		onSendMessage, 
@@ -13,12 +17,22 @@ export const ChatInput = (props: ChatInputProps) => {
 		isLoading 
 	} = props
 	const [inputValue, setInputValue] = useState('')
-	
+	const inputRef = useRef<HTMLInputElement>(null)
+	const autoFocus = false
+
+	useMount(() => {
+		if (autoFocus) {
+			inputRef.current?.focus()
+		}
+	})
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 		if (inputValue.trim() && !isLoading) {
 			onSendMessage(inputValue.trim(), currentMediaType)
 			setInputValue('')
+			// 发送后失焦
+			inputRef.current?.blur()
 		}
 	}
 	
@@ -40,6 +54,7 @@ export const ChatInput = (props: ChatInputProps) => {
 			/>
 			<div className="flex-1">
 				<Input
+					ref={inputRef}
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
 					placeholder={getPlaceholder()}

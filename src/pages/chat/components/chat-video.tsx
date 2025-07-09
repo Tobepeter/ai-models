@@ -1,9 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Play, Download, Film } from 'lucide-react'
+import { MediaData } from '@/pages/chat/chat-store'
 
+/**
+ * 聊天视频组件
+ */
 export const ChatVideo = (props: ChatVideoProps) => {
-	const { mediaData } = props
+	const { filename, size, duration } = props
 	
 	return (
 		<Card className="mt-2 max-w-sm">
@@ -25,12 +29,12 @@ export const ChatVideo = (props: ChatVideoProps) => {
 							</div>
 						</div>
 						<span className="text-xs text-gray-700 bg-white/80 px-2 py-1 rounded">
-							{mediaData.duration}
+							{duration}
 						</span>
 					</div>
 				</div>
 				<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-					<span>{mediaData.filename} • {mediaData.size}</span>
+					<span>{filename} • {size}</span>
 					<Button variant="ghost" size="sm">
 						<Download className="h-3 w-3" />
 					</Button>
@@ -40,10 +44,4 @@ export const ChatVideo = (props: ChatVideoProps) => {
 	)
 }
 
-export type ChatVideoProps = {
-	mediaData: {
-		filename?: string
-		size?: string
-		duration?: string
-	}
-} 
+export type ChatVideoProps = MediaData 

@@ -29,3 +29,7 @@ page component，store都放到对应的page下
 一般不要放到src/components（这是放通用的组件的位置）
 
 组件命名，page 如果是chat，对应抽取的组件input，可以用 chat-input.tsx 作为前缀
+
+# jsdoc
+
+每个组件上方增加一个jsdoc，就一个中文描述就行了

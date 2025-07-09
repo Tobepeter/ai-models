@@ -9,10 +9,10 @@ import {
 import { ChevronDown, MessageCircle, Image, Volume2, Film } from 'lucide-react'
 
 const mediaTypeConfig = {
-	text: { icon: MessageCircle, label: '文本', emoji: '📝' },
-	image: { icon: Image, label: '图片', emoji: '🖼️' },
-	audio: { icon: Volume2, label: '音频', emoji: '🎵' },
-	video: { icon: Film, label: '视频', emoji: '🎬' },
+	text: { icon: MessageCircle, label: '文本' },
+	image: { icon: Image, label: '图片' },
+	audio: { icon: Volume2, label: '音频' },
+	video: { icon: Film, label: '视频' },
 }
 
 export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
@@ -24,7 +24,7 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="default" size="sm" className="gap-2">
-					<span>{currentConfig.emoji}</span>
+					<CurrentIcon className="h-4 w-4" />
 					<span>{currentConfig.label}</span>
 					<ChevronDown className="h-4 w-4" />
 				</Button>
@@ -38,7 +38,7 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 							onClick={() => onChange(type as MediaType)}
 							className="gap-2"
 						>
-							<span>{config.emoji}</span>
+							<Icon className="h-4 w-4" />
 							<span>{config.label}</span>
 						</DropdownMenuItem>
 					)

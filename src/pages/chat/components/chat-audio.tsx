@@ -1,9 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Play, Download, Volume2 } from 'lucide-react'
+import { MediaData } from '@/pages/chat/chat-store'
 
+/**
+ * 聊天音频组件
+ */
 export const ChatAudio = (props: ChatAudioProps) => {
-	const { mediaData } = props
+	const { filename, size, duration } = props
 	
 	return (
 		<Card className="mt-2 max-w-sm">
@@ -20,7 +24,7 @@ export const ChatAudio = (props: ChatAudioProps) => {
 								<Play className="h-4 w-4" />
 							</Button>
 							<span className="text-xs text-muted-foreground">
-								{mediaData.duration}
+								{duration}
 							</span>
 						</div>
 						<div className="w-full bg-gray-200 rounded-full h-1 mt-2">
@@ -29,7 +33,7 @@ export const ChatAudio = (props: ChatAudioProps) => {
 					</div>
 				</div>
 				<div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-					<span>{mediaData.filename} • {mediaData.size}</span>
+					<span>{filename} • {size}</span>
 					<Button variant="ghost" size="sm">
 						<Download className="h-3 w-3" />
 					</Button>
@@ -39,10 +43,4 @@ export const ChatAudio = (props: ChatAudioProps) => {
 	)
 }
 
-export type ChatAudioProps = {
-	mediaData: {
-		filename?: string
-		size?: string
-		duration?: string
-	}
-} 
+export type ChatAudioProps = MediaData 

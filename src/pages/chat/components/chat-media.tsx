@@ -3,18 +3,22 @@ import { ChatAudio } from './chat-audio'
 import { ChatVideo } from './chat-video'
 import { Message } from '@/pages/chat/chat-store'
 
+/**
+ * 聊天媒体组件
+ */
 export const ChatMedia = (props: ChatMediaProps) => {
 	const { message } = props
+	const { mediaData } = message
 	
-	if (!message.mediaData) return null
+	if (!mediaData) return null
 	
 	switch (message.mediaType) {
 		case 'image':
-			return <ChatImage mediaData={message.mediaData} />
+			return <ChatImage {...mediaData} />
 		case 'audio':
-			return <ChatAudio mediaData={message.mediaData} />
+			return <ChatAudio {...mediaData} />
 		case 'video':
-			return <ChatVideo mediaData={message.mediaData} />
+			return <ChatVideo {...mediaData} />
 		default:
 			return null
 	}
