@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Send } from 'lucide-react'
-import { ChatMediaTypeSelector } from './chat-media-type-selector'
+import { ChatMediaSelector } from './chat-media-selector'
 import { MediaType } from '@/pages/chat/chat-store'
 
 export const ChatInput = (props: ChatInputProps) => {
@@ -34,7 +34,7 @@ export const ChatInput = (props: ChatInputProps) => {
 	
 	return (
 		<form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t bg-background">
-			<ChatMediaTypeSelector 
+			<ChatMediaSelector 
 				value={currentMediaType} 
 				onChange={onMediaTypeChange}
 			/>

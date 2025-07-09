@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react'
 import { useChatStore, simulateAIResponse, MediaType } from './chat-store'
-import { ChatMessageItem } from './components/chat-message-item'
+import { ChatMsg } from './components/chat-msg'
 import { ChatInput } from './components/chat-input'
-import { ChatLoadingMessage } from './components/chat-loading-message'
+import { ChatLoadingMsg } from './components/chat-loading-msg'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 export const Chat = () => {
@@ -75,10 +75,10 @@ export const Chat = () => {
 						)}
 						
 						{messages.map((message) => (
-							<ChatMessageItem key={message.id} message={message} />
+							<ChatMsg key={message.id} message={message} />
 						))}
 						
-						{isLoading && <ChatLoadingMessage />}
+						{isLoading && <ChatLoadingMsg />}
 					</div>
 				</ScrollArea>
 			</div>

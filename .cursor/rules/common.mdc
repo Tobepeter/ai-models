@@ -11,3 +11,11 @@ tailwind shadcn ts react vite
 # ai工作
 
 如果我没要求，不用主动执行dev，一般项目我已经启动了
+
+# 风格
+
+## 简洁
+
+追求简洁，很多时候命名没必要太长，只要不影响理解的情况下
+
+如 chat-message-item -> chat-msg

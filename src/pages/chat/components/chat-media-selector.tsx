@@ -15,7 +15,7 @@ const mediaTypeConfig = {
 	video: { icon: Film, label: '视频', emoji: '🎬' },
 }
 
-export const ChatMediaTypeSelector = (props: ChatMediaTypeSelectorProps) => {
+export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 	const { value, onChange } = props
 	const currentConfig = mediaTypeConfig[value]
 	const CurrentIcon = currentConfig.icon
