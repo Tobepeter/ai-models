@@ -5,7 +5,7 @@ function App() {
 	const navigate = useNavigate()
 
 	useMount(() => {
-		navigate('/test')
+		navigate('/chat')
 	})
 
 	return (

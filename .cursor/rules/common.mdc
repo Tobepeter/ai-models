@@ -7,3 +7,7 @@ alwaysApply: false
 # 技术框架
 
 tailwind shadcn ts react vite
+
+# ai工作
+
+如果我没要求，不用主动执行dev，一般项目我已经启动了

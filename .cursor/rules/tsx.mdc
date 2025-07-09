@@ -8,6 +8,24 @@ alwaysApply: false
 
 尽量使用具名，而不是通用的 index.tsx
 
+文件名小写，kebab-case
+
 # 导出规范
 
 我喜欢使用 export const MyComponent = () => 这种形式
+
+# props
+
+props 我喜欢用 type，而且放到底部的部分，而且也要export
+
+同时尽量不要在组件直接解构，而是定义一个props，函数第一行解构
+
+# 逻辑聚合存放
+
+一个page逻辑可能比较复杂，可以抽取一些 Component
+
+page component，store都放到对应的page下
+
+一般不要放到src/components（这是放通用的组件的位置）
+
+组件命名，page 如果是chat，对应抽取的组件input，可以用 chat-input.tsx 作为前缀

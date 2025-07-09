@@ -152,26 +152,3 @@ VITE_API_URL=http://localhost:3000/api
 2. 使用 shadcn/ui 的样式约定
 3. 导出组件供其他文件使用
 
-## 📚 相关文档
-
-- [Vite 文档](https://vitejs.dev/)
-- [React 文档](https://react.dev/)
-- [TypeScript 文档](https://www.typescriptlang.org/)
-- [Tailwind CSS 文档](https://tailwindcss.com/)
-- [shadcn/ui 文档](https://ui.shadcn.com/)
-- [ahooks 文档](https://ahooks.js.org/)
-- [TanStack Query 文档](https://tanstack.com/query/)
-- [Zustand 文档](https://github.com/pmndrs/zustand)
-- [React Router 文档](https://reactrouter.com/)
-
-## 📄 许可证
-
-此项目采用 MIT 许可证。
-
-## 🤝 贡献
-
-欢迎提交 issues 和 pull requests！
-
----
-
-由 AI 助手创建 🤖

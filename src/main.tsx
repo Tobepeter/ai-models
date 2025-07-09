@@ -8,9 +8,13 @@ import { queryClient } from './lib/react-query'
 import { router } from './router/router'
 import { isDev } from './utils/env'
 
+// NOTE: 不是很喜欢这个功能
+const enableStrict = false
+
+// NOTE: 位置有遮挡，需要时候再开启
+const enableReactQueryDevtools = false
+
 const StrictWrapper = (props: PropsWithChildren) => {
-	// NOTE: 不是很喜欢这个功能
-	const enableStrict = false
 	return enableStrict ? <StrictMode>{props.children}</StrictMode> : props.children
 }
 
@@ -18,7 +22,7 @@ createRoot(document.getElementById('root')).render(
 	<StrictWrapper>
 		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
-			{isDev && <ReactQueryDevtools initialIsOpen={false} />}
+			{isDev && enableReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
 		</QueryClientProvider>
 	</StrictWrapper>
 )
