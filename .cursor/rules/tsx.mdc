@@ -1,0 +1,13 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+
+# 文件命名规范
+
+尽量使用具名，而不是通用的 index.tsx
+
+# 导出规范
+
+我喜欢使用 export const MyComponent = () => 这种形式
