@@ -37,3 +37,9 @@ page component，store都放到对应的page下
 # shdcn的代码
 
 shdcn的代码不要改动，如 src/components/ui
+
+# classnames
+
+有现成的，shadcn工具函数 src/lib/utils.ts 有一个 cn 函数
+
+不要自己拼接，不然会出现 undefined 的类型

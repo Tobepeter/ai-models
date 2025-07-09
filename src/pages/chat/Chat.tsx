@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useMemoizedFn, useUnmount } from 'ahooks'
 import { useTimer } from '@/hooks/use-timer'
 import { eventBus, EventType } from '@/utils/event-bus'
+import { ImagePreview } from '@/components/common/image-preview'
 
 /**
  * 聊天页面主组件
@@ -105,6 +106,9 @@ export const Chat = () => {
 
 						{isLoading && <ChatLoadingMsg />}
 					</div>
+
+					{/* TEST */}
+					<ImagePreview url="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop" />
 				</ScrollArea>
 			</div>
 

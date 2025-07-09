@@ -19,3 +19,7 @@ tailwind shadcn ts react vite
 追求简洁，很多时候命名没必要太长，只要不影响理解的情况下
 
 如 chat-message-item -> chat-msg
+
+## 注释
+
+如果注释比较简单，不用独立一行，放到内容尾部
