@@ -8,7 +8,7 @@ import { MediaData } from '@/pages/chat/chat-store'
  */
 export const ChatVideo = (props: ChatVideoProps) => {
 	const { filename, size, duration } = props
-	
+
 	return (
 		<Card className="mt-2 max-w-sm">
 			<CardContent className="p-4">
@@ -28,13 +28,13 @@ export const ChatVideo = (props: ChatVideoProps) => {
 								<div className="bg-blue-600 h-1 rounded-full" style={{ width: '25%' }}></div>
 							</div>
 						</div>
-						<span className="text-xs text-gray-700 bg-white/80 px-2 py-1 rounded">
-							{duration}
-						</span>
+						<span className="text-xs text-gray-700 bg-white/80 px-2 py-1 rounded">{duration}</span>
 					</div>
 				</div>
 				<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-					<span>{filename} • {size}</span>
+					<span>
+						{filename} • {size}
+					</span>
 					<Button variant="ghost" size="sm">
 						<Download className="h-3 w-3" />
 					</Button>
@@ -44,4 +44,4 @@ export const ChatVideo = (props: ChatVideoProps) => {
 	)
 }
 
-export type ChatVideoProps = MediaData 
+export type ChatVideoProps = MediaData

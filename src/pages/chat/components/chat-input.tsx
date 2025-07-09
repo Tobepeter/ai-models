@@ -2,40 +2,58 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MediaType } from '@/pages/chat/chat-store'
 import { useMount } from 'ahooks'
-import { Send } from 'lucide-react'
+import { Send, Square } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { ChatMediaSelector } from './chat-media-selector'
+import { useEvent, EventType } from '@/utils/event-bus'
 
 /**
  * 聊天输入框组件
  */
 export const ChatInput = (props: ChatInputProps) => {
-	const { 
-		onSendMessage, 
-		currentMediaType, 
-		onMediaTypeChange,
-		isLoading 
-	} = props
-	const [inputValue, setInputValue] = useState('')
+	const { onSend, currentMediaType, onMediaTypeChange, isLoading, onStop } = props
+	const [inputVal, setInputVal] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
 	const autoFocus = false
 
+	// 自动聚焦
 	useMount(() => {
 		if (autoFocus) {
 			inputRef.current?.focus()
 		}
 	})
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (inputValue.trim() && !isLoading) {
-			onSendMessage(inputValue.trim(), currentMediaType)
-			setInputValue('')
-			// 发送后失焦
-			inputRef.current?.blur()
+	// 监听 ChatStop 事件，设置输入框值
+	useEvent(EventType.ChatStop, (lastMessage) => {
+		if (lastMessage) {
+			setInputVal(lastMessage)
+			inputRef.current?.focus()
+		}
+	})
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault()
+			handleClick()
+		} else if (e.key === 'Escape') {
+			if (isLoading) {
+				onStop()
+			} else {
+				inputRef.current?.blur()
+			}
 		}
 	}
-	
+
+	const handleClick = () => {
+		if (isLoading) {
+			onStop()
+		} else if (inputVal.trim()) {
+			onSend(inputVal.trim(), currentMediaType)
+			setInputVal('')
+			inputRef.current?.blur() // 发送后失焦
+		}
+	}
+
 	const getPlaceholder = () => {
 		const placeholders = {
 			text: '输入您的问题...',
@@ -45,38 +63,26 @@ export const ChatInput = (props: ChatInputProps) => {
 		}
 		return placeholders[currentMediaType]
 	}
-	
+
+	const buttonDisabled = !isLoading && !inputVal.trim()
+
 	return (
-		<form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t bg-background">
-			<ChatMediaSelector 
-				value={currentMediaType} 
-				onChange={onMediaTypeChange}
-			/>
+		<div className="flex gap-2 p-4 border-t bg-background">
+			<ChatMediaSelector value={currentMediaType} onChange={onMediaTypeChange} />
 			<div className="flex-1">
-				<Input
-					ref={inputRef}
-					value={inputValue}
-					onChange={(e) => setInputValue(e.target.value)}
-					placeholder={getPlaceholder()}
-					disabled={isLoading}
-					className="w-full"
-				/>
+				<Input ref={inputRef} value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} disabled={isLoading} className="w-full" />
 			</div>
-			<Button 
-				type="submit" 
-				size="sm" 
-				disabled={!inputValue.trim() || isLoading}
-				className="px-3"
-			>
-				<Send className="h-4 w-4" />
+			<Button type="button" size="sm" variant={isLoading ? 'outline' : 'default'} onClick={handleClick} disabled={buttonDisabled} className="px-3">
+				{isLoading ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
 			</Button>
-		</form>
+		</div>
 	)
 }
 
 export type ChatInputProps = {
-	onSendMessage: (message: string, mediaType: MediaType) => void
+	onSend: (message: string, mediaType: MediaType) => void
 	currentMediaType: MediaType
 	onMediaTypeChange: (type: MediaType) => void
 	isLoading: boolean
-} 
+	onStop: () => void
+}

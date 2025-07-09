@@ -20,4 +20,4 @@ export const ChatLoadingMsg = () => {
 			</div>
 		</div>
 	)
-} 
+}

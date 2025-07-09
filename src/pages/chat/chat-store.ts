@@ -20,41 +20,58 @@ export type MediaData = {
 }
 
 interface ChatStore {
-	messages: Message[]
+	msgList: Message[]
 	currentMediaType: MediaType
 	isLoading: boolean
-	setCurrentMediaType: (type: MediaType) => void
+	setCurMedia: (type: MediaType) => void
 	addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void
 	setLoading: (loading: boolean) => void
-	clearMessages: () => void
+	clearMsg: () => void
 	reset: () => void
+	stopGen: () => void
+	removeLastMsg: () => Message | null // 返回被移除的消息
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
-	messages: [],
+	msgList: [],
 	currentMediaType: 'text',
 	isLoading: false,
-	
-	setCurrentMediaType: (type) => set({ currentMediaType: type }),
-	
+
+	setCurMedia: (type) => set({ currentMediaType: type }),
+
 	addMessage: (message) => {
 		const newMessage: Message = {
 			...message,
 			id: Date.now().toString(),
 			timestamp: Date.now(),
 		}
-		set({ messages: [...get().messages, newMessage] })
+		set({ msgList: [...get().msgList, newMessage] })
 	},
-	
+
 	setLoading: (loading) => set({ isLoading: loading }),
 
-	clearMessages: () => set({ messages: [] }),
+	clearMsg: () => set({ msgList: [] }),
 
-	reset: () => set({
-		messages: [],
-		currentMediaType: 'text',
-		isLoading: false
-	}),
+	reset: () =>
+		set({
+			msgList: [],
+			currentMediaType: 'text',
+			isLoading: false,
+		}),
+
+	stopGen: () => {
+		set({ isLoading: false })
+	},
+
+	removeLastMsg: () => {
+		const msgList = get().msgList
+		if (msgList.length > 0) {
+			const lastMessage = msgList[msgList.length - 1]
+			set({ msgList: msgList.slice(0, -1) })
+			return lastMessage
+		}
+		return null
+	},
 }))
 
 // 模拟AI响应的函数

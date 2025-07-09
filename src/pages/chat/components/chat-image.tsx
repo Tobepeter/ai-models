@@ -7,16 +7,14 @@ import { MediaData } from '@/pages/chat/chat-store'
  */
 export const ChatImage = (props: ChatImageProps) => {
 	const { url, filename, size } = props
-	
+
 	return (
 		<div className="mt-2">
-			<img 
-				src={url} 
-				alt="Generated image"
-				className="max-w-sm rounded-lg shadow-md"
-			/>
+			<img src={url} alt="Generated image" className="max-w-sm rounded-lg shadow-md" />
 			<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-				<span>{filename} • {size}</span>
+				<span>
+					{filename} • {size}
+				</span>
 				<Button variant="ghost" size="sm">
 					<Download className="h-3 w-3" />
 				</Button>
@@ -25,4 +23,4 @@ export const ChatImage = (props: ChatImageProps) => {
 	)
 }
 
-export type ChatImageProps = MediaData 
+export type ChatImageProps = MediaData

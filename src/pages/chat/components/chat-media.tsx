@@ -9,9 +9,9 @@ import { Message } from '@/pages/chat/chat-store'
 export const ChatMedia = (props: ChatMediaProps) => {
 	const { message } = props
 	const { mediaData } = message
-	
+
 	if (!mediaData) return null
-	
+
 	switch (message.mediaType) {
 		case 'image':
 			return <ChatImage {...mediaData} />
@@ -26,4 +26,4 @@ export const ChatMedia = (props: ChatMediaProps) => {
 
 export type ChatMediaProps = {
 	message: Message
-} 
+}

@@ -151,4 +151,3 @@ VITE_API_URL=http://localhost:3000/api
 1. 在 \`src/components/ui/\` 目录下创建新组件
 2. 使用 shadcn/ui 的样式约定
 3. 导出组件供其他文件使用
-

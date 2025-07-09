@@ -1,11 +1,6 @@
 import { MediaType } from '@/pages/chat/chat-store'
 import { Button } from '@/components/ui/button'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDown, MessageCircle, Image, Volume2, Film } from 'lucide-react'
 
 const mediaTypeConfig = {
@@ -22,7 +17,7 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 	const { value, onChange } = props
 	const currentConfig = mediaTypeConfig[value]
 	const CurrentIcon = currentConfig.icon
-	
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -36,11 +31,7 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 				{Object.entries(mediaTypeConfig).map(([type, config]) => {
 					const Icon = config.icon
 					return (
-						<DropdownMenuItem
-							key={type}
-							onClick={() => onChange(type as MediaType)}
-							className="gap-2"
-						>
+						<DropdownMenuItem key={type} onClick={() => onChange(type as MediaType)} className="gap-2">
 							<Icon className="h-4 w-4" />
 							<span>{config.label}</span>
 						</DropdownMenuItem>
@@ -54,4 +45,4 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 export type ChatMediaTypeSelectorProps = {
 	value: MediaType
 	onChange: (type: MediaType) => void
-} 
+}

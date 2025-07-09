@@ -18,6 +18,7 @@ export default tseslint.config([
 			'@typescript-eslint/no-unused-vars': 'off',
 			// NOTE: shadcn button 组件会报错
 			'react-refresh/only-export-components': 'off',
+			'@typescript-eslint/no-explicit-any': 'off',
 		},
 	},
 ])

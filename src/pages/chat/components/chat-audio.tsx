@@ -8,7 +8,7 @@ import { MediaData } from '@/pages/chat/chat-store'
  */
 export const ChatAudio = (props: ChatAudioProps) => {
 	const { filename, size, duration } = props
-	
+
 	return (
 		<Card className="mt-2 max-w-sm">
 			<CardContent className="p-4">
@@ -23,9 +23,7 @@ export const ChatAudio = (props: ChatAudioProps) => {
 							<Button variant="ghost" size="sm">
 								<Play className="h-4 w-4" />
 							</Button>
-							<span className="text-xs text-muted-foreground">
-								{duration}
-							</span>
+							<span className="text-xs text-muted-foreground">{duration}</span>
 						</div>
 						<div className="w-full bg-gray-200 rounded-full h-1 mt-2">
 							<div className="bg-green-600 h-1 rounded-full" style={{ width: '30%' }}></div>
@@ -33,7 +31,9 @@ export const ChatAudio = (props: ChatAudioProps) => {
 					</div>
 				</div>
 				<div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-					<span>{filename} • {size}</span>
+					<span>
+						{filename} • {size}
+					</span>
 					<Button variant="ghost" size="sm">
 						<Download className="h-3 w-3" />
 					</Button>
@@ -43,4 +43,4 @@ export const ChatAudio = (props: ChatAudioProps) => {
 	)
 }
 
-export type ChatAudioProps = MediaData 
+export type ChatAudioProps = MediaData
