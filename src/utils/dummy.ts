@@ -25,10 +25,13 @@ class Dummy {
 		avatarFemale: 'https://randomuser.me/api/portraits/women/44.jpg',
 		avatarMale: 'https://randomuser.me/api/portraits/men/32.jpg',
 
-		// == picsum ==
+		// == picsum（这个会重定向） ==
 		landscape: 'https://picsum.photos/800/600',
 		portrait: 'https://picsum.photos/600/800',
 		square: 'https://picsum.photos/400/400',
+
+		shdcn: 'https://avatars.githubusercontent.com/u/124599?v=4',
+		ali: 'https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png',
 
 		// == dummy image ==
 		dummyBlack: 'https://dummyimage.com/600x400/000/fff',
@@ -43,7 +46,7 @@ class Dummy {
 	}
 
 	avatar = this.images.avatar
-	image = this.images.landscape
+	image = this.images.shdcn
 	dummyImg = this.images.dummyBlack
 
 	getImage(type: 'landscape' | 'portrait' | 'square' = 'landscape') {
@@ -53,11 +56,12 @@ class Dummy {
 		return `https://picsum.photos/${size}`
 	}
 
-	sounds = {
+	audios = {
 		wav: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-		mp3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-		ogg: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg',
+		ogg: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
 	}
+
+	audio = this.audios.ogg
 }
 
 export const dummy = new Dummy()

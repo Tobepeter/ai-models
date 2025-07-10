@@ -93,7 +93,7 @@ export const simulateAIResponse = (userInput: string, mediaType: MediaType): Mes
 		audio: {
 			content: `已为您生成音频：${userInput}`,
 			mediaData: {
-				url: dummy.sounds.mp3,
+				url: dummy.audio,
 				filename: 'generated-audio.mp3',
 				size: '3.2MB',
 				duration: '0:45',

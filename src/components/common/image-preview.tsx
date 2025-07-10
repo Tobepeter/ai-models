@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react'
 import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 /**
  * 图片预览组件
@@ -93,6 +94,10 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 				</DialogTrigger>
 
 				<DialogContent showCloseButton={false} className="p-0 border-none aspect-square" style={{ maxWidth: '1000px', width: '80vw' }}>
+					{/* radix 对话框要求无障碍 */}
+					<VisuallyHidden>
+						<DialogTitle>预览图片</DialogTitle>
+					</VisuallyHidden>
 					<img src={curUrl} alt="预览图片" className="w-full h-full object-contain" />
 				</DialogContent>
 			</Dialog>

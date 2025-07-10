@@ -28,7 +28,7 @@ export const TestDummy = () => {
 				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="images">图片</TabsTrigger>
 					<TabsTrigger value="videos">视频</TabsTrigger>
-					<TabsTrigger value="sounds">音频</TabsTrigger>
+					<TabsTrigger value="audios">音频</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="images" className="space-y-4">
@@ -146,7 +146,7 @@ export const TestDummy = () => {
 					</Card>
 				</TabsContent>
 
-				<TabsContent value="sounds" className="space-y-4">
+				<TabsContent value="audios" className="space-y-4">
 					<Card>
 						<CardHeader>
 							<CardTitle>测试音频</CardTitle>
@@ -154,7 +154,7 @@ export const TestDummy = () => {
 						</CardHeader>
 						<CardContent>
 							<div className="space-y-4">
-								{Object.entries(dummy.sounds).map(([name, url]) => (
+								{Object.entries(dummy.audios).map(([name, url]) => (
 									<div key={name} className="flex items-center justify-between p-4 border rounded-lg">
 										<div className="flex items-center space-x-3">
 											<Badge variant="outline">{name.toUpperCase()}</Badge>

@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react'
 import { Play, Plus, Trash2, Video as VideoIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 /**
  * 视频预览组件
@@ -96,6 +97,10 @@ export const VideoPreview = (props: VideoPreviewProps) => {
 				</DialogTrigger>
 
 				<DialogContent showCloseButton={false} className="p-0 border-none bg-transparent" style={{ maxWidth: '1200px', width: '90vw' }}>
+					{/* radix 对话框要求无障碍 */}
+					<VisuallyHidden>
+						<DialogTitle>预览视频</DialogTitle>
+					</VisuallyHidden>
 					<video src={curUrl} className="w-full h-full object-contain rounded-lg" controls autoPlay playsInline style={{ maxHeight: '80vh' }} />
 				</DialogContent>
 			</Dialog>
