@@ -1,26 +1,29 @@
 import { IAiAgent } from './IAiAgent'
 import { SiliconFlowAgent } from './siliconflow-agent'
-import { AIAgentConfig, AIPlatform, StreamCallback } from './types'
+import { AIAgentConfig, AIPlatform, StreamCallback, VideoStatusResponse } from './types'
 
 /**
  * AI Agent 单例管理器
  */
 export class AIAgentManager {
 	agent: IAiAgent
+	agentMap: Record<AIPlatform, new (agent: AIAgentManager) => IAiAgent> = {
+		[AIPlatform.Silicon]: SiliconFlowAgent,
+	}
+	agentCache = {} as Record<AIPlatform, IAiAgent>
 	isRunning = false
 
 	switchPlatform(platform: AIPlatform) {
-		switch (platform) {
-			case AIPlatform.Silicon:
-				this.agent = new SiliconFlowAgent(this)
-				break
-			default:
-				throw new Error(`Unsupported platform: ${platform}`)
+		if (this.agentCache[platform]) {
+			this.agent = this.agentCache[platform]
+		} else {
+			this.agent = new this.agentMap[platform](this)
+			this.agentCache[platform] = this.agent
 		}
 	}
 
 	setConfig(config: AIAgentConfig) {
-		this.agent.config = config
+		this.agent.config = { ...this.agent.config, ...config }
 	}
 
 	setRunning(isRunning: boolean) {
@@ -40,6 +43,21 @@ export class AIAgentManager {
 	async generateImage(prompt: string) {
 		if (!this.checkValid()) return ''
 		return this.agent.generateImage(prompt)
+	}
+
+	async generateVideo(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		if (!this.checkValid()) return ''
+		return this.agent.generateVideo(prompt, options)
+	}
+
+	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		if (!this.checkValid()) return ''
+		return this.agent.createVideoTask(prompt, options)
+	}
+
+	async getVideoTaskStatus(requestId: string): Promise<VideoStatusResponse | null> {
+		if (!this.checkValid()) return null
+		return this.agent.getVideoTaskStatus(requestId)
 	}
 
 	checkValid() {
@@ -66,6 +84,11 @@ export class AIAgentManager {
 		}
 
 		return true
+	}
+
+	stop() {
+		// NOTE: 旧的promise依然运行，逻辑层自行丢弃
+		this.setRunning(false)
 	}
 }
 

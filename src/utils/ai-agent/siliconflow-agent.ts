@@ -1,14 +1,16 @@
 import axios from 'axios'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
-import { AIAgentConfig, AIModelConfig, StreamCallback } from './types'
+import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } from './types'
 
 /**
  * SiliconFlow
  */
 export class SiliconFlowAgent implements IAiAgent {
 	agent: AIAgentManager
-	config: AIAgentConfig
+	config: AIAgentConfig = {
+		baseUrl: 'https://api.siliconflow.cn/v1',
+	}
 	modelConfig: AIModelConfig = siliconflowModelConfig
 
 	constructor(agent: AIAgentManager) {
@@ -28,7 +30,7 @@ export class SiliconFlowAgent implements IAiAgent {
 		try {
 			const { baseUrl } = this.config
 			const response = await axios.post(
-				`${baseUrl}/v1/chat/completions`,
+				`${baseUrl}/chat/completions`,
 				{
 					model: this.config.model,
 					stream: false,
@@ -51,7 +53,7 @@ export class SiliconFlowAgent implements IAiAgent {
 		const { baseUrl } = this.config
 
 		try {
-			const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+			const response = await fetch(`${baseUrl}/chat/completions`, {
 				method: 'POST',
 				headers: this.getHeaders(),
 				body: JSON.stringify({
@@ -112,7 +114,7 @@ export class SiliconFlowAgent implements IAiAgent {
 
 		try {
 			const response = await axios.post(
-				`${baseUrl}/v1/images/generations`,
+				`${baseUrl}/images/generations`,
 				{
 					model: this.config.model,
 					prompt: prompt,
@@ -131,6 +133,84 @@ export class SiliconFlowAgent implements IAiAgent {
 			throw error
 		}
 	}
+
+	async generateVideo(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		this.agent.setRunning(true)
+
+		try {
+			// 创建视频任务
+			const requestId = await this.createVideoTask(prompt, options)
+
+			// 轮询状态，最多15分钟（900秒），每10秒查询一次
+			const maxPollingTime = 15 * 60 * 1000 // 15分钟
+			const pollingInterval = 10 * 1000 // 10秒
+			const startTime = Date.now()
+
+			while (Date.now() - startTime < maxPollingTime) {
+				// 检查是否已停止
+				if (!this.agent.isRunning) {
+					throw new Error('视频生成已取消')
+				}
+
+				// 查询状态
+				const status = await this.getVideoTaskStatus(requestId)
+
+				if (status.status === 'Succeed' && status.results?.videos?.[0]?.url) {
+					this.agent.setRunning(false)
+					return status.results.videos[0].url
+				}
+
+				if (status.status === 'Failed') {
+					this.agent.setRunning(false)
+					throw new Error(status.reason || '视频生成失败')
+				}
+
+				// 等待10秒后再次查询
+				await new Promise((resolve) => setTimeout(resolve, pollingInterval))
+			}
+
+			// 超时
+			this.agent.setRunning(false)
+			throw new Error('视频生成超时（15分钟）')
+		} catch (error) {
+			this.agent.setRunning(false)
+			throw error
+		}
+	}
+
+	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		const { baseUrl } = this.config
+
+		// 设置默认值
+		const image_size = options?.image_size || '1280x720'
+		const model = 'Wan-AI/Wan2.1-T2V-14B'
+
+		// 构建请求参数
+		const requestData = {
+			model,
+			prompt,
+			image_size: image_size as '1280x720' | '720x1280' | '960x960',
+			negative_prompt: options?.negative_prompt,
+			image: options?.image,
+		}
+
+		// 提交视频生成请求
+		const submitResponse = await axios.post(`${baseUrl}/video/submit`, requestData, { headers: this.getHeaders() })
+		return submitResponse.data.requestId
+	}
+
+	async getVideoTaskStatus(requestId: string) {
+		const { baseUrl } = this.config
+
+		// 查询状态
+		const statusResponse = await axios.post<VideoStatusResponse>(
+			`${baseUrl}/video/status`,
+			{ requestId },
+			{ headers: this.getHeaders() }
+		)
+
+		return statusResponse.data
+	}
 }
 
 export const siliconflowModelConfig: AIModelConfig = {
@@ -143,4 +223,5 @@ export const siliconflowModelConfig: AIModelConfig = {
 		'Qwen/Qwen3-32B',
 	],
 	image: ['Kwai-Kolors/Kolors'],
+	video: ['Wan-AI/Wan2.1-T2V-14B'],
 }

@@ -5,6 +5,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { ImagePreview } from '@/components/common/image-preview'
 import { AIPlatform, ImageResponse } from '@/utils/ai-agent/types'
 import { useMutation } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
@@ -21,8 +22,10 @@ export const TestAIAgent = () => {
 	const [model, setModel] = useState('Pro/deepseek-ai/DeepSeek-R1')
 	const [textResponse, setTextResponse] = useState<string>('')
 	const [imageResponse, setImageResponse] = useState<ImageResponse | null>(null)
+	const [videoResponse, setVideoResponse] = useState<string>('')
+	const [negativePrompt, setNegativePrompt] = useState('')
+	const [imageUrl, setImageUrl] = useState<string>('')
 	const [streaming, setStreaming] = useState(true)
-	const [isRunning, setIsRunning] = useState<boolean>(false)
 	const [platform, setPlatform] = useState<AIPlatform>(AIPlatform.Silicon)
 
 	// 平台选项
@@ -34,34 +37,37 @@ export const TestAIAgent = () => {
 	const modelConfig = aiAgentMgr.agent?.modelConfig || {
 		text: [],
 		image: [],
+		video: [],
 	}
-
-	const allModels = [...modelConfig.text, ...modelConfig.image]
-	const modelOptions = allModels.map((model) => ({
-		value: model,
-		label: model,
-	}))
-
-	// 检查是否为图片模型 - 从 agent 配置中读取
-	const isImageModel = (model: string): boolean => {
-		return modelConfig.image.includes(model)
-	}
+	const isImageModel = (model: string) => modelConfig.image.includes(model)
+	const isVideoModel = (model: string) => modelConfig.video?.includes(model) || false
+	const allModels = [...modelConfig.text, ...modelConfig.image, ...(modelConfig.video || [])]
+	const modelOptions = allModels.map((model) => {
+		let suffix = '💬 '
+		if (isImageModel(model)) {
+			suffix = '🖼️ '
+		} else if (isVideoModel(model)) {
+			suffix = '🎥 '
+		}
+		return {
+			value: model,
+			label: `${model} ${suffix}`,
+		}
+	})
 
 	// 根据模型判断是否为图片模式
 	const isImageMode = isImageModel(model)
+	const isVideoMode = isVideoModel(model)
 
-	// 重置响应状态
-	const resetResponses = () => {
+	const reset = () => {
 		setTextResponse('')
 		setImageResponse(null)
+		setVideoResponse('')
 	}
 
 	// 从环境变量读取 API Key
 	useMount(() => {
-		const apiKey = import.meta.env.VITE_SILICON_API_KEY
-		if (apiKey) {
-			setToken(apiKey)
-		}
+		setToken(import.meta.env.VITE_SILICON_API_KEY)
 	})
 
 	// 监听平台变化
@@ -75,16 +81,6 @@ export const TestAIAgent = () => {
 			model: model,
 		})
 	}, [token, model])
-
-	// 监听AI Agent状态变化
-	useEffect(() => {
-		const checkState = () => {
-			setIsRunning(aiAgentMgr.isRunning)
-		}
-
-		const interval = setInterval(checkState, 100)
-		return () => clearInterval(interval)
-	}, [])
 
 	// 文本生成处理
 	const handleTextGeneration = async (streaming: boolean) => {
@@ -118,6 +114,18 @@ export const TestAIAgent = () => {
 		return result
 	}
 
+	// 视频生成处理
+	const handleVideoGeneration = async () => {
+		const options = {
+			image_size: '1280x720',
+			negative_prompt: negativePrompt.trim() || undefined,
+			image: imageUrl.trim() || undefined,
+		}
+		const result = await aiAgentMgr.generateVideo(question, options)
+		setVideoResponse(result)
+		return result
+	}
+
 	const mutation = useMutation({
 		mutationFn: async () => {
 			if (!token.trim()) {
@@ -126,6 +134,8 @@ export const TestAIAgent = () => {
 
 			if (isImageMode) {
 				return await handleImageGeneration()
+			} else if (isVideoMode) {
+				return await handleVideoGeneration()
 			} else {
 				return await handleTextGeneration(streaming)
 			}
@@ -137,6 +147,7 @@ export const TestAIAgent = () => {
 			console.error('Generation failed:', error)
 			setTextResponse(`错误: ${error instanceof Error ? error.message : '未知错误'}`)
 			setImageResponse(null)
+			setVideoResponse('')
 		},
 	})
 
@@ -151,17 +162,44 @@ export const TestAIAgent = () => {
 			return
 		}
 
-		resetResponses()
+		reset()
 		mutation.mutate()
+	}
+
+	// 获取输入标签文字
+	const getInputLabel = () => {
+		if (isImageMode) return '图片描述'
+		if (isVideoMode) return '视频描述'
+		return '问题/描述'
+	}
+
+	// 获取输入占位符
+	const getInputPlaceholder = () => {
+		if (isImageMode) return '请描述你想要生成的图片...'
+		if (isVideoMode) return '请描述你想要生成的视频...'
+		return '请输入你的问题...'
+	}
+
+	const { isPending } = mutation
+
+	// 获取按钮文字
+	const getButtonText = () => {
+		if (isPending) {
+			if (isImageMode) return '生成图片中...'
+			if (isVideoMode) return '生成视频中...'
+			return '生成文本中...'
+		}
+		if (isImageMode) return '生成图片'
+		if (isVideoMode) return '生成视频'
+		return '生成文本'
 	}
 
 	return (
 		<div className="p-6 space-y-6">
 			<Card>
 				<CardHeader>
-					<CardTitle className="flex items-center justify-between">
+					<CardTitle className="flex items-center">
 						<span>AI Agent 测试</span>
-						<Badge className={`${isRunning ? 'bg-blue-500' : 'bg-gray-500'} text-white`}>{isRunning ? '运行中' : '空闲'}</Badge>
 					</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
@@ -188,12 +226,27 @@ export const TestAIAgent = () => {
 
 					<div>
 						<label htmlFor="question" className="block text-sm font-medium mb-2">
-							{isImageMode ? '图片描述' : '问题/描述'}
+							{getInputLabel()}
 						</label>
-						<Textarea id="question" placeholder={isImageMode ? '请描述你想要生成的图片...' : '请输入你的问题...'} value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
+						<Textarea id="question" placeholder={getInputPlaceholder()} value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
 					</div>
 
-					{!isImageMode && (
+					{isVideoMode && (
+						<>
+							<div>
+								<label htmlFor="negativePrompt" className="block text-sm font-medium mb-2">
+									反向提示词 (可选)
+								</label>
+								<Input id="negativePrompt" placeholder="输入不想要的内容，如：模糊、低质量" value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} />
+							</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">参考图片 (可选)</label>
+								<ImagePreview url={imageUrl} base64Mode onChange={setImageUrl} size={120} className="border-2 border-dashed" />
+							</div>
+						</>
+					)}
+
+					{!isImageMode && !isVideoMode && (
 						<div className="flex items-center space-x-2">
 							<Switch id="streaming" checked={streaming} onCheckedChange={setStreaming} />
 							<label htmlFor="streaming" className="text-sm font-medium">
@@ -203,23 +256,21 @@ export const TestAIAgent = () => {
 					)}
 
 					<div className="flex space-x-2">
-						<Button onClick={handleSubmit} disabled={mutation.isPending || isRunning} className="flex-1">
-							{mutation.isPending || isRunning ? (
+						<Button onClick={handleSubmit} disabled={mutation.isPending} className="flex-1">
+							{isPending ? (
 								<>
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									{isImageMode ? '生成图片中...' : '生成文本中...'}
+									{getButtonText()}
 								</>
-							) : isImageMode ? (
-								'生成图片'
 							) : (
-								'生成文本'
+								getButtonText()
 							)}
 						</Button>
 					</div>
 				</CardContent>
 			</Card>
 
-			{(textResponse || imageResponse) && (
+			{(textResponse || imageResponse || videoResponse) && (
 				<Card>
 					<CardHeader>
 						<CardTitle>响应结果</CardTitle>
@@ -238,6 +289,14 @@ export const TestAIAgent = () => {
 										<div className="text-sm text-muted-foreground">图片生成完成</div>
 									</div>
 								))}
+							</div>
+						)}
+						{videoResponse && (
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<video src={videoResponse} controls className="w-full h-auto rounded-md border" />
+									<div className="text-sm text-muted-foreground">视频生成完成</div>
+								</div>
 							</div>
 						)}
 					</CardContent>

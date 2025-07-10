@@ -3,16 +3,17 @@ import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { useMemoizedFn } from 'ahooks'
+import { useMemoizedFn, useUnmount } from 'ahooks'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 /**
  * 图片预览组件
  */
 export const ImagePreview = (props: ImagePreviewProps) => {
-	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size } = props
+	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size, base64Mode = false } = props
 	const editable = !notEditable
 	const [internalUrl, setInternalUrl] = useState(defaultUrl || '')
+	const objectUrlRef = useRef('') // 用ref跟踪object url
 	const curUrl = url ?? internalUrl // 如果外部没有传入url，则使用内部url
 
 	// 计算实际的宽高
@@ -22,19 +23,36 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 	const [isHovering, setIsHovering] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
+	// 清理 object url
+	const revokeObjectUrl = () => {
+		if (objectUrlRef.current) {
+			URL.revokeObjectURL(objectUrlRef.current)
+			objectUrlRef.current = ''
+		}
+	}
+
 	const handleFileUpload = useMemoizedFn((event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
 		if (file) {
-			// 创建本地预览 URL
-			const fileUrl = URL.createObjectURL(file)
-
-			// 如果没有外部url控制，更新内部状态
-			if (url === undefined) {
-				setInternalUrl(fileUrl)
-			}
-
-			onChange?.(fileUrl)
+			revokeObjectUrl()
 			onUpload?.(file)
+
+			if (base64Mode) {
+				// base64模式：将文件转换为base64
+				const reader = new FileReader()
+				reader.onload = (e) => {
+					const base64Url = e.target?.result as string
+					if (url === undefined) setInternalUrl(base64Url)
+					onChange?.(base64Url)
+				}
+				reader.readAsDataURL(file)
+			} else {
+				// 普通模式：使用object URL
+				const fileUrl = URL.createObjectURL(file)
+				objectUrlRef.current = fileUrl
+				if (url === undefined) setInternalUrl(fileUrl)
+				onChange?.(fileUrl)
+			}
 		}
 	})
 
@@ -45,15 +63,18 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 	const handleDelete = (e: React.MouseEvent) => {
 		// 防止触发 hover
 		e.stopPropagation()
+		revokeObjectUrl()
 
-		// 如果没有外部url控制，更新内部状态
-		if (url === undefined) {
-			setInternalUrl('')
-		}
+		if (url === undefined) setInternalUrl('')
 
 		onChange?.('')
 		onDelete?.()
 	}
+
+	// 组件卸载时清理 object url（base64模式下不需要清理）
+	useUnmount(() => {
+		revokeObjectUrl()
+	})
 
 	// 如果没有URL，显示空状态或上传按钮
 	if (!curUrl) {
@@ -121,4 +142,5 @@ export type ImagePreviewProps = {
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）
+	base64Mode?: boolean // 是否使用base64模式
 }

@@ -5,7 +5,7 @@ export enum AIPlatform {
 
 // 基础配置接口
 export interface AIAgentConfig {
-	apiKey: string
+	apiKey?: string
 	baseUrl?: string
 	model?: string
 }
@@ -30,10 +30,32 @@ export interface ImageResponse {
 	}>
 }
 
+export interface VideoGenerationOptions {
+	image_size?: string
+	negative_prompt?: string
+	image?: string
+}
+
+// 视频状态响应
+export interface VideoStatusResponse {
+	status: 'Succeed' | 'InQueue' | 'InProgress' | 'Failed'
+	reason?: string
+	results?: {
+		videos: Array<{
+			url: string
+		}>
+		timings?: {
+			inference: number
+		}
+		seed?: number
+	}
+}
+
 // 流式回调函数
 export type StreamCallback = (chunk: string) => void
 
 export interface AIModelConfig {
 	text: string[]
 	image: string[]
+	video?: string[]
 }
