@@ -8,28 +8,28 @@ import { TestImagePreview } from './components/test-image-preview'
 import { TestShadcn } from './components/test-shadcn'
 import { TestVideoPreview } from './components/test-video-preview'
 import { TestSilicon } from './components/test-silicon'
+import { TestAIAgent } from './components/test-ai-agent'
 
 let Test = () => <div>Test</div>
 
 if (isDev) {
 	Test = () => {
 		const [searchParams, setSearchParams] = useSearchParams()
-		
+
 		const config = {
 			shadcn: <TestShadcn />,
 			dummy: <TestDummy />,
 			image: <TestImagePreview />,
 			video: <TestVideoPreview />,
 			silicon: <TestSilicon />,
+			aiAgent: <TestAIAgent />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>
 		const currTest = searchParams.get('test')
-		
+
 		// 确定当前选中的测试用例
-		const selectedKey = (currTest && keys.includes(currTest as keyof typeof config)) 
-			? (currTest as keyof typeof config)
-			: keys[0]
+		const selectedKey = currTest && keys.includes(currTest as keyof typeof config) ? (currTest as keyof typeof config) : keys[0]
 
 		// 初始化时同步 URL 参数
 		useEffect(() => {
@@ -53,10 +53,7 @@ if (isDev) {
 							<Button
 								key={key}
 								variant={selectedKey === key ? 'default' : 'ghost'}
-								className={cn(
-									"w-full justify-start",
-									selectedKey === key && "bg-blue-600 hover:bg-blue-700"
-								)}
+								className={cn('w-full justify-start', selectedKey === key && 'bg-blue-600 hover:bg-blue-700')}
 								onClick={() => handleTestChange(key)}
 							>
 								{key}
@@ -66,9 +63,7 @@ if (isDev) {
 				</div>
 
 				{/* 主内容区域 */}
-				<div className="flex-1">
-					{config[selectedKey]}
-				</div>
+				<div className="flex-1">{config[selectedKey]}</div>
 			</div>
 		)
 	}

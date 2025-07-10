@@ -1,6 +1,6 @@
 /**
  * 下载文件工具函数
- * 
+ *
  * 必须要用blob，chrome如果不用blob，每次一定会打开新标签而不是下载
  */
 export const download = async (url: string, filename: string) => {
@@ -18,7 +18,7 @@ export const downloadUrl = (url: string, filename: string) => {
 	link.href = url
 	link.download = filename
 	link.style.display = 'none'
-  // NOTE: 必须这么设置，否则chrome还是打开一个新的标签
+	// NOTE: 必须这么设置，否则chrome还是打开一个新的标签
 	link.target = '_self'
 	document.body.appendChild(link)
 	link.click()

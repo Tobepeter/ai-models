@@ -10,11 +10,7 @@ export const ChatVideo = (props: ChatVideoProps) => {
 
 	return (
 		<div className="mt-2">
-			<VideoPreview 
-				url={url} 
-				notEditable={true}
-				className="rounded-lg shadow-md"
-			/>
+			<VideoPreview url={url} notEditable={true} className="rounded-lg shadow-md" />
 			<div className="mt-2">
 				<ChatDownload url={url} filename={filename} size={size} />
 			</div>

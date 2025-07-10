@@ -108,7 +108,6 @@ export const SuggestInput = (props: SuggestInputProps) => {
 		selectSuggestion(suggestion)
 	}
 
-
 	const handleFocus = () => {
 		setIsFocused(true)
 		setSuggestIdx(0) // 聚焦时默认选择第一个建议
@@ -128,7 +127,15 @@ export const SuggestInput = (props: SuggestInputProps) => {
 	return (
 		<div className="relative" ref={containerRef}>
 			<div className="relative">
-				<Input ref={inputRef} className={cn(className, isFocused && currValue && 'pr-8')} placeholder={placeholder} value={currValue} onChange={handleInputChange} onKeyDown={handleKeyDown} onFocus={handleFocus} />
+				<Input
+					ref={inputRef}
+					className={cn(className, isFocused && currValue && 'pr-8')}
+					placeholder={placeholder}
+					value={currValue}
+					onChange={handleInputChange}
+					onKeyDown={handleKeyDown}
+					onFocus={handleFocus}
+				/>
 				{isFocused && currValue && (
 					<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={handleClear}>
 						<X size={16} />

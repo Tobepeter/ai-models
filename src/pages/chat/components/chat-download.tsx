@@ -30,4 +30,4 @@ export type ChatDownloadProps = {
 	url: string
 	filename: string
 	size: string
-} 
+}

@@ -241,13 +241,7 @@ export const TestSilicon = () => {
 						<label htmlFor="model" className="block text-sm font-medium mb-2">
 							模型
 						</label>
-						<SuggestInput
-							placeholder="选择模型..."
-							suggestions={modelOptions}
-							value={model}
-							onChange={(value) => setModel(value)}
-							className="w-full"
-						/>
+						<SuggestInput placeholder="选择模型..." suggestions={modelOptions} value={model} onChange={(value) => setModel(value)} className="w-full" />
 					</div>
 
 					<div>

@@ -10,11 +10,7 @@ export const ChatImage = (props: ChatImageProps) => {
 
 	return (
 		<div className="mt-2">
-			<ImagePreview 
-				url={url} 
-				notEditable={true}
-				className="w-full aspect-square"
-			/>
+			<ImagePreview url={url} notEditable={true} className="w-full aspect-square" />
 			<div className="mt-2">
 				<ChatDownload url={url} filename={filename} size={size} />
 			</div>
