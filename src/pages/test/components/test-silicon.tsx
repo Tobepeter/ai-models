@@ -224,7 +224,7 @@ export const TestSilicon = () => {
 	}
 
 	return (
-		<div className="p-6 max-w-4xl mx-auto space-y-6">
+		<div className="p-6 space-y-6">
 			<Card>
 				<CardHeader>
 					<CardTitle>Silicon Flow API 测试</CardTitle>

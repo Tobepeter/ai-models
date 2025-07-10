@@ -43,14 +43,16 @@ export class AIAgentManager {
 	}
 
 	checkValid() {
-		if (!this.isValid()) {
-			console.error('AI Agent is not valid')
+		if (!this.agent) {
+			console.error('AI Agent is not initialized')
 			return false
 		}
-		return true
-	}
 
-	isValid() {
+		if (this.isRunning) {
+			console.error('AI Agent is running')
+			return false
+		}
+
 		let valid = false
 		if (this.agent.isValid) {
 			valid = this.agent.isValid()
@@ -58,7 +60,12 @@ export class AIAgentManager {
 			valid = !!(this.agent.config.apiKey && this.agent.config.baseUrl)
 		}
 
-		return valid
+		if (!valid) {
+			console.error('AI Agent is not valid')
+			return false
+		}
+
+		return true
 	}
 }
 

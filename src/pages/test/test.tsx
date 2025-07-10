@@ -1,8 +1,20 @@
 import { isDev } from '@/utils/env'
 import { useSearchParams } from 'react-router-dom'
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarInset,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarProvider,
+	SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { TestDummy } from './components/test-dummy'
 import { TestImagePreview } from './components/test-image-preview'
 import { TestShadcn } from './components/test-shadcn'
@@ -44,27 +56,43 @@ if (isDev) {
 		}
 
 		return (
-			<div className="flex h-screen">
-				{/* 侧边栏 */}
-				<div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
-					<h2 className="text-lg font-semibold mb-4">测试用例</h2>
-					<div className="space-y-2">
-						{keys.map((key) => (
-							<Button
-								key={key}
-								variant={selectedKey === key ? 'default' : 'ghost'}
-								className={cn('w-full justify-start', selectedKey === key && 'bg-blue-600 hover:bg-blue-700')}
-								onClick={() => handleTestChange(key)}
-							>
-								{key}
-							</Button>
-						))}
+			<SidebarProvider>
+				<Sidebar>
+					<SidebarHeader>
+						<h2 className="text-lg font-semibold">测试用例</h2>
+					</SidebarHeader>
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>测试组件</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									{keys.map((key) => (
+										<SidebarMenuItem key={key}>
+											<SidebarMenuButton
+												isActive={selectedKey === key}
+												onClick={() => handleTestChange(key)}
+											>
+												{key}
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset>
+					<header className="flex h-16 shrink-0 items-center gap-2 border-b px-2">
+						<SidebarTrigger />
+						<h1 className="text-lg font-semibold">
+							{selectedKey} 测试
+						</h1>
+					</header>
+					<div>
+						{config[selectedKey]}
 					</div>
-				</div>
-
-				{/* 主内容区域 */}
-				<div className="flex-1">{config[selectedKey]}</div>
-			</div>
+				</SidebarInset>
+			</SidebarProvider>
 		)
 	}
 }
