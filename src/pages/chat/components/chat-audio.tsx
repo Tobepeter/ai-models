@@ -2,12 +2,19 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Play, Download, Volume2 } from 'lucide-react'
 import { MediaData } from '@/pages/chat/chat-store'
+import { useMemoizedFn } from 'ahooks'
+import { download } from '@/utils/download'
 
 /**
  * 聊天音频组件
  */
 export const ChatAudio = (props: ChatAudioProps) => {
-	const { filename, size, duration } = props
+	const { url, filename, size, duration } = props
+
+	const handleDownload = useMemoizedFn(() => {
+		if (!url || !filename) return
+		download(url, filename)
+	})
 
 	return (
 		<Card className="mt-2 max-w-sm">
@@ -34,7 +41,7 @@ export const ChatAudio = (props: ChatAudioProps) => {
 					<span>
 						{filename} • {size}
 					</span>
-					<Button variant="ghost" size="sm">
+					<Button variant="ghost" size="sm" onClick={handleDownload}>
 						<Download className="h-3 w-3" />
 					</Button>
 				</div>

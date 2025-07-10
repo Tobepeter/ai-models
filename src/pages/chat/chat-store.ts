@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { dummy } from '@/utils/dummy'
 
 export type MediaType = 'text' | 'image' | 'audio' | 'video'
 
@@ -84,7 +85,7 @@ export const simulateAIResponse = (userInput: string, mediaType: MediaType): Mes
 		image: {
 			content: `已为您生成图片：${userInput}`,
 			mediaData: {
-				url: `https://picsum.photos/400/300?random=${Date.now()}`,
+				url: dummy.image,
 				filename: 'generated-image.jpg',
 				size: '2.5MB',
 			},
@@ -92,7 +93,7 @@ export const simulateAIResponse = (userInput: string, mediaType: MediaType): Mes
 		audio: {
 			content: `已为您生成音频：${userInput}`,
 			mediaData: {
-				url: '/audio-sample.mp3',
+				url: dummy.sounds.mp3,
 				filename: 'generated-audio.mp3',
 				size: '3.2MB',
 				duration: '0:45',
@@ -101,7 +102,7 @@ export const simulateAIResponse = (userInput: string, mediaType: MediaType): Mes
 		video: {
 			content: `已为您生成视频：${userInput}`,
 			mediaData: {
-				url: '/video-sample.mp4',
+				url: dummy.video,
 				filename: 'generated-video.mp4',
 				size: '15.8MB',
 				duration: '1:30',
