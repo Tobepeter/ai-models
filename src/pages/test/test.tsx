@@ -1,12 +1,18 @@
-import { useRequest } from 'ahooks'
-import { TestShadcn } from './components/test-shadcn'
-import { TestDummy } from './components/test-dummy'
+import { isDev } from '@/utils/env'
+import { TestImagePreview } from './components/test-image-preview'
+import { TestVideoPreview } from './components/test-video-preview'
 
 export const Test = () => {
 	return (
 		<>
-			{/* <TestShadcn /> */}
-			<TestDummy />
+			{isDev && (
+				<>
+					{/* <TestShadcn /> */}
+					{/* <TestDummy /> */}
+					{/* <TestImagePreview /> */}
+					<TestVideoPreview />
+				</>
+			)}
 		</>
 	)
 }
