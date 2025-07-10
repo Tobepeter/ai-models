@@ -22,7 +22,7 @@ export type MediaData = {
 
 interface ChatStore {
 	msgList: Message[]
-	currentMediaType: MediaType
+	currMediaType: MediaType
 	isLoading: boolean
 	setCurMedia: (type: MediaType) => void
 	addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void
@@ -35,10 +35,10 @@ interface ChatStore {
 
 export const useChatStore = create<ChatStore>((set, get) => ({
 	msgList: [],
-	currentMediaType: 'text',
+	currMediaType: 'text',
 	isLoading: false,
 
-	setCurMedia: (type) => set({ currentMediaType: type }),
+	setCurMedia: (type) => set({ currMediaType: type }),
 
 	addMessage: (message) => {
 		const newMessage: Message = {
@@ -56,7 +56,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	reset: () =>
 		set({
 			msgList: [],
-			currentMediaType: 'text',
+			currMediaType: 'text',
 			isLoading: false,
 		}),
 

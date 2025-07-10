@@ -11,7 +11,7 @@ import { useEvent, EventType } from '@/utils/event-bus'
  * 聊天输入框组件
  */
 export const ChatInput = (props: ChatInputProps) => {
-	const { onSend, currentMediaType, onMediaTypeChange, isLoading, onStop } = props
+	const { onSend, currMediaType, onMediaTypeChange, isLoading, onStop } = props
 	const [inputVal, setInputVal] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
 	const autoFocus = false
@@ -48,7 +48,7 @@ export const ChatInput = (props: ChatInputProps) => {
 		if (isLoading) {
 			onStop()
 		} else if (inputVal.trim()) {
-			onSend(inputVal.trim(), currentMediaType)
+			onSend(inputVal.trim(), currMediaType)
 			setInputVal('')
 			inputRef.current?.blur() // 发送后失焦
 		}
@@ -61,14 +61,14 @@ export const ChatInput = (props: ChatInputProps) => {
 			audio: '描述您想要的音频...',
 			video: '描述您想要的视频...',
 		}
-		return placeholders[currentMediaType]
+		return placeholders[currMediaType]
 	}
 
 	const buttonDisabled = !isLoading && !inputVal.trim()
 
 	return (
 		<div className="flex gap-2 p-4 border-t bg-background">
-			<ChatMediaSelector value={currentMediaType} onChange={onMediaTypeChange} />
+			<ChatMediaSelector value={currMediaType} onChange={onMediaTypeChange} />
 			<div className="flex-1">
 				<Input ref={inputRef} value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} disabled={isLoading} className="w-full" />
 			</div>
@@ -81,7 +81,7 @@ export const ChatInput = (props: ChatInputProps) => {
 
 export type ChatInputProps = {
 	onSend: (message: string, mediaType: MediaType) => void
-	currentMediaType: MediaType
+	currMediaType: MediaType
 	onMediaTypeChange: (type: MediaType) => void
 	isLoading: boolean
 	onStop: () => void

@@ -12,7 +12,7 @@ import { ChatMsg } from './components/chat-msg'
  * 聊天页面主组件
  */
 export const Chat = () => {
-	const { msgList, currentMediaType, isLoading, setCurMedia, addMessage, setLoading, reset, stopGen, removeLastMsg } = useChatStore()
+	const { msgList, currMediaType, isLoading, setCurMedia, addMessage, setLoading, reset, stopGen, removeLastMsg } = useChatStore()
 
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const { start, clear } = useTimer()
@@ -75,10 +75,10 @@ export const Chat = () => {
 				<h1 className="text-lg font-semibold">
 					AI 助手
 					<span className="text-sm font-normal text-muted-foreground ml-2">
-						{currentMediaType === 'text' && '文本对话'}
-						{currentMediaType === 'image' && '图片生成'}
-						{currentMediaType === 'audio' && '音频生成'}
-						{currentMediaType === 'video' && '视频生成'}
+						{currMediaType === 'text' && '文本对话'}
+						{currMediaType === 'image' && '图片生成'}
+						{currMediaType === 'audio' && '音频生成'}
+						{currMediaType === 'video' && '视频生成'}
 					</span>
 				</h1>
 			</div>
@@ -91,10 +91,10 @@ export const Chat = () => {
 							<div className="text-center text-muted-foreground py-8">
 								<p className="text-lg mb-2">👋 您好！我是AI助手</p>
 								<p className="text-sm">
-									{currentMediaType === 'text' && '我可以与您进行文本对话，回答您的问题。'}
-									{currentMediaType === 'image' && '我可以根据您的描述生成图片。'}
-									{currentMediaType === 'audio' && '我可以根据您的描述生成音频。'}
-									{currentMediaType === 'video' && '我可以根据您的描述生成视频。'}
+									{currMediaType === 'text' && '我可以与您进行文本对话，回答您的问题。'}
+									{currMediaType === 'image' && '我可以根据您的描述生成图片。'}
+									{currMediaType === 'audio' && '我可以根据您的描述生成音频。'}
+									{currMediaType === 'video' && '我可以根据您的描述生成视频。'}
 								</p>
 							</div>
 						)}
@@ -110,7 +110,7 @@ export const Chat = () => {
 
 			{/* 输入区域 */}
 			<div className="flex-shrink-0">
-				<ChatInput onSend={handleSendMessage} currentMediaType={currentMediaType} onMediaTypeChange={setCurMedia} isLoading={isLoading} onStop={handleStopGeneration} />
+				<ChatInput onSend={handleSendMessage} currMediaType={currMediaType} onMediaTypeChange={setCurMedia} isLoading={isLoading} onStop={handleStopGeneration} />
 			</div>
 		</div>
 	)
