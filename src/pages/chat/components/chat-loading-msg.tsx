@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react'
 export const ChatLoadingMsg = () => {
 	return (
 		<div className="flex w-full mb-4 justify-start">
-			<div className="flex max-w-[70%]">
+			<div className="flex max-w-[85%] sm:max-w-[75%] md:max-w-[65%] lg:max-w-2xl xl:max-w-3xl">
 				<Avatar className="w-8 h-8 mr-2">
 					<AvatarFallback>AI</AvatarFallback>
 				</Avatar>

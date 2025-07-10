@@ -12,7 +12,7 @@ export const ChatMsg = (props: ChatMsgProps) => {
 
 	return (
 		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')}>
-			<div className={cn('flex max-w-[70%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
+			<div className={cn('flex max-w-[85%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
 				{!isUser && (
 					<Avatar className="w-8 h-8 mr-2">
 						<AvatarFallback>AI</AvatarFallback>

@@ -10,14 +10,15 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
  * 视频预览组件
  */
 export const VideoPreview = (props: VideoPreviewProps) => {
-	const { url, defaultUrl, cover, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size = 128 } = props
+	const { url, defaultUrl, cover, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size } = props
 	const editable = !notEditable
 	const [internalUrl, setInternalUrl] = useState(defaultUrl || '')
 	const curUrl = url ?? internalUrl // 如果外部没有传入url，则使用内部url
 
 	// 计算实际的宽高
-	const actualWidth = width || size
-	const actualHeight = height || size
+	const actualWidth = width || size || '100%'
+	const actualHeight = height || size || 'unset'
+	const aspectRatio = actualHeight === 'unset' ? '16/9' : 'unset'
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -60,7 +61,7 @@ export const VideoPreview = (props: VideoPreviewProps) => {
 			<>
 				<Card
 					className={cn('flex items-center justify-center', editable && 'border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer transition-colors', className)}
-					style={{ width: actualWidth, height: actualHeight, ...style }}
+					style={{ width: actualWidth, height: actualHeight, aspectRatio, ...style }}
 					onClick={editable ? handleUploadClick : undefined}
 				>
 					{editable ? <Plus className="w-8 h-8 text-gray-400" /> : <VideoIcon className="w-8 h-8 text-gray-400" />}
@@ -74,7 +75,7 @@ export const VideoPreview = (props: VideoPreviewProps) => {
 		<>
 			<Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
 				<DialogTrigger asChild>
-					<div className={cn('relative cursor-pointer overflow-hidden', className)} style={children ? style : { width: actualWidth, height: actualHeight, ...style }}>
+					<div className={cn('relative cursor-pointer overflow-hidden', className)} style={{ width: actualWidth, height: actualHeight, aspectRatio, ...style }}>
 						{children || (
 							<>
 								{/* 封面 */}
@@ -124,5 +125,5 @@ export type VideoPreviewProps = {
 	children?: React.ReactNode // 插槽内容
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
-	size?: number // 统一尺寸（像素），默认128，当没有指定width或height时使用
+	size?: number // 统一尺寸（像素）
 }

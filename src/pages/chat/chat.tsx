@@ -1,14 +1,12 @@
-import { useRef, useEffect } from 'react'
-import { useChatStore, simulateAIResponse, MediaType } from './chat-store'
-import { ChatMsg } from './components/chat-msg'
-import { ChatInput } from './components/chat-input'
-import { ChatLoadingMsg } from './components/chat-loading-msg'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useMemoizedFn, useUnmount } from 'ahooks'
 import { useTimer } from '@/hooks/use-timer'
 import { eventBus, EventType } from '@/utils/event-bus'
-import { ImagePreview } from '@/components/common/image-preview'
-import { VideoPreview } from '@/components/common/video-preview'
+import { useMemoizedFn, useUnmount } from 'ahooks'
+import { useEffect, useRef } from 'react'
+import { MediaType, simulateAIResponse, useChatStore } from './chat-store'
+import { ChatInput } from './components/chat-input'
+import { ChatLoadingMsg } from './components/chat-loading-msg'
+import { ChatMsg } from './components/chat-msg'
 
 /**
  * 聊天页面主组件
@@ -27,7 +25,7 @@ export const Chat = () => {
 	// 自动滚动到底部
 	useEffect(() => {
 		if (scrollAreaRef.current) {
-			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+			scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' })
 		}
 	}, [msgList, isLoading])
 
@@ -88,7 +86,7 @@ export const Chat = () => {
 			{/* 消息列表 */}
 			<div className="flex-1 overflow-hidden">
 				<ScrollArea className="h-full">
-					<div ref={scrollAreaRef} className="p-4 space-y-4">
+					<div ref={scrollAreaRef} className="w-screen p-4 space-y-4">
 						{msgList.length === 0 && (
 							<div className="text-center text-muted-foreground py-8">
 								<p className="text-lg mb-2">👋 您好！我是AI助手</p>

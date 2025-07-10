@@ -13,8 +13,6 @@ export const ChatVideo = (props: ChatVideoProps) => {
 			<VideoPreview 
 				url={url} 
 				notEditable={true}
-				width={400}
-				height={225}
 				className="rounded-lg shadow-md"
 			/>
 			<div className="mt-2">

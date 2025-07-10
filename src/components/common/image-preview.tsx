@@ -10,14 +10,14 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
  * 图片预览组件
  */
 export const ImagePreview = (props: ImagePreviewProps) => {
-	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size = 128 } = props
+	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size } = props
 	const editable = !notEditable
 	const [internalUrl, setInternalUrl] = useState(defaultUrl || '')
 	const curUrl = url ?? internalUrl // 如果外部没有传入url，则使用内部url
 
 	// 计算实际的宽高
-	const actualWidth = width || size
-	const actualHeight = height || size
+	const actualWidth = width || size || '100%'
+	const actualHeight = height || size || 'unset'
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 	const [isHovering, setIsHovering] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
@@ -120,5 +120,5 @@ export type ImagePreviewProps = {
 	children?: React.ReactNode // 插槽内容
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
-	size?: number // 统一尺寸（像素），默认128，当没有指定width或height时使用
+	size?: number // 统一尺寸（像素）
 }
