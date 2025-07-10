@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { MediaData } from '@/pages/chat/chat-store'
+import { MediaData } from '@/pages/chat/chat-type'
 import { ChatDownload } from './chat-download'
 
 /**

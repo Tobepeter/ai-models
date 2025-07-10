@@ -25,8 +25,6 @@ export class SiliconFlowAgent implements IAiAgent {
 	}
 
 	async generateText(prompt: string) {
-		this.agent.setRunning(true)
-
 		try {
 			const { baseUrl } = this.config
 			const response = await axios.post(
@@ -39,17 +37,15 @@ export class SiliconFlowAgent implements IAiAgent {
 				},
 				{ headers: this.getHeaders() }
 			)
-
-			this.agent.setRunning(false)
-			return response.data.choices[0]?.message?.content || ''
+			const content = response.data.choices[0]?.message?.content || ''
+			return content.trim()
 		} catch (error) {
-			this.agent.setRunning(false)
-			throw error
+			console.error('[SiliconFlowAgent] generateText error', error)
+			return ''
 		}
 	}
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
-		this.agent.setRunning(true)
 		const { baseUrl } = this.config
 
 		try {
@@ -72,6 +68,9 @@ export class SiliconFlowAgent implements IAiAgent {
 			const decoder = new TextDecoder()
 			let fullContent = ''
 
+			// 标记是否开始有效内容（deepseek会返回一些前导换行符）
+			let hasValidContent = false
+
 			if (reader) {
 				while (true) {
 					const { done, value } = await reader.read()
@@ -83,33 +82,41 @@ export class SiliconFlowAgent implements IAiAgent {
 					for (const line of lines) {
 						if (line.startsWith('data: ')) {
 							const data = line.slice(6).trim()
-							if (data === '[DONE]') continue
-
+							if (data === '[DONE]') break
 							try {
 								const parsed = JSON.parse(data)
 								const content = parsed.choices[0]?.delta?.content
 								if (content) {
-									fullContent += content
-									onChunk(content)
+									// 如果还没有开始有效内容，检查是否为空白字符
+									if (!hasValidContent) {
+										// 检查是否包含非空白字符
+										if (content.trim().length > 0) {
+											hasValidContent = true
+											onChunk(content)
+											fullContent += content
+										}
+									} else {
+										// 已经开始有效内容，直接输出
+										onChunk(content)
+										fullContent += content
+									}
 								}
 							} catch (e) {
-								// 忽略解析错误
+								// TODO: 解析错误
 							}
 						}
 					}
 				}
 			}
 
-			this.agent.setRunning(false)
 			return fullContent
 		} catch (error) {
-			this.agent.setRunning(false)
-			throw error
+			console.error('[SiliconFlowAgent] generateTextStream error', error)
+			return ''
 		}
 	}
 
 	async generateImage(prompt: string) {
-		this.agent.setRunning(true)
 		const { baseUrl } = this.config
 
 		try {
@@ -126,17 +133,14 @@ export class SiliconFlowAgent implements IAiAgent {
 				{ headers: this.getHeaders() }
 			)
 
-			this.agent.setRunning(false)
 			return response.data.images
 		} catch (error) {
-			this.agent.setRunning(false)
-			throw error
+			console.error('[SiliconFlowAgent] generateImage error', error)
+			return ''
 		}
 	}
 
 	async generateVideo(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		this.agent.setRunning(true)
-
 		try {
 			// 创建视频任务
 			const requestId = await this.createVideoTask(prompt, options)
@@ -147,21 +151,14 @@ export class SiliconFlowAgent implements IAiAgent {
 			const startTime = Date.now()
 
 			while (Date.now() - startTime < maxPollingTime) {
-				// 检查是否已停止
-				if (!this.agent.isRunning) {
-					throw new Error('视频生成已取消')
-				}
-
 				// 查询状态
 				const status = await this.getVideoTaskStatus(requestId)
 
 				if (status.status === 'Succeed' && status.results?.videos?.[0]?.url) {
-					this.agent.setRunning(false)
 					return status.results.videos[0].url
 				}
 
 				if (status.status === 'Failed') {
-					this.agent.setRunning(false)
 					throw new Error(status.reason || '视频生成失败')
 				}
 
@@ -170,11 +167,10 @@ export class SiliconFlowAgent implements IAiAgent {
 			}
 
 			// 超时
-			this.agent.setRunning(false)
 			throw new Error('视频生成超时（15分钟）')
 		} catch (error) {
-			this.agent.setRunning(false)
-			throw error
+			console.error('[SiliconFlowAgent] generateVideo error', error)
+			return ''
 		}
 	}
 
@@ -203,11 +199,7 @@ export class SiliconFlowAgent implements IAiAgent {
 		const { baseUrl } = this.config
 
 		// 查询状态
-		const statusResponse = await axios.post<VideoStatusResponse>(
-			`${baseUrl}/video/status`,
-			{ requestId },
-			{ headers: this.getHeaders() }
-		)
+		const statusResponse = await axios.post<VideoStatusResponse>(`${baseUrl}/video/status`, { requestId }, { headers: this.getHeaders() })
 
 		return statusResponse.data
 	}

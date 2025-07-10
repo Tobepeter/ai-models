@@ -1,18 +1,18 @@
 import { ChatImage } from './chat-image'
 import { ChatAudio } from './chat-audio'
 import { ChatVideo } from './chat-video'
-import { Message } from '@/pages/chat/chat-store'
+import { Msg } from '@/pages/chat/chat-type'
 
 /**
  * 聊天媒体组件
  */
 export const ChatMedia = (props: ChatMediaProps) => {
-	const { message } = props
-	const { mediaData } = message
+	const { msg } = props
+	const { mediaData } = msg
 
 	if (!mediaData) return null
 
-	switch (message.mediaType) {
+	switch (msg.mediaType) {
 		case 'image':
 			return <ChatImage {...mediaData} />
 		case 'audio':
@@ -25,5 +25,5 @@ export const ChatMedia = (props: ChatMediaProps) => {
 }
 
 export type ChatMediaProps = {
-	message: Message
+	msg: Msg
 }

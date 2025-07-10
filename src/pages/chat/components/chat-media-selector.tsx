@@ -1,4 +1,4 @@
-import { MediaType } from '@/pages/chat/chat-store'
+import { MediaType } from '@/pages/chat/chat-type'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDown, MessageCircle, Image, Volume2, Film } from 'lucide-react'
@@ -15,15 +15,15 @@ const mediaTypeConfig = {
  */
 export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 	const { value, onChange } = props
-	const currentConfig = mediaTypeConfig[value]
-	const CurrentIcon = currentConfig.icon
+	const currConfig = mediaTypeConfig[value]
+	const CurrIcon = currConfig.icon
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="default" size="sm" className="gap-2">
-					<CurrentIcon className="h-4 w-4" />
-					<span>{currentConfig.label}</span>
+					<CurrIcon className="h-4 w-4" />
+					<span>{currConfig.label}</span>
 					<ChevronDown className="h-4 w-4" />
 				</Button>
 			</DropdownMenuTrigger>

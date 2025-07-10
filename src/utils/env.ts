@@ -1,3 +1,4 @@
 export const mode = import.meta.env.MODE
 export const isDev = import.meta.env.DEV
 export const isProd = import.meta.env.PROD
+export const isMock = isDev && import.meta.env.VITE_MOCK_MODE === 'true'

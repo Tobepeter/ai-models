@@ -1,36 +1,22 @@
+import { v4 as uuidv4 } from 'uuid'
 import { create } from 'zustand'
-import { dummy } from '@/utils/dummy'
+import { chatMgr } from './chat-mgr'
+import { MediaType, Msg } from './chat-type'
 
-export type MediaType = 'text' | 'image' | 'audio' | 'video'
-
-export interface Message {
-	id: string
-	type: 'user' | 'assistant'
-	content: string
-	mediaType: MediaType
-	timestamp: number
-	// 模拟的媒体数据
-	mediaData?: MediaData
-}
-
-export type MediaData = {
-	url?: string
-	filename?: string
-	size?: string
-	duration?: string
-}
-
-interface ChatStore {
-	msgList: Message[]
+export interface ChatStore {
+	msgList: Msg[]
 	currMediaType: MediaType
-	isLoading: boolean
+	isLoading: boolean // 仅用于文本streaming
+
 	setCurMedia: (type: MediaType) => void
-	addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void
+	addMsg: (msg: Omit<Msg, 'id' | 'timestamp'>) => void
+	updateMsg: (id: string, updates: Partial<Msg>) => void
 	setLoading: (loading: boolean) => void
 	clearMsg: () => void
 	reset: () => void
 	stopGen: () => void
-	removeLastMsg: () => Message | null // 返回被移除的消息
+	removeLastMsg: () => Msg | null
+	genAIResp: (userInput: string, mediaType: MediaType) => Promise<void>
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -40,28 +26,36 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
 	setCurMedia: (type) => set({ currMediaType: type }),
 
-	addMessage: (message) => {
-		const newMessage: Message = {
-			...message,
-			id: Date.now().toString(),
+	addMsg: (msg) => {
+		const newMsg: Msg = {
+			...msg,
+			id: uuidv4(),
 			timestamp: Date.now(),
 		}
-		set({ msgList: [...get().msgList, newMessage] })
+		set({ msgList: [...get().msgList, newMsg] })
+	},
+
+	updateMsg: (id, updates) => {
+		set({
+			msgList: get().msgList.map((msg) => (msg.id === id ? { ...msg, ...updates } : msg)),
+		})
 	},
 
 	setLoading: (loading) => set({ isLoading: loading }),
 
 	clearMsg: () => set({ msgList: [] }),
 
-	reset: () =>
+	reset: () => {
 		set({
 			msgList: [],
 			currMediaType: 'text',
 			isLoading: false,
-		}),
+		})
+	},
 
 	stopGen: () => {
-		set({ isLoading: false })
+		get().setLoading(false)
+		chatMgr.stop()
 	},
 
 	removeLastMsg: () => {
@@ -73,49 +67,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 		}
 		return null
 	},
+
+	genAIResp: async (userInput: string, mediaType: MediaType) => {
+		const aiMsg: Msg = {
+			id: uuidv4(),
+			type: 'assistant',
+			content: '',
+			mediaType,
+			timestamp: Date.now(),
+			status: 'pending',
+		}
+		set({ msgList: [...get().msgList, aiMsg] })
+		await chatMgr.genAIResp(userInput, mediaType, aiMsg.id)
+	},
 }))
-
-// 模拟AI响应的函数
-export const simulateAIResponse = (userInput: string, mediaType: MediaType): Message => {
-	const responses = {
-		text: {
-			content: `这是对"${userInput}"的AI回复。我是一个AI助手，很高兴为您服务！`,
-			mediaData: undefined,
-		},
-		image: {
-			content: `已为您生成图片：${userInput}`,
-			mediaData: {
-				url: dummy.image,
-				filename: 'generated-image.jpg',
-				size: '2.5MB',
-			},
-		},
-		audio: {
-			content: `已为您生成音频：${userInput}`,
-			mediaData: {
-				url: dummy.audio,
-				filename: 'generated-audio.mp3',
-				size: '3.2MB',
-				duration: '0:45',
-			},
-		},
-		video: {
-			content: `已为您生成视频：${userInput}`,
-			mediaData: {
-				url: dummy.video,
-				filename: 'generated-video.mp4',
-				size: '15.8MB',
-				duration: '1:30',
-			},
-		},
-	}
-
-	return {
-		id: Date.now().toString(),
-		type: 'assistant',
-		content: responses[mediaType].content,
-		mediaType,
-		timestamp: Date.now(),
-		mediaData: responses[mediaType].mediaData,
-	}
-}

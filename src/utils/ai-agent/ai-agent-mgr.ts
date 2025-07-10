@@ -11,7 +11,6 @@ export class AIAgentManager {
 		[AIPlatform.Silicon]: SiliconFlowAgent,
 	}
 	agentCache = {} as Record<AIPlatform, IAiAgent>
-	isRunning = false
 
 	switchPlatform(platform: AIPlatform) {
 		if (this.agentCache[platform]) {
@@ -24,10 +23,6 @@ export class AIAgentManager {
 
 	setConfig(config: AIAgentConfig) {
 		this.agent.config = { ...this.agent.config, ...config }
-	}
-
-	setRunning(isRunning: boolean) {
-		this.isRunning = isRunning
 	}
 
 	async generateText(prompt: string) {
@@ -66,11 +61,6 @@ export class AIAgentManager {
 			return false
 		}
 
-		if (this.isRunning) {
-			console.error('AI Agent is running')
-			return false
-		}
-
 		let valid = false
 		if (this.agent.isValid) {
 			valid = this.agent.isValid()
@@ -84,11 +74,6 @@ export class AIAgentManager {
 		}
 
 		return true
-	}
-
-	stop() {
-		// NOTE: 旧的promise依然运行，逻辑层自行丢弃
-		this.setRunning(false)
 	}
 }
 

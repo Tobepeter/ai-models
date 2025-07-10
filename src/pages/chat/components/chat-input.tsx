@@ -1,17 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { MediaType } from '@/pages/chat/chat-store'
+import { MediaType } from '@/pages/chat/chat-type'
 import { useMount } from 'ahooks'
 import { Send, Square } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { ChatMediaSelector } from './chat-media-selector'
 import { useEvent, EventType } from '@/utils/event-bus'
+import { useChatStore } from '../chat-store'
 
 /**
  * 聊天输入框组件
  */
-export const ChatInput = (props: ChatInputProps) => {
-	const { onSend, currMediaType, onMediaTypeChange, isLoading, onStop } = props
+export const ChatInput = () => {
+	const { currMediaType, isLoading, addMsg, genAIResp, stopGen, setCurMedia } = useChatStore()
 	const [inputVal, setInputVal] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
 	const autoFocus = false
@@ -37,18 +38,30 @@ export const ChatInput = (props: ChatInputProps) => {
 			handleClick()
 		} else if (e.key === 'Escape') {
 			if (isLoading) {
-				onStop()
+				stopGen()
 			} else {
 				inputRef.current?.blur()
 			}
 		}
 	}
 
+	const handleSend = async (content: string, mediaType: MediaType) => {
+		// 添加用户消息
+		addMsg({
+			type: 'user',
+			content,
+			mediaType,
+		})
+
+		// 生成AI响应
+		await genAIResp(content, mediaType)
+	}
+
 	const handleClick = () => {
 		if (isLoading) {
-			onStop()
+			stopGen()
 		} else if (inputVal.trim()) {
-			onSend(inputVal.trim(), currMediaType)
+			handleSend(inputVal.trim(), currMediaType)
 			setInputVal('')
 			inputRef.current?.blur() // 发送后失焦
 		}
@@ -68,7 +81,7 @@ export const ChatInput = (props: ChatInputProps) => {
 
 	return (
 		<div className="flex gap-2 p-4 border-t bg-background">
-			<ChatMediaSelector value={currMediaType} onChange={onMediaTypeChange} />
+			<ChatMediaSelector value={currMediaType} onChange={setCurMedia} />
 			<div className="flex-1">
 				<Input ref={inputRef} value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} disabled={isLoading} className="w-full" />
 			</div>
@@ -77,12 +90,4 @@ export const ChatInput = (props: ChatInputProps) => {
 			</Button>
 		</div>
 	)
-}
-
-export type ChatInputProps = {
-	onSend: (message: string, mediaType: MediaType) => void
-	currMediaType: MediaType
-	onMediaTypeChange: (type: MediaType) => void
-	isLoading: boolean
-	onStop: () => void
 }

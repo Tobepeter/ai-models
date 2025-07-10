@@ -1,4 +1,4 @@
-import { MediaData } from '@/pages/chat/chat-store'
+import { MediaData } from '@/pages/chat/chat-type'
 import { VideoPreview } from '@/components/common/video-preview'
 import { ChatDownload } from './chat-download'
 
