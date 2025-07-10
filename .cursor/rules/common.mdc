@@ -6,7 +6,7 @@ alwaysApply: false
 
 # 技术框架
 
-tailwind shadcn ts react vite
+tailwind shadcn ts react vite ahooks tanstack-query axios
 
 # ai工作
 
