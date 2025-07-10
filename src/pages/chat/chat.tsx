@@ -15,7 +15,7 @@ export const Chat = () => {
 	const { msgList, currMediaType, isLoading, setCurMedia, addMessage, setLoading, reset, stopGen, removeLastMsg } = useChatStore()
 
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
-	const { start, clear } = useTimer()
+	const { start, stop } = useTimer()
 
 	// 组件卸载时重置 store
 	useUnmount(() => {
@@ -56,7 +56,7 @@ export const Chat = () => {
 		}
 
 		setLoading(false)
-		clear()
+		stop()
 		stopGen()
 
 		// 移除最后一条用户消息并通过事件总线传递内容

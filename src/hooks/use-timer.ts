@@ -6,7 +6,7 @@ export const useTimer = () => {
 	const [timeId, setTimeId] = useState(0)
 	const [isRunning, setIsRunning] = useState(false)
 
-	const clear = () => {
+	const stop = () => {
 		setIsRunning(false)
 		clearInterval(timeId)
 		clearTimeout(timeId)
@@ -15,7 +15,7 @@ export const useTimer = () => {
 
 	const start = (delay: number, fn: AnyFn) => {
 		setIsRunning(true)
-		clear()
+		stop()
 		const timer = setTimeout(() => {
 			fn()
 		}, delay) as any
@@ -24,22 +24,39 @@ export const useTimer = () => {
 
 	const loop = (dur: number, fn: AnyFn) => {
 		setIsRunning(true)
-		clear()
+		stop()
 		const timer = setInterval(() => {
 			fn()
 		}, dur) as any
 		setTimeId(timer)
 	}
 
+	const sleep = (dur: number) => {
+		return new Promise((resolve) => {
+			setTimeout(resolve, dur)
+		})
+	}
+
+	const nextFrame = (fn: AnyFn) => {
+		start(0, fn)
+	}
+
+	const sleepNextFrame = () => {
+		return sleep(0)
+	}
+
 	useUnmount(() => {
-		clear()
+		stop()
 	})
 
 	return {
 		timeId,
 		isRunning,
 		start,
-		clear,
+		stop,
+		sleep,
+		nextFrame,
+		sleepNextFrame,
 		loop,
 	}
 }

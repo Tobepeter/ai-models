@@ -7,6 +7,7 @@ import { TestDummy } from './components/test-dummy'
 import { TestImagePreview } from './components/test-image-preview'
 import { TestShadcn } from './components/test-shadcn'
 import { TestVideoPreview } from './components/test-video-preview'
+import { TestSilicon } from './components/test-silicon'
 
 let Test = () => <div>Test</div>
 
@@ -19,6 +20,7 @@ if (isDev) {
 			dummy: <TestDummy />,
 			image: <TestImagePreview />,
 			video: <TestVideoPreview />,
+			silicon: <TestSilicon />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>
