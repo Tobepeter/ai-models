@@ -11,6 +11,8 @@ import { useMutation } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
+import { siliconflowModelConfig } from '@/utils/ai-agent/siliconflow-agent'
+import { mockModelConfig } from '@/utils/ai-agent/mock-agent'
 import { useMount } from 'ahooks'
 
 /**
@@ -21,7 +23,7 @@ export const TestAIAgent = () => {
 	const [token, setToken] = useState('')
 	const [model, setModel] = useState('Pro/deepseek-ai/DeepSeek-R1')
 	const [textResponse, setTextResponse] = useState<string>('')
-	const [imageResponse, setImageResponse] = useState<ImageResponse | null>(null)
+	const [imageResponse, setImageResponse] = useState<string>('')
 	const [videoResponse, setVideoResponse] = useState<string>('')
 	const [negativePrompt, setNegativePrompt] = useState('')
 	const [imageUrl, setImageUrl] = useState<string>('')
@@ -34,11 +36,25 @@ export const TestAIAgent = () => {
 		label: val,
 	}))
 
-	const modelConfig = aiAgentMgr.agent?.modelConfig || {
-		text: [],
-		image: [],
-		video: [],
+	// 根据平台获取模型配置
+	const getModelConfig = () => {
+		switch (platform) {
+			case AIPlatform.Mock:
+				return mockModelConfig
+			case AIPlatform.Silicon:
+				return siliconflowModelConfig
+			default:
+				return (
+					aiAgentMgr.agent?.modelConfig || {
+						text: [],
+						image: [],
+						video: [],
+					}
+				)
+		}
 	}
+
+	const modelConfig = getModelConfig()
 	const isImageModel = (model: string) => modelConfig.image.includes(model)
 	const isVideoModel = (model: string) => modelConfig.video?.includes(model) || false
 	const allModels = [...modelConfig.text, ...modelConfig.image, ...(modelConfig.video || [])]
@@ -61,7 +77,7 @@ export const TestAIAgent = () => {
 
 	const reset = () => {
 		setTextResponse('')
-		setImageResponse(null)
+		setImageResponse('')
 		setVideoResponse('')
 	}
 
@@ -73,6 +89,12 @@ export const TestAIAgent = () => {
 	// 监听平台变化
 	useEffect(() => {
 		aiAgentMgr.switchPlatform(platform)
+
+		// 切换平台时重置为该平台的默认模型
+		const newModelConfig = getModelConfig()
+		if (newModelConfig.text.length > 0) {
+			setModel(newModelConfig.text[0])
+		}
 	}, [platform])
 
 	useEffect(() => {
@@ -102,16 +124,13 @@ export const TestAIAgent = () => {
 
 	// 图片生成处理
 	const handleImageGeneration = async () => {
-		const result = await aiAgentMgr.generateImage(question)
-		// 由于接口返回 string，需要解析为 images 数组
+		const images = await aiAgentMgr.generateImages(question)
 		try {
-			const images = Array.isArray(result) ? result : JSON.parse(result)
-			setImageResponse({ images })
+			setImageResponse(images[0])
 		} catch {
-			// 如果解析失败，假设是单个 URL
-			setImageResponse({ images: [{ url: result }] })
+			setImageResponse('')
 		}
-		return result
+		return images
 	}
 
 	// 视频生成处理
@@ -121,8 +140,8 @@ export const TestAIAgent = () => {
 			negative_prompt: negativePrompt.trim() || undefined,
 			image: imageUrl.trim() || undefined,
 		}
-		const result = await aiAgentMgr.generateVideo(question, options)
-		setVideoResponse(result)
+		const result = await aiAgentMgr.generateVideos(question, options)
+		setVideoResponse(result[0])
 		return result
 	}
 
@@ -146,7 +165,7 @@ export const TestAIAgent = () => {
 		onError: (error) => {
 			console.error('Generation failed:', error)
 			setTextResponse(`错误: ${error instanceof Error ? error.message : '未知错误'}`)
-			setImageResponse(null)
+			setImageResponse('')
 			setVideoResponse('')
 		},
 	})
@@ -283,12 +302,10 @@ export const TestAIAgent = () => {
 						)}
 						{imageResponse && (
 							<div className="space-y-4">
-								{imageResponse.images.map((image, index) => (
-									<div key={index} className="space-y-2">
-										<img src={image.url} alt={`Generated image ${index + 1}`} className="w-full h-auto rounded-md border" loading="lazy" />
-										<div className="text-sm text-muted-foreground">图片生成完成</div>
-									</div>
-								))}
+								<div className="space-y-2">
+									<img src={imageResponse} alt={`Generated image`} className="w-full h-auto rounded-md border" loading="lazy" />
+									<div className="text-sm text-muted-foreground">图片生成完成</div>
+								</div>
 							</div>
 						)}
 						{videoResponse && (

@@ -114,6 +114,12 @@ npm run preview
 npm run lint
 \`\`\`
 
+### 启动 Mock Server (开发测试)
+
+\`\`\`bash
+npm run mock-server
+\`\`\`
+
 ## 📝 使用说明
 
 1. **启动项目**：运行 \`npm run dev\` 启动开发服务器

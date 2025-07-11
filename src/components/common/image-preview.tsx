@@ -10,15 +10,16 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
  * 图片预览组件
  */
 export const ImagePreview = (props: ImagePreviewProps) => {
-	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size, base64Mode = false } = props
+	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size, aspectRatio, base64Mode = false } = props
 	const editable = !notEditable
 	const [internalUrl, setInternalUrl] = useState(defaultUrl || '')
 	const objectUrlRef = useRef('') // 用ref跟踪object url
 	const curUrl = url ?? internalUrl // 如果外部没有传入url，则使用内部url
 
-	// 计算实际的宽高
+	// 计算实际的宽高和宽高比
 	const actualWidth = width || size || '100%'
-	const actualHeight = height || size || 'unset'
+	const actualHeight = height || size
+	const computedAspectRatio = aspectRatio || (actualHeight ? 'unset' : '1/1')
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 	const [isHovering, setIsHovering] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
@@ -78,11 +79,17 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 	// 如果没有URL，显示空状态或上传按钮
 	if (!curUrl) {
+		const emptyStyle: React.CSSProperties = {
+			width: actualWidth,
+			...(actualHeight ? { height: actualHeight } : { aspectRatio: computedAspectRatio }),
+			...style,
+		}
+
 		return (
 			<>
 				<Card
 					className={cn('flex items-center justify-center', editable && 'border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer transition-colors', className)}
-					style={{ width: actualWidth, height: actualHeight, ...style }}
+					style={emptyStyle}
 					onClick={editable ? handleUploadClick : undefined}
 				>
 					{editable ? <Plus className="w-8 h-8 text-gray-400" /> : <ImageIcon className="w-8 h-8 text-gray-400" />}
@@ -98,7 +105,11 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 				<DialogTrigger asChild>
 					<div
 						className={cn('relative cursor-pointer overflow-hidden rounded-lg', className)}
-						style={children ? style : { width: actualWidth, height: actualHeight, ...style }}
+						style={children ? style : {
+							width: actualWidth,
+							...(actualHeight ? { height: actualHeight } : { aspectRatio: computedAspectRatio }),
+							...style,
+						}}
 						onMouseEnter={() => setIsHovering(true)}
 						onMouseLeave={() => setIsHovering(false)}
 					>
@@ -142,5 +153,6 @@ export type ImagePreviewProps = {
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）
+	aspectRatio?: string // 宽高比，如 '16/9', '4/3', '1/1' 等
 	base64Mode?: boolean // 是否使用base64模式
 }

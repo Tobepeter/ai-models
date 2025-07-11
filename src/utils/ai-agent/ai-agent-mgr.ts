@@ -1,5 +1,6 @@
 import { IAiAgent } from './IAiAgent'
 import { SiliconFlowAgent } from './siliconflow-agent'
+import { MockAgent } from './mock-agent'
 import { AIAgentConfig, AIPlatform, StreamCallback, VideoStatusResponse } from './types'
 
 /**
@@ -9,6 +10,7 @@ export class AIAgentManager {
 	agent: IAiAgent
 	agentMap: Record<AIPlatform, new (agent: AIAgentManager) => IAiAgent> = {
 		[AIPlatform.Silicon]: SiliconFlowAgent,
+		[AIPlatform.Mock]: MockAgent,
 	}
 	agentCache = {} as Record<AIPlatform, IAiAgent>
 
@@ -35,14 +37,14 @@ export class AIAgentManager {
 		return this.agent.generateTextStream(prompt, onChunk)
 	}
 
-	async generateImage(prompt: string) {
-		if (!this.checkValid()) return ''
-		return this.agent.generateImage(prompt)
+	async generateImages(prompt: string) {
+		if (!this.checkValid()) return []
+		return this.agent.generateImages(prompt)
 	}
 
-	async generateVideo(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		if (!this.checkValid()) return ''
-		return this.agent.generateVideo(prompt, options)
+	async generateVideos(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		if (!this.checkValid()) return []
+		return this.agent.generateVideos(prompt, options)
 	}
 
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {

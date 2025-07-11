@@ -5,14 +5,17 @@ import { AIAgentManager } from './ai-agent-mgr'
 import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } from './types'
 
 /**
- * SiliconFlow
+ * Mock Agent
+ *
+ * 注意和 env 的 isMock 不同，isMock 是完全离线的
+ * mock agent用的是本地mock server
  */
-export class SiliconFlowAgent implements IAiAgent {
+export class MockAgent implements IAiAgent {
 	agent: AIAgentManager
 	config: AIAgentConfig = {
-		baseUrl: 'https://api.siliconflow.cn/v1',
+		baseUrl: 'http://localhost:3000/v1',
 	}
-	modelConfig: AIModelConfig = siliconflowModelConfig
+	modelConfig: AIModelConfig = mockModelConfig
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
@@ -20,7 +23,7 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	private getHeaders() {
 		return {
-			Authorization: `Bearer ${this.config.apiKey}`,
+			Authorization: `Bearer ${this.config.apiKey || 'mock-token'}`,
 			'Content-Type': 'application/json',
 		}
 	}
@@ -41,7 +44,7 @@ export class SiliconFlowAgent implements IAiAgent {
 			const content = response.data.choices[0]?.message?.content || ''
 			return content.trim()
 		} catch (error) {
-			console.error('[SiliconFlowAgent] generateText error', error)
+			console.error('[MockAgent] generateText error', error)
 			return ''
 		}
 	}
@@ -50,7 +53,7 @@ export class SiliconFlowAgent implements IAiAgent {
 		const { baseUrl } = this.config
 
 		try {
-			const response = await fetch(`${baseUrl}/chat/completions`, {
+			const response = await fetch(`${baseUrl}/chat/completions-stream`, {
 				method: 'POST',
 				headers: this.getHeaders(),
 				body: JSON.stringify({
@@ -68,26 +71,16 @@ export class SiliconFlowAgent implements IAiAgent {
 			const reader = response.body?.getReader()
 			const decoder = new TextDecoder()
 			let fullContent = ''
-			let hasValidContent = false
 
 			const parser = createParser({
 				onEvent: (event) => {
 					if (event.data === '[DONE]') return
 					try {
 						const parsed = JSON.parse(event.data)
-						const content: string = parsed.choices[0]?.delta?.content
+						const content = parsed.choices?.[0]?.delta?.content || ''
 						if (content) {
-							if (!hasValidContent) {
-								if (content.trim().length > 0) {
-									hasValidContent = true
-									const trimmedContent = content.trimStart()
-									onChunk(trimmedContent)
-									fullContent += trimmedContent
-								}
-							} else {
-								onChunk(content)
-								fullContent += content
-							}
+							fullContent += content
+							onChunk(content)
 						}
 					} catch (e) {
 						// 忽略解析错误
@@ -95,18 +88,16 @@ export class SiliconFlowAgent implements IAiAgent {
 				},
 			})
 
-			if (reader) {
-				while (true) {
-					const { done, value } = await reader.read()
-					if (done) break
-					const chunk = decoder.decode(value)
-					parser.feed(chunk)
-				}
+			while (true) {
+				const { done, value } = await reader!.read()
+				if (done) break
+				const chunk = decoder.decode(value, { stream: true })
+				parser.feed(chunk)
 			}
 
 			return fullContent
 		} catch (error) {
-			console.error('[SiliconFlowAgent] generateTextStream error', error)
+			console.error('[MockAgent] generateTextStream error', error)
 			return ''
 		}
 	}
@@ -128,9 +119,9 @@ export class SiliconFlowAgent implements IAiAgent {
 				{ headers: this.getHeaders() }
 			)
 
-			return response.data.images.map((item: any) => item.url)
+			return response.data.data.map((item: any) => item.url)
 		} catch (error) {
-			console.error('[SiliconFlowAgent] generateImages error', error)
+			console.error('[MockAgent] generateImages error', error)
 			return []
 		}
 	}
@@ -164,7 +155,7 @@ export class SiliconFlowAgent implements IAiAgent {
 			// 超时
 			throw new Error('视频生成超时（15分钟）')
 		} catch (error) {
-			console.error('[SiliconFlowAgent] generateVideos error', error)
+			console.error('[MockAgent] generateVideos error', error)
 			return []
 		}
 	}
@@ -174,7 +165,7 @@ export class SiliconFlowAgent implements IAiAgent {
 
 		// 设置默认值
 		const image_size = options?.image_size || '1280x720'
-		const model = 'Wan-AI/Wan2.1-T2V-14B'
+		const model = 'mock-video-model'
 
 		// 构建请求参数
 		const requestData = {
@@ -200,15 +191,8 @@ export class SiliconFlowAgent implements IAiAgent {
 	}
 }
 
-export const siliconflowModelConfig: AIModelConfig = {
-	text: [
-		// == prettier break ==
-		'deepseek-ai/DeepSeek-R1',
-		'Pro/deepseek-ai/DeepSeek-R1',
-		'THUDM/GLM-4.1V-9B-Thinking',
-		'tencent/Hunyuan-A13B-Instruct',
-		'Qwen/Qwen3-32B',
-	],
-	image: ['Kwai-Kolors/Kolors'],
-	video: ['Wan-AI/Wan2.1-T2V-14B'],
+export const mockModelConfig: AIModelConfig = {
+	text: ['mock-text-model-1', 'mock-text-model-2', 'mock-gpt-4', 'mock-claude-3', 'mock-deepseek'],
+	image: ['mock-image-model', 'mock-dalle-3', 'mock-midjourney'],
+	video: ['mock-video-model', 'mock-sora', 'mock-runway'],
 }

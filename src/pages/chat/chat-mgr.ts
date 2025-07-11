@@ -1,5 +1,6 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { siliconflowModelConfig } from '@/utils/ai-agent/siliconflow-agent'
+import { mockModelConfig } from '@/utils/ai-agent/mock-agent'
 import { dummy } from '@/utils/dummy'
 import { isMock } from '@/utils/env'
 import { eventBus, EventType } from '@/utils/event-bus'
@@ -14,15 +15,16 @@ class ChatManager {
 
 	/** 根据媒体类型自动选择模型 */
 	private getModelForMediaType(mediaType: MediaType) {
+		const cfg = siliconflowModelConfig
 		switch (mediaType) {
 			case 'text':
-				return siliconflowModelConfig.text[0]
+				return cfg.text[0]
 			case 'image':
-				return siliconflowModelConfig.image[0]
+				return cfg.image[0]
 			case 'video':
-				return siliconflowModelConfig.video?.[0] || siliconflowModelConfig.text[0]
+				return cfg.video?.[0] || cfg.text[0]
 			default:
-				return siliconflowModelConfig.text[0]
+				return cfg.text[0]
 		}
 	}
 
@@ -137,11 +139,10 @@ class ChatManager {
 
 		aiAgentMgr.setConfig({ model: this.getModelForMediaType('image') })
 
-		const images = await aiAgentMgr.generateImage(userInput)
+		const images = await aiAgentMgr.generateImages(userInput)
 
 		if (images && images.length > 0) {
-			// 处理图片URL，可能是直接的URL字符串或包含url属性的对象
-			const imageUrl = typeof images[0] === 'string' ? images[0] : (images[0] as any).url
+			const imageUrl = images[0]
 			store.updateMsg(msgId, {
 				content: `已为您生成图片：${userInput}`,
 				status: 'success',
@@ -186,14 +187,13 @@ class ChatManager {
 
 		aiAgentMgr.setConfig({ model: this.getModelForMediaType('video') })
 
-		const videoUrl = await aiAgentMgr.generateVideo(userInput)
-
-		if (videoUrl) {
+		const videos = await aiAgentMgr.generateVideos(userInput)
+		if (videos && videos.length > 0) {
 			store.updateMsg(msgId, {
 				content: `已为您生成视频：${userInput}`,
 				status: 'success',
 				mediaData: {
-					url: videoUrl,
+					url: videos[0],
 					filename: 'generated-video.mp4',
 				},
 			})

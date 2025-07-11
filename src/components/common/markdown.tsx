@@ -34,6 +34,10 @@ const MermaidChart = ({ chart }: { chart: string }) => {
 
 /**
  * Markdown 渲染组件
+ *
+ * 关于streaming:
+ * streaming 我尝试做一些动画，不过失败了
+ * 貌似内部每次所有内容都是重新创建的，状态是无法维持的
  */
 export const Markdown = (props: MarkdownProps) => {
 	const { content, className, style, noMarkdown = false } = props

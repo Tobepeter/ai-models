@@ -1,6 +1,7 @@
 // AI Agent 支持的平台
 export enum AIPlatform {
 	Silicon = 'silicon',
+	Mock = 'mock',
 }
 
 // 基础配置接口
