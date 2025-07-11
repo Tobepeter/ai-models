@@ -21,6 +21,7 @@ import { TestShadcn } from './components/test-shadcn'
 import { TestVideoPreview } from './components/test-video-preview'
 import { TestSilicon } from './components/test-silicon'
 import { TestAIAgent } from './components/test-ai-agent'
+import { TestChatMsg } from './components/test-chat-msg'
 
 let Test = () => <div>Test</div>
 
@@ -35,6 +36,7 @@ if (isDev) {
 			video: <TestVideoPreview />,
 			silicon: <TestSilicon />,
 			aiAgent: <TestAIAgent />,
+			chatMsg: <TestChatMsg />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>

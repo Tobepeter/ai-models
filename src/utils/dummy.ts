@@ -50,9 +50,9 @@ class Dummy {
 	dummyImg = this.images.dummyBlack
 
 	getImage(type: 'landscape' | 'portrait' | 'square' = 'landscape') {
-		let size = '400x400'
-		if (type === 'landscape') size = '800x600'
-		else if (type === 'portrait') size = '600x800'
+		let size = '400/400'
+		if (type === 'landscape') size = '800/600'
+		else if (type === 'portrait') size = '600/800'
 		return `https://picsum.photos/${size}`
 	}
 

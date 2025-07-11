@@ -258,6 +258,49 @@ class ChatManager {
 			console.error('没有消息需要停止')
 		}
 	}
+
+	/** 重试消息 */
+	async retryMsg(msgId: string) {
+		const store = useChatStore.getState()
+		const msgList = store.msgList
+		const msgIndex = msgList.findIndex((msg) => msg.id === msgId)
+
+		if (msgIndex === -1) {
+			console.error('未找到要重试的消息')
+			return
+		}
+
+		const msg = msgList[msgIndex]
+		if (msg.type !== 'assistant') {
+			console.error('只能重试AI消息')
+			return
+		}
+
+		// 查找对应的用户消息（通常是前一条消息）
+		let userInput = ''
+		for (let i = msgIndex - 1; i >= 0; i--) {
+			const prevMsg = msgList[i]
+			if (prevMsg.type === 'user') {
+				userInput = prevMsg.content
+				break
+			}
+		}
+
+		if (!userInput) {
+			console.error('未找到对应的用户输入')
+			return
+		}
+
+		// 重置消息状态
+		store.updateMsg(msgId, {
+			status: 'pending',
+			content: '',
+			error: undefined,
+		})
+
+		// 重新生成响应
+		await this.genAIResp(userInput, msg.mediaType, msgId)
+	}
 }
 
 export const chatMgr = new ChatManager()
