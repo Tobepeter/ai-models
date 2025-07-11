@@ -21,6 +21,8 @@ import { TestStreamText } from './components/test-stream-text'
 import { TestCustom } from './components/test-custom'
 import { TestDummy } from './components/test-dummy'
 import { TestImagePreview } from './components/test-image-preview'
+import { TestMarkdown } from './components/test-markdown'
+import { TestMarkdownMermaid } from './components/test-markdown-mermaid'
 import { TestShadcn } from './components/test-shadcn'
 import { TestShimmer } from './components/test-shimmer'
 import { TestShimmerOp } from './components/test-shimmer-op'
@@ -42,6 +44,8 @@ if (isDev) {
 			silicon: <TestSilicon />,
 			aiAgent: <TestAIAgent />,
 			chatMsg: <TestChatMsg />,
+			markdown: <TestMarkdown />,
+			mermaid: <TestMarkdownMermaid />,
 			shimmer: <TestShimmer />,
 			shimmerOp: <TestShimmerOp />,
 			streamText: <TestStreamText />,

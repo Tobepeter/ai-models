@@ -87,7 +87,7 @@ export const TestShimmer = () => {
 			<div className="space-y-4">
 				<h4 className="font-medium">聊天消息加载效果</h4>
 				<div className="flex w-full justify-start">
-					<div className="flex max-w-[75%] flex-row">
+					<div className="flex max-w-[85%] flex-row">
 						<Avatar className="w-8 h-8 mr-2">
 							<AvatarFallback>AI</AvatarFallback>
 						</Avatar>

@@ -115,6 +115,210 @@ export const TestChatMsg = () => {
 				size: '1.2MB',
 			},
 		},
+		// 助手markdown - 基础语法
+		{
+			id: uuidv4(),
+			type: 'assistant',
+			content: `# AI 技术概述
+
+人工智能（AI）是一个快速发展的领域，涵盖了多个技术分支：
+
+## 主要技术分类
+
+### 1. 机器学习 (Machine Learning)
+- **监督学习**: 使用标记数据训练模型
+- **无监督学习**: 从未标记数据中发现模式
+- **强化学习**: 通过奖励机制学习最优策略
+
+### 2. 深度学习 (Deep Learning)
+深度学习是机器学习的一个子集，使用多层神经网络来模拟人脑的工作方式。
+
+\`\`\`python
+# 简单的神经网络示例
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+\`\`\`
+
+## 应用领域
+
+| 领域 | 应用 | 成熟度 |
+|------|------|--------|
+| 计算机视觉 | 图像识别、目标检测 | ⭐⭐⭐⭐⭐ |
+| 自然语言处理 | 机器翻译、文本生成 | ⭐⭐⭐⭐ |
+| 语音识别 | 语音助手、转录 | ⭐⭐⭐⭐ |
+
+> **注意**: AI 技术仍在快速发展中，新的突破不断涌现。
+
+---
+
+想了解更多信息，可以访问 [OpenAI](https://openai.com) 或 [Google AI](https://ai.google)。`,
+			mediaType: 'text',
+			timestamp: Date.now(),
+			status: 'success',
+		},
+		// 助手markdown - 代码示例
+		{
+			id: uuidv4(),
+			type: 'assistant',
+			content: `## 代码实现示例
+
+以下是一个简单的机器学习模型训练过程：
+
+### 数据预处理
+\`\`\`javascript
+// 数据清洗和预处理
+const preprocessData = (rawData) => {
+  return rawData
+    .filter(item => item.value !== null)
+    .map(item => ({
+      ...item,
+      normalizedValue: item.value / 100
+    }))
+}
+
+const cleanData = preprocessData(rawData)
+console.log(\`处理后的数据量: \${cleanData.length}\`)
+\`\`\`
+
+### 模型训练
+\`\`\`python
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+# 准备数据
+X_train, X_test, y_train, y_test = train_test_split(
+    features, labels, test_size=0.2, random_state=42
+)
+
+# 训练模型
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+
+# 评估性能
+accuracy = model.score(X_test, y_test)
+print(f"模型准确率: {accuracy:.2%}")
+\`\`\`
+
+### TypeScript 类型定义
+\`\`\`typescript
+interface ModelConfig {
+  learningRate: number
+  epochs: number
+  batchSize: number
+}
+
+interface TrainingResult {
+  accuracy: number
+  loss: number
+  trainingTime: number
+}
+
+class AIModel {
+  private config: ModelConfig
+
+  constructor(config: ModelConfig) {
+    this.config = config
+  }
+
+  async train(data: TrainingData[]): Promise<TrainingResult> {
+    // 训练逻辑实现
+    return {
+      accuracy: 0.95,
+      loss: 0.05,
+      trainingTime: 1200
+    }
+  }
+}
+\`\`\`
+
+这些代码展示了从数据预处理到模型训练的完整流程。`,
+			mediaType: 'text',
+			timestamp: Date.now(),
+			status: 'success',
+		},
+		// 助手markdown - Mermaid图表
+		{
+			id: uuidv4(),
+			type: 'assistant',
+			content: `## AI 系统架构图
+
+下面是一个典型的 AI 系统架构流程：
+
+\`\`\`mermaid
+flowchart TD
+    A[数据收集] --> B[数据预处理]
+    B --> C[特征工程]
+    C --> D[模型选择]
+    D --> E[模型训练]
+    E --> F{验证结果}
+    F -->|准确率低| G[调整参数]
+    G --> E
+    F -->|准确率高| H[模型部署]
+    H --> I[在线预测]
+    I --> J[结果监控]
+    J --> K{性能下降?}
+    K -->|是| L[重新训练]
+    L --> E
+    K -->|否| I
+\`\`\`
+
+### 数据流时序图
+
+\`\`\`mermaid
+sequenceDiagram
+    participant U as 用户
+    participant API as API网关
+    participant ML as ML服务
+    participant DB as 数据库
+
+    U->>API: 发送预测请求
+    API->>ML: 转发请求
+    ML->>DB: 查询历史数据
+    DB-->>ML: 返回数据
+    ML->>ML: 模型推理
+    ML-->>API: 返回预测结果
+    API-->>U: 响应结果
+
+    Note over ML,DB: 模型可能需要实时学习
+\`\`\`
+
+### 系统组件关系图
+
+\`\`\`mermaid
+classDiagram
+    class DataProcessor {
+        +clean(data)
+        +normalize(data)
+        +validate(data)
+    }
+
+    class MLModel {
+        +train(dataset)
+        +predict(input)
+        +evaluate(testData)
+    }
+
+    class APIService {
+        +handleRequest()
+        +validateInput()
+        +formatResponse()
+    }
+
+    DataProcessor --> MLModel : provides clean data
+    MLModel --> APIService : provides predictions
+    APIService --> DataProcessor : requests validation
+\`\`\`
+
+这些图表展示了 AI 系统的完整工作流程和组件关系。`,
+			mediaType: 'text',
+			timestamp: Date.now(),
+			status: 'success',
+		}
 	]
 
 	return (

@@ -1,4 +1,5 @@
 import { Shimmer } from '@/components/common/shimmer'
+import { Markdown } from '@/components/common/markdown'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -21,7 +22,7 @@ export const ChatMsg = (props: ChatMsgProps) => {
 
 	return (
 		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')}>
-			<div className={cn('flex max-w-[75%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
+			<div className={cn('flex max-w-[85%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
 				{!isUser && (
 					<Avatar className="w-8 h-8 mr-2">
 						<AvatarFallback>AI</AvatarFallback>
@@ -29,7 +30,13 @@ export const ChatMsg = (props: ChatMsgProps) => {
 				)}
 				<div className={cn('px-4 py-2 rounded-lg', isUser ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
 					{/* 消息内容 */}
-					<ChatText content={msg.content} isStream={msg.status === 'generating'} />
+					{/* {msg.status === 'generating' ? (
+						<ChatText content={msg.content} isStream={true} />
+					) : (
+						<Markdown content={msg.content} />
+					)} */}
+
+					<Markdown content={msg.content} />
 
 					{/* 用户消息的媒体内容 */}
 					{isUser && <ChatMedia msg={msg} />}

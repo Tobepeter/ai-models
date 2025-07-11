@@ -18,6 +18,7 @@ export const ChatText = (props: ChatTextProps) => {
 		</div>
 	)
 }
+
 export type ChatTextProps = {
 	content: string
 	className?: string
