@@ -23,7 +23,6 @@ src/
 │ └── ui/ # shadcn/ui 组件
 ├── lib/
 │ ├── utils.ts # 工具函数
-│ ├── axios.ts # Axios 配置
 │ └── react-query.ts # React Query 配置
 ├── pages/
 │ └── TestPage.tsx # 测试页面

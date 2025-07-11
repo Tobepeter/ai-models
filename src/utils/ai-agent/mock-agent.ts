@@ -16,6 +16,10 @@ export class MockAgent implements IAiAgent {
 		baseUrl: 'http://localhost:3000/v1',
 	}
 	modelConfig: AIModelConfig = mockModelConfig
+	axiosClient = axios.create({
+		baseURL: this.config.baseUrl,
+		timeout: 3000, // 3秒超时
+	})
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
@@ -30,9 +34,8 @@ export class MockAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const { baseUrl } = this.config
-			const response = await axios.post(
-				`${baseUrl}/chat/completions`,
+			const response = await this.axiosClient.post(
+				'/chat/completions',
 				{
 					model: this.config.model,
 					stream: false,
@@ -103,11 +106,9 @@ export class MockAgent implements IAiAgent {
 	}
 
 	async generateImages(prompt: string) {
-		const { baseUrl } = this.config
-
 		try {
-			const response = await axios.post(
-				`${baseUrl}/images/generations`,
+			const response = await this.axiosClient.post(
+				'/images/generations',
 				{
 					model: this.config.model,
 					prompt: prompt,
@@ -161,8 +162,6 @@ export class MockAgent implements IAiAgent {
 	}
 
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		const { baseUrl } = this.config
-
 		// 设置默认值
 		const image_size = options?.image_size || '1280x720'
 		const model = 'mock-video-model'
@@ -177,15 +176,13 @@ export class MockAgent implements IAiAgent {
 		}
 
 		// 提交视频生成请求
-		const submitResponse = await axios.post(`${baseUrl}/video/submit`, requestData, { headers: this.getHeaders() })
+		const submitResponse = await this.axiosClient.post('/video/submit', requestData, { headers: this.getHeaders() })
 		return submitResponse.data.requestId
 	}
 
 	async getVideoTaskStatus(requestId: string) {
-		const { baseUrl } = this.config
-
 		// 查询状态
-		const statusResponse = await axios.post<VideoStatusResponse>(`${baseUrl}/video/status`, { requestId }, { headers: this.getHeaders() })
+		const statusResponse = await this.axiosClient.post<VideoStatusResponse>('/video/status', { requestId }, { headers: this.getHeaders() })
 
 		return statusResponse.data
 	}

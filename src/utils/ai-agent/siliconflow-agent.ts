@@ -4,15 +4,16 @@ import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
 import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } from './types'
 
-/**
- * SiliconFlow
- */
 export class SiliconFlowAgent implements IAiAgent {
 	agent: AIAgentManager
 	config: AIAgentConfig = {
 		baseUrl: 'https://api.siliconflow.cn/v1',
 	}
 	modelConfig: AIModelConfig = siliconflowModelConfig
+	axiosClient = axios.create({
+		baseURL: this.config.baseUrl,
+		timeout: 3000,
+	})
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
@@ -27,9 +28,8 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const { baseUrl } = this.config
-			const response = await axios.post(
-				`${baseUrl}/chat/completions`,
+			const response = await this.axiosClient.post(
+				'/chat/completions',
 				{
 					model: this.config.model,
 					stream: false,
@@ -90,7 +90,7 @@ export class SiliconFlowAgent implements IAiAgent {
 							}
 						}
 					} catch (e) {
-						// 忽略解析错误
+						// ignore
 					}
 				},
 			})
