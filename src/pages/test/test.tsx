@@ -22,6 +22,9 @@ import { TestVideoPreview } from './components/test-video-preview'
 import { TestSilicon } from './components/test-silicon'
 import { TestAIAgent } from './components/test-ai-agent'
 import { TestChatMsg } from './components/test-chat-msg'
+import { TestShimmer } from './components/test-shimmer'
+import { TestShimmerOp } from './components/test-shimmer-op'
+import { TestCustom } from './components/test-custom'
 
 let Test = () => <div>Test</div>
 
@@ -37,6 +40,9 @@ if (isDev) {
 			silicon: <TestSilicon />,
 			aiAgent: <TestAIAgent />,
 			chatMsg: <TestChatMsg />,
+			shimmer: <TestShimmer />,
+			shimmerOp: <TestShimmerOp />,
+			custom: <TestCustom />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>
@@ -70,10 +76,7 @@ if (isDev) {
 								<SidebarMenu>
 									{keys.map((key) => (
 										<SidebarMenuItem key={key}>
-											<SidebarMenuButton
-												isActive={selectedKey === key}
-												onClick={() => handleTestChange(key)}
-											>
+											<SidebarMenuButton isActive={selectedKey === key} onClick={() => handleTestChange(key)}>
 												{key}
 											</SidebarMenuButton>
 										</SidebarMenuItem>
@@ -86,13 +89,9 @@ if (isDev) {
 				<SidebarInset>
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b px-2">
 						<SidebarTrigger />
-						<h1 className="text-lg font-semibold">
-							{selectedKey} 测试
-						</h1>
+						<h1 className="text-lg font-semibold">{selectedKey} 测试</h1>
 					</header>
-					<div>
-						{config[selectedKey]}
-					</div>
+					<div>{config[selectedKey]}</div>
 				</SidebarInset>
 			</SidebarProvider>
 		)

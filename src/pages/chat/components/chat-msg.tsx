@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Loader2, AlertCircle, RotateCcw } from 'lucide-react'
 import { ChatMedia } from './chat-media'
 import { chatMgr } from '@/pages/chat/chat-mgr'
+import { Shimmer } from '@/components/common/shimmer'
 
 /**
  * 聊天消息组件
@@ -38,14 +39,14 @@ export const ChatMsg = (props: ChatMsgProps) => {
 
 					{/* 状态显示 */}
 					{!isUser && msg.status === 'pending' && (
-						<div className="flex items-center gap-2 text-ms text-muted-foreground">
-							<Loader2 className="w-4 h-4 animate-spin" />
-							<span>
+						<div className="flex items-center gap-2 text-ms">
+							<Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+							<Shimmer className="text-muted-foreground">
 								{msg.mediaType === 'text' && '正在思考...'}
 								{msg.mediaType === 'image' && '正在生成图片...'}
 								{msg.mediaType === 'audio' && '正在生成音频...'}
 								{msg.mediaType === 'video' && '正在生成视频...'}
-							</span>
+							</Shimmer>
 						</div>
 					)}
 

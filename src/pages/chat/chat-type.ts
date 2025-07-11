@@ -8,10 +8,8 @@ export interface Msg {
 	content: string
 	mediaType: MediaType
 	timestamp: number
-	// 新增状态字段
 	status?: MsgStatus
 	error?: string
-	// 模拟的媒体数据
 	mediaData?: MediaData
 }
 
