@@ -85,15 +85,18 @@ export class SiliconFlowAgent implements IAiAgent {
 							if (data === '[DONE]') break
 							try {
 								const parsed = JSON.parse(data)
-								const content = parsed.choices[0]?.delta?.content
+								const content: string = parsed.choices[0]?.delta?.content
 								if (content) {
 									// 如果还没有开始有效内容，检查是否为空白字符
 									if (!hasValidContent) {
 										// 检查是否包含非空白字符
 										if (content.trim().length > 0) {
 											hasValidContent = true
-											onChunk(content)
-											fullContent += content
+
+											// 仅删除前导空白
+											const trimmedContent = content.trimStart()
+											onChunk(trimmedContent)
+											fullContent += trimmedContent
 										}
 									} else {
 										// 已经开始有效内容，直接输出

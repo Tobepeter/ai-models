@@ -97,7 +97,7 @@ class ChatManager {
 				// 检查是否还在loading状态
 				if (useChatStore.getState().isLoading) {
 					fullContent += chunk
-					store.updateMsg(msgId, { content: fullContent })
+					store.updateMsg(msgId, { content: fullContent, status: 'generating' })
 				}
 			})
 

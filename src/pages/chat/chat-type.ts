@@ -1,6 +1,6 @@
 export type MediaType = 'text' | 'image' | 'audio' | 'video'
 
-export type MsgStatus = 'pending' | 'success' | 'error'
+export type MsgStatus = 'pending' | 'generating' | 'success' | 'error'
 
 export interface Msg {
 	id: string

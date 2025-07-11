@@ -1,6 +1,3 @@
-import { isDev } from '@/utils/env'
-import { useSearchParams } from 'react-router-dom'
-import { useEffect } from 'react'
 import {
 	Sidebar,
 	SidebarContent,
@@ -15,16 +12,20 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { isDev } from '@/utils/env'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { TestAIAgent } from './components/test-ai-agent'
+import { TestChatMsg } from './components/test-chat-msg'
+import { TestStreamText } from './components/test-stream-text'
+import { TestCustom } from './components/test-custom'
 import { TestDummy } from './components/test-dummy'
 import { TestImagePreview } from './components/test-image-preview'
 import { TestShadcn } from './components/test-shadcn'
-import { TestVideoPreview } from './components/test-video-preview'
-import { TestSilicon } from './components/test-silicon'
-import { TestAIAgent } from './components/test-ai-agent'
-import { TestChatMsg } from './components/test-chat-msg'
 import { TestShimmer } from './components/test-shimmer'
 import { TestShimmerOp } from './components/test-shimmer-op'
-import { TestCustom } from './components/test-custom'
+import { TestSilicon } from './components/test-silicon'
+import { TestVideoPreview } from './components/test-video-preview'
 
 let Test = () => <div>Test</div>
 
@@ -33,6 +34,7 @@ if (isDev) {
 		const [searchParams, setSearchParams] = useSearchParams()
 
 		const config = {
+			custom: <TestCustom />,
 			shadcn: <TestShadcn />,
 			dummy: <TestDummy />,
 			image: <TestImagePreview />,
@@ -42,7 +44,7 @@ if (isDev) {
 			chatMsg: <TestChatMsg />,
 			shimmer: <TestShimmer />,
 			shimmerOp: <TestShimmerOp />,
-			custom: <TestCustom />,
+			streamText: <TestStreamText />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>
