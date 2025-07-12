@@ -29,7 +29,9 @@ import { TestShadcn } from './components/test-shadcn'
 import { TestShimmer } from './components/test-shimmer'
 import { TestShimmerOp } from './components/test-shimmer-op'
 import { TestSilicon } from './components/test-silicon'
+import { TestTwBreakpoint } from './components/test-tw-breakpoint'
 import { TestVideoPreview } from './components/test-video-preview'
+import { TestGrid } from './components/test-grid'
 
 let Test = () => <div>Test</div>
 
@@ -53,6 +55,8 @@ if (isDev) {
 			shimmer: <TestShimmer />,
 			shimmerOp: <TestShimmerOp />,
 			streamText: <TestStreamText />,
+			twBreakpoint: <TestTwBreakpoint />,
+			grid: <TestGrid />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>
