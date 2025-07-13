@@ -11,6 +11,9 @@ export interface ChatStore {
 	currModel: string
 	isLoading: boolean
 
+	showSettings: boolean
+	showInvalidAlert: boolean
+
 	setData: (data: Partial<ChatStore>) => void
 
 	addMsg: (msg: Omit<Msg, 'id' | 'timestamp'>) => void
@@ -29,6 +32,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	currPlatform: AIPlatform.Unknown,
 	currModel: '',
 	isLoading: false,
+	showSettings: false,
+	showInvalidAlert: true,
 
 	setData: (data) => set({ ...get(), ...data }),
 
@@ -52,7 +57,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	clearMsg: () => set({ msgList: [] }),
 
 	reset: () => {
-		set({ msgList: [], isLoading: false })
+		set({ msgList: [], isLoading: false, showSettings: false, showInvalidAlert: false })
 	},
 
 	stopGen: () => {

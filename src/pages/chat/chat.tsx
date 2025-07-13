@@ -1,12 +1,13 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
-import { AIPlatform } from '@/utils/ai-agent/types'
 import { useMount } from 'ahooks'
 import { useEffect, useRef } from 'react'
 import { chatHelper } from './chat-helper'
 import { useChatStore } from './chat-store'
 import { ChatInput } from './components/chat-input'
+import { ChatInvalidAlert } from './components/chat-invalid-alert'
 import { ChatMsg } from './components/chat-msg'
+import { ChatSettings } from './components/chat-settings'
 import { ChatToolbar } from './components/chat-toolbar'
 
 /**
@@ -73,6 +74,10 @@ export const Chat = () => {
 			<div className="flex-shrink-0">
 				<ChatInput />
 			</div>
+
+			{/* 弹窗 */}
+			<ChatInvalidAlert />
+			<ChatSettings />
 		</div>
 	)
 }

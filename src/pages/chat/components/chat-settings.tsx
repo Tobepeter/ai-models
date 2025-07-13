@@ -14,8 +14,8 @@ import { useChatStore } from '../chat-store'
 /**
  * 聊天设置对话框
  */
-export const ChatSettings = (props: ChatSettingsProps) => {
-	const { open = false, onOpenChange } = props
+export const ChatSettings = () => {
+	const { showSettings, setData } = useChatStore()
 	const { currPlatform } = useChatStore()
 	const { theme, setTheme } = useAppStore()
 	const [apiKey, setApiKey] = useState(aiAgentConfig.getApiKey(currPlatform))
@@ -24,7 +24,7 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 	const saveConfigs = () => {
 		aiAgentConfig.setApiKey(currPlatform, apiKey)
 		aiAgentConfig.save()
-		onOpenChange?.(false)
+		setData({ showSettings: false })
 	}
 
 	// 切换平台
@@ -36,7 +36,7 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 	const platformList = Object.values(AIPlatform).filter((platform) => platform !== AIPlatform.Unknown)
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange} >
+		<Dialog open={showSettings} onOpenChange={(open) => setData({ showSettings: open })}>
 			<DialogContent className="sm:max-w-[500px]" aria-describedby="settings">
 				<DialogHeader>
 					<DialogTitle>设置</DialogTitle>
@@ -87,7 +87,7 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 
 					{/* 操作按钮 */}
 					<div className="flex justify-end space-x-2 pt-4">
-						<Button variant="outline" onClick={() => onOpenChange?.(false)}>
+						<Button variant="outline" onClick={() => setData({ showSettings: false })}>
 							取消
 						</Button>
 						<Button onClick={saveConfigs}>保存</Button>
@@ -96,9 +96,4 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 			</DialogContent>
 		</Dialog>
 	)
-}
-
-export type ChatSettingsProps = {
-	open?: boolean
-	onOpenChange?: (open: boolean) => void
 }

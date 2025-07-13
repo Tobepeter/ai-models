@@ -8,12 +8,13 @@ import { ChatMediaSelector } from './chat-media-selector'
 import { useEvent, EventType } from '@/utils/event-bus'
 import { useChatStore } from '../chat-store'
 import { chatHelper } from '../chat-helper'
+import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 
 /**
  * 聊天输入框组件
  */
 export const ChatInput = () => {
-	const { currMediaType, isLoading, addMsg, genAIResp, stopGen } = useChatStore()
+	const { currMediaType, isLoading, addMsg, genAIResp, stopGen, currModel, setData } = useChatStore()
 	const [inputVal, setInputVal] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
 	const autoFocus = false
@@ -62,6 +63,12 @@ export const ChatInput = () => {
 		if (isLoading) {
 			stopGen()
 		} else if (inputVal.trim()) {
+			// 检测模型是否有效
+			if (!aiAgentMgr.isValidModel(currModel)) {
+				setData({ showInvalidAlert: true })
+				return
+			}
+			
 			handleSend(inputVal.trim(), currMediaType)
 			setInputVal('')
 			inputRef.current?.blur() // 发送后失焦

@@ -107,20 +107,26 @@ export class AIAgentManager {
 		return this.agent.getVideoTaskStatus(requestId)
 	}
 
-	checkValid() {
-		if (!this.agent) {
-			console.error('agent is not initialized')
-			return false	
-		}
-		if (!aiAgentConfig.data[this.platform].apiKey) {
-			console.error(`platform ${this.platform} api key is not set`)
-			return false
-		}
-		if (!this.agent.currModel) {
-			console.error(`platform ${this.platform} model is not set`)
+	checkValid(): boolean {
+		const info = this.getInValidinfo()
+		if (info) {
+			console.error(info)
 			return false
 		}
 		return true
+	}
+
+	getInValidinfo(): string {
+		if (!this.agent) {
+			return 'agent is not initialized'
+		}
+		if (!aiAgentConfig.data[this.platform].apiKey) {
+			return `platform ${this.platform} api key is not set`
+		}
+		if (!this.agent.currModel) {
+			return `platform ${this.platform} model is not set`
+		}
+		return ''
 	}
 }
 
