@@ -14,13 +14,17 @@ export const ChatToolbar = () => {
 	const [showSettings, setShowSettings] = useState(false)
 	const modelOptions = chatHelper.getModelOptions()
 
+	const handleModelChange = (model: string) => {
+		chatHelper.setModel(model)
+	}
+
 	return (
 		<div className="flex items-center justify-between px-4 py-2 border-b bg-card">
 			<div className="flex items-center space-x-4">
 				{/* 模型选择 */}
 				<div className="flex items-center space-x-2">
 					<span className="text-sm text-muted-foreground">模型:</span>
-					<Select value={currModel} onValueChange={chatHelper.setModel}>
+					<Select value={currModel} onValueChange={handleModelChange}>
 						<SelectTrigger className="w-72">
 							<SelectValue placeholder="选择模型" />
 						</SelectTrigger>

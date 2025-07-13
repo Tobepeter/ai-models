@@ -26,7 +26,7 @@ export interface ChatStore {
 export const useChatStore = create<ChatStore>((set, get) => ({
 	msgList: [],
 	currMediaType: 'text',
-	currPlatform: AIPlatform.Mock,
+	currPlatform: AIPlatform.Unknown,
 	currModel: '',
 	isLoading: false,
 
@@ -52,13 +52,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	clearMsg: () => set({ msgList: [] }),
 
 	reset: () => {
-		set({
-			msgList: [],
-			currMediaType: 'text',
-			currPlatform: AIPlatform.Mock,
-			currModel: '',
-			isLoading: false,
-		})
+		set({ msgList: [], isLoading: false })
 	},
 
 	stopGen: () => {

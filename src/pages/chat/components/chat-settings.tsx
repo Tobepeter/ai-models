@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -33,39 +33,27 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 		setApiKey(aiAgentConfig.getApiKey(platform))
 	}
 
-	// 获取平台显示名称
-	const getPlatformDisplayName = (platform: AIPlatform): string => {
-		switch (platform) {
-			case AIPlatform.Mock:
-				return 'Mock (本地测试)'
-			case AIPlatform.Silicon:
-				return 'SiliconFlow'
-			case AIPlatform.OpenRouter:
-				return 'OpenRouter'
-			default:
-				return platform
-		}
-	}
+	const platformList = Object.values(AIPlatform).filter((platform) => platform !== AIPlatform.Unknown)
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[500px]">
+		<Dialog open={open} onOpenChange={onOpenChange} >
+			<DialogContent className="sm:max-w-[500px]" aria-describedby="settings">
 				<DialogHeader>
 					<DialogTitle>设置</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-6">
 					{/* 平台选择 */}
-					<div className="space-y-2">
+					<div className="flex flex-col gap-4">
 						<Label>AI 平台</Label>
 						<Select value={currPlatform} onValueChange={handlePlatformChange}>
 							<SelectTrigger>
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								{Object.values(AIPlatform).map((platform) => (
+								{platformList.map((platform) => (
 									<SelectItem key={platform} value={platform}>
-										{getPlatformDisplayName(platform)}
+										{platform}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -74,39 +62,27 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 
 					<Separator />
 
-					{/* 当前平台配置 */}
-					<div className="space-y-4">
-						<div className="flex items-center space-x-2">
-							<Label className="text-base font-medium">{getPlatformDisplayName(currPlatform)} 配置</Label>
-						</div>
-
-						{/* API Key */}
-						<div className="space-y-2">
-							<Label htmlFor="apiKey">API Key</Label>
-							<Input id="apiKey" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="请输入API Key" />
-						</div>
+					{/* API Key */}
+					<div className="flex flex-col gap-4">
+						<Label htmlFor="apiKey">API Key</Label>
+						<Input id="apiKey" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="请输入API Key" />
 					</div>
 
 					<Separator />
 
-					{/* 其他设置 */}
-					<div className="space-y-4">
-						<Label className="text-base font-medium">其他设置</Label>
-
-						{/* 主题设置 */}
-						<div className="space-y-2">
-							<Label>主题</Label>
-							<Select value={theme} onValueChange={setTheme}>
-								<SelectTrigger>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="light">浅色</SelectItem>
-									<SelectItem value="dark">深色</SelectItem>
-									<SelectItem value="system">跟随系统</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
+					{/* 主题设置 */}
+					<div className="flex flex-col gap-4">
+						<Label>主题</Label>
+						<Select value={theme} onValueChange={setTheme}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="light">浅色</SelectItem>
+								<SelectItem value="dark">深色</SelectItem>
+								<SelectItem value="system">跟随系统</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 
 					{/* 操作按钮 */}

@@ -1,8 +1,8 @@
 import { AIAgentManager } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform } from '@/utils/ai-agent/types'
-import { ChatCard, ModelConfig } from './chat-hub-type'
-import { useChatHubStore } from './chat-hub-store'
 import { v4 as uuidv4 } from 'uuid'
+import { useChatHubStore } from './chat-hub-store'
+import { ChatCard, ModelConfig } from './chat-hub-type'
 
 class ChatHubManager {
 	// 缓存 platform+model 为一个agent实例

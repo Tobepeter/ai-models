@@ -39,6 +39,19 @@ export class AIAgentManager {
 		if (this.agent) this.agent.currModel = model
 	}
 
+	isValidModel(model: string) {
+		const platformConfig = aiAgentConfig.data[this.platform]
+		if (!platformConfig?.models) return false
+		const modelConfig = platformConfig.models
+		for (const mediaType in modelConfig) {
+			const models = modelConfig[mediaType as MediaType]
+			if (models && models.includes(model)) {
+				return true
+			}
+		}
+		return false
+	}
+
 	getModel(): string {
 		return this.agent?.currModel || ''
 	}
@@ -65,27 +78,49 @@ export class AIAgentManager {
 	}
 
 	async generateText(prompt: string) {
+		if (!this.checkValid()) return ''
 		return this.agent.generateText(prompt)
 	}
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+		if (!this.checkValid()) return
 		return this.agent.generateTextStream(prompt, onChunk)
 	}
 
 	async generateImages(prompt: string) {
+		if (!this.checkValid()) return []
 		return this.agent.generateImages(prompt)
 	}
 
 	async generateVideos(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		if (!this.checkValid()) return []
 		return this.agent.generateVideos(prompt, options)
 	}
 
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
+		if (!this.checkValid()) return ''
 		return this.agent.createVideoTask(prompt, options)
 	}
 
-	async getVideoTaskStatus(requestId: string): Promise<VideoStatusResponse | null> {
+	async getVideoTaskStatus(requestId: string): Promise<VideoStatusResponse> {
+		if (!this.checkValid()) return null
 		return this.agent.getVideoTaskStatus(requestId)
+	}
+
+	checkValid() {
+		if (!this.agent) {
+			console.error('agent is not initialized')
+			return false	
+		}
+		if (!aiAgentConfig.data[this.platform].apiKey) {
+			console.error(`platform ${this.platform} api key is not set`)
+			return false
+		}
+		if (!this.agent.currModel) {
+			console.error(`platform ${this.platform} model is not set`)
+			return false
+		}
+		return true
 	}
 }
 

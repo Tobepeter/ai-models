@@ -19,3 +19,8 @@ export type MediaData = {
 	size?: string
 	duration?: string
 }
+
+export type ChatPersist = {
+	platform: AIPlatform
+	model: string
+}

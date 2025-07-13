@@ -6,7 +6,7 @@ import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
 import { aiAgentConfig } from './ai-agent-config'
 
 /**
- * OpenRouter AI Agent 实现
+ * OpenRouter
  */
 export class OpenRouterAgent implements IAiAgent {
 	agent: AIAgentManager

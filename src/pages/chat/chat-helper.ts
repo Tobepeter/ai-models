@@ -1,11 +1,13 @@
-import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
-import { AIPlatform, MediaType, PlatformConfig } from '@/utils/ai-agent/types'
-import { useChatStore } from './chat-store'
+import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
+import { Film, Image, MessageCircle, Volume2 } from 'lucide-react'
 import { ElementType } from 'react'
-import { MessageCircle, Image, Volume2, Film } from 'lucide-react'
+import { useChatStore } from './chat-store'
+import { ChatPersist } from './chat-type'
 
 class ChatHelper {
+	persistKey = 'chat-model'
+
 	switchPlatform(platform: AIPlatform) {
 		const store = useChatStore.getState()
 		aiAgentMgr.switchPlatform(platform)
@@ -22,6 +24,7 @@ class ChatHelper {
 					break
 				}
 			}
+			aiAgentMgr.setModel(currModel)
 		}
 
 		store.setData({
@@ -29,15 +32,37 @@ class ChatHelper {
 			currModel: currModel,
 			currMediaType: currMediaType,
 		})
+
+		this.persist()
 	}
 
-	setModel(model: string) {
+	restorePersist() {
+		const persistData = this.loadPersist()
+		if (!persistData) {
+			this.switchPlatform(AIPlatform.Mock)
+			return
+		}
+		this.switchPlatform(persistData.platform)
+		this.setModel(persistData.model, true)
+	}
+
+	setModel(model: string, fromPersist = false) {
 		const store = useChatStore.getState()
+
+		if (!aiAgentMgr.isValidModel(model)) {
+			console.error(`[ChatHelper] setModel but model ${model} is not valid`)
+			return
+		}
+
 		aiAgentMgr.setModel(model)
 		store.setData({
 			currModel: model,
 			currMediaType: aiAgentMgr.getModelMedia(),
 		})
+
+		if (!fromPersist) {
+			this.persist()
+		}
 	}
 
 	setMedia(media: MediaType) {
@@ -54,6 +79,8 @@ class ChatHelper {
 			currMediaType: media,
 			currModel: model,
 		})
+
+		this.persist()
 	}
 
 	pickModel(media: MediaType) {
@@ -87,18 +114,19 @@ class ChatHelper {
 		return options
 	}
 
-	/** 获取平台显示名称 */
-	getPlatformDisplayName(platform: AIPlatform): string {
-		switch (platform) {
-			case AIPlatform.Mock:
-				return 'Mock (本地测试)'
-			case AIPlatform.Silicon:
-				return 'SiliconFlow'
-			case AIPlatform.OpenRouter:
-				return 'OpenRouter'
-			default:
-				return platform
+	persist() {
+		const store = useChatStore.getState()
+		const persistData: ChatPersist = {
+			platform: store.currPlatform,
+			model: store.currModel,
 		}
+		localStorage.setItem(this.persistKey, JSON.stringify(persistData))
+	}
+
+	loadPersist(): ChatPersist | null {
+		const str = localStorage.getItem(this.persistKey)
+		if (!str) return null
+		return JSON.parse(str) as ChatPersist
 	}
 }
 
