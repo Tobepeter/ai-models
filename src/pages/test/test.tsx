@@ -24,11 +24,9 @@ import { TestImagePreview } from './components/test-image-preview'
 import { TestMarkdown } from './components/test-markdown'
 import { TestMarkdownMermaid } from './components/test-markdown-mermaid'
 import { TestMarkdownStreaming } from './components/test-markdown-streaming'
-import { TestMockAgent } from './components/test-mock-agent'
 import { TestShadcn } from './components/test-shadcn'
 import { TestShimmer } from './components/test-shimmer'
 import { TestShimmerOp } from './components/test-shimmer-op'
-import { TestSilicon } from './components/test-silicon'
 import { TestTwBreakpoint } from './components/test-tw-breakpoint'
 import { TestVideoPreview } from './components/test-video-preview'
 import { TestGrid } from './components/test-grid'
@@ -45,8 +43,6 @@ if (isDev) {
 			dummy: <TestDummy />,
 			image: <TestImagePreview />,
 			video: <TestVideoPreview />,
-			silicon: <TestSilicon />,
-			mockAgent: <TestMockAgent />,
 			aiAgent: <TestAIAgent />,
 			chatMsg: <TestChatMsg />,
 			markdown: <TestMarkdown />,

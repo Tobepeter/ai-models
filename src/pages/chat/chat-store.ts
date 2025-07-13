@@ -1,14 +1,18 @@
+import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
 import { v4 as uuidv4 } from 'uuid'
 import { create } from 'zustand'
 import { chatMgr } from './chat-mgr'
-import { MediaType, Msg } from './chat-type'
+import { Msg } from './chat-type'
 
 export interface ChatStore {
 	msgList: Msg[]
 	currMediaType: MediaType
-	isLoading: boolean // 仅用于文本streaming
+	currPlatform: AIPlatform
+	currModel: string
+	isLoading: boolean
 
-	setCurMedia: (type: MediaType) => void
+	setData: (data: Partial<ChatStore>) => void
+
 	addMsg: (msg: Omit<Msg, 'id' | 'timestamp'>) => void
 	updateMsg: (id: string, updates: Partial<Msg>) => void
 	setLoading: (loading: boolean) => void
@@ -22,9 +26,11 @@ export interface ChatStore {
 export const useChatStore = create<ChatStore>((set, get) => ({
 	msgList: [],
 	currMediaType: 'text',
+	currPlatform: AIPlatform.Mock,
+	currModel: '',
 	isLoading: false,
 
-	setCurMedia: (type) => set({ currMediaType: type }),
+	setData: (data) => set({ ...get(), ...data }),
 
 	addMsg: (msg) => {
 		const newMsg: Msg = {
@@ -49,6 +55,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 		set({
 			msgList: [],
 			currMediaType: 'text',
+			currPlatform: AIPlatform.Mock,
+			currModel: '',
 			isLoading: false,
 		})
 	},

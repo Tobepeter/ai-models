@@ -1,10 +1,12 @@
-import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
+import { AIAgentManager } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform } from '@/utils/ai-agent/types'
 import { ChatCard, ModelConfig } from './chat-hub-type'
 import { useChatHubStore } from './chat-hub-store'
 import { v4 as uuidv4 } from 'uuid'
 
 class ChatHubManager {
+	// 缓存 platform+model 为一个agent实例
+	private agentCache = new Map<string, AIAgentManager>()
 	async startGeneration(question: string, models: ModelConfig[]) {
 		// 为每个模型启动生成任务
 		const promises = models.map((model) => this.generateForModel(question, model))
@@ -17,6 +19,24 @@ class ChatHubManager {
 			// 检查是否所有任务完成
 			this.checkAllCompleted()
 		}
+	}
+
+	// 获取或创建agent实例
+	private getAgent(platform: string, model: string): AIAgentManager {
+		const cacheKey = `${platform}-${model}`
+
+		if (!this.agentCache.has(cacheKey)) {
+			const agent = new AIAgentManager()
+			// 根据platform设置对应的平台
+			const platformEnum = platform === 'mock' ? AIPlatform.Mock : platform === 'silicon' ? AIPlatform.Silicon : platform === 'openrouter' ? AIPlatform.OpenRouter : AIPlatform.Unknown
+
+			agent.switchPlatform(platformEnum)
+			agent.setModel(model)
+
+			this.agentCache.set(cacheKey, agent)
+		}
+
+		return this.agentCache.get(cacheKey)!
 	}
 
 	private async generateForModel(question: string, model: ModelConfig) {
@@ -40,18 +60,14 @@ class ChatHubManager {
 			// 更新状态为等待中
 			store.updateCard(cardId, { status: 'pending' })
 
-			// 设置AI平台和配置（目前只使用 Mock）
-			aiAgentMgr.switchPlatform(AIPlatform.Mock)
-			aiAgentMgr.setConfig({
-				model: model.model,
-				apiKey: 'mock-key',
-			})
+			// 获取对应的agent实例
+			const agent = this.getAgent(model.platform, model.model)
 
 			let fullAnswer = ''
 			let isFirstChunk = true
 
 			// 流式生成
-			await aiAgentMgr.generateTextStream(question, (chunk: string) => {
+			await agent.generateTextStream(question, (chunk: string) => {
 				// 第一次收到内容时，更新状态为生成中
 				if (isFirstChunk) {
 					store.updateCard(cardId, {
@@ -82,6 +98,11 @@ class ChatHubManager {
 		// 停止生成（实际上请求会继续，但不会更新UI状态）
 		const store = useChatHubStore.getState()
 		store.reset()
+	}
+
+	// 清空agent缓存，组件unmount时调用
+	clearCache() {
+		this.agentCache.clear()
 	}
 
 	private checkAllCompleted() {

@@ -1,25 +1,25 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform } from '@/utils/ai-agent/types'
+import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { useMount } from 'ahooks'
 import { useEffect, useRef } from 'react'
 import { useChatStore } from './chat-store'
 import { ChatInput } from './components/chat-input'
 import { ChatMsg } from './components/chat-msg'
+import { ChatToolbar } from './components/chat-toolbar'
+import { chatHelper } from './chat-helper'
 
 /**
  * 聊天页面主组件
  */
 export const Chat = () => {
 	const { msgList, currMediaType, isLoading } = useChatStore()
-
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
 	useMount(() => {
-		aiAgentMgr.switchPlatform(AIPlatform.Silicon)
-		aiAgentMgr.setConfig({
-			apiKey: import.meta.env.VITE_SILICON_API_KEY,
-		})
+		aiAgentConfig.restore()
+		chatHelper.switchPlatform(AIPlatform.Mock)
 	})
 
 	// 自动滚动到底部
@@ -63,10 +63,12 @@ export const Chat = () => {
 						{msgList.map((msg) => (
 							<ChatMsg key={msg.id} msg={msg} />
 						))}
-
 					</div>
 				</ScrollArea>
 			</div>
+
+			{/* 工具栏 */}
+			<ChatToolbar />
 
 			{/* 输入区域 */}
 			<div className="flex-shrink-0">

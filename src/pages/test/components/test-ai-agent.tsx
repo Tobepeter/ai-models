@@ -6,14 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { ImagePreview } from '@/components/common/image-preview'
-import { AIPlatform, ImageResponse } from '@/utils/ai-agent/types'
+import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
+import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
+import { AIPlatform } from '@/utils/ai-agent/types'
 import { useMutation } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
-import { siliconflowModelConfig } from '@/utils/ai-agent/siliconflow-agent'
-import { mockModelConfig } from '@/utils/ai-agent/mock-agent'
-import { useMount } from 'ahooks'
 
 /**
  * AI Agent 测试组件
@@ -40,24 +38,18 @@ export const TestAIAgent = () => {
 	const getModelConfig = () => {
 		switch (platform) {
 			case AIPlatform.Mock:
-				return mockModelConfig
+				return aiAgentConfig.data[AIPlatform.Mock]
 			case AIPlatform.Silicon:
-				return siliconflowModelConfig
+				return aiAgentConfig.data[AIPlatform.Silicon]
 			default:
-				return (
-					aiAgentMgr.agent?.modelConfig || {
-						text: [],
-						image: [],
-						video: [],
-					}
-				)
+				return aiAgentConfig.data[AIPlatform.Unknown]
 		}
 	}
 
 	const modelConfig = getModelConfig()
-	const isImageModel = (model: string) => modelConfig.image.includes(model)
-	const isVideoModel = (model: string) => modelConfig.video?.includes(model) || false
-	const allModels = [...modelConfig.text, ...modelConfig.image, ...(modelConfig.video || [])]
+	const isImageModel = (model: string) => modelConfig.models.image?.includes(model) || false
+	const isVideoModel = (model: string) => modelConfig.models.video?.includes(model) || false
+	const allModels = [...modelConfig.models.text, ...modelConfig.models.image, ...(modelConfig.models.video || [])]
 	const modelOptions = allModels.map((model) => {
 		let suffix = '💬 '
 		if (isImageModel(model)) {
@@ -81,27 +73,19 @@ export const TestAIAgent = () => {
 		setVideoResponse('')
 	}
 
-	// 从环境变量读取 API Key
-	useMount(() => {
-		setToken(import.meta.env.VITE_SILICON_API_KEY)
-	})
-
 	// 监听平台变化
 	useEffect(() => {
 		aiAgentMgr.switchPlatform(platform)
 
 		// 切换平台时重置为该平台的默认模型
 		const newModelConfig = getModelConfig()
-		if (newModelConfig.text.length > 0) {
-			setModel(newModelConfig.text[0])
+		if (newModelConfig.models.text.length > 0) {
+			setModel(newModelConfig.models.text[0])
 		}
 	}, [platform])
 
 	useEffect(() => {
-		aiAgentMgr.setConfig({
-			apiKey: token,
-			model: model,
-		})
+		aiAgentMgr.setModel(model)
 	}, [token, model])
 
 	// 文本生成处理

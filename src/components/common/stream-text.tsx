@@ -28,7 +28,7 @@ export const StreamText = (props: StreamTextProps) => {
 						animate={{ opacity: 1 }}
 						transition={{
 							duration: isNewChar ? 0.15 : 0, // 只对新字符应用动画
-							ease: 'easeOut'
+							ease: 'easeOut',
 						}}
 					>
 						{char}

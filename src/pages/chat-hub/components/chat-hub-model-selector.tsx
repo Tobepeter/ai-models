@@ -25,14 +25,7 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 			{models.map((model) => {
 				const isSelected = selectedModels.some((m) => m.id === model.id)
 				return (
-					<Button
-						key={model.id}
-						onClick={() => handleToggle(model)}
-						disabled={disabled}
-						variant={isSelected ? 'default' : 'outline'}
-						size="sm"
-						className="rounded-full"
-					>
+					<Button key={model.id} onClick={() => handleToggle(model)} disabled={disabled} variant={isSelected ? 'default' : 'outline'} size="sm" className="rounded-full">
 						{model.name}
 					</Button>
 				)

@@ -97,10 +97,10 @@ export const TestShimmer = () => {
 								<motion.span
 									className="text-transparent bg-clip-text"
 									style={{
-                    /**
-                     * 宽度其实100 200都行
-                     * 只是200拉长两倍，过渡的颜色被拉长，看起来更柔顺
-                     */
+										/**
+										 * 宽度其实100 200都行
+										 * 只是200拉长两倍，过渡的颜色被拉长，看起来更柔顺
+										 */
 										backgroundSize: '200% 100%',
 										backgroundImage: `linear-gradient(to right, currentColor, ${colors.purple400}, currentColor)`,
 									}}

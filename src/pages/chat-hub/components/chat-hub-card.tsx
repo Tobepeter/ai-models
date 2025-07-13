@@ -46,9 +46,7 @@ export const ChatHubCard = (props: ChatHubCardProps) => {
 				{/* 问题区域 */}
 				<div className="mb-4 pb-3 border-b">
 					<div className="text-xs text-muted-foreground mb-1">问题</div>
-					<div className="text-sm">
-						{card.question || '等待输入问题...'}
-					</div>
+					<div className="text-sm">{card.question || '等待输入问题...'}</div>
 				</div>
 
 				{/* 回答区域 */}
@@ -72,9 +70,7 @@ export const ChatHubCard = (props: ChatHubCardProps) => {
 				{/* 卡片底部 */}
 				<div className="pt-3 border-t text-xs text-muted-foreground flex justify-between">
 					<span>{config.label}</span>
-					<span>
-						{card.status === 'completed' ? getDuration() : formatTime(card.timestamp)}
-					</span>
+					<span>{card.status === 'completed' ? getDuration() : formatTime(card.timestamp)}</span>
 				</div>
 			</CardContent>
 		</Card>

@@ -186,8 +186,7 @@ flowchart LR
 			<h2 className="text-2xl font-bold mb-6">Mermaid 图表测试</h2>
 			<div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
 				<p className="text-sm text-yellow-800">
-					<strong>注意</strong>: Mermaid 包体积较大 (~500KB)，已标记为待优化项目。
-					当前使用暗色主题，后续需要适配主题切换。
+					<strong>注意</strong>: Mermaid 包体积较大 (~500KB)，已标记为待优化项目。 当前使用暗色主题，后续需要适配主题切换。
 				</p>
 			</div>
 			<div className="space-y-8">

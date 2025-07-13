@@ -1,18 +1,19 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { MediaType } from '@/pages/chat/chat-type'
+import { MediaType } from '@/utils/ai-agent/types'
 import { useMount } from 'ahooks'
 import { Send, Square } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { ChatMediaSelector } from './chat-media-selector'
 import { useEvent, EventType } from '@/utils/event-bus'
 import { useChatStore } from '../chat-store'
+import { chatHelper } from '../chat-helper'
 
 /**
  * 聊天输入框组件
  */
 export const ChatInput = () => {
-	const { currMediaType, isLoading, addMsg, genAIResp, stopGen, setCurMedia } = useChatStore()
+	const { currMediaType, isLoading, addMsg, genAIResp, stopGen } = useChatStore()
 	const [inputVal, setInputVal] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
 	const autoFocus = false
@@ -81,7 +82,7 @@ export const ChatInput = () => {
 
 	return (
 		<div className="flex gap-2 p-4 border-t bg-background">
-			<ChatMediaSelector value={currMediaType} onChange={setCurMedia} />
+			<ChatMediaSelector />
 			<div className="flex-1">
 				<Input ref={inputRef} value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} disabled={isLoading} className="w-full" />
 			</div>

@@ -2,18 +2,16 @@ import axios from 'axios'
 import { createParser } from 'eventsource-parser'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
-import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } from './types'
+import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
+import { aiAgentConfig } from './ai-agent-config'
 
 export class SiliconFlowAgent implements IAiAgent {
 	agent: AIAgentManager
-	config: AIAgentConfig = {
-		baseUrl: 'https://api.siliconflow.cn/v1',
-	}
-	modelConfig: AIModelConfig = siliconflowModelConfig
 	axiosClient = axios.create({
-		baseURL: this.config.baseUrl,
+		baseURL: aiAgentConfig.data[AIPlatform.Silicon].baseUrl,
 		timeout: 3000,
 	})
+	currModel: string
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
@@ -21,7 +19,7 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	private getHeaders() {
 		return {
-			Authorization: `Bearer ${this.config.apiKey}`,
+			Authorization: `Bearer ${aiAgentConfig.getApiKey(AIPlatform.Silicon)}`,
 			'Content-Type': 'application/json',
 		}
 	}
@@ -31,7 +29,7 @@ export class SiliconFlowAgent implements IAiAgent {
 			const response = await this.axiosClient.post(
 				'/chat/completions',
 				{
-					model: this.config.model,
+					model: this.currModel,
 					stream: false,
 					messages: [{ role: 'user', content: prompt }],
 					max_tokens: 1000,
@@ -47,14 +45,12 @@ export class SiliconFlowAgent implements IAiAgent {
 	}
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
-		const { baseUrl } = this.config
-
 		try {
-			const response = await fetch(`${baseUrl}/chat/completions`, {
+			const response = await fetch(`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/chat/completions`, {
 				method: 'POST',
 				headers: this.getHeaders(),
 				body: JSON.stringify({
-					model: this.config.model,
+					model: this.currModel,
 					stream: true,
 					messages: [{ role: 'user', content: prompt }],
 					max_tokens: 1000,
@@ -112,13 +108,11 @@ export class SiliconFlowAgent implements IAiAgent {
 	}
 
 	async generateImages(prompt: string) {
-		const { baseUrl } = this.config
-
 		try {
 			const response = await axios.post(
-				`${baseUrl}/images/generations`,
+				`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/images/generations`,
 				{
-					model: this.config.model,
+					model: this.currModel,
 					prompt: prompt,
 					image_size: '1024x1024',
 					batch_size: 1,
@@ -170,8 +164,6 @@ export class SiliconFlowAgent implements IAiAgent {
 	}
 
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		const { baseUrl } = this.config
-
 		// 设置默认值
 		const image_size = options?.image_size || '1280x720'
 		const model = 'Wan-AI/Wan2.1-T2V-14B'
@@ -186,29 +178,14 @@ export class SiliconFlowAgent implements IAiAgent {
 		}
 
 		// 提交视频生成请求
-		const submitResponse = await axios.post(`${baseUrl}/video/submit`, requestData, { headers: this.getHeaders() })
+		const submitResponse = await axios.post(`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/video/submit`, requestData, { headers: this.getHeaders() })
 		return submitResponse.data.requestId
 	}
 
 	async getVideoTaskStatus(requestId: string) {
-		const { baseUrl } = this.config
-
 		// 查询状态
-		const statusResponse = await axios.post<VideoStatusResponse>(`${baseUrl}/video/status`, { requestId }, { headers: this.getHeaders() })
+		const statusResponse = await axios.post<VideoStatusResponse>(`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/video/status`, { requestId }, { headers: this.getHeaders() })
 
 		return statusResponse.data
 	}
-}
-
-export const siliconflowModelConfig: AIModelConfig = {
-	text: [
-		// == prettier break ==
-		'deepseek-ai/DeepSeek-R1',
-		'Pro/deepseek-ai/DeepSeek-R1',
-		'THUDM/GLM-4.1V-9B-Thinking',
-		'tencent/Hunyuan-A13B-Instruct',
-		'Qwen/Qwen3-32B',
-	],
-	image: ['Kwai-Kolors/Kolors'],
-	video: ['Wan-AI/Wan2.1-T2V-14B'],
 }

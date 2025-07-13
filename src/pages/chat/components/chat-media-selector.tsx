@@ -1,22 +1,22 @@
-import { MediaType } from '@/pages/chat/chat-type'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ChevronDown, MessageCircle, Image, Volume2, Film } from 'lucide-react'
-
-const mediaTypeConfig = {
-	text: { icon: MessageCircle, label: '文本' },
-	image: { icon: Image, label: '图片' },
-	audio: { icon: Volume2, label: '音频' },
-	video: { icon: Film, label: '视频' },
-}
+import { MediaType } from '@/utils/ai-agent/types'
+import { ChevronDown, Film, Image, MessageCircle, Volume2 } from 'lucide-react'
+import { ElementType } from 'react'
+import { useChatStore } from '../chat-store'
+import { chatHelper } from '../chat-helper'
 
 /**
  * 媒体类型选择器组件
  */
-export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
-	const { value, onChange } = props
-	const currConfig = mediaTypeConfig[value]
+export const ChatMediaSelector = () => {
+	const { currMediaType, setData } = useChatStore()
+	const currConfig = chatHelper.mediaConfig[currMediaType]
 	const CurrIcon = currConfig.icon
+
+	const handleSelect = (type: MediaType) => {
+		setData({ currMediaType: type })
+	}
 
 	return (
 		<DropdownMenu>
@@ -28,10 +28,10 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start">
-				{Object.entries(mediaTypeConfig).map(([type, config]) => {
+				{Object.entries(chatHelper.mediaConfig).map(([type, config]) => {
 					const Icon = config.icon
 					return (
-						<DropdownMenuItem key={type} onClick={() => onChange(type as MediaType)} className="gap-2">
+						<DropdownMenuItem key={type} onClick={() => handleSelect(type as MediaType)} className="gap-2">
 							<Icon className="h-4 w-4" />
 							<span>{config.label}</span>
 						</DropdownMenuItem>
@@ -40,9 +40,4 @@ export const ChatMediaSelector = (props: ChatMediaTypeSelectorProps) => {
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)
-}
-
-export type ChatMediaTypeSelectorProps = {
-	value: MediaType
-	onChange: (type: MediaType) => void
 }

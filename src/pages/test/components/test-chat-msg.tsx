@@ -17,7 +17,7 @@ export const TestChatMsg = () => {
 			timestamp: Date.now(),
 			status: 'success',
 		},
-		// 长文本消息		
+		// 长文本消息
 		{
 			id: uuidv4(),
 			type: 'user',
@@ -30,7 +30,8 @@ export const TestChatMsg = () => {
 		{
 			id: uuidv4(),
 			type: 'user',
-			content: '请帮我分析一下这个复杂的问题：\n\n1. 人工智能在未来十年内会如何影响各个行业？\n2. 机器学习和深度学习的区别是什么？\n3. 自然语言处理技术的发展趋势如何？\n\n特别是在以下几个方面：\n- 医疗健康领域的应用\n- 金融科技的创新\n- 教育行业的变革\n- 制造业的智能化升级\n\n希望能得到详细的分析和建议，谢谢！',
+			content:
+				'请帮我分析一下这个复杂的问题：\n\n1. 人工智能在未来十年内会如何影响各个行业？\n2. 机器学习和深度学习的区别是什么？\n3. 自然语言处理技术的发展趋势如何？\n\n特别是在以下几个方面：\n- 医疗健康领域的应用\n- 金融科技的创新\n- 教育行业的变革\n- 制造业的智能化升级\n\n希望能得到详细的分析和建议，谢谢！',
 			mediaType: 'text',
 			timestamp: Date.now(),
 			status: 'success',
@@ -318,7 +319,7 @@ classDiagram
 			mediaType: 'text',
 			timestamp: Date.now(),
 			status: 'success',
-		}
+		},
 	]
 
 	return (
@@ -336,4 +337,4 @@ classDiagram
 			</div>
 		</div>
 	)
-} 
+}

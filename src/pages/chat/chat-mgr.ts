@@ -1,11 +1,9 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
-import { siliconflowModelConfig } from '@/utils/ai-agent/siliconflow-agent'
-import { mockModelConfig } from '@/utils/ai-agent/mock-agent'
 import { dummy } from '@/utils/dummy'
 import { isMock } from '@/utils/env'
 import { eventBus, EventType } from '@/utils/event-bus'
+import { MediaType } from '@/utils/ai-agent/types'
 import { useChatStore } from './chat-store'
-import { MediaType } from './chat-type'
 
 /**
  * 聊天管理器 - 处理AI生成相关的工作
@@ -13,27 +11,12 @@ import { MediaType } from './chat-type'
 class ChatManager {
 	private mockDur = 300 // mock延迟时间
 
-	/** 根据媒体类型自动选择模型 */
-	private getModelForMediaType(mediaType: MediaType) {
-		const cfg = siliconflowModelConfig
-		switch (mediaType) {
-			case 'text':
-				return cfg.text[0]
-			case 'image':
-				return cfg.image[0]
-			case 'video':
-				return cfg.video?.[0] || cfg.text[0]
-			default:
-				return cfg.text[0]
-		}
-	}
-
 	/** 模拟延迟 */
 	private async mockDelay() {
 		return new Promise((resolve) => setTimeout(resolve, this.mockDur + Math.random() * 1000))
 	}
 
-	/** 生成 mock 响应数据 */
+	/** mock 响应数据 */
 	private genMockResp(userInput: string, mediaType: MediaType) {
 		const responses = {
 			text: {
@@ -71,7 +54,7 @@ class ChatManager {
 		return responses[mediaType]
 	}
 
-	/** 文本生成处理 */
+	/** 文本生成 */
 	async genText(userInput: string, msgId: string) {
 		const store = useChatStore.getState()
 
@@ -89,8 +72,6 @@ class ChatManager {
 		store.setLoading(true)
 
 		try {
-			aiAgentMgr.setConfig({ model: this.getModelForMediaType('text') })
-
 			let fullContent = ''
 
 			// TODO: 如果chat卸载了，要完全防止写入 store 了，否则二次进入可能会有问题
@@ -136,8 +117,6 @@ class ChatManager {
 			})
 			return
 		}
-
-		aiAgentMgr.setConfig({ model: this.getModelForMediaType('image') })
 
 		const images = await aiAgentMgr.generateImages(userInput)
 
@@ -185,8 +164,6 @@ class ChatManager {
 			return
 		}
 
-		aiAgentMgr.setConfig({ model: this.getModelForMediaType('video') })
-
 		const videos = await aiAgentMgr.generateVideos(userInput)
 		if (videos && videos.length > 0) {
 			store.updateMsg(msgId, {
@@ -202,7 +179,11 @@ class ChatManager {
 		}
 	}
 
-	/** AI响应生成入口 */
+	/**
+	 * AI响应生成入口
+	 *
+	 * NOTE: 使用前请设置好 model
+	 */
 	async genAIResp(userInput: string, mediaType: MediaType, msgId: string) {
 		try {
 			switch (mediaType) {

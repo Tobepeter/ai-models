@@ -3,25 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useChatHubStore } from '../chat-hub-store'
 import { ChatHubModelSelector } from './chat-hub-model-selector'
-import { ModelConfig } from '../chat-hub-type'
-import { mockModelConfig } from '@/utils/ai-agent/mock-agent'
-
-// 从 mock-agent 生成所有可用模型
-const allModels: ModelConfig[] = mockModelConfig.text.map((model, idx) => ({
-	id: `text-${idx}`,
-	platform: 'mock',
-	model: model,
-	name: model
-		.replace('mock-', 'Mock ')
-		.replace('-', ' ')
-		.replace(/\b\w/g, (l) => l.toUpperCase()), // deep seek -> Deep Seek
-}))
 
 /**
  * 输入组件
  */
 export const ChatHubInput = () => {
-	const { isGenerating, selectedModels, startGeneration, stopGeneration, setSelectedModels } = useChatHubStore()
+	const { isGenerating, allModels, selectedModels, startGeneration, stopGeneration, setSelectedModels } = useChatHubStore()
 	const [inputVal, setInputVal] = useState('')
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 

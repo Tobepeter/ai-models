@@ -1,20 +1,32 @@
+import { aiAgentConfig } from './ai-agent-config'
 import { IAiAgent } from './IAiAgent'
-import { SiliconFlowAgent } from './siliconflow-agent'
 import { MockAgent } from './mock-agent'
-import { AIAgentConfig, AIPlatform, StreamCallback, VideoStatusResponse } from './types'
+import { OpenRouterAgent } from './open-router-agent'
+import { SiliconFlowAgent } from './siliconflow-agent'
+import { AIPlatform, MediaType, PlatformConfig, StreamCallback, VideoStatusResponse } from './types'
 
 /**
- * AI Agent 单例管理器
+ * AI Agent
  */
 export class AIAgentManager {
 	agent: IAiAgent
+	platform = AIPlatform.Unknown
 	agentMap: Record<AIPlatform, new (agent: AIAgentManager) => IAiAgent> = {
+		[AIPlatform.Unknown]: null,
 		[AIPlatform.Silicon]: SiliconFlowAgent,
+		[AIPlatform.OpenRouter]: OpenRouterAgent,
 		[AIPlatform.Mock]: MockAgent,
 	}
 	agentCache = {} as Record<AIPlatform, IAiAgent>
 
 	switchPlatform(platform: AIPlatform) {
+		this.platform = platform
+
+		if (!this.agentMap[platform]) {
+			this.agent = null
+			return
+		}
+
 		if (this.agentCache[platform]) {
 			this.agent = this.agentCache[platform]
 		} else {
@@ -23,59 +35,57 @@ export class AIAgentManager {
 		}
 	}
 
-	setConfig(config: AIAgentConfig) {
-		this.agent.config = { ...this.agent.config, ...config }
+	setModel(model: string) {
+		if (this.agent) this.agent.currModel = model
+	}
+
+	getModel(): string {
+		return this.agent?.currModel || ''
+	}
+
+	getModelMedia(): MediaType {
+		if (!this.agent) return 'text'
+
+		const model = this.agent.currModel
+		const platformConfig = aiAgentConfig.data[this.platform]
+		if (!platformConfig?.models) return 'text'
+
+		const modelConfig = platformConfig.models
+		for (const mediaType in modelConfig) {
+			const models = modelConfig[mediaType as MediaType]
+			if (models && models.includes(model)) {
+				return mediaType as MediaType
+			}
+		}
+		return 'text'
+	}
+
+	getPlatformConfig(): PlatformConfig {
+		return aiAgentConfig.data[this.platform]
 	}
 
 	async generateText(prompt: string) {
-		if (!this.checkValid()) return ''
 		return this.agent.generateText(prompt)
 	}
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
-		if (!this.checkValid()) return ''
 		return this.agent.generateTextStream(prompt, onChunk)
 	}
 
 	async generateImages(prompt: string) {
-		if (!this.checkValid()) return []
 		return this.agent.generateImages(prompt)
 	}
 
 	async generateVideos(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		if (!this.checkValid()) return []
 		return this.agent.generateVideos(prompt, options)
 	}
 
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
-		if (!this.checkValid()) return ''
 		return this.agent.createVideoTask(prompt, options)
 	}
 
 	async getVideoTaskStatus(requestId: string): Promise<VideoStatusResponse | null> {
-		if (!this.checkValid()) return null
 		return this.agent.getVideoTaskStatus(requestId)
-	}
-
-	checkValid() {
-		if (!this.agent) {
-			console.error('AI Agent is not initialized')
-			return false
-		}
-
-		let valid = false
-		if (this.agent.isValid) {
-			valid = this.agent.isValid()
-		} else {
-			valid = !!(this.agent.config.apiKey && this.agent.config.baseUrl)
-		}
-
-		if (!valid) {
-			console.error('AI Agent is not valid')
-			return false
-		}
-
-		return true
 	}
 }
 

@@ -39,13 +39,7 @@ export const TestImagePreviewAspectRatio = () => {
 						{aspectRatios.map(({ label, value }) => (
 							<div key={value} className="space-y-2">
 								<h3 className="text-sm font-medium text-center">{label}</h3>
-								<ImagePreview
-									url={imageUrl}
-									aspectRatio={value}
-									width={200}
-									onChange={setImageUrl}
-									className="border"
-								/>
+								<ImagePreview url={imageUrl} aspectRatio={value} width={200} onChange={setImageUrl} className="border" />
 							</div>
 						))}
 					</div>
@@ -55,23 +49,11 @@ export const TestImagePreviewAspectRatio = () => {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div className="space-y-2">
 								<h4 className="text-sm font-medium text-center">固定高度 (200px)</h4>
-								<ImagePreview
-									url={imageUrl}
-									width={200}
-									height={200}
-									onChange={setImageUrl}
-									className="border"
-								/>
+								<ImagePreview url={imageUrl} width={200} height={200} onChange={setImageUrl} className="border" />
 							</div>
 							<div className="space-y-2">
 								<h4 className="text-sm font-medium text-center">AspectRatio (1/1)</h4>
-								<ImagePreview
-									url={imageUrl}
-									width={200}
-									aspectRatio="1/1"
-									onChange={setImageUrl}
-									className="border"
-								/>
+								<ImagePreview url={imageUrl} width={200} aspectRatio="1/1" onChange={setImageUrl} className="border" />
 							</div>
 						</div>
 					</div>
@@ -81,21 +63,11 @@ export const TestImagePreviewAspectRatio = () => {
 						<div className="space-y-4">
 							<div className="space-y-2">
 								<h4 className="text-sm font-medium">100% 宽度 + 16:9 比例</h4>
-								<ImagePreview
-									url={imageUrl}
-									aspectRatio="16/9"
-									onChange={setImageUrl}
-									className="border max-w-md"
-								/>
+								<ImagePreview url={imageUrl} aspectRatio="16/9" onChange={setImageUrl} className="border max-w-md" />
 							</div>
 							<div className="space-y-2">
 								<h4 className="text-sm font-medium">100% 宽度 + 4:3 比例</h4>
-								<ImagePreview
-									url={imageUrl}
-									aspectRatio="4/3"
-									onChange={setImageUrl}
-									className="border max-w-md"
-								/>
+								<ImagePreview url={imageUrl} aspectRatio="4/3" onChange={setImageUrl} className="border max-w-md" />
 							</div>
 						</div>
 					</div>

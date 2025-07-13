@@ -35,33 +35,45 @@ export const TestTwBreakpoint = () => {
 					<h2 className="text-lg font-semibold mb-3">断点说明</h2>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
 						<div className="p-3 bg-gray-50 rounded">
-							<strong>xs (默认)</strong><br />
-							0px - 639px<br />
+							<strong>xs (默认)</strong>
+							<br />
+							0px - 639px
+							<br />
 							<span className="text-gray-600">移动设备</span>
 						</div>
 						<div className="p-3 bg-blue-50 rounded">
-							<strong>sm</strong><br />
-							640px+<br />
+							<strong>sm</strong>
+							<br />
+							640px+
+							<br />
 							<span className="text-gray-600">大手机</span>
 						</div>
 						<div className="p-3 bg-green-50 rounded">
-							<strong>md</strong><br />
-							768px+<br />
+							<strong>md</strong>
+							<br />
+							768px+
+							<br />
 							<span className="text-gray-600">平板</span>
 						</div>
 						<div className="p-3 bg-yellow-50 rounded">
-							<strong>lg</strong><br />
-							1024px+<br />
+							<strong>lg</strong>
+							<br />
+							1024px+
+							<br />
 							<span className="text-gray-600">小桌面</span>
 						</div>
 						<div className="p-3 bg-purple-50 rounded">
-							<strong>xl</strong><br />
-							1280px+<br />
+							<strong>xl</strong>
+							<br />
+							1280px+
+							<br />
 							<span className="text-gray-600">桌面</span>
 						</div>
 						<div className="p-3 bg-pink-50 rounded">
-							<strong>2xl</strong><br />
-							1536px+<br />
+							<strong>2xl</strong>
+							<br />
+							1536px+
+							<br />
 							<span className="text-gray-600">大桌面</span>
 						</div>
 					</div>
@@ -105,24 +117,12 @@ export const TestTwBreakpoint = () => {
 				<div className="bg-white p-4 rounded-lg shadow">
 					<h2 className="text-lg font-semibold mb-3">响应式显示/隐藏</h2>
 					<div className="space-y-2">
-						<div className="p-3 bg-red-100 rounded sm:hidden">
-							📱 只在小屏显示 (默认显示, sm:hidden)
-						</div>
-						<div className="p-3 bg-blue-100 rounded hidden sm:block md:hidden">
-							📱 只在 sm 显示 (640px - 767px)
-						</div>
-						<div className="p-3 bg-green-100 rounded hidden md:block lg:hidden">
-							💻 只在 md 显示 (768px - 1023px)
-						</div>
-						<div className="p-3 bg-yellow-100 rounded hidden lg:block xl:hidden">
-							🖥️ 只在 lg 显示 (1024px - 1279px)
-						</div>
-						<div className="p-3 bg-purple-100 rounded hidden xl:block 2xl:hidden">
-							🖥️ 只在 xl 显示 (1280px - 1535px)
-						</div>
-						<div className="p-3 bg-pink-100 rounded hidden 2xl:block">
-							🖥️ 只在 2xl 显示 (1536px+)
-						</div>
+						<div className="p-3 bg-red-100 rounded sm:hidden">📱 只在小屏显示 (默认显示, sm:hidden)</div>
+						<div className="p-3 bg-blue-100 rounded hidden sm:block md:hidden">📱 只在 sm 显示 (640px - 767px)</div>
+						<div className="p-3 bg-green-100 rounded hidden md:block lg:hidden">💻 只在 md 显示 (768px - 1023px)</div>
+						<div className="p-3 bg-yellow-100 rounded hidden lg:block xl:hidden">🖥️ 只在 lg 显示 (1024px - 1279px)</div>
+						<div className="p-3 bg-purple-100 rounded hidden xl:block 2xl:hidden">🖥️ 只在 xl 显示 (1280px - 1535px)</div>
+						<div className="p-3 bg-pink-100 rounded hidden 2xl:block">🖥️ 只在 2xl 显示 (1536px+)</div>
 					</div>
 				</div>
 
@@ -142,9 +142,7 @@ export const TestTwBreakpoint = () => {
 					</div>
 				</div>
 
-				<div className="text-center text-gray-600 text-sm bg-white p-4 rounded-lg">
-					💡 提示：调整浏览器窗口大小或使用开发者工具的设备模拟器来测试不同断点
-				</div>
+				<div className="text-center text-gray-600 text-sm bg-white p-4 rounded-lg">💡 提示：调整浏览器窗口大小或使用开发者工具的设备模拟器来测试不同断点</div>
 			</div>
 		</div>
 	)

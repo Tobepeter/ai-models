@@ -4,6 +4,7 @@ export interface ModelConfig {
 	platform: string
 	model: string
 	name: string // 显示名称
+	enabled: boolean // 是否启用
 }
 
 // 卡片状态

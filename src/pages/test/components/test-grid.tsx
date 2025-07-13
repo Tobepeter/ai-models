@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 
 export const TestGrid = () => {
@@ -49,10 +48,7 @@ export const TestGrid = () => {
 			title: '自适应列数',
 			description: '根据容器宽度自动调整列数',
 			component: (
-				<div
-					className="grid gap-4 p-4"
-					style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}
-				>
+				<div className="grid gap-4 p-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
 					{Array.from({ length: 8 }, (_, idx) => (
 						<div key={idx} className="bg-purple-100 p-4 rounded text-center">
 							Auto Item {idx + 1}
@@ -68,10 +64,7 @@ export const TestGrid = () => {
 				<div className="space-y-6 p-4">
 					<div>
 						<h4 className="mb-2 font-semibold">auto-fit (收缩到内容)</h4>
-						<div
-							className="grid gap-4 border-2 border-dashed border-gray-300"
-							style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}
-						>
+						<div className="grid gap-4 border-2 border-dashed border-gray-300" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
 							{Array.from({ length: 3 }, (_, idx) => (
 								<div key={idx} className="bg-yellow-100 p-4 rounded text-center">
 									Fit {idx + 1}
@@ -81,10 +74,7 @@ export const TestGrid = () => {
 					</div>
 					<div>
 						<h4 className="mb-2 font-semibold">auto-fill (保持空列)</h4>
-						<div
-							className="grid gap-4 border-2 border-dashed border-gray-300"
-							style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}
-						>
+						<div className="grid gap-4 border-2 border-dashed border-gray-300" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}>
 							{Array.from({ length: 3 }, (_, idx) => (
 								<div key={idx} className="bg-orange-100 p-4 rounded text-center">
 									Fill {idx + 1}
@@ -172,10 +162,7 @@ export const TestGrid = () => {
 			title: 'minmax 函数',
 			description: '设置列的最小和最大尺寸',
 			component: (
-				<div
-					className="grid gap-4 p-4"
-					style={{ gridTemplateColumns: 'minmax(100px, 200px) minmax(200px, 1fr) minmax(150px, 300px)' }}
-				>
+				<div className="grid gap-4 p-4" style={{ gridTemplateColumns: 'minmax(100px, 200px) minmax(200px, 1fr) minmax(150px, 300px)' }}>
 					{Array.from({ length: 6 }, (_, idx) => (
 						<div key={idx} className="bg-teal-100 p-4 rounded text-center">
 							Minmax {idx + 1}
@@ -188,10 +175,7 @@ export const TestGrid = () => {
 			title: 'fr 单位',
 			description: '使用 fr 单位分配剩余空间',
 			component: (
-				<div
-					className="grid gap-4 p-4"
-					style={{ gridTemplateColumns: '1fr 2fr 1fr' }}
-				>
+				<div className="grid gap-4 p-4" style={{ gridTemplateColumns: '1fr 2fr 1fr' }}>
 					<div className="bg-red-100 p-4 rounded text-center">1fr</div>
 					<div className="bg-blue-100 p-4 rounded text-center">2fr (双倍宽度)</div>
 					<div className="bg-green-100 p-4 rounded text-center">1fr</div>
@@ -205,7 +189,7 @@ export const TestGrid = () => {
 	return (
 		<div className="p-6 max-w-6xl mx-auto">
 			<h2 className="text-2xl font-bold mb-6">CSS Grid 布局练习</h2>
-			
+
 			{/* 示例选择器 */}
 			<div className="mb-6">
 				<div className="flex flex-wrap gap-2">
@@ -213,11 +197,7 @@ export const TestGrid = () => {
 						<button
 							key={key}
 							onClick={() => setSelectedExample(key)}
-							className={`px-4 py-2 rounded transition-colors ${
-								selectedExample === key
-									? 'bg-blue-500 text-white'
-									: 'bg-gray-200 hover:bg-gray-300'
-							}`}
+							className={`px-4 py-2 rounded transition-colors ${selectedExample === key ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
 						>
 							{examples[key].title}
 						</button>
@@ -231,9 +211,7 @@ export const TestGrid = () => {
 					<h3 className="text-lg font-semibold">{examples[selectedExample].title}</h3>
 					<p className="text-gray-600">{examples[selectedExample].description}</p>
 				</div>
-				<div className="bg-white">
-					{examples[selectedExample].component}
-				</div>
+				<div className="bg-white">{examples[selectedExample].component}</div>
 			</div>
 
 			{/* 说明文档 */}

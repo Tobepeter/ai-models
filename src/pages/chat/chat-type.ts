@@ -1,4 +1,4 @@
-export type MediaType = 'text' | 'image' | 'audio' | 'video'
+import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
 
 export type MsgStatus = 'pending' | 'generating' | 'success' | 'error'
 

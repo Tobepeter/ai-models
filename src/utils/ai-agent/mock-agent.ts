@@ -2,7 +2,8 @@ import axios from 'axios'
 import { createParser } from 'eventsource-parser'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
-import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } from './types'
+import { StreamCallback, VideoStatusResponse, AIPlatform, MediaType } from './types'
+import { aiAgentConfig } from './ai-agent-config'
 
 /**
  * Mock Agent
@@ -12,14 +13,11 @@ import { AIAgentConfig, AIModelConfig, StreamCallback, VideoStatusResponse } fro
  */
 export class MockAgent implements IAiAgent {
 	agent: AIAgentManager
-	config: AIAgentConfig = {
-		baseUrl: 'http://localhost:3000/v1',
-	}
-	modelConfig: AIModelConfig = mockModelConfig
 	axiosClient = axios.create({
-		baseURL: this.config.baseUrl,
+		baseURL: aiAgentConfig.data[AIPlatform.Mock].baseUrl,
 		timeout: 3000, // 3秒超时
 	})
+	currModel: string
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
@@ -27,7 +25,7 @@ export class MockAgent implements IAiAgent {
 
 	private getHeaders() {
 		return {
-			Authorization: `Bearer ${this.config.apiKey || 'mock-token'}`,
+			Authorization: `Bearer ${aiAgentConfig.getApiKey(AIPlatform.Mock)}`,
 			'Content-Type': 'application/json',
 		}
 	}
@@ -37,7 +35,7 @@ export class MockAgent implements IAiAgent {
 			const response = await this.axiosClient.post(
 				'/chat/completions',
 				{
-					model: this.config.model,
+					model: this.currModel,
 					stream: false,
 					messages: [{ role: 'user', content: prompt }],
 					max_tokens: 1000,
@@ -53,14 +51,12 @@ export class MockAgent implements IAiAgent {
 	}
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
-		const { baseUrl } = this.config
-
 		try {
-			const response = await fetch(`${baseUrl}/chat/completions-stream`, {
+			const response = await fetch(`${aiAgentConfig.data[AIPlatform.Mock].baseUrl}/chat/completions-stream`, {
 				method: 'POST',
 				headers: this.getHeaders(),
 				body: JSON.stringify({
-					model: this.config.model,
+					model: this.currModel,
 					stream: true,
 					messages: [{ role: 'user', content: prompt }],
 					max_tokens: 1000,
@@ -110,7 +106,7 @@ export class MockAgent implements IAiAgent {
 			const response = await this.axiosClient.post(
 				'/images/generations',
 				{
-					model: this.config.model,
+					model: this.currModel,
 					prompt: prompt,
 					image_size: '1024x1024',
 					batch_size: 1,
@@ -164,11 +160,10 @@ export class MockAgent implements IAiAgent {
 	async createVideoTask(prompt: string, options?: { image_size?: string; negative_prompt?: string; image?: string }) {
 		// 设置默认值
 		const image_size = options?.image_size || '1280x720'
-		const model = 'mock-video-model'
 
 		// 构建请求参数
 		const requestData = {
-			model,
+			model: this.currModel,
 			prompt,
 			image_size: image_size as '1280x720' | '720x1280' | '960x960',
 			negative_prompt: options?.negative_prompt,
@@ -186,10 +181,4 @@ export class MockAgent implements IAiAgent {
 
 		return statusResponse.data
 	}
-}
-
-export const mockModelConfig: AIModelConfig = {
-	text: ['mock-text-model-1', 'mock-text-model-2', 'mock-gpt-4', 'mock-claude-3', 'mock-deepseek'],
-	image: ['mock-image-model', 'mock-dalle-3', 'mock-midjourney'],
-	video: ['mock-video-model', 'mock-sora', 'mock-runway'],
 }

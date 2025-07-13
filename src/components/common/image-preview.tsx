@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, CSSProperties } from 'react'
 import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -77,19 +77,20 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 		revokeObjectUrl()
 	})
 
+	const cardStyle: CSSProperties = {
+		width: actualWidth,
+		height: actualHeight,
+		aspectRatio: computedAspectRatio,
+		...style,
+	}
+
 	// 如果没有URL，显示空状态或上传按钮
 	if (!curUrl) {
-		const emptyStyle: React.CSSProperties = {
-			width: actualWidth,
-			...(actualHeight ? { height: actualHeight } : { aspectRatio: computedAspectRatio }),
-			...style,
-		}
-
 		return (
 			<>
 				<Card
 					className={cn('flex items-center justify-center', editable && 'border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer transition-colors', className)}
-					style={emptyStyle}
+					style={cardStyle}
 					onClick={editable ? handleUploadClick : undefined}
 				>
 					{editable ? <Plus className="w-8 h-8 text-gray-400" /> : <ImageIcon className="w-8 h-8 text-gray-400" />}
@@ -103,16 +104,7 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 		<>
 			<Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
 				<DialogTrigger asChild>
-					<div
-						className={cn('relative cursor-pointer overflow-hidden rounded-lg', className)}
-						style={children ? style : {
-							width: actualWidth,
-							...(actualHeight ? { height: actualHeight } : { aspectRatio: computedAspectRatio }),
-							...style,
-						}}
-						onMouseEnter={() => setIsHovering(true)}
-						onMouseLeave={() => setIsHovering(false)}
-					>
+					<div className={cn('relative cursor-pointer overflow-hidden rounded-lg', className)} style={cardStyle} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
 						<div className="absolute inset-0">{children || <img src={curUrl} alt="预览图片" className="w-full h-full object-cover" />}</div>
 
 						{/* 悬停时显示蒙层 */}

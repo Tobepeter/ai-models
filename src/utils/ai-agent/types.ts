@@ -1,14 +1,16 @@
 // AI Agent 支持的平台
 export enum AIPlatform {
+	Unknown = 'unknown',
 	Silicon = 'silicon',
+	OpenRouter = 'openrouter',
 	Mock = 'mock',
 }
 
-// 基础配置接口
-export interface AIAgentConfig {
-	apiKey?: string
-	baseUrl?: string
-	model?: string
+// 平台配置
+export interface PlatformConfig {
+	apiKey: string
+	baseUrl: string
+	models: Partial<Record<MediaType, string[]>>
 }
 
 // 文本生成请求参数
@@ -60,3 +62,5 @@ export interface AIModelConfig {
 	image: string[]
 	video?: string[]
 }
+
+export type MediaType = 'text' | 'image' | 'video' | 'audio'
