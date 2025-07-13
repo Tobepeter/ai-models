@@ -7,6 +7,7 @@ import './index.css'
 import { queryClient } from './lib/react-query'
 import { router } from './router/router'
 import { isDev } from './utils/env'
+import { useTheme } from './hooks/use-theme.ts'
 
 // NOTE: 不是很喜欢这个功能
 const enableStrict = false
@@ -18,11 +19,18 @@ const StrictWrapper = (props: PropsWithChildren) => {
 	return enableStrict ? <StrictMode>{props.children}</StrictMode> : props.children
 }
 
-createRoot(document.getElementById('root')).render(
-	<StrictWrapper>
+const AppWithTheme = () => {
+	useTheme()
+	return (
 		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
 			{isDev && enableReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
 		</QueryClientProvider>
+	)
+}
+
+createRoot(document.getElementById('root')).render(
+	<StrictWrapper>
+		<AppWithTheme />
 	</StrictWrapper>
 )

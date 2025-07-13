@@ -23,6 +23,7 @@ export default tseslint.config(
 				// NOTE: shadcn button 组件会报错
 				'react-refresh/only-export-components': 'off',
 				'@typescript-eslint/no-explicit-any': 'off',
+				'react-hooks/exhaustive-deps': 'off',
 			},
 		},
 	],

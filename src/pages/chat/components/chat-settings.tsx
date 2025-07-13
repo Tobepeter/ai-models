@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import { useMemoizedFn } from 'ahooks'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
+import { useAppStore } from '@/store/store'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { AIPlatform } from '@/utils/ai-agent/types'
-import { useChatStore } from '../chat-store'
+import { useState } from 'react'
 import { chatHelper } from '../chat-helper'
+import { useChatStore } from '../chat-store'
 
 /**
  * 聊天设置对话框
@@ -18,8 +17,8 @@ import { chatHelper } from '../chat-helper'
 export const ChatSettings = (props: ChatSettingsProps) => {
 	const { open = false, onOpenChange } = props
 	const { currPlatform } = useChatStore()
+	const { theme, setTheme } = useAppStore()
 	const [apiKey, setApiKey] = useState(aiAgentConfig.getApiKey(currPlatform))
-	const [darkMode, setDarkMode] = useState(false)
 
 	// 保存配置
 	const saveConfigs = () => {
@@ -94,13 +93,19 @@ export const ChatSettings = (props: ChatSettingsProps) => {
 					<div className="space-y-4">
 						<Label className="text-base font-medium">其他设置</Label>
 
-						{/* 深色模式 - 预留功能 */}
-						<div className="flex items-center justify-between">
-							<div className="space-y-0.5">
-								<Label>深色模式</Label>
-								<div className="text-sm text-muted-foreground">切换深色/浅色主题（暂未实现）</div>
-							</div>
-							<Switch checked={darkMode} onCheckedChange={setDarkMode} disabled />
+						{/* 主题设置 */}
+						<div className="space-y-2">
+							<Label>主题</Label>
+							<Select value={theme} onValueChange={setTheme}>
+								<SelectTrigger>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="light">浅色</SelectItem>
+									<SelectItem value="dark">深色</SelectItem>
+									<SelectItem value="system">跟随系统</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 					</div>
 
