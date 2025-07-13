@@ -3,6 +3,7 @@ export enum AIPlatform {
 	Unknown = 'unknown',
 	Silicon = 'silicon',
 	OpenRouter = 'openrouter',
+	DashScope = 'dashscope',
 	Mock = 'mock',
 }
 

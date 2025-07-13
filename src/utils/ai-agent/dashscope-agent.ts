@@ -6,13 +6,13 @@ import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
 import { aiAgentConfig } from './ai-agent-config'
 
 /**
- * OpenRouter
+ * 阿里百炼 DashScope
  */
-export class OpenRouterAgent implements IAiAgent {
+export class DashScopeAgent implements IAiAgent {
 	agent: AIAgentManager
 	axiosClient = axios.create({
-		baseURL: aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl,
-		timeout: 30000, // OpenRouter 可能需要更长的超时时间
+		baseURL: aiAgentConfig.data[AIPlatform.DashScope].baseUrl,
+		timeout: 30000,
 	})
 	currModel: string
 
@@ -22,7 +22,7 @@ export class OpenRouterAgent implements IAiAgent {
 
 	private getHeaders() {
 		return {
-			Authorization: `Bearer ${aiAgentConfig.getApiKey(AIPlatform.OpenRouter)}`,
+			Authorization: `Bearer ${aiAgentConfig.getApiKey(AIPlatform.DashScope)}`,
 			'Content-Type': 'application/json',
 		}
 	}
@@ -34,16 +34,23 @@ export class OpenRouterAgent implements IAiAgent {
 				'/chat/completions',
 				{
 					model,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-					stream: false,
+					messages: [
+						{
+							role: 'user',
+							content: prompt,
+						},
+					],
 				},
 				{ headers: this.getHeaders() }
 			)
+
 			const content = response.data.choices[0]?.message?.content || ''
-			return content.trim()
+			if (content) {
+				return content.trim()
+			}
+			return ''
 		} catch (error) {
-			console.error('[OpenRouterAgent] generateText error', error)
+			console.error('[DashScopeAgent] generateText error', error)
 			return ''
 		}
 	}
@@ -51,14 +58,19 @@ export class OpenRouterAgent implements IAiAgent {
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
 			const model = this.currModel
-			const response = await fetch(`${aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl}/chat/completions`, {
+			const response = await fetch(`${aiAgentConfig.data[AIPlatform.DashScope].baseUrl}/chat/completions`, {
 				method: 'POST',
 				headers: this.getHeaders(),
 				body: JSON.stringify({
 					model,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
+					messages: [
+						{
+							role: 'user',
+							content: prompt,
+						},
+					],
 					stream: true,
+					max_tokens: 1000,
 				}),
 			})
 
@@ -76,7 +88,7 @@ export class OpenRouterAgent implements IAiAgent {
 					if (event.data === '[DONE]') return
 					try {
 						const parsed = JSON.parse(event.data)
-						const content: string = parsed.choices[0]?.delta?.content
+						const content = parsed.choices[0]?.delta?.content
 						if (content) {
 							if (!hasValidContent) {
 								if (content.trim().length > 0) {
@@ -107,32 +119,32 @@ export class OpenRouterAgent implements IAiAgent {
 
 			return fullContent
 		} catch (error) {
-			console.error('[OpenRouterAgent] generateTextStream error', error)
+			console.error('[DashScopeAgent] generateTextStream error', error)
 			return ''
 		}
 	}
 
 	async generateImages(_prompt: string) {
-		/* OpenRouter 图像生成暂未实现 */
-		console.warn('[OpenRouterAgent] generateImages not implemented')
+		/* DashScope 图像生成暂未实现 */
+		console.warn('[DashScopeAgent] generateImages not implemented')
 		return []
 	}
 
 	async generateVideos(_prompt: string, _options?: any) {
-		/* OpenRouter 视频生成暂未实现 */
-		console.warn('[OpenRouterAgent] generateVideos not implemented')
+		/* DashScope 视频生成暂未实现 */
+		console.warn('[DashScopeAgent] generateVideos not implemented')
 		return []
 	}
 
 	async createVideoTask(_prompt: string, _options?: { image_size?: string; negative_prompt?: string; image?: string }): Promise<string> {
-		/* OpenRouter 视频任务创建暂未实现 */
-		console.warn('[OpenRouterAgent] createVideoTask not implemented')
-		throw new Error('createVideoTask not implemented for OpenRouter')
+		/* DashScope 视频任务创建暂未实现 */
+		console.warn('[DashScopeAgent] createVideoTask not implemented')
+		throw new Error('createVideoTask not implemented for DashScope')
 	}
 
 	async getVideoTaskStatus(_requestId: string): Promise<VideoStatusResponse> {
-		/* OpenRouter 视频任务状态查询暂未实现 */
-		console.warn('[OpenRouterAgent] getVideoTaskStatus not implemented')
-		throw new Error('getVideoTaskStatus not implemented for OpenRouter')
+		/* DashScope 视频任务状态查询暂未实现 */
+		console.warn('[DashScopeAgent] getVideoTaskStatus not implemented')
+		throw new Error('getVideoTaskStatus not implemented for DashScope')
 	}
 }

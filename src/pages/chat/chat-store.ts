@@ -33,7 +33,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	currModel: '',
 	isLoading: false,
 	showSettings: false,
-	showInvalidAlert: true,
+	showInvalidAlert: false,
 
 	setData: (data) => set({ ...get(), ...data }),
 

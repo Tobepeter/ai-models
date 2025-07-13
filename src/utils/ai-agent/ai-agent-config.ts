@@ -57,6 +57,32 @@ class AIAgentConfig {
 				],
 			},
 		},
+		[AIPlatform.DashScope]: {
+			apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY || '',
+			baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+			models: {
+				text: [
+					'qwen-turbo',
+					'qwen-turbo-latest',
+					'qwen-plus',
+					'qwen-plus-latest',
+					'qwen-max',
+					'qwen-max-longcontext',
+					'qwen2.5-72b-instruct',
+					'qwen2.5-32b-instruct',
+					'qwen2.5-14b-instruct',
+					'qwen2.5-7b-instruct',
+					'qwen2.5-3b-instruct',
+					'qwen2.5-1.5b-instruct',
+					'qwen2.5-0.5b-instruct',
+				],
+				image: [
+					'wanx-v1',
+					'flux-dev',
+					'flux-schnell',
+				],
+			},
+		},
 	}
 
 	setApiKey(platform: AIPlatform, apiKey: string) {

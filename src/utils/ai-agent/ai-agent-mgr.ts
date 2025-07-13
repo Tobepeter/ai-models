@@ -3,6 +3,7 @@ import { IAiAgent } from './IAiAgent'
 import { MockAgent } from './mock-agent'
 import { OpenRouterAgent } from './open-router-agent'
 import { SiliconFlowAgent } from './siliconflow-agent'
+import { DashScopeAgent } from './dashscope-agent'
 import { AIPlatform, MediaType, PlatformConfig, StreamCallback, VideoStatusResponse } from './types'
 
 /**
@@ -15,6 +16,7 @@ export class AIAgentManager {
 		[AIPlatform.Unknown]: null,
 		[AIPlatform.Silicon]: SiliconFlowAgent,
 		[AIPlatform.OpenRouter]: OpenRouterAgent,
+		[AIPlatform.DashScope]: DashScopeAgent,
 		[AIPlatform.Mock]: MockAgent,
 	}
 	agentCache = {} as Record<AIPlatform, IAiAgent>
