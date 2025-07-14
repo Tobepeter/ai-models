@@ -30,6 +30,8 @@ import { TestShimmerOp } from './components/test-shimmer-op'
 import { TestTwBreakpoint } from './components/test-tw-breakpoint'
 import { TestVideoPreview } from './components/test-video-preview'
 import { TestGrid } from './components/test-grid'
+import { TestMultiSelector } from './components/test-multi-selector'
+import { TestOSS } from './components/test-oss'
 
 let Test = () => <div>Test</div>
 
@@ -40,9 +42,11 @@ if (isDev) {
 		const config = {
 			custom: <TestCustom />,
 			shadcn: <TestShadcn />,
+			multiSelector: <TestMultiSelector />,
 			dummy: <TestDummy />,
 			image: <TestImagePreview />,
 			video: <TestVideoPreview />,
+			oss: <TestOSS />,
 			aiAgent: <TestAIAgent />,
 			chatMsg: <TestChatMsg />,
 			markdown: <TestMarkdown />,

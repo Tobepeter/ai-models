@@ -52,6 +52,8 @@ export class MockAgent implements IAiAgent {
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
+			// TODO: 使用 axios 实现起来很麻烦，而且默认很容易 timeout，所以暂时用 fetch 实现
+			//  不过这里是没有超时的，有条件可以实现没有新的消息就 10s timeout
 			const response = await fetch(`${aiAgentConfig.data[AIPlatform.Mock].baseUrl}/chat/completions-stream`, {
 				method: 'POST',
 				headers: this.getHeaders(),
