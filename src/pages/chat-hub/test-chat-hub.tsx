@@ -5,7 +5,8 @@ import { chatHubMgr } from './chat-hub-mgr'
  * ChatHub 测试组件
  */
 export const TestChatHub = () => {
-	const { allModels, selectedModels, toggleModel } = useChatHubStore()
+	const { models, toggleModel } = useChatHubStore()
+	const selectedModels = models.filter(m => m.enabled)
 
 	return (
 		<div className="p-4 space-y-4">
@@ -13,9 +14,9 @@ export const TestChatHub = () => {
 
 			{/* 全部模型列表 */}
 			<div>
-				<h3 className="text-md font-medium mb-2">全部模型 ({allModels.length})</h3>
+				<h3 className="text-md font-medium mb-2">全部模型 ({models.length})</h3>
 				<div className="grid grid-cols-2 gap-2">
-					{allModels.map((model) => (
+					{models.map((model) => (
 						<div key={model.id} className="flex items-center gap-2 p-2 border rounded">
 							<input type="checkbox" checked={model.enabled} onChange={() => toggleModel(model.id)} />
 							<span className="text-sm">

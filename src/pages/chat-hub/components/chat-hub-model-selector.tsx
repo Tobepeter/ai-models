@@ -1,4 +1,4 @@
-import { ModelConfig } from '../chat-hub-type'
+import { ChatHubModel } from '../chat-hub-type'
 import { Button } from '@/components/ui/button'
 
 /**
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	const { models, selectedModels, onChange, disabled = false } = props
 
-	const handleToggle = (model: ModelConfig) => {
+	const handleToggle = (model: ChatHubModel) => {
 		if (disabled) return
 
 		const isSelected = selectedModels.some((m) => m.id === model.id)
@@ -35,8 +35,8 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 }
 
 export type ChatHubModelSelectorProps = {
-	models: ModelConfig[]
-	selectedModels: ModelConfig[]
-	onChange: (models: ModelConfig[]) => void
+	models: ChatHubModel[]
+	selectedModels: ChatHubModel[]
+	onChange: (models: ChatHubModel[]) => void
 	disabled?: boolean
 }

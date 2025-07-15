@@ -1,5 +1,5 @@
 // 平台-模型配置
-export interface ModelConfig {
+export interface ChatHubModel {
 	id: string
 	platform: string
 	model: string
@@ -8,15 +8,15 @@ export interface ModelConfig {
 }
 
 // 卡片状态
-export type CardStatus = 'not-started' | 'pending' | 'generating' | 'completed' | 'error'
+export type ChatHubCardStatus = 'not-started' | 'pending' | 'generating' | 'completed' | 'error'
 
 // 卡片数据
-export interface ChatCard {
+export interface ChatHubCard {
 	id: string
 	platform: string // AI平台标识
 	model: string // 模型ID
 	modelName: string // 显示名称
-	status: CardStatus
+	status: ChatHubCardStatus
 	question: string // 用户问题
 	answer: string // AI回答内容
 	error?: string // 错误信息

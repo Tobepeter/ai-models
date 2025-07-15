@@ -1,6 +1,7 @@
 import { useMount, useUnmount } from 'ahooks'
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform } from '@/utils/ai-agent/types'
+import { isDev } from '@/utils/env'
 import { useChatHubStore } from './chat-hub-store'
 import { ChatHubWrap } from './components/chat-hub-wrap'
 import { ChatHubInput } from './components/chat-hub-input'
@@ -15,7 +16,8 @@ export const ChatHub = () => {
 
 	useMount(() => {
 		aiAgentConfig.restore()
-		aiAgentMgr.switchPlatform(AIPlatform.Mock)
+		const defaultPlatform = isDev ? AIPlatform.Mock : AIPlatform.Silicon
+		aiAgentMgr.switchPlatform(defaultPlatform)
 	})
 
 	useUnmount(() => {

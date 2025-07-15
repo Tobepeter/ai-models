@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/store'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { AIPlatform } from '@/utils/ai-agent/types'
+import { isProd } from '@/utils/env'
 import { useState } from 'react'
 import { chatHelper } from '../chat-helper'
 import { useChatStore } from '../chat-store'
@@ -33,7 +34,11 @@ export const ChatSettings = () => {
 		setApiKey(aiAgentConfig.getApiKey(platform))
 	}
 
-	const platformList = Object.values(AIPlatform).filter((platform) => platform !== AIPlatform.Unknown)
+	const platformList = Object.values(AIPlatform).filter((platform) => {
+		if (platform === AIPlatform.Unknown) return false
+		if (isProd && platform === AIPlatform.Mock) return false
+		return true
+	})
 
 	return (
 		<Dialog open={showSettings} onOpenChange={(open) => setData({ showSettings: open })}>

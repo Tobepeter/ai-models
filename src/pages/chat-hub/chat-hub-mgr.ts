@@ -2,12 +2,12 @@ import { AIAgentManager } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform } from '@/utils/ai-agent/types'
 import { v4 as uuidv4 } from 'uuid'
 import { useChatHubStore } from './chat-hub-store'
-import { ChatCard, ModelConfig } from './chat-hub-type'
+import { ChatHubCard, ChatHubModel } from './chat-hub-type'
 
 class ChatHubManager {
 	// 缓存 platform+model 为一个agent实例
 	private agentCache = new Map<string, AIAgentManager>()
-	async startGeneration(question: string, models: ModelConfig[]) {
+	async startGeneration(question: string, models: ChatHubModel[]) {
 		// 为每个模型启动生成任务
 		const promises = models.map((model) => this.generateForModel(question, model))
 
@@ -39,12 +39,12 @@ class ChatHubManager {
 		return this.agentCache.get(cacheKey)!
 	}
 
-	private async generateForModel(question: string, model: ModelConfig) {
+	private async generateForModel(question: string, model: ChatHubModel) {
 		const store = useChatHubStore.getState()
 
 		// 创建新卡片
 		const cardId = uuidv4()
-		const newCard: ChatCard = {
+		const newCard: ChatHubCard = {
 			id: cardId,
 			platform: model.platform,
 			model: model.model,

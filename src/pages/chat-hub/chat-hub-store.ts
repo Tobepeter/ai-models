@@ -1,89 +1,41 @@
 import { create } from 'zustand'
-import { ChatCard, ModelConfig } from './chat-hub-type'
-import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
-import { AIPlatform } from '@/utils/ai-agent/types'
+import { chatHubHelper } from './chat-hub-helper'
 import { chatHubMgr } from './chat-hub-mgr'
+import { ChatHubCard, ChatHubModel } from './chat-hub-type'
 
 export interface ChatHubStore {
 	// 全局状态
 	isGenerating: boolean
-	allModels: ModelConfig[] // 全部模型列表
-	selectedModels: ModelConfig[] // 当前选中的模型
+	models: ChatHubModel[] // 全部模型列表
 	currentQuestion: string
-	cards: ChatCard[]
+	cards: ChatHubCard[]
 
 	// 操作方法
-	setSelectedModels: (models: ModelConfig[]) => void
 	toggleModel: (modelId: string) => void // 切换模型启用状态
 	startGeneration: (question: string) => Promise<void>
 	stopGeneration: () => void
-	addCard: (card: ChatCard) => void
-	updateCard: (cardId: string, updates: Partial<ChatCard>) => void
+	addCard: (card: ChatHubCard) => void
+	updateCard: (cardId: string, updates: Partial<ChatHubCard>) => void
 	reset: () => void
 }
 
-// 生成全部模型列表，用enable标记
-const allModels: ModelConfig[] = []
-
-// Mock平台模型
-aiAgentConfig.data[AIPlatform.Mock].models.text.forEach((model, idx) => {
-	allModels.push({
-		id: `mock-text-${idx}`,
-		platform: 'mock',
-		model: model,
-		name: model
-			.replace('mock-', 'Mock ')
-			.replace('-', ' ')
-			.replace(/\b\w/g, (l) => l.toUpperCase()),
-		enabled: idx < 3, // 默认启用前3个
-	})
-})
-
-// Silicon平台模型
-aiAgentConfig.data[AIPlatform.Silicon].models.text.forEach((model, idx) => {
-	allModels.push({
-		id: `silicon-text-${idx}`,
-		platform: 'silicon',
-		model: model,
-		name: model.split('/').pop() || model, // 取最后一部分作为显示名称
-		enabled: false, // 默认不启用
-	})
-})
-
-// OpenRouter平台模型
-aiAgentConfig.data[AIPlatform.OpenRouter].models.text.forEach((model, idx) => {
-	allModels.push({
-		id: `openrouter-text-${idx}`,
-		platform: 'openrouter',
-		model: model,
-		name: model.split('/').pop() || model, // 取最后一部分作为显示名称
-		enabled: false, // 默认不启用
-	})
-})
-
 export const useChatHubStore = create<ChatHubStore>((set, get) => ({
 	isGenerating: false,
-	allModels: allModels, // 全部模型列表
-	selectedModels: allModels.filter((m) => m.enabled), // 使用启用的模型
+	models: chatHubHelper.getModels(), // 全部模型列表
 	currentQuestion: '',
 	cards: [],
 
-	setSelectedModels: (models) => {
-		set({ selectedModels: models })
-	},
-
 	toggleModel: (modelId) => {
-		const { allModels } = get()
-		const updatedModels = allModels.map((model) => (model.id === modelId ? { ...model, enabled: !model.enabled } : model))
-		const enabledModels = updatedModels.filter((m) => m.enabled)
+		const { models } = get()
+		const updatedModels = models.map((model) => (model.id === modelId ? { ...model, enabled: !model.enabled } : model))
 		set({
-			allModels: updatedModels,
-			selectedModels: enabledModels,
+			models: updatedModels,
 		})
 	},
 
 	startGeneration: async (question) => {
-		const { selectedModels } = get()
+		const { models } = get()
+		const selectedModels = models.filter((m) => m.enabled)
 		if (!question.trim() || selectedModels.length === 0) return
 
 		set({

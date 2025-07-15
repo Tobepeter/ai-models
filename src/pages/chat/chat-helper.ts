@@ -1,5 +1,6 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
+import { isDev } from '@/utils/env'
 import { Film, Image, MessageCircle, Volume2 } from 'lucide-react'
 import { ElementType } from 'react'
 import { useChatStore } from './chat-store'
@@ -39,7 +40,8 @@ class ChatHelper {
 	restorePersist() {
 		const persistData = this.loadPersist()
 		if (!persistData) {
-			this.switchPlatform(AIPlatform.Mock)
+			const defaultPlatform = isDev ? AIPlatform.Mock : AIPlatform.Silicon
+			this.switchPlatform(defaultPlatform)
 			return
 		}
 		this.switchPlatform(persistData.platform)

@@ -39,7 +39,12 @@
 - 挂载/卸载使用 `useMount` 和 `useUnmount`
 - 如果一个函数可能被间接延迟调用，请考虑使用 `useMemoizedFn`，防止闭包访问旧数据的问题
 
-## TypeScript 规范
+## 代码规范
+
+### 代码解构
+- 如果是简单if语句，考虑使用三元表达式
+
+### TypeScript 规范
 - 充分利用类型推断，避免冗余类型注解
 - 导入时优先解构，避免命名空间导入
 - 使用 `Record` 代替 `Map`
@@ -49,6 +54,7 @@
 
 ### 文件命名
 - 使用 kebab-case，避免 index 文件泛滥
+- 尽可能具名组件，不要 `type.ts`，而是 `chat-types.ts`
 
 ### 变量命名
 - 优先使用短名（如 `curr`, `idx`, `msg`）
