@@ -3,6 +3,7 @@ import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { config } from 'dotenv-flow'
+import qrcode from 'qrcode-terminal'
 import { qrcodeHelper } from './utils/qrcode-helper.js'
 
 config()
@@ -36,7 +37,7 @@ async function generateQRCode() {
 	const ip = getLocalIP()
 	const port = process.env.VITE_PORT || 5173
 	const outputs = [
-		{ url: `http://${ip}:${port}`, file: 'vite.png' },
+		{ url: `http://${ip}:${port}/chat`, file: 'vite.png' },
 		{ url: 'https://tobeei.com', file: 'tobeei.png' },
 	]
 
@@ -44,8 +45,12 @@ async function generateQRCode() {
 		for (const output of outputs) {
 			const { file, url } = output
 			const outputFile = path.join(outputDir, file)
+			
+			// 生成文件
 			await qrcodeHelper.generateQRCodeWithText(url, outputFile)
 			console.log(`- ${file} 已生成，位置: ${outputFile}`)
+			console.log(`URL: ${url}`)
+			qrcode.generate(url, { small: true })
 		}
 
 		console.log(`✅ 二维码全部生成成功!`)

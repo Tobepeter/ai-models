@@ -12,13 +12,11 @@ export type EventMap = {
 export const eventBus = new EventEmitter<EventMap>()
 
 export const useEvent = <T extends EventType>(event: T, fn: (...args: EventMap[T]) => void) => {
-	const off = eventBus.off
-
 	useUnmount(() => {
-		off(event)
+		eventBus.off(event, fn)
 	})
 
 	eventBus.on(event, fn)
 
-	return off
+	return () => eventBus.off(event, fn)
 }

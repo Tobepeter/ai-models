@@ -6,7 +6,8 @@ import { isDev, isMock, isProd } from './utils/env'
 function App() {
 	const navigate = useNavigate()
 	useMount(() => {
-		console.log(`%c[App] isDev: ${isDev}, isMock: ${isMock}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
+		console.log(`%c[App] isDev: ${isDev}, isMock: ${isMock}
+			`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
 		if (isDev) debug.init()
 
 		// auto nagivat to chat
@@ -15,8 +16,10 @@ function App() {
 		}
 	})
 
+	// 测试dvh
+	
 	return (
-		<div className="min-h-screen bg-background text-foreground">
+		<div className="bg-background text-foreground">
 			<Outlet />
 		</div>
 	)
