@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Express } from 'express'
 import cors from 'cors'
 import OSS from 'ali-oss'
 import dotenv from 'dotenv-flow'
@@ -21,7 +21,7 @@ if (!OSS_ACCESS_KEY_ID || !OSS_ACCESS_KEY_SECRET || !OSS_ROLE_ARN) {
 }
 
 const PORT = 3001
-const app = express()
+const app: Express = express()
 
 const ERROR_CODE = 101 // 暂时写死
 
@@ -63,7 +63,7 @@ app.post('/api/oss/sts', async (req, res) => {
 				expiration: credentials.Expiration,
 			},
 		})
-	} catch (error) {
+	} catch (error: any) {
 		console.error('获取STS凭证失败:', error)
 		res.status(500).json({
 			code: ERROR_CODE,
@@ -117,7 +117,7 @@ app.post('/api/oss/signature', async (req, res) => {
 				accessUrl: `https://${OSS_BUCKET}.${OSS_REGION}.aliyuncs.com/${objectKey}`,
 			},
 		})
-	} catch (error) {
+	} catch (error: any) {
 		res.status(500).json({
 			code: ERROR_CODE,
 			msg: `生成上传签名失败: ${error.message}`,
@@ -145,7 +145,7 @@ app.delete('/api/oss/file', async (req, res) => {
 			code: 0,
 			msg: 'success',
 		})
-	} catch (error) {
+	} catch (error: any) {
 		console.error('删除文件失败:', error)
 		res.status(500).json({
 			code: ERROR_CODE,
@@ -161,21 +161,21 @@ app.get('/api/oss/files', async (req, res) => {
 		const { prefix = '', maxKeys } = req.query
 		const canPublic = false
 
-		let maxKeysInt = parseInt(maxKeys)
+		let maxKeysInt = parseInt(maxKeys as string, 10)
 		if (isNaN(maxKeysInt)) {
 			maxKeysInt = 100
 		}
 
 		const result = await client.list({
-			prefix, // 匹配path前缀
+			prefix: prefix as string, // 匹配path前缀
 			'max-keys': maxKeysInt, // 最大返回数量
-		})
+		}, {})
 
-		const getUrlPublic = (name) => {
+		const getUrlPublic = (name: string) => {
 			return `https://${OSS_BUCKET}.${OSS_REGION}.aliyuncs.com/${name}`
 		}
 
-		const getUrlSigned = (name) => {
+		const getUrlSigned = (name: string) => {
 			return client.signatureUrl(name, {
 				method: 'GET',
 				expires: 3600,
@@ -201,7 +201,7 @@ app.get('/api/oss/files', async (req, res) => {
 				nextMarker: result.nextMarker,
 			},
 		})
-	} catch (error) {
+	} catch (error: any) {
 		console.error('获取文件列表失败:', error)
 		res.status(500).json({
 			code: ERROR_CODE,
@@ -213,4 +213,4 @@ app.get('/api/oss/files', async (req, res) => {
 
 app.listen(PORT, () => {
 	console.log(`OSS服务器运行在 http://localhost:${PORT}`)
-})
+}) 

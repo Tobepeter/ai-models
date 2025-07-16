@@ -1,10 +1,11 @@
 import { fakerZH_CN as faker } from '@faker-js/faker'
 import cors from 'cors'
-import express from 'express'
+import express, { Express } from 'express'
 import morgan from 'morgan'
 import { v4 as uuidv4 } from 'uuid'
+import dayjs from 'dayjs'
 
-const app = express()
+const app: Express = express()
 const PORT = 3000
 
 app.use(cors())
@@ -13,7 +14,7 @@ app.use(express.text())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // 视频状态权重配置
 const videoStatusWeights = {
@@ -24,7 +25,7 @@ const videoStatusWeights = {
 }
 
 // 权重随机选择
-const weightedRandom = (weightConfig) => {
+const weightedRandom = (weightConfig: Record<string, number>) => {
 	const random = Math.random()
 	let cumulative = 0
 	for (const [key, weight] of Object.entries(weightConfig)) {
@@ -37,7 +38,7 @@ const weightedRandom = (weightConfig) => {
 const mockVideo = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
 const mockImage = 'https://avatars.githubusercontent.com/u/124599?v=4'
 
-const genResp = (prompt, model) => {
+const genResp = (prompt: string, model: string) => {
 	const length = faker.number.int({ min: 1000, max: 3000 })
 	const sentences = faker.lorem.sentences(faker.number.int({ min: 3, max: 15 }))
 	return sentences.repeat(Math.ceil(length / sentences.length)).slice(0, length)
@@ -135,7 +136,7 @@ app.post('/v1/images/generations', async (req, res) => {
 	const requestId = uuidv4()
 	console.log(`[Mock] Image generation request: ${prompt.slice(0, 50)}...`)
 	await delay(2000)
-	const images = []
+	const images: any[] = []
 	for (let i = 0; i < (batch_size || 1); i++) {
 		images.push({
 			url: mockImage,
@@ -206,4 +207,4 @@ process.on('uncaughtException', (err) => {
 
 process.on('unhandledRejection', (reason, promise) => {
 	console.error('Unhandled Rejection at:', promise, 'reason:', reason)
-})
+}) 

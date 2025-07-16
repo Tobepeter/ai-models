@@ -4,7 +4,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { config } from 'dotenv-flow'
 import qrcode from 'qrcode-terminal'
-import { qrcodeHelper } from './utils/qrcode-helper.js'
+import { qrcodeHelper } from './utils/qrcode-helper.ts'
 
 config()
 
@@ -15,13 +15,16 @@ const __dirname = path.dirname(__filename)
 const outputDir = path.join(__dirname, '../temp/qrcode/')
 
 /** 获取本机内网IP地址 */
-function getLocalIP() {
+function getLocalIP(): string {
 	const interfaces = os.networkInterfaces()
 
 	for (const name of Object.keys(interfaces)) {
-		for (const iface of interfaces[name]) {
-			if (iface.family === 'IPv4' && !iface.internal) {
-				return iface.address
+		const networkInterface = interfaces[name]
+		if (networkInterface) {
+			for (const iface of networkInterface) {
+				if (iface.family === 'IPv4' && !iface.internal) {
+					return iface.address
+				}
 			}
 		}
 	}
@@ -60,4 +63,4 @@ async function generateQRCode() {
 	}
 }
 
-generateQRCode()
+generateQRCode() 

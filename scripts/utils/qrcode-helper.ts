@@ -3,11 +3,24 @@ import path from 'path'
 import QRCode from 'qrcode'
 import { createCanvas, loadImage } from 'canvas'
 
+interface QRCodeHelperConfig {
+	qrWidth: number
+	qrMargin: number
+	errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H'
+	qrColor: {
+		dark: string
+		light: string
+	}
+	enableText: boolean
+	fontSize: number
+	fontFamily: string
+}
+
 /**
  * 二维码生成助手
  */
 class QRCodeHelper {
-	config = {
+	config: QRCodeHelperConfig = {
 		qrWidth: 300,
 		qrMargin: 2,
 		errorCorrectionLevel: 'M',
@@ -22,7 +35,7 @@ class QRCodeHelper {
 	}
 
 	/** 在二维码底部添加文字 */
-	async addText(qrPath, outputPath, text) {
+	async addText(qrPath: string, outputPath: string, text: string) {
 		const qrImage = await loadImage(qrPath)
 		const qrWidth = qrImage.width
 		const qrHeight = qrImage.height
@@ -55,7 +68,7 @@ class QRCodeHelper {
 	}
 
 	/** 生成带文字的二维码 */
-	async generateQRCodeWithText(url, filename) {
+	async generateQRCodeWithText(url: string, filename: string) {
 		fse.ensureDirSync(path.dirname(filename)) // 确保目录存在
 
 		// 生成原始二维码
@@ -76,4 +89,4 @@ class QRCodeHelper {
 	}
 }
 
-export const qrcodeHelper = new QRCodeHelper()
+export const qrcodeHelper = new QRCodeHelper() 

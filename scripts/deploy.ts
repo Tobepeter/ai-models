@@ -1,11 +1,11 @@
 import { Command } from 'commander'
 import { config } from 'dotenv-flow'
-import { deployTool } from './utils/deploy-tool.js'
+import { deployTool } from './utils/deploy-tool.ts'
 
 config()
 
 /** 执行部署流程 */
-const deploy = async (steps) => {
+const deploy = async (steps: string[]) => {
 	const isAll = steps.length === 0 || steps.includes('all')
 	try {
 		if (isAll || steps.includes('build')) {
@@ -25,7 +25,7 @@ const deploy = async (steps) => {
 		}
 
 		console.log('🎉 部署完成！')
-	} catch (error) {
+	} catch (error: any) {
 		console.error('❌ 部署失败:', error.message)
 		throw error
 	}
@@ -36,7 +36,7 @@ program.name('deploy-tool').description('前端项目部署工具').version('1.0
 program.option('-s, --steps <steps>', '指定执行步骤: build,zip,upload,clear', 'build,zip,upload,clear').option('-v, --verbose', '显示详细日志', false)
 
 program.action((options) => {
-	const steps = options.steps ? options.steps.split(',').map((s) => s.trim()) : []
+	const steps = options.steps ? options.steps.split(',').map((s: string) => s.trim()) : []
 
 	// 验证步骤参数
 	const validSteps = ['build', 'zip', 'upload', 'clear']
@@ -48,7 +48,7 @@ program.action((options) => {
 	}
 
 	// 配置部署工具
-	const config = {
+	const config: any = {
 		host: process.env.SERVER_HOST,
 		verbose: options.verbose,
 	}
@@ -75,4 +75,4 @@ program.action((options) => {
 	})
 })
 
-program.parse(process.argv)
+program.parse(process.argv) 

@@ -12,13 +12,20 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.join(__dirname, '../..')
 
+interface DeployConfig {
+	host: string
+	username: string
+	privateKeyPath: string
+	verbose: boolean
+}
+
 /**
  * 前端项目部署
  */
 class DeployTool {
 	// NOTE: 不使用密码，仅使用密钥对验证
 	ssh = new NodeSSH()
-	config = {
+	config: DeployConfig = {
 		host: '',
 		username: 'root',
 		privateKeyPath: path.join(homedir(), '.ssh', 'id_rsa'),
@@ -30,7 +37,7 @@ class DeployTool {
 	targetZipFolder = '/temp'
 	targetDeployFolder = '/var/www/chat'
 
-	init(config) {
+	init(config: Partial<DeployConfig>) {
 		this.config = { ...this.config, ...config }
 		this.checkValid()
 	}
@@ -65,7 +72,7 @@ class DeployTool {
 		await fse.ensureDir(dirname(sourceFile))
 
 		console.log('📦 打包 dist 文件夹...')
-		return new Promise((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 			const zipPath = sourceFile
 			const output = fs.createWriteStream(zipPath)
 			const archive = archiver('zip', { zlib: { level: 9 } })
@@ -151,7 +158,7 @@ class DeployTool {
 		console.log('✅ 连接已关闭')
 	}
 
-	logCommand(msg, cmd) {
+	logCommand(msg: string, cmd: string) {
 		if (this.config.verbose) {
 			console.log(`${msg}, cmd: ${cmd}`)
 		} else {
@@ -160,4 +167,4 @@ class DeployTool {
 	}
 }
 
-export const deployTool = new DeployTool()
+export const deployTool = new DeployTool() 
