@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AI Models</title>
+		<script>
+			// GitHub Pages SPA 路由处理
+			// 保存当前路径到 sessionStorage，然后重定向到应用根路径
+			// React Router 会在应用加载后恢复正确的路由
+			;(function () {
+				// 保存完整的 URL 路径
+				sessionStorage.setItem('spa-redirect', location.pathname + location.search + location.hash)
+
+				// 重定向到应用根路径
+				var segments = location.pathname.split('/')
+				var basePath = segments.length > 1 ? '/' + segments[1] + '/' : '/'
+				location.replace(location.origin + basePath)
+			})()
+		</script>
+	</head>
+	<body>
+		<div id="root">
+			<div
+				style="
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 100vh;
+					font-family:
+						system-ui,
+						-apple-system,
+						sans-serif;
+				"
+			>
+				<div style="text-align: center">
+					<h1>Loading...</h1>
+					<p>Redirecting to the application...</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

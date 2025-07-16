@@ -6,7 +6,7 @@ import { chatHubMgr } from './chat-hub-mgr'
  */
 export const TestChatHub = () => {
 	const { models, toggleModel } = useChatHubStore()
-	const selectedModels = models.filter(m => m.enabled)
+	const selectedModels = models.filter((m) => m.enabled)
 
 	return (
 		<div className="p-4 space-y-4">

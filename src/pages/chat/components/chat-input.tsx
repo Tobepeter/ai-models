@@ -68,7 +68,7 @@ export const ChatInput = () => {
 				setData({ showInvalidAlert: true })
 				return
 			}
-			
+
 			handleSend(inputVal.trim(), currMediaType)
 			setInputVal('')
 			inputRef.current?.blur() // 发送后失焦

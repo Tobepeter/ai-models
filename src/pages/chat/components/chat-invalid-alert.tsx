@@ -27,9 +27,7 @@ export const ChatInvalidAlert = () => {
 					<CardContent className="p-4">
 						<div className="flex items-start justify-between mb-3">
 							<div className="flex-1">
-								<p className="text-sm text-muted-foreground">
-									当前模型配置无效，请检查模型设置
-								</p>
+								<p className="text-sm text-muted-foreground">当前模型配置无效，请检查模型设置</p>
 							</div>
 							<Button variant="ghost" size="sm" onClick={handleClose} className="h-6 w-6 p-0">
 								<X className="h-3 w-3" />

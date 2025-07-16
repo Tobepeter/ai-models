@@ -48,7 +48,7 @@ async function generateQRCode() {
 		for (const output of outputs) {
 			const { file, url } = output
 			const outputFile = path.join(outputDir, file)
-			
+
 			// 生成文件
 			await qrcodeHelper.generateQRCodeWithText(url, outputFile)
 			console.log(`- ${file} 已生成，位置: ${outputFile}`)
@@ -63,4 +63,4 @@ async function generateQRCode() {
 	}
 }
 
-generateQRCode() 
+generateQRCode()

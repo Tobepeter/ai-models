@@ -89,4 +89,4 @@ class QRCodeHelper {
 	}
 }
 
-export const qrcodeHelper = new QRCodeHelper() 
+export const qrcodeHelper = new QRCodeHelper()

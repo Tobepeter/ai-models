@@ -9,7 +9,7 @@ import { ChatHubModelSelector } from './chat-hub-model-selector'
  */
 export const ChatHubInput = () => {
 	const { isGenerating, models, startGeneration, stopGeneration, toggleModel } = useChatHubStore()
-	const selectedModels = models.filter(m => m.enabled)
+	const selectedModels = models.filter((m) => m.enabled)
 	const [inputVal, setInputVal] = useState('')
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -44,15 +44,20 @@ export const ChatHubInput = () => {
 				{/* 模型选择器 */}
 				<div>
 					<div className="text-sm text-muted-foreground mb-2">选择AI模型</div>
-					<ChatHubModelSelector models={models} selectedModels={selectedModels} onChange={(newSelectedModels) => {
-						// Update model enabled status based on selection
-						models.forEach(model => {
-							const shouldBeEnabled = newSelectedModels.some(sm => sm.id === model.id)
-							if (model.enabled !== shouldBeEnabled) {
-								toggleModel(model.id)
-							}
-						})
-					}} disabled={isGenerating} />
+					<ChatHubModelSelector
+						models={models}
+						selectedModels={selectedModels}
+						onChange={(newSelectedModels) => {
+							// Update model enabled status based on selection
+							models.forEach((model) => {
+								const shouldBeEnabled = newSelectedModels.some((sm) => sm.id === model.id)
+								if (model.enabled !== shouldBeEnabled) {
+									toggleModel(model.id)
+								}
+							})
+						}}
+						disabled={isGenerating}
+					/>
 				</div>
 
 				{/* 输入区域 */}

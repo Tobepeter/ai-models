@@ -167,4 +167,4 @@ class DeployTool {
 	}
 }
 
-export const deployTool = new DeployTool() 
+export const deployTool = new DeployTool()

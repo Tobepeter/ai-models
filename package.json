@@ -130,6 +130,7 @@
 		"typescript": "~5.8.3",
 		"typescript-eslint": "^8.35.1",
 		"vite": "^7.0.3",
+		"vite-plugin-oss": "^1.2.13",
 		"vitest": "^3.2.4"
 	}
 }

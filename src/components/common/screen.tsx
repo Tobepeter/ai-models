@@ -13,7 +13,7 @@ export const Screen = (props: PropsWithChildren<ScreenProps>) => {
 	const { noLockScroll, dynamicHeight, children } = props
 	const LockScroll = withCondHook(useLockScroll, !noLockScroll)
 
-  const height = dynamicHeight ? '100dvh' : '100svh'
+	const height = dynamicHeight ? '100dvh' : '100svh'
 	const ScreenContainer = styled.div`
 		height: 100vh;
 		height: ${height};

@@ -1,9 +1,5 @@
 import { Markdown } from '@/components/common/markdown'
-import {
-	SidebarInset,
-	SidebarProvider,
-	SidebarTrigger,
-} from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { isDev } from '@/utils/env'
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -17,7 +13,7 @@ let Doc = () => <div>文档功能仅在开发环境可用</div>
 if (isDev) {
 	/**
 	 * doc
-	 * 
+	 *
 	 * 开发环境展示项目内的文档
 	 * 运行时方便阅读
 	 */
@@ -77,10 +73,7 @@ if (isDev) {
 
 		return (
 			<SidebarProvider>
-				<DocSidebar 
-					selectedItem={selectedItem} 
-					onDocSelect={handleDocSelect} 
-				/>
+				<DocSidebar selectedItem={selectedItem} onDocSelect={handleDocSelect} />
 				<SidebarInset>
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 						<SidebarTrigger />

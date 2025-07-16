@@ -247,10 +247,7 @@ const ModelGroupSelector = () => {
 				{selectedModels.length === 0 && <span className="text-sm text-muted-foreground">未选择任何模型</span>}
 			</div>
 
-			<Accordion
-				type="multiple"
-				defaultValue={['silicon']}
-			>
+			<Accordion type="multiple" defaultValue={['silicon']}>
 				{Object.entries(groupedModels).map(([platform, group]) => {
 					const selectedCount = getSelectedCount(group.models)
 					const allSelected = selectedCount === group.models.length
@@ -604,7 +601,7 @@ const TestMultiSelectDialog = () => {
 		'Silicon Flow': ['DeepSeek R1', 'GLM-4.1V-9B', 'Qwen3-32B', 'Hunyuan-A13B'],
 		'OpenRouter (free)': ['DeepSeek Chat V3', 'DeepSeek R1', 'Kimi Dev 72B', 'Claude 3.5 Haiku'],
 		'OpenRouter (paid)': ['GPT-4o', 'Claude 3.5 Sonnet', 'Gemini Pro', 'GPT-4 Turbo'],
-		'Mock Models': ['Test Model A', 'Test Model B', 'Test Model C']
+		'Mock Models': ['Test Model A', 'Test Model B', 'Test Model C'],
 	}
 
 	return (
@@ -613,29 +610,16 @@ const TestMultiSelectDialog = () => {
 			<div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
 				<label className="text-sm font-medium">交互模式:</label>
 				<div className="flex items-center gap-2">
-					<Switch
-						id="hover-change"
-						checked={hoverChange}
-						onCheckedChange={setHoverChange}
-					/>
+					<Switch id="hover-change" checked={hoverChange} onCheckedChange={setHoverChange} />
 					<label htmlFor="hover-change" className="text-sm">
 						{hoverChange ? '悬停切换' : '点击切换'}
 					</label>
 				</div>
-				<span className="text-xs text-muted-foreground">
-					{hoverChange ? '鼠标悬停在左侧分组上即可切换' : '需要点击左侧分组才能切换'}
-				</span>
+				<span className="text-xs text-muted-foreground">{hoverChange ? '鼠标悬停在左侧分组上即可切换' : '需要点击左侧分组才能切换'}</span>
 			</div>
 
 			{/* 通用组件 */}
-			<MultiSelectDialog
-				value={selectedItems}
-				onChange={setSelectedItems}
-				hoverChange={hoverChange}
-				groups={simpleGroups}
-				triggerText="选择AI模型"
-				dialogTitle="选择AI模型"
-			/>
+			<MultiSelectDialog value={selectedItems} onChange={setSelectedItems} hoverChange={hoverChange} groups={simpleGroups} triggerText="选择AI模型" dialogTitle="选择AI模型" />
 		</div>
 	)
 }

@@ -76,11 +76,7 @@ class AIAgentConfig {
 					'qwen2.5-1.5b-instruct',
 					'qwen2.5-0.5b-instruct',
 				],
-				image: [
-					'wanx-v1',
-					'flux-dev',
-					'flux-schnell',
-				],
+				image: ['wanx-v1', 'flux-dev', 'flux-schnell'],
 			},
 		},
 	}

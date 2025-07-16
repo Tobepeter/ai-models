@@ -166,10 +166,13 @@ app.get('/api/oss/files', async (req, res) => {
 			maxKeysInt = 100
 		}
 
-		const result = await client.list({
-			prefix: prefix as string, // 匹配path前缀
-			'max-keys': maxKeysInt, // 最大返回数量
-		}, {})
+		const result = await client.list(
+			{
+				prefix: prefix as string, // 匹配path前缀
+				'max-keys': maxKeysInt, // 最大返回数量
+			},
+			{}
+		)
 
 		const getUrlPublic = (name: string) => {
 			return `https://${OSS_BUCKET}.${OSS_REGION}.aliyuncs.com/${name}`
@@ -213,4 +216,4 @@ app.get('/api/oss/files', async (req, res) => {
 
 app.listen(PORT, () => {
 	console.log(`OSS服务器运行在 http://localhost:${PORT}`)
-}) 
+})
