@@ -3,6 +3,7 @@ import App from '@/App'
 import { Test } from '@/pages/test/test'
 import { Chat } from '@/pages/chat/chat'
 import { ChatHub } from '@/pages/chat-hub/chat-hub'
+import { Doc } from '@/pages/docs/doc'
 
 export const router = createBrowserRouter([
 	{
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
 			{
 				path: 'chat-hub',
 				element: <ChatHub />,
+			},
+			{
+				path: 'doc',
+				element: <Doc />,
 			},
 		],
 	},

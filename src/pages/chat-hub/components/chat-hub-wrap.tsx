@@ -1,8 +1,8 @@
-import { ChatHubCard } from '../chat-hub-type'
+import { ChatHubCard as ChatHubCardType } from '../chat-hub-type'
 import { ChatHubCard } from './chat-hub-card'
 
 interface ChatHubWrapProps {
-	cards: ChatHubCard[]
+	cards: ChatHubCardType[]
 }
 
 /**

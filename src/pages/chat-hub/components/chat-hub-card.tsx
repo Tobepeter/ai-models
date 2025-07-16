@@ -1,4 +1,4 @@
-import { ChatHubCard } from '../chat-hub-type'
+import { ChatHubCard as ChatHubCardType } from '../chat-hub-type'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -78,5 +78,5 @@ export const ChatHubCard = (props: ChatHubCardProps) => {
 }
 
 export type ChatHubCardProps = {
-	card: ChatHubCard
+	card: ChatHubCardType
 }

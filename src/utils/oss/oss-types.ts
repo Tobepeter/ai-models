@@ -1,5 +1,3 @@
-// ==================== 后端接口类型定义 ====================
-
 /** 通用API响应格式 */
 export interface BaseResponse<T> {
 	code: number
