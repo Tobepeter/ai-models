@@ -1,6 +1,6 @@
 import path from 'path'
-import { ossEnable, ossBucket, ossRegion, ossAccessKeyId, ossAccessKeySecret, ossPrefix, projectRootDir, repoName, isDev } from './env'
 import VitePluginOss from 'vite-plugin-oss'
+import { isDev, ossAccessKeyId, ossAccessKeySecret, ossBucket, ossEnable, ossPrefix, ossRegion, projectRootDir } from './env'
 
 export const getOssPlugin = () => {
 	if (isDev) return [] // 开发环境不启用 oss
