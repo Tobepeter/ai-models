@@ -19,12 +19,12 @@ export const getOssPlugin = () => {
 			process.exit(1)
 		}
 
-    // - 关于 index.html
-    // 其实可以排除 index.html，不过上传了当做归档用吧
-    // 用 oss 默认地址访问这个 index 在 spa 是看不了的
+		// - 关于 index.html
+		// 其实可以排除 index.html，不过上传了当做归档用吧
+		// 用 oss 默认地址访问这个 index 在 spa 是看不了的
 
-    // TODO: 有条件可以 oss 清空 prefix 目录
-    //  或者版本控制（云资源紧张可以轮换机制）
+		// TODO: 有条件可以 oss 清空 prefix 目录
+		//  或者版本控制（云资源紧张可以轮换机制）
 
 		// NOTE: 注意，如果自定义 setOssPath 函数，会忽略 dist 作为 prefix
 		//  某种角度可以理解 setOssPath 其实是和 dist 参数是互斥的
@@ -92,9 +92,6 @@ export const checkOssPrefixValid = () => {
 		console.error('[oss] prefix must not start with /')
 		return false
 	}
-
-  // 自己的规则，必须从特定目录开始，且包含项目名称
-  const myPrefixRule = `/web/${repoName}/`
 
 	// 必须以 / 结尾
 	if (!ossPrefix.endsWith('/')) {
