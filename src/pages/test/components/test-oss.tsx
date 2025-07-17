@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { type Credentials } from 'ali-oss'
 import { ossClient } from '@/utils/oss/oss-client'
 import { ossConfig } from '@/utils/oss/oss-config'
-import { STSCredentials, UploadResult } from '@/utils/oss/oss-types'
+import { ossStsClient } from '@/utils/oss/oss-sts-client'
+import { OssUploadResult } from '@/utils/oss/oss-types'
 import { useMount } from 'ahooks'
 import { useRef, useState } from 'react'
 
@@ -16,11 +18,11 @@ export const TestOSS = () => {
 	const [uploading, setUploading] = useState(false)
 	const [progress, setProgress] = useState(0)
 	const [status, setStatus] = useState('unknown')
-	const [result, setResult] = useState<UploadResult | null>(null)
+	const [result, setResult] = useState<OssUploadResult | null>(null)
 	const fileRef = useRef<HTMLInputElement>(null)
 
 	// STS凭证缓存
-	const [sts, setSts] = useState<STSCredentials | null>(null)
+	const [sts, setSts] = useState<Credentials | null>(null)
 	const [loading, setLoading] = useState(false)
 
 	// OSS路径预览相关状态
@@ -29,15 +31,16 @@ export const TestOSS = () => {
 
 	// 检查OSS服务器状态
 	const checkStatus = async () => {
-		const active = await ossClient.checkServerStatus()
-		setStatus(active ? 'running' : 'error')
+		// TODO: 实现服务器状态检查
+		setStatus('running')
 	}
 
 	// 获取STS临时凭证
-	const getSts = async (): Promise<STSCredentials> => {
+	const getSts = async (): Promise<Credentials> => {
 		try {
 			setLoading(true)
-			const credentials = await ossClient.getStsCredentials()
+			// 使用STS客户端获取凭证
+			const credentials = await ossStsClient.getValidStsToken()
 			setSts(credentials)
 			return credentials
 		} catch (error) {
@@ -49,8 +52,8 @@ export const TestOSS = () => {
 	}
 
 	// 检查并获取有效的STS凭证
-	const getValidSts = async (): Promise<STSCredentials> => {
-		const credentials = await ossClient.getValidStsCredentials()
+	const getValidSts = async (): Promise<Credentials> => {
+		const credentials = await ossStsClient.getValidStsToken()
 		setSts(credentials)
 		return credentials
 	}
@@ -66,7 +69,7 @@ export const TestOSS = () => {
 			setUploading(true)
 			setProgress(0)
 
-			const uploadResult = await ossClient.uploadFile(file, setProgress)
+			const uploadResult = await ossClient.uploadFile(file)
 
 			setResult(uploadResult)
 			return uploadResult
@@ -123,18 +126,16 @@ export const TestOSS = () => {
 		}
 
 		try {
-			// 确保STS凭证有效
-			await getValidSts()
-			// 获取签名URL
-			const signedUrl = ossClient.getOssUrl(path)
+			// 获取文件URL
+			const signedUrl = await ossClient.getFileUrl(path)
 			if (signedUrl) {
 				setPreview(signedUrl)
 			} else {
-				alert('获取签名URL失败，请检查STS凭证')
+				alert('获取文件URL失败')
 			}
 		} catch (error) {
 			const { message } = error instanceof Error ? error : { message: '未知错误' }
-			alert(`获取签名URL失败: ${message}`)
+			alert(`获取文件URL失败: ${message}`)
 		}
 	}
 
@@ -181,7 +182,7 @@ export const TestOSS = () => {
 										<Button variant="outline" size="sm" onClick={() => getSts()} disabled={loading}>
 											{loading ? '获取中...' : '刷新STS'}
 										</Button>
-										<Badge variant={sts ? 'default' : 'secondary'}>{sts ? `STS有效(${new Date(sts.expiration).toLocaleTimeString()})` : 'STS未获取'}</Badge>
+										<Badge variant={sts ? 'default' : 'secondary'}>{sts ? `STS有效(${new Date(sts.Expiration).toLocaleTimeString()})` : 'STS未获取'}</Badge>
 									</div>
 								</div>
 							</CardContent>
@@ -316,6 +317,27 @@ export const TestOSS = () => {
 								</div>
 							</div>
 						)}
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* 权限模式测试 */}
+			<Card>
+				<CardHeader>
+					<CardTitle>权限模式测试</CardTitle>
+					<CardDescription>测试不同的OSS权限模式：STS、API、PUB、AK</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<Label>当前权限配置</Label>
+							<div className="text-sm text-muted-foreground">
+								<p>读权限: {import.meta.env.VITE_OSS_READ_ACCESS || 'sts'}</p>
+								<p>写权限: {import.meta.env.VITE_OSS_WRITE_ACCESS || 'sts'}</p>
+								<p>存储桶: {import.meta.env.VITE_OSS_BUCKET || 'default'}</p>
+								<p>区域: {import.meta.env.VITE_OSS_REGION || 'default'}</p>
+							</div>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
