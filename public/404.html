@@ -9,13 +9,36 @@
 			// 保存当前路径到 sessionStorage，然后重定向到应用根路径
 			// React Router 会在应用加载后恢复正确的路由
 			;(function () {
-				// 保存完整的 URL 路径
-				sessionStorage.setItem('spa-redirect', location.pathname + location.search + location.hash)
+				function getBasePath(origin, pathname) {
+					const isGithub = origin.includes('github.io')
+					if (isGithub) {
+						const split = pathname.split('/')
+						if (split[1]) {
+							return '/' + split[1] + '/'
+						} else {
+							return '/'
+						}
+					}
+					return '/'
+				}
 
-				// 重定向到应用根路径
-				var segments = location.pathname.split('/')
-				var basePath = segments.length > 1 ? '/' + segments[1] + '/' : '/'
-				location.replace(location.origin + basePath)
+				function redirect() {
+					const l = window.location
+					const basePath = getBasePath(l.origin, l.pathname)
+					// eg. l.pathname = /basepath/test/123/
+					// redirectPath = /test/123
+					let redirectPath = l.pathname
+					if (basePath !== '/' && redirectPath.startsWith(basePath)) {
+						redirectPath = redirectPath.slice(basePath.length)
+					}
+					if (redirectPath.length > 1 && redirectPath.endsWith('/')) {
+						redirectPath = redirectPath.slice(0, -1)
+					}
+
+					sessionStorage.setItem('spa-redirect', redirectPath + l.search + l.hash)
+					location.replace(l.origin + basePath)
+				}
+				redirect()
 			})()
 		</script>
 	</head>
@@ -27,6 +50,7 @@
 					justify-content: center;
 					align-items: center;
 					height: 100vh;
+					height: 100dvh;
 					font-family:
 						system-ui,
 						-apple-system,

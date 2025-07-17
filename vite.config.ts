@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import { getOssPlugin } from './config/oss'
 
 // https://vite.dev/config/
 import { fileURLToPath } from 'node:url'
@@ -12,30 +13,28 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 // OSS 配置
 const enableOss = false // 先设置为 false，不启用 OSS 上传
 
-// 动态导入 OSS 插件
-const getOssPlugin = () => {
-	if (!enableOss) return []
+// GitHub Pages 配置
+const isGitHubActions = process.env.GITHUB_ACTIONS === 'true'
+const isProduction = process.env.NODE_ENV === 'production'
 
-	// 只有在启用 OSS 时才导入插件
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	const VitePluginOss = require('vite-plugin-oss')
+// 获取 base 路径
+const getBasePath = () => {
+	if (!isProduction) return '/'
 
-	return [
-		VitePluginOss({
-			from: './dist/**', // 上传源目录
-			dist: '/ai-models', // OSS 目标目录
-			region: 'oss-cn-shenzhen', // OSS 区域
-			accessKeyId: process.env.OSS_ACCESS_KEY_ID || '', // AccessKey ID
-			accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET || '', // AccessKey Secret
-			bucket: 'tobeei-bucket', // 存储桶名称
-			setOssPath: (filePath: string) => {
-				// 设置文件在 OSS 上的路径
-				const index = filePath.lastIndexOf('dist')
-				const path = filePath.substring(index + 4)
-				return path.replace(/\\/g, '/')
-			},
-		}),
-	]
+	// 如果在 GitHub Actions 中构建，使用仓库名作为 base path
+	if (isGitHubActions) {
+		const repository = process.env.GITHUB_REPOSITORY || ''
+		const repoName = repository.split('/')[1] || 'ai-models'
+		return `/${repoName}/`
+	}
+
+	// 如果启用了 OSS，使用 OSS 路径
+	if (enableOss) {
+		return '/ai-models/'
+	}
+
+	// 默认 GitHub Pages 路径
+	return '/ai-models/'
 }
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
@@ -43,11 +42,12 @@ export default defineConfig({
 	plugins: [
 		react(),
 		tailwindcss(),
-		// OSS 上传插件配置
-		...getOssPlugin(),
+		// NOTE: 有点奇怪的类型问题
+		// @ts-ignore
+		...getOssPlugin(), // OSS 上传插件配置 
 	],
 	// 根据环境设置 base 路径
-	base: process.env.NODE_ENV === 'production' ? (enableOss ? '/ai-models/' : '/ai-models/') : '/',
+	base: getBasePath(),
 	server: {
 		host: '0.0.0.0', // 允许局域网访问
 		port: 5173,

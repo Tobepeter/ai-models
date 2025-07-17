@@ -7,15 +7,9 @@ const { STS } = OSS
 
 dotenv.config()
 
-// OSS配置 - 请在环境变量中设置
-const OSS_REGION = 'oss-cn-shenzhen'
-const OSS_BUCKET = 'tobeei-bucket'
-const OSS_ACCESS_KEY_ID = process.env.OSS_ACCESS_KEY_ID
-const OSS_ACCESS_KEY_SECRET = process.env.OSS_ACCESS_KEY_SECRET
-const OSS_ROLE_ARN = process.env.OSS_ROLE_ARN
+const { OSS_REGION, OSS_BUCKET, OSS_ACCESS_KEY_ID, OSS_ACCESS_KEY_SECRET, OSS_ROLE_ARN } = process.env
 
-// 验证必要的环境变量
-if (!OSS_ACCESS_KEY_ID || !OSS_ACCESS_KEY_SECRET || !OSS_ROLE_ARN) {
+if (!OSS_REGION || !OSS_BUCKET || !OSS_ACCESS_KEY_ID || !OSS_ACCESS_KEY_SECRET || !OSS_ROLE_ARN) {
 	console.error('❌ 缺少必要的环境变量:')
 	process.exit(1)
 }

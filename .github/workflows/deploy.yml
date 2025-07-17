@@ -42,11 +42,13 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
-          enablement: true
+          enablement: true # 自动开启此功能，如有权限，不需要去后台配置
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

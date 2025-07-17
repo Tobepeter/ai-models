@@ -1,8 +1,8 @@
 import { Command } from 'commander'
-import { config } from 'dotenv-flow'
+import dotenv from 'dotenv-flow'
 import { deployTool } from './utils/deploy-tool.ts'
 
-config()
+dotenv.config()
 
 /** 执行部署流程 */
 const deploy = async (steps: string[]) => {

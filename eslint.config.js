@@ -26,6 +26,7 @@ export default tseslint.config(
 				'@typescript-eslint/no-explicit-any': 'off',
 				'react-hooks/exhaustive-deps': 'off',
 				'@typescript-eslint/no-empty-object-type': 'off',
+				'@typescript-eslint/ban-ts-comment': 'off', // 允许 @ts-ignore 注释，非强制 @ts-expect-error
 			},
 		},
 	],

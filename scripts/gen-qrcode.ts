@@ -2,11 +2,11 @@ import fse from 'fs-extra'
 import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { config } from 'dotenv-flow'
+import dotenv from 'dotenv-flow'
 import qrcode from 'qrcode-terminal'
 import { qrcodeHelper } from './utils/qrcode-helper.ts'
 
-config()
+dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

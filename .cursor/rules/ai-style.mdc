@@ -10,4 +10,4 @@ alwaysApply: true
 
 # git
 
-不允许自动提交git
+不允许自动提交git（使用 git mcp 也不行）
