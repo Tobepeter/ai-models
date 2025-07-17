@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import packageJson from '../package.json'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const __rootDir = path.resolve(__dirname, '../')
+const projectRoot = path.resolve(__dirname, '../')
 
 export const isGithub = process.env.GITHUB_ACTIONS === 'true'
 export const isDev = process.env.NODE_ENV === 'development'
@@ -23,4 +23,4 @@ export const ossPrefix = `/web/${repoName}/`
 
 export const githubRepository = process.env.GITHUB_REPOSITORY
 
-export const projectRootDir = __rootDir
+export const projectRootDir = projectRoot

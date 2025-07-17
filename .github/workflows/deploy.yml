@@ -21,6 +21,10 @@ jobs:
   # 构建作业
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_SILICON_API_KEY: ${{ secrets.VITE_SILICON_API_KEY }}
+      VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
+      VITE_DASHSCOPE_API_KEY: ${{ secrets.VITE_DASHSCOPE_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
