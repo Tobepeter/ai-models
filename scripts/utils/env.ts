@@ -32,3 +32,5 @@ export const ossPrefix = `web/${repoName}/`
 
 export const isGithub = process.env.GITHUB_ACTIONS === 'true'
 export const githubRepository = process.env.GITHUB_REPOSITORY
+
+export const serverHost = process.env.SERVER_HOST || ''

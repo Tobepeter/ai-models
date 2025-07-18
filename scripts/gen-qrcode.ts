@@ -1,9 +1,10 @@
+import dotenv from 'dotenv-flow'
 import fse from 'fs-extra'
 import os from 'os'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import dotenv from 'dotenv-flow'
 import qrcode from 'qrcode-terminal'
+import { fileURLToPath } from 'url'
+import { port } from './utils/env.ts'
 import { qrcodeHelper } from './utils/qrcode-helper.ts'
 
 dotenv.config()
@@ -38,7 +39,6 @@ async function generateQRCode() {
 	fse.ensureDirSync(outputDir)
 
 	const ip = getLocalIP()
-	const port = process.env.VITE_PORT || 5173
 	const outputs = [
 		{ url: `http://${ip}:${port}/chat`, file: 'vite.png' },
 		{ url: 'https://tobeei.com', file: 'tobeei.png' },

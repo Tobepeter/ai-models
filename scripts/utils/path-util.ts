@@ -1,4 +1,3 @@
-import path from 'path'
 import { isProd, ossBucket, ossEnable, ossPrefix, ossRegion } from './env'
 
 class PathUtil {
@@ -12,7 +11,7 @@ class PathUtil {
 		if (!isProd) return '/'
 
 		if (ossEnable) {
-			return this.getOssPrefixBase()
+			return this.getOssBasePrefix()
 		}
 
 		return '/'
@@ -24,9 +23,9 @@ class PathUtil {
 	}
 
 	/** 项目的upload目录 */
-	getOssPrefixBase() {
-		const base = this.getOssBase()
-		return path.join(base, ossPrefix)
+	getOssBasePrefix() {
+		// NOTE: https有连个斜杠，用 path.join 会去掉一个，url需要手动拼接
+		return `${this.getOssBase()}/${ossPrefix}`
 	}
 }
 

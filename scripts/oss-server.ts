@@ -66,7 +66,6 @@ const validateFile = (file: Express.Multer.File) => {
 app.use(cors())
 app.use(express.json())
 app.use(generalLimiter) // 应用通用速率限制
-
 ossAPI.init()
 
 // 获取STS临时凭证

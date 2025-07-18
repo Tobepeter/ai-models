@@ -23,7 +23,7 @@
 - 即使上层组件有状态，业务组件也应直接使用 store
 
 ### 组件结构
-- 组件定义在顶部，props 类型定义在下方并使用 `type` 定义，需要 `export`
+- 组件定义在顶部，props 类型定义在下方并，需要 `export`
 
 ### 回调命名
 - 组件内回调使用 `handleXXX` 命名，避免与 props 的 `onXXX` 冲突
@@ -56,6 +56,7 @@
 - 尽可能使用解构导入变量
 - 使用 `Record` 代替 `Map`
 - 禁用严格的 lint 规则（`noUnusedImports`, `noUnusedVariables` 等）
+- 尽量使用 `interface` 代替 `type`
 
 ## 命名规范
 

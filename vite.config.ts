@@ -4,19 +4,12 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { defineConfig } from 'vite'
-import packageJson from './package.json'
-
-const isDev = process.env.NODE_ENV === 'development'
-const ossEnable = process.env.OSS_DEPLOY_ENABLE === 'true'
-const ossBucket = process.env.VITE_OSS_BUCKET || ''
-const ossRegion = process.env.VITE_OSS_REGION || ''
-
-const repoName = packageJson.name
+import { pathUtil } from './scripts/utils/path-util'
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
-	base: getBaseUrl(),
+	base: pathUtil.getBaseUrl(),
 	server: {
 		host: '0.0.0.0', // 允许局域网访问
 		port: Number(process.env.VITE_PORT) || 5173,
@@ -25,6 +18,12 @@ export default defineConfig({
 		alias: {
 			'@': path.resolve(__dirname, './src'),
 		},
+	},
+	define: {
+		'__OSS_BASE__': JSON.stringify(pathUtil.getOssBase()),
+		'__OSS_BASE_PREFIX__': JSON.stringify(pathUtil.getOssBasePrefix()),
+		'__BUILD_TIME__': JSON.stringify(new Date().toISOString()),
+		'__BUILD_TIME_LOCAL__': JSON.stringify(new Date().toLocaleString()),
 	},
 	test: {
 		projects: [
@@ -55,16 +54,3 @@ export default defineConfig({
 		],
 	},
 })
-
-function getBaseUrl() {
-	if (isDev) {
-		return '/'
-	}
-
-	if (ossEnable) {
-		const base = `https://${ossBucket}.${ossRegion}.aliyuncs.com`
-		return `${base}/web/${repoName}/`
-	}
-
-	return '/'
-}

@@ -16,3 +16,8 @@ interface ImportMetaEnv {
 	readonly VITE_OSS_READ_ACCESS: string // 读权限模式: sts|api|pub|ak
 	readonly VITE_OSS_WRITE_ACCESS: string // 写权限模式: sts|api|pub|ak
 }
+
+declare const __OSS_BASE__: string
+declare const __OSS_BASE_PREFIX__: string
+declare const __BUILD_TIME__: string
+declare const __BUILD_TIME_LOCAL__: string

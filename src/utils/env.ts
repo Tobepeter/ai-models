@@ -28,7 +28,7 @@ export const ossRegion = import.meta.env.VITE_OSS_REGION || ''
 
 export const ossRoleArn = import.meta.env.VITE_OSS_ROLE_ARN || ''
 
-export const ossReadAccess = (import.meta.env.VITE_OSS_READ_ACCESS as OssAccessType) || OssAccessType.Sts
+export const ossReadAccess = (import.meta.env.VITE_OSS_READ_ACCESS as OssAccessType) || OssAccessType.Pub
 export const ossWriteAccess = (import.meta.env.VITE_OSS_WRITE_ACCESS as OssAccessType) || OssAccessType.Sts
 
 // NOTE: 只有env配置了，ak，这个变量才会注入到前端
@@ -39,3 +39,8 @@ if (ossReadAccess === OssAccessType.Ak || ossWriteAccess === OssAccessType.Ak) {
 	ossAccessKeySecret = import.meta.env.VITE_OSS_ACCESS_KEY_SECRET || ''
 }
 export { ossAccessKeyId, ossAccessKeySecret }
+
+export const ossBase = __OSS_BASE__
+export const ossBasePrefix = __OSS_BASE_PREFIX__
+export const buildTime = __BUILD_TIME__
+export const buildTimeLocal = __BUILD_TIME_LOCAL__
