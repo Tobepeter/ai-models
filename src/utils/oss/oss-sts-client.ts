@@ -2,7 +2,8 @@ import OSS, { type Credentials } from 'ali-oss'
 import axios from 'axios'
 import { ossConfig } from './oss-config'
 import { OssBaseResp, OssSTSRespData, OssUploadResult } from './oss-types'
-import { ossUtil } from './oss-utils'
+import { ossUtil } from './oss-util'
+import { ossRegion, ossBucket } from '../env'
 
 /**
  * 前端OSS客户端（基于STS）
@@ -28,9 +29,7 @@ class OssStsClient {
 		const resp = await axios.post<OssBaseResp<OssSTSRespData>>(`${ossConfig.apiBaseUrl}/sts`)
 		const { data } = resp
 		if (data.code !== 0) throw new Error(data.msg || 'Failed to get STS token')
-
-		// 直接使用后端返回的 credentials
-		const token = data.data
+		const token = data.data.credentials
 
 		this.token = token
 		this.cacheToken(token)
@@ -101,11 +100,11 @@ class OssStsClient {
 		if (!this.token) throw new Error('[OSS] Cannot refresh OSS client: STS token not found')
 
 		this.oss = new OSS({
-			region: ossConfig.region,
 			accessKeyId: this.token.AccessKeyId,
 			accessKeySecret: this.token.AccessKeySecret,
+			region: ossRegion,
+			bucket: ossBucket,
 			stsToken: this.token.SecurityToken,
-			bucket: ossConfig.bucket,
 		})
 	}
 

@@ -16,6 +16,7 @@
 ### Prop 设计
 - 降低组件使用复杂度，props 能可选就可选
 - 回调函数 `onXXX` 尽量设为可选的
+- Prop不要定义children，而是在参数内用 `PropsWithChildren` 包装
 
 ### 业务组件 Props
 - 业务组件优先消费 store 数据，避免 props 传递
@@ -41,12 +42,18 @@
 
 ## 代码规范
 
-### 代码解构
+### 风格
 - 如果是简单if语句，考虑使用三元表达式
+- 注释后置，保持克制，只在特殊逻辑处添加
+- 简单逻辑尽量写在一行，如 `if (condition) return`
+- JSDoc 保持简短描述，函数注释如果只有一行，使用 `/* description */` 格式
+- class 必须是三行 jsDoc
+- 管理类，helper，utils，使用大写 Class 定义，导出小写实例，减少 static 使用
 
 ### TypeScript 规范
 - 充分利用类型推断，避免冗余类型注解
 - 导入时优先解构，避免命名空间导入
+- 尽可能使用解构导入变量
 - 使用 `Record` 代替 `Map`
 - 禁用严格的 lint 规则（`noUnusedImports`, `noUnusedVariables` 等）
 
@@ -61,9 +68,3 @@
 
 ### 页面文件
 - 直接使用功能名，如 `chat.tsx`
-
-## 代码管理类规范
-- 使用大写 Class 定义，导出小写实例，减少 static 使用
-- JSDoc 保持简短描述，函数注释使用 `/* description */` 格式
-- 注释后置，保持克制，只在特殊逻辑处添加
-- 简单逻辑尽量写在一行，如 `if (condition) return`

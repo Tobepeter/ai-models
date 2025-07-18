@@ -1,3 +1,5 @@
+import { OssAccessType } from './oss/oss-types'
+
 export const mode = import.meta.env.MODE
 export const isDev = import.meta.env.DEV
 export const isProd = import.meta.env.PROD
@@ -19,3 +21,21 @@ export const aiConfig = {
 		baseUrl: 'http://localhost:3000/v1',
 	},
 }
+
+// OSS 配置
+export const ossBucket = import.meta.env.VITE_OSS_BUCKET || ''
+export const ossRegion = import.meta.env.VITE_OSS_REGION || ''
+
+export const ossRoleArn = import.meta.env.VITE_OSS_ROLE_ARN || ''
+
+export const ossReadAccess = (import.meta.env.VITE_OSS_READ_ACCESS as OssAccessType) || OssAccessType.Sts
+export const ossWriteAccess = (import.meta.env.VITE_OSS_WRITE_ACCESS as OssAccessType) || OssAccessType.Sts
+
+// NOTE: 只有env配置了，ak，这个变量才会注入到前端
+let ossAccessKeyId = ''
+let ossAccessKeySecret = ''
+if (ossReadAccess === OssAccessType.Ak || ossWriteAccess === OssAccessType.Ak) {
+	ossAccessKeyId = import.meta.env.VITE_OSS_ACCESS_KEY_ID || ''
+	ossAccessKeySecret = import.meta.env.VITE_OSS_ACCESS_KEY_SECRET || ''
+}
+export { ossAccessKeyId, ossAccessKeySecret }

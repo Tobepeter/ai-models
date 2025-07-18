@@ -7,7 +7,7 @@ import { defineConfig } from 'vite'
 import packageJson from './package.json'
 
 const isDev = process.env.NODE_ENV === 'development'
-const ossEnable = process.env.VITE_OSS_DEPLOY_ENABLE === 'true'
+const ossEnable = process.env.OSS_DEPLOY_ENABLE === 'true'
 const ossBucket = process.env.VITE_OSS_BUCKET || ''
 const ossRegion = process.env.VITE_OSS_REGION || ''
 

@@ -100,7 +100,8 @@ if (isDev) {
 						</SidebarGroup>
 					</SidebarContent>
 				</Sidebar>
-				<SidebarInset>
+				{/* NOTE: flex 1 默认 min-w 是 auto，尽可能文本不换行，但是 w-0，子元素会换行适应容器宽度 */}
+				<SidebarInset className="min-w-0">
 					<header className="flex h-16 shrink-0 items-center gap-2 border-b px-2">
 						<SidebarTrigger />
 						<h1 className="text-lg font-semibold">{selectedKey} 测试</h1>

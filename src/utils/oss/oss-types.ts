@@ -1,3 +1,5 @@
+import { Credentials } from 'ali-oss'
+
 /** 通用API响应格式 */
 export interface OssBaseResp<T> {
 	code: number
@@ -7,15 +9,12 @@ export interface OssBaseResp<T> {
 
 /** 后端STS响应数据 - 直接返回 ali-oss Credentials */
 export interface OssSTSRespData {
-	AccessKeyId: string
-	AccessKeySecret: string
-	SecurityToken: string
-	Expiration: string
+	credentials: Credentials
 }
 
 /** 上传结果 */
 export interface OssUploadResult {
-	url: string
+	url?: string // 可选，如果不需要预览，可以不返回
 	objectKey: string
 	hashifyName: string
 	size: number
@@ -40,12 +39,33 @@ export interface OssHashifyNameData {
 	hashifyName: string
 }
 
+/** API模式上传响应数据 */
+export interface OssApiUploadData {
+	objectKey: string
+	url: string
+	size: number
+	type: string
+	uploadTime: string
+}
+
+/** API模式获取URL响应数据 */
+export interface OssApiGetUrlData {
+	url: string
+	objectKey: string
+}
+
+/** OSS上传选项 */
+export interface OssUploadOpt {
+	prefix?: string
+	fileName?: string
+	noPreview?: boolean // 不需要预览URL，可以跳过获取URL步骤
+	onProgress?: (percent: number) => void // 上传进度回调
+}
+
 /** 通用oss客户端配置 */
 export interface OssClientConfig {
 	accessKeyId: string
 	accessKeySecret: string
-	bucket: string
-	region: string
 }
 
 export enum OssAccessType {

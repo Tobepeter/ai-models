@@ -2,14 +2,8 @@ import { ossApiClient } from './oss-api-client'
 import { ossPubClient } from './oss-pub-client'
 import { ossStsClient } from './oss-sts-client'
 import { OssAccessType, OssClientConfig } from './oss-types'
-
-// OSS权限配置
-const OSS_READ_ACCESS: OssAccessType = (import.meta.env.VITE_OSS_READ_ACCESS as OssAccessType) || OssAccessType.Sts
-const OSS_WRITE_ACCESS: OssAccessType = (import.meta.env.VITE_OSS_WRITE_ACCESS as OssAccessType) || OssAccessType.Sts
-const OSS_BUCKET = import.meta.env.VITE_OSS_BUCKET || ''
-const OSS_REGION = import.meta.env.VITE_OSS_REGION || ''
-const OSS_ACCESS_KEY = import.meta.env.VITE_OSS_ACCESS_KEY || ''
-const OSS_ACCESS_SECRET = import.meta.env.VITE_OSS_ACCESS_SECRET || ''
+import { ossReadAccess, ossWriteAccess } from '../env'
+import { ossAccessKeyId, ossAccessKeySecret, ossBucket, ossRegion } from '../env'
 
 /**
  * oss 客户端
@@ -19,21 +13,52 @@ const OSS_ACCESS_SECRET = import.meta.env.VITE_OSS_ACCESS_SECRET || ''
  * 公共客户端
  */
 class OssClient {
+	verbose = true
+	read: OssAccessType = ossReadAccess
+	write: OssAccessType = ossWriteAccess
+
 	init() {
 		ossPubClient.init({
-			accessKeyId: OSS_ACCESS_KEY,
-			accessKeySecret: OSS_ACCESS_SECRET,
-			bucket: OSS_BUCKET,
-			region: OSS_REGION,
+			accessKeyId: ossAccessKeyId,
+			accessKeySecret: ossAccessKeySecret,
 		})
+
+		if (this.verbose) {
+			console.log('[oss] init', {
+				readAccess: ossReadAccess,
+				writeAccess: ossWriteAccess,
+				bucket: ossBucket,
+				region: ossRegion,
+				accessKeyId: ossAccessKeyId,
+				accessKeySecret: ossAccessKeySecret,
+			})
+		}
 	}
 
 	update(config: OssClientConfig) {
 		ossPubClient.init(config)
 	}
 
+	changeReadAccess(access: OssAccessType) {
+		if (access === OssAccessType.Ak) {
+			if (!ossPubClient.hasAk) console.error('[oss] accessKey not configured')
+			return
+		}
+
+		this.read = access
+	}
+
+	changeWriteAccess(access: OssAccessType) {
+		if (access === OssAccessType.Ak) {
+			if (!ossPubClient.hasAk) console.error('[oss] accessKey not configured')
+			return
+		}
+
+		this.write = access
+	}
+
 	uploadFile(file: File) {
-		switch (OSS_WRITE_ACCESS) {
+		switch (this.write) {
 			case OssAccessType.Pub:
 				return ossPubClient.publicUploadFile(file)
 			case OssAccessType.Ak:
@@ -48,7 +73,7 @@ class OssClient {
 	}
 
 	deleteFile(objectKey: string) {
-		switch (OSS_WRITE_ACCESS) {
+		switch (this.write) {
 			case OssAccessType.Pub:
 				return ossPubClient.publicDeleteFile(objectKey)
 			case OssAccessType.Ak:
@@ -62,7 +87,7 @@ class OssClient {
 	}
 
 	async getFileUrl(objectKey: string) {
-		switch (OSS_READ_ACCESS) {
+		switch (this.read) {
 			case OssAccessType.Pub:
 				return ossPubClient.getPublicUrl(objectKey)
 			case OssAccessType.Ak:

@@ -1,14 +1,21 @@
-import OSS, { STS } from 'ali-oss'
+import OSS from 'ali-oss'
 import { ossAccessKeyId, ossAccessKeySecret, ossBucket, ossRegion, ossRoleArn } from './env'
 
 class OssAPI {
 	oss: OSS
-	sts: STS
+	// NOTE: import 不能用解构语法，代码实际是并未导出
+	sts: OSS.STS
 
 	init() {
-		if (!ossAccessKeyId || !ossAccessKeySecret || !ossBucket || !ossRegion || !ossRoleArn) {
-			throw new Error('OSS 配置不完整')
+		const keys = {
+			accessKeyId: ossAccessKeyId,
+			accessKeySecret: ossAccessKeySecret,
+			bucket: ossBucket,
+			region: ossRegion,
+			roleArn: ossRoleArn,
 		}
+		const validKeys = Object.values(keys).every((value) => value !== '')
+		if (!validKeys) throw new Error(`[oss] 配置不完整，请检查 env 配置: ${JSON.stringify(keys)}`)
 
 		this.oss = new OSS({
 			region: ossRegion,
@@ -17,7 +24,7 @@ class OssAPI {
 			bucket: ossBucket,
 		})
 
-		this.sts = new STS({
+		this.sts = new OSS.STS({
 			// NOTE：sts 其实是通用服务，和 oss 的 bucket 信息无关
 			accessKeyId: ossAccessKeyId,
 			accessKeySecret: ossAccessKeySecret,
@@ -92,7 +99,7 @@ class OssAPI {
 	/** 直接上传文件 */
 	async uploadFile(buffer: Buffer, objectKey: string, contentType: string) {
 		const result = await this.oss.put(objectKey, buffer, {
-			headers: { 'Content-Type': contentType }
+			headers: { 'Content-Type': contentType },
 		})
 		return result
 	}

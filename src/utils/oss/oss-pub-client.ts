@@ -1,7 +1,8 @@
 import OSS from 'ali-oss'
 import axios from 'axios'
 import { OssClientConfig, OssUploadResult } from './oss-types'
-import { ossUtil } from './oss-utils'
+import { ossUtil } from './oss-util'
+import { ossBucket, ossRegion } from '../env'
 
 /**
  * 前端公共客户端
@@ -15,10 +16,10 @@ class OssPubClient {
 
 	init(config: OssClientConfig) {
 		this.config = config
-		const { accessKeyId, accessKeySecret, bucket, region } = config
+		const { accessKeyId, accessKeySecret } = config
 
 		if (accessKeyId && accessKeySecret) {
-			this.oss = new OSS({ accessKeyId, accessKeySecret, bucket, region })
+			this.oss = new OSS({ accessKeyId, accessKeySecret, bucket: ossBucket, region: ossRegion })
 			this.hasAk = true
 		} else {
 			this.oss = null
@@ -64,7 +65,7 @@ class OssPubClient {
 	}
 
 	getPublicUrl(objectKey: string) {
-		return `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${objectKey}`
+		return `https://${ossBucket}.${ossRegion}.aliyuncs.com/${objectKey}`
 	}
 
 	getUrl(objectKey: string) {

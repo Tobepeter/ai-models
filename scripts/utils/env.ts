@@ -18,13 +18,13 @@ export const verbose = process.env.VERBOSE === 'true'
 export const repoName = packageJson.name
 export const repoVersion = packageJson.version
 
-export const ossEnable = process.env.VITE_OSS_DEPLOY_ENABLE === 'true'
+export const ossEnable = process.env.OSS_DEPLOY_ENABLE === 'true'
 
 export const ossBucket = process.env.VITE_OSS_BUCKET || ''
 export const ossRegion = process.env.VITE_OSS_REGION || ''
-export const ossAccessKeyId = process.env.VITE_OSS_ACCESS_KEY || ''
-export const ossAccessKeySecret = process.env.VITE_OSS_ACCESS_SECRET || ''
-export const ossRoleArn = process.env.VITE_OSS_ROLE_ARN || ''
+export const ossAccessKeyId = process.env.VITE_OSS_ACCESS_KEY_ID || ''
+export const ossAccessKeySecret = process.env.VITE_OSS_ACCESS_KEY_SECRET || ''
+export const ossRoleArn = process.env.OSS_ROLE_ARN || ''
 
 // NOTE: 这个暂时不让配置，防止 oss 弄得太乱了
 // OSS prefix 不能以 / 开头，必须以 / 结尾
