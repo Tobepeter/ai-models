@@ -84,7 +84,7 @@ func validateToken(tokenString string) (*JWTClaims, error) {
 		return claims, nil
 	}
 
-	return nil, jwt.ErrTokenInvalid
+	return nil, jwt.ErrTokenMalformed
 }
 
 // GenerateToken generates a new JWT token for the user

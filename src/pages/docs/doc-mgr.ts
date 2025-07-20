@@ -21,7 +21,8 @@ if (isDev) {
 			const files = [
 				// == prettier break==
 				import.meta.glob('/docs/**/*.md', { query: '?raw' }),
-				import.meta.glob('/temp/计划/**/*.md', { query: '?raw' }),
+				// import.meta.glob('/temp/计划/**/*.md', { query: '?raw' }),
+				import.meta.glob('/temp/ai/**/*.md', { query: '?raw' }),
 			]
 
 			this.docFilesMap = {}
