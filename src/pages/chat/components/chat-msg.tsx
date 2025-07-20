@@ -8,6 +8,7 @@ import { Msg } from '@/pages/chat/chat-type'
 import { AlertCircle, Loader2, RotateCcw } from 'lucide-react'
 import { ChatMedia } from './chat-media'
 import { ChatText } from './chat-text'
+import { StreamText } from '@/components/common/stream-text'
 
 /**
  * 聊天消息组件
@@ -20,6 +21,16 @@ export const ChatMsg = (props: ChatMsgProps) => {
 		chatMgr.retryMsg(msg.id)
 	}
 
+	// NOTE: 多种内容组件，保留下来可以切换
+	// const chatComp = msg.status === 'generating' ? (
+	// 	<ChatText content={msg.content} isStream={true} />
+	// ) : (
+	// 	<Markdown content={msg.content} />
+	// )
+
+	const chatComp = <ChatText content={msg.content} isStream={true} />
+	// const chatComp = <Markdown content={msg.content} />
+
 	return (
 		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')}>
 			<div className={cn('flex max-w-[85%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
@@ -30,13 +41,7 @@ export const ChatMsg = (props: ChatMsgProps) => {
 				)}
 				<div className={cn('px-4 py-2 rounded-lg', isUser ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
 					{/* 消息内容 */}
-					{/* {msg.status === 'generating' ? (
-						<ChatText content={msg.content} isStream={true} />
-					) : (
-						<Markdown content={msg.content} />
-					)} */}
-
-					<Markdown content={msg.content} />
+					{chatComp}
 
 					{/* 用户消息的媒体内容 */}
 					{isUser && <ChatMedia msg={msg} />}

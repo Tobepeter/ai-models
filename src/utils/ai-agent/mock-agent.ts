@@ -1,9 +1,10 @@
+import OpenAI from 'openai'
 import axios from 'axios'
-import { createParser } from 'eventsource-parser'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
 import { StreamCallback, VideoStatusResponse, AIPlatform, MediaType } from './types'
 import { aiAgentConfig } from './ai-agent-config'
+import { requestConfig } from '@/config/request-config'
 
 /**
  * Mock Agent
@@ -13,14 +14,21 @@ import { aiAgentConfig } from './ai-agent-config'
  */
 export class MockAgent implements IAiAgent {
 	agent: AIAgentManager
+	openai: OpenAI
 	axiosClient = axios.create({
-		baseURL: aiAgentConfig.data[AIPlatform.Mock].baseUrl,
-		timeout: 3000, // 3秒超时
+		baseURL: 'http://localhost:3000',
+		timeout: requestConfig.chatTimeout,
 	})
 	currModel: string
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
+		this.openai = new OpenAI({
+			baseURL: aiAgentConfig.data[AIPlatform.Mock].baseUrl,
+			apiKey: aiAgentConfig.getApiKey(AIPlatform.Mock),
+			timeout: requestConfig.chatTimeout,
+			dangerouslyAllowBrowser: true,
+		})
 	}
 
 	private getHeaders() {
@@ -32,17 +40,13 @@ export class MockAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const response = await this.axiosClient.post(
-				'/chat/completions',
-				{
-					model: this.currModel,
-					stream: false,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-				},
-				{ headers: this.getHeaders() }
-			)
-			const content = response.data.choices[0]?.message?.content || ''
+			const response = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: false,
+			})
+			const content = response.choices[0]?.message?.content || ''
 			return content.trim()
 		} catch (error) {
 			console.error('[MockAgent] generateText error', error)
@@ -52,48 +56,20 @@ export class MockAgent implements IAiAgent {
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
-			// TODO: 使用 axios 实现起来很麻烦，而且默认很容易 timeout，所以暂时用 fetch 实现
-			//  不过这里是没有超时的，有条件可以实现没有新的消息就 10s timeout
-			const response = await fetch(`${aiAgentConfig.data[AIPlatform.Mock].baseUrl}/chat/completions-stream`, {
-				method: 'POST',
-				headers: this.getHeaders(),
-				body: JSON.stringify({
-					model: this.currModel,
-					stream: true,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-				}),
+			const stream = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: true,
 			})
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
-			}
-
-			const reader = response.body?.getReader()
-			const decoder = new TextDecoder()
 			let fullContent = ''
-
-			const parser = createParser({
-				onEvent: (event) => {
-					if (event.data === '[DONE]') return
-					try {
-						const parsed = JSON.parse(event.data)
-						const content = parsed.choices?.[0]?.delta?.content || ''
-						if (content) {
-							fullContent += content
-							onChunk(content)
-						}
-					} catch (e) {
-						// 忽略解析错误
-					}
-				},
-			})
-
-			while (true) {
-				const { done, value } = await reader!.read()
-				if (done) break
-				const chunk = decoder.decode(value, { stream: true })
-				parser.feed(chunk)
+			for await (const chunk of stream) {
+				const content = chunk.choices[0]?.delta?.content || ''
+				if (content) {
+					fullContent += content
+					onChunk(content)
+				}
 			}
 
 			return fullContent
@@ -106,7 +82,7 @@ export class MockAgent implements IAiAgent {
 	async generateImages(prompt: string) {
 		try {
 			const response = await this.axiosClient.post(
-				'/images/generations',
+				'/v1/images/generations',
 				{
 					model: this.currModel,
 					prompt: prompt,
@@ -173,13 +149,13 @@ export class MockAgent implements IAiAgent {
 		}
 
 		// 提交视频生成请求
-		const submitResponse = await this.axiosClient.post('/video/submit', requestData, { headers: this.getHeaders() })
+		const submitResponse = await this.axiosClient.post('/v1/video/submit', requestData, { headers: this.getHeaders() })
 		return submitResponse.data.requestId
 	}
 
 	async getVideoTaskStatus(requestId: string) {
 		// 查询状态
-		const statusResponse = await this.axiosClient.post<VideoStatusResponse>('/video/status', { requestId }, { headers: this.getHeaders() })
+		const statusResponse = await this.axiosClient.post<VideoStatusResponse>('/v1/video/status', { requestId }, { headers: this.getHeaders() })
 
 		return statusResponse.data
 	}

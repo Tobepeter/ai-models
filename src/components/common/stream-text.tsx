@@ -1,18 +1,14 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { CSSProperties, useRef, useEffect } from 'react'
+import { useMount, usePrevious } from 'ahooks'
 
-/** 流式文本组件 - 优化版，避免闪烁 */
+/**
+ * 流式文本组件
+ */
 export const StreamText = (props: StreamTextProps) => {
-	const { content, className, style } = props
-	const prevContentRef = useRef('')
-
-	// 记录上次的内容，用于判断哪些字符是新增的
-	useEffect(() => {
-		prevContentRef.current = content
-	})
-
-	const prevContent = prevContentRef.current
+	const { content, className, style, duration = 1 } = props
+	const prevContent = usePrevious(content) || ''
 	const characters = content.split('')
 
 	return (
@@ -24,10 +20,10 @@ export const StreamText = (props: StreamTextProps) => {
 				return (
 					<motion.span
 						key={`char-${idx}`}
-						initial={isNewChar ? { opacity: 0 } : false} // 已存在的字符不需要初始状态
+						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						transition={{
-							duration: isNewChar ? 0.15 : 0, // 只对新字符应用动画
+							duration,
 							ease: 'easeOut',
 						}}
 					>

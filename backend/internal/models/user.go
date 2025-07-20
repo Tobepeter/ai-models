@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// User represents a user in the system
+// 用户模型
 type User struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
 	Username  string         `json:"username" gorm:"uniqueIndex;not null"`
@@ -18,27 +18,27 @@ type User struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-// UserCreateRequest represents the request for creating a user
+// 创建用户请求
 type UserCreateRequest struct {
 	Username string `json:"username" binding:"required,min=3,max=50"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-// UserLoginRequest represents the request for user login
+// 用户登录请求
 type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-// UserUpdateRequest represents the request for updating user profile
+// 更新用户请求
 type UserUpdateRequest struct {
 	Username string `json:"username,omitempty" binding:"omitempty,min=3,max=50"`
 	Email    string `json:"email,omitempty" binding:"omitempty,email"`
 	Avatar   string `json:"avatar,omitempty"`
 }
 
-// UserResponse represents the response structure for user data
+// 用户响应
 type UserResponse struct {
 	ID        uint      `json:"id"`
 	Username  string    `json:"username"`
@@ -49,7 +49,6 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// ToResponse converts User to UserResponse
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
 		ID:        u.ID,

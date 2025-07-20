@@ -12,19 +12,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// UserHandler handles user-related HTTP requests
+// 用户请求处理器
 type UserHandler struct {
 	userService *services.UserService
 }
-
-// NewUserHandler creates a new UserHandler
 func NewUserHandler(userService *services.UserService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 	}
 }
 
-// Register handles user registration
+// 用户注册
 func (h *UserHandler) Register(c *gin.Context) {
 	var req models.UserCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -40,7 +38,6 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Generate token
 	token, err := middleware.GenerateToken(user.ID, user.Username)
 	if err != nil {
 		logrus.Error("Failed to generate token:", err)
@@ -56,7 +53,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 	response.Success(c, http.StatusCreated, "User registered successfully", data)
 }
 
-// Login handles user login
+// 用户登录
 func (h *UserHandler) Login(c *gin.Context) {
 	var req models.UserLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -72,7 +69,6 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Generate token
 	token, err := middleware.GenerateToken(user.ID, user.Username)
 	if err != nil {
 		logrus.Error("Failed to generate token:", err)
@@ -88,7 +84,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Login successful", data)
 }
 
-// GetProfile handles getting user profile
+// 获取用户信息
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -106,7 +102,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Profile retrieved successfully", user.ToResponse())
 }
 
-// UpdateProfile handles updating user profile
+// 更新用户信息
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -131,7 +127,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Profile updated successfully", user.ToResponse())
 }
 
-// GetUsers handles getting all users (admin only)
+// 获取用户列表
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))

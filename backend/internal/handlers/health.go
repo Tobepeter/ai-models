@@ -8,15 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HealthHandler handles health check requests
+// 健康检查处理器
 type HealthHandler struct{}
-
-// NewHealthHandler creates a new HealthHandler
 func NewHealthHandler() *HealthHandler {
 	return &HealthHandler{}
 }
 
-// Health handles health check endpoint
+// 健康检查
 func (h *HealthHandler) Health(c *gin.Context) {
 	data := gin.H{
 		"status":    "healthy",
@@ -28,10 +26,8 @@ func (h *HealthHandler) Health(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Service is healthy", data)
 }
 
-// ReadyHandler handles readiness check
+// 就绪检查
 func (h *HealthHandler) Ready(c *gin.Context) {
-	// Check if all dependencies are ready
-	// This could include database connections, external services, etc.
 	
 	data := gin.H{
 		"status":    "ready",
@@ -46,12 +42,12 @@ func (h *HealthHandler) Ready(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Service is ready", data)
 }
 
-// LiveHandler handles liveness check
+// 存活检查
 func (h *HealthHandler) Live(c *gin.Context) {
 	data := gin.H{
 		"status":    "alive",
 		"timestamp": time.Now().UTC(),
-		"uptime":    time.Since(time.Now()).String(), // In real app, track actual uptime
+		"uptime":    time.Since(time.Now()).String(),
 	}
 
 	response.Success(c, http.StatusOK, "Service is alive", data)

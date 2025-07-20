@@ -8,25 +8,17 @@ import (
 	"strings"
 )
 
-// AIService handles AI-related business logic
+// AI 服务
 type AIService struct {
-	// In a real application, this would include AI client connections
 }
-
-// NewAIService creates a new AIService
 func NewAIService() *AIService {
 	return &AIService{}
 }
 
-// Chat processes a chat request
+// 处理聊天请求
 func (s *AIService) Chat(userID uint, req models.ChatRequest) (*models.ChatResponse, error) {
-	// In a real application, you would call an AI service like OpenAI, Anthropic, etc.
-	// For demo purposes, we'll return a mock response
-	
-	// Simulate processing time
 	time.Sleep(100 * time.Millisecond)
 	
-	// Generate mock response
 	response := &models.ChatResponse{
 		ID:        fmt.Sprintf("chat_%d_%d", userID, time.Now().UnixNano()),
 		Message:   s.generateMockResponse(req.Message),
@@ -39,17 +31,14 @@ func (s *AIService) Chat(userID uint, req models.ChatRequest) (*models.ChatRespo
 		},
 	}
 
-	// In a real application, you would save the conversation to database
 	s.saveChatHistory(userID, "user", req.Message, req.Model)
 	s.saveChatHistory(userID, "assistant", response.Message, req.Model)
 
 	return response, nil
 }
 
-// StreamChat processes a streaming chat request
+// 流式聊天
 func (s *AIService) StreamChat(userID uint, req models.ChatRequest, responseChan chan<- string) error {
-	// In a real application, you would stream from an AI service
-	// For demo purposes, we'll simulate streaming
 	
 	mockResponse := s.generateMockResponse(req.Message)
 	words := strings.Fields(mockResponse)
@@ -63,19 +52,14 @@ func (s *AIService) StreamChat(userID uint, req models.ChatRequest, responseChan
 		}
 	}
 
-	// Save to chat history
 	s.saveChatHistory(userID, "user", req.Message, req.Model)
 	s.saveChatHistory(userID, "assistant", mockResponse, req.Model)
 
 	return nil
 }
 
-// Generate processes a text generation request
+// 文本生成
 func (s *AIService) Generate(userID uint, req models.GenerateRequest) (*models.GenerateResponse, error) {
-	// In a real application, you would call an AI service
-	// For demo purposes, we'll return a mock response
-	
-	// Simulate processing time
 	time.Sleep(200 * time.Millisecond)
 	
 	response := &models.GenerateResponse{
@@ -93,10 +77,8 @@ func (s *AIService) Generate(userID uint, req models.GenerateRequest) (*models.G
 	return response, nil
 }
 
-// GetAvailableModels returns available AI models
+// 获取可用模型
 func (s *AIService) GetAvailableModels() ([]models.AIModel, error) {
-	// In a real application, you would fetch from AI service providers
-	// For demo purposes, we'll return mock models
 	
 	models := []models.AIModel{
 		{
@@ -144,10 +126,8 @@ func (s *AIService) GetAvailableModels() ([]models.AIModel, error) {
 	return models, nil
 }
 
-// GetChatHistory retrieves chat history for a user session
+// 获取聊天历史
 func (s *AIService) GetChatHistory(userID uint, sessionID string) ([]models.ConversationHistory, error) {
-	// In a real application, you would query the database
-	// For demo purposes, we'll return mock history
 	
 	history := []models.ConversationHistory{
 		{
@@ -173,14 +153,11 @@ func (s *AIService) GetChatHistory(userID uint, sessionID string) ([]models.Conv
 	return history, nil
 }
 
-// ClearChatHistory clears chat history for a user session
+// 清除聊天历史
 func (s *AIService) ClearChatHistory(userID uint, sessionID string) error {
-	// In a real application, you would delete from database
-	// For demo purposes, we'll just return nil
 	return nil
 }
 
-// Helper methods
 
 func (s *AIService) generateMockResponse(message string) string {
 	responses := []string{
@@ -209,8 +186,6 @@ func (s *AIService) getModelName(model string) string {
 }
 
 func (s *AIService) saveChatHistory(userID uint, role, content, model string) {
-	// In a real application, you would save to database
-	// For demo purposes, we'll just log it
 	sessionID := fmt.Sprintf("session_%d", userID)
 	
 	history := models.ConversationHistory{
@@ -222,6 +197,5 @@ func (s *AIService) saveChatHistory(userID uint, role, content, model string) {
 		CreatedAt: time.Now(),
 	}
 	
-	// This would be saved to database in a real application
 	_ = history
 }

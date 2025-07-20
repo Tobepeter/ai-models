@@ -130,7 +130,7 @@ pie title 项目技术栈分布
 			title: 'Git 分支图',
 			content: `## Git 工作流
 \`\`\`mermaid
-gitgraph
+gitGraph
     commit id: "初始化项目"
     branch feature/markdown
     checkout feature/markdown

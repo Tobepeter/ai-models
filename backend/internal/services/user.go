@@ -8,28 +8,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// UserService handles user-related business logic
+// 用户服务
 type UserService struct {
-	// In a real application, this would include database repositories
-	// users map[uint]*models.User // In-memory storage for demo
 }
-
-// NewUserService creates a new UserService
 func NewUserService() *UserService {
 	return &UserService{
 		// users: make(map[uint]*models.User),
 	}
 }
 
-// CreateUser creates a new user
+// 创建用户
 func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, error) {
-	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create user
 	user := &models.User{
 		ID:        uint(time.Now().UnixNano()), // Simple ID generation for demo
 		Username:  req.Username,
@@ -40,21 +34,14 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 		UpdatedAt: time.Now(),
 	}
 
-	// In a real application, you would save to database here
-	// For demo purposes, we'll just return the user
 
 	return user, nil
 }
 
-// AuthenticateUser authenticates a user with username and password
+// 用户认证
 func (s *UserService) AuthenticateUser(username, password string) (*models.User, error) {
-	// In a real application, you would query the database
-	// For demo purposes, we'll create a mock user
-	
-	// Hash the password for comparison
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
 	
-	// Mock user for demo
 	user := &models.User{
 		ID:        1,
 		Username:  username,
@@ -65,7 +52,6 @@ func (s *UserService) AuthenticateUser(username, password string) (*models.User,
 		UpdatedAt: time.Now(),
 	}
 
-	// Check password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, errors.New("invalid credentials")
 	}
@@ -73,10 +59,8 @@ func (s *UserService) AuthenticateUser(username, password string) (*models.User,
 	return user, nil
 }
 
-// GetUserByID retrieves a user by ID
+// 根据ID获取用户
 func (s *UserService) GetUserByID(id uint) (*models.User, error) {
-	// In a real application, you would query the database
-	// For demo purposes, we'll return a mock user
 	
 	user := &models.User{
 		ID:        id,
@@ -91,10 +75,8 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 	return user, nil
 }
 
-// UpdateUser updates a user's information
+// 更新用户信息
 func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models.User, error) {
-	// In a real application, you would query and update the database
-	// For demo purposes, we'll return a mock updated user
 	
 	user := &models.User{
 		ID:        id,
@@ -106,7 +88,6 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 		UpdatedAt: time.Now(),
 	}
 
-	// If fields are empty, keep existing values
 	if req.Username == "" {
 		user.Username = "demo_user"
 	}
@@ -120,10 +101,8 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 	return user, nil
 }
 
-// GetUsers retrieves paginated users
+// 获取用户列表
 func (s *UserService) GetUsers(page, limit int) ([]models.UserResponse, int64, error) {
-	// In a real application, you would query the database with pagination
-	// For demo purposes, we'll return mock users
 	
 	users := []models.UserResponse{
 		{
@@ -149,23 +128,17 @@ func (s *UserService) GetUsers(page, limit int) ([]models.UserResponse, int64, e
 	return users, int64(len(users)), nil
 }
 
-// DeleteUser deletes a user (soft delete)
+// 删除用户
 func (s *UserService) DeleteUser(id uint) error {
-	// In a real application, you would perform soft delete in database
-	// For demo purposes, we'll just return nil
 	return nil
 }
 
-// ActivateUser activates a user account
+// 激活用户
 func (s *UserService) ActivateUser(id uint) error {
-	// In a real application, you would update the database
-	// For demo purposes, we'll just return nil
 	return nil
 }
 
-// DeactivateUser deactivates a user account
+// 停用用户
 func (s *UserService) DeactivateUser(id uint) error {
-	// In a real application, you would update the database
-	// For demo purposes, we'll just return nil
 	return nil
 }

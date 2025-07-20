@@ -11,14 +11,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// JWTClaims represents the JWT claims structure
+// JWT 声明
 type JWTClaims struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-// AuthRequired is a middleware that requires authentication
+// 认证中间件
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := extractToken(c)
@@ -37,26 +37,22 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		// Set user information in context
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
 		c.Next()
 	}
 }
 
-// extractToken extracts the JWT token from the Authorization header
 func extractToken(c *gin.Context) (string, error) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		return "", jwt.ErrTokenMalformed
 	}
 
-	// Check if the header starts with "Bearer "
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		return "", jwt.ErrTokenMalformed
 	}
 
-	// Extract the token part
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 	if token == "" {
 		return "", jwt.ErrTokenMalformed
@@ -65,14 +61,11 @@ func extractToken(c *gin.Context) (string, error) {
 	return token, nil
 }
 
-// validateToken validates the JWT token and returns the claims
 func validateToken(tokenString string) (*JWTClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
-		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		// Return the secret key for validation
 		return []byte(getJWTSecret()), nil
 	})
 
@@ -87,7 +80,7 @@ func validateToken(tokenString string) (*JWTClaims, error) {
 	return nil, jwt.ErrTokenMalformed
 }
 
-// GenerateToken generates a new JWT token for the user
+// 生成token
 func GenerateToken(userID uint, username string) (string, error) {
 	claims := JWTClaims{
 		UserID:   userID,
@@ -104,8 +97,6 @@ func GenerateToken(userID uint, username string) (string, error) {
 	return token.SignedString([]byte(getJWTSecret()))
 }
 
-// getJWTSecret returns the JWT secret key
 func getJWTSecret() string {
-	// In a real application, this should come from environment variables
 	return "your-secret-key-change-in-production"
 }

@@ -12,7 +12,7 @@ export class OpenRouterAgent implements IAiAgent {
 	agent: AIAgentManager
 	axiosClient = axios.create({
 		baseURL: aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl,
-		timeout: 30000, // OpenRouter 可能需要更长的超时时间
+		timeout: 30000,
 	})
 	currModel: string
 

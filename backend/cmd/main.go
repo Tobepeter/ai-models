@@ -15,30 +15,22 @@ import (
 )
 
 func main() {
-	// Load environment variables
+	// 加载环境变量
 	if err := godotenv.Load(); err != nil {
-		logrus.Warn("No .env file found, using system environment variables")
+		logrus.Warn("未找到 .env 文件，使用系统环境变量")
 	}
 
-	// Initialize configuration
 	cfg := config.New()
-
-	// Initialize services
 	userService := services.NewUserService()
 	aiService := services.NewAIService()
-
-	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
 	aiHandler := handlers.NewAIHandler(aiService)
 	healthHandler := handlers.NewHealthHandler()
-
-	// Setup router
 	router := setupRouter(cfg, userHandler, aiHandler, healthHandler)
 
-	// Start server
-	logrus.Infof("Starting server on port %s", cfg.Port)
+	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
-		log.Fatal("Failed to start server:", err)
+		log.Fatal("服务器启动失败:", err)
 	}
 }
 
@@ -48,19 +40,14 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 	}
 
 	r := gin.New()
-
-	// Global middleware
 	r.Use(middleware.Logger())
 	r.Use(middleware.Recovery())
 	r.Use(middleware.CORS())
 
-	// Health check endpoint
 	r.GET("/health", healthHandler.Health)
 
-	// API routes
-	api := r.Group("/api/v1")
+	api := r.Group("/api")
 	{
-		// User routes
 		users := api.Group("/users")
 		{
 			users.POST("/register", userHandler.Register)
@@ -69,19 +56,18 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			users.PUT("/profile", middleware.AuthRequired(), userHandler.UpdateProfile)
 		}
 
-		// AI routes
 		ai := api.Group("/ai")
 		ai.Use(middleware.AuthRequired())
 		{
 			ai.POST("/chat", aiHandler.Chat)
 			ai.POST("/generate", aiHandler.Generate)
 			ai.GET("/models", aiHandler.GetModels)
+			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
 		}
 	}
 
-	// 404 handler
 	r.NoRoute(func(c *gin.Context) {
-		response.Error(c, http.StatusNotFound, "Route not found")
+		response.Error(c, http.StatusNotFound, "路由未找到")
 	})
 
 	return r

@@ -10,27 +10,31 @@ type Config struct {
 	Port        string
 	Environment string
 	
-	// Database configuration
 	DBHost     string
 	DBPort     string
 	DBUser     string
 	DBPassword string
 	DBName     string
 	
-	// Redis configuration
 	RedisAddr     string
 	RedisPassword string
 	RedisDB       int
 	
-	// JWT configuration
 	JWTSecret     string
 	JWTExpiration time.Duration
 	
-	// AI Service configuration
 	AIAPIKey    string
 	AIBaseURL   string
 	AIModel     string
 	AITimeout   time.Duration
+
+	OSSAccessKeyID     string
+	OSSAccessKeySecret string
+	OSSBucket          string
+	OSSRegion          string
+	OSSRoleArn         string
+	OSSReadAccess      string
+	OSSWriteAccess     string
 }
 
 func New() *Config {
@@ -38,27 +42,31 @@ func New() *Config {
 		Port:        getEnv("PORT", "8080"),
 		Environment: getEnv("ENVIRONMENT", "development"),
 		
-		// Database
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "3306"),
 		DBUser:     getEnv("DB_USER", "root"),
 		DBPassword: getEnv("DB_PASSWORD", ""),
 		DBName:     getEnv("DB_NAME", "ai_models"),
 		
-		// Redis
 		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword: getEnv("REDIS_PASSWORD", ""),
 		RedisDB:       getEnvInt("REDIS_DB", 0),
 		
-		// JWT
 		JWTSecret:     getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
 		JWTExpiration: getEnvDuration("JWT_EXPIRATION", "24h"),
 		
-		// AI Service
 		AIAPIKey:  getEnv("AI_API_KEY", ""),
 		AIBaseURL: getEnv("AI_BASE_URL", "https://api.openai.com/v1"),
 		AIModel:   getEnv("AI_MODEL", "gpt-3.5-turbo"),
 		AITimeout: getEnvDuration("AI_TIMEOUT", "30s"),
+
+		OSSAccessKeyID:     getEnv("OSS_ACCESS_KEY_ID", ""),
+		OSSAccessKeySecret: getEnv("OSS_ACCESS_KEY_SECRET", ""),
+		OSSBucket:          getEnv("OSS_BUCKET", ""),
+		OSSRegion:          getEnv("OSS_REGION", ""),
+		OSSRoleArn:         getEnv("OSS_ROLE_ARN", ""),
+		OSSReadAccess:      getEnv("OSS_READ_ACCESS", "sts"),
+		OSSWriteAccess:     getEnv("OSS_WRITE_ACCESS", "sts"),
 	}
 }
 

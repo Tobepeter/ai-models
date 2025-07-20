@@ -3,6 +3,12 @@ import { useLockScroll } from '@/hooks/use-lock-scroll'
 import styled from '@emotion/styled'
 import { PropsWithChildren } from 'react'
 
+// NOTE：千万不要函数内定义，否则每次render都是一个新的组件，导致整个页面重新渲染
+const ScreenContainer = styled.div<{ height: string }>`
+	height: 100vh;
+	height: ${({ height }) => height};
+`
+
 /**
  * 屏幕容器组件
  *
@@ -14,12 +20,9 @@ export const Screen = (props: PropsWithChildren<ScreenProps>) => {
 	const LockScroll = withCondHook(useLockScroll, !noLockScroll)
 
 	const height = dynamicHeight ? '100dvh' : '100svh'
-	const ScreenContainer = styled.div`
-		height: 100vh;
-		height: ${height};
-	`
+
 	return (
-		<ScreenContainer>
+		<ScreenContainer height={height}>
 			<LockScroll />
 			{children}
 		</ScreenContainer>

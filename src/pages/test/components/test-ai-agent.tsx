@@ -205,71 +205,76 @@ export const TestAIAgent = () => {
 						<span>AI Agent 测试</span>
 					</CardTitle>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<div>
-						<label htmlFor="token" className="block text-sm font-medium mb-2">
-							API Token
-						</label>
-						<Input id="token" type="password" placeholder="输入您的 API Token" value={token} onChange={(e) => setToken(e.target.value)} />
-					</div>
-
-					<div>
-						<label htmlFor="platform" className="block text-sm font-medium mb-2">
-							平台
-						</label>
-						<Combobox options={platformOptions} value={platform} onValueChange={(value) => setPlatform(value as AIPlatform)} placeholder="选择平台..." className="w-full" />
-					</div>
-
-					<div>
-						<label htmlFor="model" className="block text-sm font-medium mb-2">
-							模型
-						</label>
-						<Combobox options={modelOptions} value={model} onValueChange={(value) => setModel(value)} placeholder="选择模型..." className="w-full" />
-					</div>
-
-					<div>
-						<label htmlFor="question" className="block text-sm font-medium mb-2">
-							{getInputLabel()}
-						</label>
-						<Textarea id="question" placeholder={getInputPlaceholder()} value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
-					</div>
-
-					{isVideoMode && (
-						<>
-							<div>
-								<label htmlFor="negativePrompt" className="block text-sm font-medium mb-2">
-									反向提示词 (可选)
-								</label>
-								<Input id="negativePrompt" placeholder="输入不想要的内容，如：模糊、低质量" value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} />
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-2">参考图片 (可选)</label>
-								<ImagePreview url={imageUrl} base64Mode onChange={setImageUrl} size={120} className="border-2 border-dashed" />
-							</div>
-						</>
-					)}
-
-					{!isImageMode && !isVideoMode && (
-						<div className="flex items-center space-x-2">
-							<Switch id="streaming" checked={streaming} onCheckedChange={setStreaming} />
-							<label htmlFor="streaming" className="text-sm font-medium">
-								流式响应 (Streaming)
+				<CardContent>
+					<form className='space-y-4'>
+						{/* 隐藏的用户名字段，用于满足浏览器对密码表单的无障碍要求 */}
+						<input type="text" name="username" autoComplete="username" className="hidden" />
+						<div>
+							<label htmlFor="token" className="block text-sm font-medium mb-2">
+								API Token
 							</label>
+							{/* NOTE：浏览器warn，password需要在form内，[DOM] Password field is not contained in a form: (More info: https:/Lgoo.gl/9p2vKg)  */}
+							<Input id="token" type="password" placeholder="输入您的 API Token" value={token} onChange={(e) => setToken(e.target.value)} autoComplete="new-password" />
 						</div>
-					)}
 
-					<div className="flex space-x-2">
-						<Button onClick={handleSubmit} disabled={mutation.isPending} className="flex-1">
-							{isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									{getButtonText()}
-								</>
-							) : (
-								getButtonText()
-							)}
-						</Button>
-					</div>
+						<div>
+							<label htmlFor="platform" className="block text-sm font-medium mb-2">
+								平台
+							</label>
+							<Combobox options={platformOptions} value={platform} onValueChange={(value) => setPlatform(value as AIPlatform)} placeholder="选择平台..." className="w-full" />
+						</div>
+
+						<div>
+							<label htmlFor="model" className="block text-sm font-medium mb-2">
+								模型
+							</label>
+							<Combobox options={modelOptions} value={model} onValueChange={(value) => setModel(value)} placeholder="选择模型..." className="w-full" />
+						</div>
+
+						<div>
+							<label htmlFor="question" className="block text-sm font-medium mb-2">
+								{getInputLabel()}
+							</label>
+							<Textarea id="question" placeholder={getInputPlaceholder()} value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} />
+						</div>
+
+						{isVideoMode && (
+							<>
+								<div>
+									<label htmlFor="negativePrompt" className="block text-sm font-medium mb-2">
+										反向提示词 (可选)
+									</label>
+									<Input id="negativePrompt" placeholder="输入不想要的内容，如：模糊、低质量" value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} />
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">参考图片 (可选)</label>
+									<ImagePreview url={imageUrl} base64Mode onChange={setImageUrl} size={120} className="border-2 border-dashed" />
+								</div>
+							</>
+						)}
+
+						{!isImageMode && !isVideoMode && (
+							<div className="flex items-center space-x-2">
+								<Switch id="streaming" checked={streaming} onCheckedChange={setStreaming} />
+								<label htmlFor="streaming" className="text-sm font-medium">
+									流式响应 (Streaming)
+								</label>
+							</div>
+						)}
+
+						<div className="flex space-x-2">
+							<Button onClick={handleSubmit} disabled={mutation.isPending} className="flex-1">
+								{isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{getButtonText()}
+									</>
+								) : (
+									getButtonText()
+								)}
+							</Button>
+						</div>
+					</form>
 				</CardContent>
 			</Card>
 

@@ -53,7 +53,7 @@ export const Markdown = (props: MarkdownProps) => {
 	return (
 		<div className={cn('markdown-content text-sm', className)} style={style}>
 			<ReactMarkdown
-				remarkPlugins={[remarkGfm]}
+				// remarkPlugins={[remarkGfm]}
 				components={{
 					// 代码块组件
 					code: (props: any) => {

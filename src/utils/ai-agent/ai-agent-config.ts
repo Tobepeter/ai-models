@@ -11,6 +11,7 @@ class AIAgentConfig {
 		},
 		[AIPlatform.Mock]: {
 			apiKey: 'mock-token',
+			// NOTE: openai包只有自己的域名才会加v1，其他的是不会
 			baseUrl: 'http://localhost:3000/v1',
 			models: {
 				text: ['mock-text-model-1', 'mock-text-model-2', 'mock-gpt-4', 'mock-claude-3', 'mock-deepseek'],
