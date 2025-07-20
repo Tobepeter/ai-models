@@ -81,20 +81,15 @@ export class MockAgent implements IAiAgent {
 
 	async generateImages(prompt: string) {
 		try {
-			const response = await this.axiosClient.post(
-				'/v1/images/generations',
-				{
-					model: this.currModel,
-					prompt: prompt,
-					image_size: '1024x1024',
-					batch_size: 1,
-					num_inference_steps: 20,
-					guidance_scale: 7.5,
-				},
-				{ headers: this.getHeaders() }
-			)
+			const response = await this.openai.images.generate({
+				model: 'dall-e-3',
+				prompt: prompt,
+				size: '1024x1024',
+				quality: 'standard',
+				n: 1,
+			})
 
-			return response.data.data.map((item: any) => item.url)
+			return response.data.map((item) => item.url).filter(Boolean) as string[]
 		} catch (error) {
 			console.error('[MockAgent] generateImages error', error)
 			return []

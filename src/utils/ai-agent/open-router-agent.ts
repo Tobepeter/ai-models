@@ -4,6 +4,7 @@ import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
 import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
 import { aiAgentConfig } from './ai-agent-config'
+import { requestConfig } from '@/config/request-config'
 
 /**
  * OpenRouter
@@ -12,7 +13,7 @@ export class OpenRouterAgent implements IAiAgent {
 	agent: AIAgentManager
 	axiosClient = axios.create({
 		baseURL: aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl,
-		timeout: 30000,
+		timeout: requestConfig.chatTimeout,
 	})
 	currModel: string
 
