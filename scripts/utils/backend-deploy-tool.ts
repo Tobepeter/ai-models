@@ -1,9 +1,8 @@
 import { execSync } from 'child_process'
 import fs from 'fs'
-import { NodeSSH } from 'node-ssh'
-import { homedir } from 'os'
 import path from 'path'
-import { dockerImageName, dockerNamespace, dockerPassword, dockerRegistry, dockerRegistryVpc, dockerUsername, projectRoot, serverHost } from './env'
+import { dockerImageName, dockerNamespace, dockerPassword, dockerRegistry, dockerRegistryVpc, dockerUsername, projectRoot, verbose } from './env'
+import { sshClient } from './ssh-client'
 
 const backendRoot = path.join(projectRoot, 'backend')
 
@@ -11,12 +10,8 @@ const backendRoot = path.join(projectRoot, 'backend')
  * 后端部署工具
  */
 class BackendDeployTool {
-	ssh = new NodeSSH()
 	config = {
-		host: serverHost,
-		username: 'root',
-		privateKeyPath: path.join(homedir(), '.ssh', 'id_rsa'),
-		verbose: false,
+		verbose: verbose,
 		dockerImageName,
 		dockerRegistry,
 		dockerRegistryVpc,
@@ -85,26 +80,11 @@ class BackendDeployTool {
 	async remoteDockerLogin() {
 		// NOTE: 先预留，远程已经登录好了
 		const { dockerRegistry, dockerUsername, dockerPassword } = this.config
-
 		console.log('🔐 远程服务器登录Docker Registry...')
-
 		try {
 			// 使用 echo 管道密码到 docker login，避免在命令行中暴露密码
 			const loginCmd = `echo "${dockerPassword}" | docker login --username ${dockerUsername} --password-stdin ${dockerRegistry}`
-
-			// 注意：不要在verbose模式下显示包含密码的命令
-			if (this.config.verbose) {
-				console.log(`远程执行登录命令: docker login --username ${dockerUsername} --password-stdin ${dockerRegistry}`)
-			} else {
-				console.log('远程执行Docker登录...')
-			}
-
-			const result = await this.ssh.execCommand(loginCmd)
-
-			if (result.code !== 0) {
-				throw new Error(`登录失败: ${result.stderr}`)
-			}
-
+			await sshClient.execCommand(loginCmd)
 			console.log('✅ 远程服务器Docker登录成功')
 		} catch (error: any) {
 			console.error('❌ 远程服务器Docker登录失败:', error.message)
@@ -149,30 +129,13 @@ class BackendDeployTool {
 		console.log('🚀 开始部署到服务器...')
 
 		try {
-			await this.connect()
+			await sshClient.connect()
 			await this.setupDirs()
 			await this.uploadDeployFiles()
 			await this.startServices()
 			console.log('✅ 服务器部署完成')
 		} finally {
-			await this.disconnect()
-		}
-	}
-
-	/** 连接SSH */
-	async connect() {
-		const { host, username, privateKeyPath } = this.config
-		console.log(`🔗 连接服务器 ${host}...`)
-
-		await this.ssh.connect({ host, username, privateKeyPath })
-		console.log('✅ SSH连接成功')
-	}
-
-	/** 断开SSH连接 */
-	async disconnect() {
-		if (this.ssh.isConnected()) {
-			this.ssh.dispose()
-			console.log('🔄 SSH连接已关闭')
+			await sshClient.disconnect()
 		}
 	}
 
@@ -180,9 +143,7 @@ class BackendDeployTool {
 	async setupDirs() {
 		console.log('📁 设置服务器目录...')
 		const { baseDir } = this.deployPaths
-
-		await this.ssh.execCommand(`mkdir -p ${baseDir}`)
-		this.logCommand(`创建目录`, baseDir)
+		await sshClient.execCommand(`mkdir -p ${baseDir}`)
 		console.log('✅ 目录设置完成')
 	}
 
@@ -200,7 +161,7 @@ class BackendDeployTool {
 		console.log('📄 上传 docker-compose...')
 		const localComposePath = path.join(backendRoot, localComposeFile)
 		const remoteComposePath = path.join(baseDir, 'docker-compose.yml')
-		await this.ssh.putFile(localComposePath, remoteComposePath)
+		await sshClient.putFile(localComposePath, remoteComposePath)
 		this.logCommand('上传 docker-compose', `${localComposePath} -> ${remoteComposePath}`)
 
 		// 上传并修改 .env 文件
@@ -220,7 +181,7 @@ class BackendDeployTool {
 		const modifiedContent = `${envContent}\n# 部署时自动添加\nIMAGE_NAME=${imageName}\n`
 
 		// 写入远程文件
-		await this.ssh.execCommand(`cat > ${remotePath} << 'EOF'\n${modifiedContent}EOF`)
+		await sshClient.execCommand(`cat > ${remotePath} << 'EOF'\n${modifiedContent}EOF`, true)
 		this.logCommand('修改 .env', `添加 IMAGE_NAME=${imageName}`)
 	}
 
@@ -232,22 +193,10 @@ class BackendDeployTool {
 		const image = this.getImageName()
 		const cd = `cd ${baseDir}`
 
-		// 停止现有服务
-		await this.ssh.execCommand(`${cd} && docker compose down`)
-		this.logCommand('停止现有服务', 'docker compose down')
-
-		// 拉取最新镜像
-		await this.ssh.execCommand(`docker pull ${image}`)
-		this.logCommand('拉取最新镜像', image)
-
-		// 启动服务
-		await this.ssh.execCommand(`${cd} && docker compose up -d`)
-		this.logCommand('启动服务', 'docker compose up -d')
-
-		// 检查服务状态
-		const result = await this.ssh.execCommand(`${cd} && docker compose ps`)
-		console.log('📊 服务状态:')
-		console.log(result.stdout)
+		// 重新启动
+		await sshClient.execCommand(`${cd} && docker compose down`)
+		await sshClient.execCommand(`docker pull ${image}`)
+		await sshClient.execCommand(`${cd} && docker compose up -d`)
 
 		console.log('✅ 服务启动完成')
 	}
@@ -255,42 +204,27 @@ class BackendDeployTool {
 	/** 查看服务日志 */
 	async viewLogs(lines: number = 50) {
 		console.log(`📋 查看服务日志 (最近 ${lines} 行)...`)
-
 		try {
-			await this.connect()
-
+			await sshClient.connect()
 			const { baseDir } = this.deployPaths
 			const cmd = `cd ${baseDir} && docker compose logs --tail=${lines}`
-
-			const result = await this.ssh.execCommand(cmd)
-			console.log('📋 服务日志:')
-			console.log(result.stdout)
-
-			if (result.stderr) {
-				console.error('❌ 错误日志:')
-				console.error(result.stderr)
-			}
+			await sshClient.execCommand(cmd)
 		} finally {
-			await this.disconnect()
+			await sshClient.disconnect()
 		}
 	}
 
 	/** 重启服务 */
 	async restartServices() {
 		console.log('🔄 重启服务...')
-
 		try {
-			await this.connect()
-
+			await sshClient.connect()
 			const { baseDir } = this.deployPaths
 			const cmd = `cd ${baseDir} && docker compose restart`
-
-			await this.ssh.execCommand(cmd)
-			this.logCommand('重启服务', cmd)
-
+			await sshClient.execCommand(cmd)
 			console.log('✅ 服务重启完成')
 		} finally {
-			await this.disconnect()
+			await sshClient.disconnect()
 		}
 	}
 

@@ -2,59 +2,34 @@ import archiver from 'archiver'
 import { execSync } from 'child_process'
 import fs from 'fs'
 import fse from 'fs-extra'
-import { NodeSSH } from 'node-ssh'
-import { homedir } from 'os'
 import path, { dirname } from 'path'
 import prettyBytes from 'pretty-bytes'
-import { fileURLToPath } from 'url'
-import { ossEnable, ossPrefix } from './env'
+import { ossEnable, ossPrefix, projectRoot } from './env'
 import { fsUtil } from './fs-util'
 import { ossAPI } from './oss-api'
 import { pathUtil } from './path-util'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const projectRoot = path.join(__dirname, '../..')
+import { sshClient } from './ssh-client'
 
 /**
  * 前端项目部署
  */
 class DeployTool {
-	// NOTE: 不使用密码，仅使用密钥对验证
-	ssh = new NodeSSH()
-	config: DeployConfig = {
-		host: '',
-		username: 'root',
-		privateKeyPath: path.join(homedir(), '.ssh', 'id_rsa'),
-		verbose: false,
-	}
-
 	sourceFolder = path.join(projectRoot, 'dist')
 	sourceFile = path.join(projectRoot, 'temp', 'dist.zip')
 	targetZipFolder = '/temp'
 	targetDeployFolder = '/var/www/chat'
 
+	config = {
+		dryRun: false,
+	}
+
 	async upload() {
 		if (ossEnable) {
 			await this.ossValidateHtml()
-			if (!this.config.onlyOss) {
-				await this.uploadHtmlToServer()
-			}
+			await this.uploadHtmlToServer()
 			await this.uploadToOss()
 		} else {
 			await this.uploadToServer()
-		}
-	}
-
-	init(config: Partial<DeployConfig>) {
-		this.config = { ...this.config, ...config }
-		this.checkValid()
-	}
-
-	checkValid() {
-		const { host, username, privateKeyPath } = this.config
-		if (!host || !username || !privateKeyPath) {
-			throw new Error('服务器配置不完整')
 		}
 	}
 
@@ -76,8 +51,7 @@ class DeployTool {
 
 	/** 打包 dist 文件夹 */
 	async zipDist() {
-		const { sourceFile, config } = this
-		const { verbose } = config
+		const { sourceFile } = this
 		await fse.ensureDir(dirname(sourceFile))
 
 		console.log('📦 打包 dist 文件夹...')
@@ -98,26 +72,20 @@ class DeployTool {
 			archive.directory(this.sourceFolder, destpath)
 			archive.finalize()
 
-			if (verbose) {
-				console.log(`打包从 ${this.sourceFolder} 到 ${sourceFile}`)
-			}
+			console.log(`打包从 ${this.sourceFolder} 到 ${sourceFile}`)
 		})
 	}
 
 	clearZipFile() {
 		fse.removeSync(this.sourceFile)
-		this.logCommand('🗑️ 清理临时文件', this.sourceFile)
+		console.log('🗑️ 清理临时文件', this.sourceFile)
 	}
 
 	/** OSS 上传方法 */
 	async uploadToOss() {
-		const { verbose } = this.config
-
 		// 获取 OSS 上传基础路径
 		const ossBase = pathUtil.getOssBasePrefix()
-		if (verbose) {
-			console.log(`OSS 上传基础路径: ${ossBase}`)
-		}
+		console.log(`OSS 上传基础路径: ${ossBase}`)
 		await this.clearOssFolder()
 		await this.uploadDistToOss()
 		console.log('✅ OSS 上传完成')
@@ -147,15 +115,12 @@ class DeployTool {
 	/** 上传 dist 文件夹到 OSS */
 	async uploadDistToOss() {
 		console.log('📤 上传静态资源到 OSS...')
-		const { verbose } = this.config
 
 		// const exclude = ['index.html']
 		const exclude = [] // 可以上传html，当做备份也行
 		const allFiles = fsUtil.getAllFiles(this.sourceFolder, { exclude }) // 递归获取所有文件
 
-		if (verbose) {
-			console.log(`📁 找到 ${allFiles.length} 个静态资源文件需要上传到 OSS`)
-		}
+		console.log(`📁 找到 ${allFiles.length} 个静态资源文件需要上传到 OSS`)
 
 		for (const relPath of allFiles) {
 			const posixPath = fsUtil.posixPath(relPath) // 确保使用正斜杠
@@ -167,9 +132,7 @@ class DeployTool {
 				if (!this.config.dryRun) {
 					await ossAPI.uploadFile(fileBuffer, objectKey, contentType)
 				}
-				if (verbose) {
-					console.log(`✅ 上传到 OSS: ${objectKey}`)
-				}
+				console.log(`✅ 上传到 OSS: ${objectKey}`)
 			} catch (error: any) {
 				console.error(`❌ OSS 上传失败 ${objectKey}:`, error.message)
 				throw error
@@ -190,20 +153,13 @@ class DeployTool {
 	/** 上传到服务器 */
 	async uploadToServer() {
 		console.log('🚀 上传文件到服务器...')
-		const { config, sourceFile, targetZipFolder, targetDeployFolder } = this
-		const { host, username, privateKeyPath, verbose } = config
+		const { sourceFile, targetZipFolder, targetDeployFolder } = this
 		const targetZipFile = path.join(targetZipFolder, 'dist.zip')
-		await this.ssh.connect({
-			host,
-			username,
-			privateKeyPath,
-		})
+		await sshClient.connect()
 
-		if (verbose) {
-			console.log(`上传文件 ${sourceFile} 到 ${targetZipFile}`)
-		}
+		console.log(`上传文件 ${sourceFile} 到 ${targetZipFile}`)
 
-		await this.ssh.putFile(sourceFile, targetZipFile)
+		await sshClient.putFile(sourceFile, targetZipFile)
 		console.log('✅ 文件上传完成')
 
 		console.log('🔄 执行服务器端部署...')
@@ -212,43 +168,32 @@ class DeployTool {
 
 		// 解压文件
 		cmd = `cd ${targetZipFolder} && unzip -o dist.zip`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 解压完成', cmd)
+		await sshClient.execCommand(cmd)
 
 		// 解压后删除 zip 文件
 		cmd = `rm -f ${targetZipFile}`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 清理 zip 文件', cmd)
+		await sshClient.execCommand(cmd)
 
 		// 清空目标目录
 		cmd = `rm -rf ${targetDeployFolder}/*`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 清空目标目录', cmd)
+		await sshClient.execCommand(cmd)
 
 		// TODO: 理论上备份一下
 
 		// 复制文件 (解压后是 /temp/dist/xxx，复制 /temp/dist/* 到目标目录)
 		cmd = `cp -r ${targetZipFolder}/dist/* ${targetDeployFolder}/`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 文件复制完成', cmd)
+		await sshClient.execCommand(cmd)
 
 		// 清理解压的临时文件
 		cmd = `rm -rf ${targetZipFolder}/*`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 清理临时文件', cmd)
+		await sshClient.execCommand(cmd)
 
-		console.log('🔄 关闭连接...')
-
-		// NOTE: "await" 对此表达式的类型没有影响。ts(80007)
-		//  查阅文档是支持的
-		await this.ssh.dispose()
-		console.log('✅ 连接已关闭')
+		await sshClient.disconnect()
 	}
 
 	async uploadHtmlToServer() {
 		console.log('🚀 上传 index.html 到服务器...')
-		const { config, targetDeployFolder } = this
-		const { host, username, privateKeyPath, verbose } = config
+		const { targetDeployFolder } = this
 		const indexHtmlPath = path.join(this.sourceFolder, 'index.html')
 
 		// 检查 index.html 是否存在
@@ -256,35 +201,18 @@ class DeployTool {
 			throw new Error('index.html 文件不存在，请先执行构建')
 		}
 
-		await this.ssh.connect({ host, username, privateKeyPath })
-
-		if (verbose) {
-			console.log(`上传 index.html 到 ${targetDeployFolder}/index.html`)
-		}
+		await sshClient.connect()
 
 		// 清空目标目录
 		const cmd = `rm -rf ${targetDeployFolder}/*`
-		await this.ssh.execCommand(cmd)
-		this.logCommand('✅ 清空目标目录', cmd)
+		await sshClient.execCommand(cmd)
 
 		// 直接上传 index.html
 		const targetIndexPath = path.join(targetDeployFolder, 'index.html')
-		await this.ssh.putFile(indexHtmlPath, targetIndexPath)
+		await sshClient.putFile(indexHtmlPath, targetIndexPath)
 		console.log('✅ index.html 上传完成')
 
-		console.log('🔄 关闭连接...')
-		// NOTE: "await" 对此表达式的类型没有影响。ts(80007)
-		//  查阅文档是支持的
-		await this.ssh.dispose()
-		console.log('✅ 连接已关闭')
-	}
-
-	logCommand(msg: string, cmd: string) {
-		if (this.config.verbose) {
-			console.log(`${msg}, cmd: ${cmd}`)
-		} else {
-			console.log(`${msg}`)
-		}
+		await sshClient.disconnect()
 	}
 }
 

@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 import { deployTool } from './utils/deploy-tool.ts'
-import { ossEnable, serverHost, verbose } from './utils/env'
+import { ossEnable } from './utils/env'
 import { ossAPI } from './utils/oss-api'
 
 /** 执行部署流程 */
@@ -43,12 +43,11 @@ const deploy = async (steps: string[]) => {
 const program = new Command()
 program.name('deploy-tool').description('前端项目部署工具').version('1.0.0')
 program.option('-s, --steps <steps>', '指定执行步骤，默认不包含build, 可选: build,zip,upload,clear', '')
-program.option('--only-oss', '激活oss时，不部署到服务器', false)
 program.option('--dry-run', '只打印日志，不执行实际操作（目前只支持oss模式）', false)
 program.option('-v, --verbose', '显示详细日志', false)
 
 program.action((options) => {
-	const { onlyOss, dryRun } = options
+	const { dryRun } = options
 	let steps: BuildSteps[] = options.steps ? options.steps.split(',').map((s: string) => s.trim()) : []
 	if (!steps.length) {
 		// 默认不包含 build
@@ -63,14 +62,7 @@ program.action((options) => {
 		}
 	}
 
-	const finalVerbose = options.verbose || verbose
-
-	deployTool.init({
-		host: serverHost,
-		verbose: finalVerbose,
-		onlyOss,
-		dryRun,
-	})
+	deployTool.config.dryRun = dryRun
 
 	// 执行部署
 	deploy(steps).catch((error) => {

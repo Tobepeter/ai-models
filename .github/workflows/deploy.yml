@@ -1,10 +1,11 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+  # NOTE: 目前仅支持手动触发，不然一直上传 OSS，浪费流量
+  # push:
+  #   branches: [main, master]
+  # pull_request:
+  #   branches: [main, master]
   workflow_dispatch:
 
 # 设置 GITHUB_TOKEN 权限以允许部署到 GitHub Pages
