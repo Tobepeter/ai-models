@@ -1,23 +1,32 @@
+import OpenAI from 'openai'
 import axios from 'axios'
-import { createParser } from 'eventsource-parser'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
 import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
 import { aiAgentConfig } from './ai-agent-config'
+import { requestConfig } from '@/config/request-config'
 
 export class SiliconFlowAgent implements IAiAgent {
 	agent: AIAgentManager
+	openai: OpenAI
 	axiosClient = axios.create({
 		baseURL: aiAgentConfig.data[AIPlatform.Silicon].baseUrl,
-		timeout: 3000,
+		timeout: requestConfig.chatTimeout,
 	})
 	currModel: string
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
+		this.openai = new OpenAI({
+			baseURL: aiAgentConfig.data[AIPlatform.Silicon].baseUrl,
+			apiKey: 'placeholder', // 使用占位符，实际鉴权通过 headers 传递
+			timeout: requestConfig.chatTimeout,
+			dangerouslyAllowBrowser: true,
+		})
 	}
 
 	private getHeaders() {
+		// NOTE: apikey 可能动态获得，不能new openai时候传进去
 		return {
 			Authorization: `Bearer ${aiAgentConfig.getApiKey(AIPlatform.Silicon)}`,
 			'Content-Type': 'application/json',
@@ -26,17 +35,19 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const response = await this.axiosClient.post(
-				'/chat/completions',
-				{
-					model: this.currModel,
-					stream: false,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-				},
-				{ headers: this.getHeaders() }
-			)
-			const content = response.data.choices[0]?.message?.content || ''
+			const response = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: false,
+			}, { 
+				headers: this.getHeaders() 
+			})
+			let content = response.choices[0]?.message?.content || ''
+			const reasoningContent = response.choices[0]?.message?.['reasoning_content'] || ''
+			if (reasoningContent) {
+				content = reasoningContent + content
+			}
 			return content.trim()
 		} catch (error) {
 			console.error('[SiliconFlowAgent] generateText error', error)
@@ -46,57 +57,34 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
-			const response = await fetch(`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/chat/completions`, {
-				method: 'POST',
-				headers: this.getHeaders(),
-				body: JSON.stringify({
-					model: this.currModel,
-					stream: true,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-				}),
+			const stream = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: true,
+			}, { 
+				headers: this.getHeaders() 
 			})
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
-			}
-
-			const reader = response.body?.getReader()
-			const decoder = new TextDecoder()
 			let fullContent = ''
 			let hasValidContent = false
 
-			const parser = createParser({
-				onEvent: (event) => {
-					if (event.data === '[DONE]') return
-					try {
-						const parsed = JSON.parse(event.data)
-						const content: string = parsed.choices[0]?.delta?.content
-						if (content) {
-							if (!hasValidContent) {
-								if (content.trim().length > 0) {
-									hasValidContent = true
-									const trimmedContent = content.trimStart()
-									onChunk(trimmedContent)
-									fullContent += trimmedContent
-								}
-							} else {
-								onChunk(content)
-								fullContent += content
-							}
+			for await (const chunk of stream) {
+				// NOTE: deepseek 如果有reasoning_content，则优先使用
+				const reasoningContent = chunk.choices[0]?.delta?.['reasoning_content'] || ''
+				const content = chunk.choices[0]?.delta?.content || reasoningContent
+				if (content) {
+					if (!hasValidContent) {
+						if (content.trim().length > 0) {
+							hasValidContent = true
+							const trimmedContent = content.trimStart()
+							onChunk(trimmedContent)
+							fullContent += trimmedContent
 						}
-					} catch (e) {
-						// ignore
+					} else {
+						onChunk(content)
+						fullContent += content
 					}
-				},
-			})
-
-			if (reader) {
-				while (true) {
-					const { done, value } = await reader.read()
-					if (done) break
-					const chunk = decoder.decode(value)
-					parser.feed(chunk)
 				}
 			}
 
@@ -109,20 +97,16 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateImages(prompt: string) {
 		try {
-			const response = await axios.post(
-				`${aiAgentConfig.data[AIPlatform.Silicon].baseUrl}/images/generations`,
-				{
-					model: this.currModel,
-					prompt: prompt,
-					image_size: '1024x1024',
-					batch_size: 1,
-					num_inference_steps: 20,
-					guidance_scale: 7.5,
-				},
-				{ headers: this.getHeaders() }
-			)
+			const response = await this.openai.images.generate({
+				model: this.currModel,
+				prompt: prompt,
+				size: '1024x1024',
+				n: 1,
+			}, { 
+				headers: this.getHeaders() 
+			})
 
-			return response.data.images.map((item: any) => item.url)
+			return response.data.map((item) => item.url).filter(Boolean) as string[]
 		} catch (error) {
 			console.error('[SiliconFlowAgent] generateImages error', error)
 			return []

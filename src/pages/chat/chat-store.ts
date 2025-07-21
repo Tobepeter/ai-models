@@ -9,6 +9,7 @@ export interface ChatStore {
 	currMediaType: MediaType
 	currPlatform: AIPlatform
 	currModel: string
+	currStream: boolean
 	isLoading: boolean
 
 	showSettings: boolean
@@ -31,6 +32,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	currMediaType: 'text',
 	currPlatform: AIPlatform.Unknown,
 	currModel: '',
+	currStream: true,
 	isLoading: false,
 	showSettings: false,
 	showInvalidAlert: false,

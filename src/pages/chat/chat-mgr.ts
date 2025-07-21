@@ -72,24 +72,40 @@ class ChatManager {
 		store.setLoading(true)
 
 		try {
-			let fullContent = ''
+			const isStreamEnabled = store.currStream
 
-			// TODO: 如果chat卸载了，要完全防止写入 store 了，否则二次进入可能会有问题
+			if (isStreamEnabled) {
+				// 流式输出
+				let fullContent = ''
 
-			await aiAgentMgr.generateTextStream(userInput, (chunk: string) => {
-				// 检查是否还在loading状态
+				// TODO: 如果chat卸载了，要完全防止写入 store 了，否则二次进入可能会有问题
+
+				await aiAgentMgr.generateTextStream(userInput, (chunk: string) => {
+					// 检查是否还在loading状态
+					if (useChatStore.getState().isLoading) {
+						fullContent += chunk
+						store.updateMsg(msgId, { content: fullContent, status: 'generating' })
+					}
+				})
+
+				// 完成后更新状态
 				if (useChatStore.getState().isLoading) {
-					fullContent += chunk
-					store.updateMsg(msgId, { content: fullContent, status: 'generating' })
+					store.updateMsg(msgId, { status: 'success' })
+					store.setLoading(false)
+				} else {
+					console.error('不太可能不loading')
 				}
-			})
-
-			// 完成后更新状态
-			if (useChatStore.getState().isLoading) {
-				store.updateMsg(msgId, { status: 'success' })
-				store.setLoading(false)
 			} else {
-				console.error('不太可能不loading')
+				// 非流式输出，直接获取完整结果
+				const result = await aiAgentMgr.generateText(userInput)
+				
+				if (useChatStore.getState().isLoading) {
+					store.updateMsg(msgId, { 
+						content: result, 
+						status: 'success'
+					})
+					store.setLoading(false)
+				}
 			}
 		} catch (error) {
 			if (useChatStore.getState().isLoading) {

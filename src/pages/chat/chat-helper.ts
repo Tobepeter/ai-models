@@ -1,14 +1,13 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
 import { isDev } from '@/utils/env'
+import { storage } from '@/utils/storage'
 import { Film, Image, MessageCircle, Volume2 } from 'lucide-react'
 import { ElementType } from 'react'
 import { useChatStore } from './chat-store'
 import { ChatPersist } from './chat-type'
 
 class ChatHelper {
-	persistKey = 'chat-model'
-
 	switchPlatform(platform: AIPlatform) {
 		const store = useChatStore.getState()
 		aiAgentMgr.switchPlatform(platform)
@@ -33,8 +32,6 @@ class ChatHelper {
 			currModel: currModel,
 			currMediaType: currMediaType,
 		})
-
-		this.persist()
 	}
 
 	restorePersist() {
@@ -46,6 +43,7 @@ class ChatHelper {
 		}
 		this.switchPlatform(persistData.platform)
 		this.setModel(persistData.model, true)
+		this.setStream(persistData.stream ?? true, true) // 默认启用流式
 	}
 
 	setModel(model: string, fromPersist = false) {
@@ -116,19 +114,28 @@ class ChatHelper {
 		return options
 	}
 
+	setStream(stream: boolean, fromPersist = false) {
+		const store = useChatStore.getState()
+		store.setData({ currStream: stream })
+		
+		if (!fromPersist) {
+			this.persist()
+		}
+	}
+
 	persist() {
 		const store = useChatStore.getState()
-		const persistData: ChatPersist = {
+		const chatPersist: ChatPersist = {
 			platform: store.currPlatform,
 			model: store.currModel,
+			stream: store.currStream,
 		}
-		localStorage.setItem(this.persistKey, JSON.stringify(persistData))
+		storage.setAppData({ chatPersist })
 	}
 
 	loadPersist(): ChatPersist | null {
-		const str = localStorage.getItem(this.persistKey)
-		if (!str) return null
-		return JSON.parse(str) as ChatPersist
+		const appData = storage.getAppData()
+		return appData.chatPersist || null
 	}
 }
 

@@ -23,4 +23,5 @@ export type MediaData = {
 export type ChatPersist = {
 	platform: AIPlatform
 	model: string
+	stream?: boolean
 }

@@ -1,7 +1,7 @@
+import { storage } from '@/utils/storage'
 import { AIPlatform, PlatformConfig } from './types'
 
 class AIAgentConfig {
-	storageKey = 'ai-agent-config'
 
 	data: Record<AIPlatform, PlatformConfig> = {
 		[AIPlatform.Unknown]: {
@@ -11,7 +11,7 @@ class AIAgentConfig {
 		},
 		[AIPlatform.Mock]: {
 			apiKey: 'mock-token',
-			// NOTE: openai包只有自己的域名才会加v1，其他的是不会
+			// NOTE: openai并不会拼接v1，虽然很多人都喜欢加这个前缀
 			baseUrl: 'http://localhost:3000/v1',
 			models: {
 				text: ['mock-text-model-1', 'mock-text-model-2', 'mock-gpt-4', 'mock-claude-3', 'mock-deepseek'],
@@ -21,6 +21,7 @@ class AIAgentConfig {
 		},
 		[AIPlatform.Silicon]: {
 			apiKey: import.meta.env.VITE_SILICON_API_KEY || '',
+			// NOTE： silicon 貌似做了兼容，是否包含 v1 其实都可以
 			baseUrl: 'https://api.siliconflow.cn/v1',
 			models: {
 				text: ['deepseek-ai/DeepSeek-R1', 'Pro/deepseek-ai/DeepSeek-R1', 'THUDM/GLM-4.1V-9B-Thinking', 'tencent/Hunyuan-A13B-Instruct', 'Qwen/Qwen3-32B'],
@@ -91,20 +92,20 @@ class AIAgentConfig {
 	}
 
 	save() {
-		const apiKeys = {}
+		const apiKeys: Partial<Record<AIPlatform, string>> = {}
 		for (const platform in this.data) {
 			if (platform === AIPlatform.Unknown) continue
-			apiKeys[platform] = this.data[platform].apiKey
+			apiKeys[platform as AIPlatform] = this.data[platform as AIPlatform].apiKey
 		}
-		localStorage.setItem(this.storageKey, JSON.stringify(apiKeys))
+		storage.setAppData({ apiKeys })
 	}
 
 	restore() {
-		const apiKeys = localStorage.getItem(this.storageKey)
-		if (apiKeys) {
-			const savedData = JSON.parse(apiKeys)
-			for (const platform in savedData) {
-				this.data[platform].apiKey = savedData[platform]
+		const appData = storage.getAppData()
+		const apiKeys = appData.apiKeys || {}
+		for (const platform in apiKeys) {
+			if (this.data[platform as AIPlatform] && apiKeys[platform as AIPlatform]) {
+				this.data[platform as AIPlatform].apiKey = apiKeys[platform as AIPlatform]!
 			}
 		}
 	}

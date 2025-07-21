@@ -1,10 +1,10 @@
 // AI Agent 支持的平台
 export enum AIPlatform {
 	Unknown = 'unknown',
+	Mock = 'mock',
 	Silicon = 'silicon',
 	OpenRouter = 'openrouter',
 	DashScope = 'dashscope',
-	Mock = 'mock',
 }
 
 // 平台配置

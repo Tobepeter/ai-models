@@ -71,6 +71,7 @@ export const ChatHubInput = () => {
 							placeholder="输入您的问题..."
 							className="min-h-[60px] resize-none"
 							disabled={isGenerating}
+							autoComplete="off"
 						/>
 					</div>
 					<Button onClick={handleSubmit} disabled={!canSubmit && !isGenerating} variant={isGenerating ? 'destructive' : 'default'} size="lg" className="px-6">

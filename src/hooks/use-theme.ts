@@ -1,11 +1,18 @@
 import { useAppStore } from '@/store/store'
+import { storage } from '@/utils/storage'
 import { useMount } from 'ahooks'
 import { useEffect } from 'react'
 
 export const useTheme = () => {
-	const { theme, getComputedTheme } = useAppStore()
+	const { theme, getComputedTheme, setTheme } = useAppStore()
 
 	useMount(() => {
+		// 从存储恢复主题
+		const appData = storage.getAppData()
+		if (appData.theme) {
+			setTheme(appData.theme)
+		}
+
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 		mediaQuery.addEventListener('change', updateTheme)
 		return () => {

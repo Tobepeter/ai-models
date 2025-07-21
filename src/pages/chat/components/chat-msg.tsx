@@ -28,8 +28,8 @@ export const ChatMsg = (props: ChatMsgProps) => {
 	// 	<Markdown content={msg.content} />
 	// )
 
-	const chatComp = <ChatText content={msg.content} isStream={true} />
-	// const chatComp = <Markdown content={msg.content} />
+	// const chatComp = <ChatText content={msg.content} isStream={true} />
+	const chatComp = <Markdown content={msg.content} />
 
 	return (
 		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')}>

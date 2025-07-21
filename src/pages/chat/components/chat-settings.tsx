@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
+import { FormTips } from '@/components/common/form-tips'
 import { useAppStore } from '@/store/store'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { AIPlatform } from '@/utils/ai-agent/types'
 import { isProd } from '@/utils/env'
-import { useState } from 'react'
+import { storage } from '@/utils/storage'
+import { useState, useEffect } from 'react'
 import { chatHelper } from '../chat-helper'
 import { useChatStore } from '../chat-store'
 
@@ -16,15 +17,29 @@ import { useChatStore } from '../chat-store'
  * 聊天设置对话框
  */
 export const ChatSettings = () => {
-	const { showSettings, setData } = useChatStore()
+	const { showSettings, setData, currStream } = useChatStore()
 	const { currPlatform } = useChatStore()
 	const { theme, setTheme } = useAppStore()
+
 	const [apiKey, setApiKey] = useState(aiAgentConfig.getApiKey(currPlatform))
+	const [currTheme, setCurrTheme] = useState(theme)
+	const [streamEnabled, setStreamEnabled] = useState(currStream)
+
+	// showSettings 响应时更新状态
+	useEffect(() => {
+		if (showSettings) {
+			setApiKey(aiAgentConfig.getApiKey(currPlatform))
+			setCurrTheme(theme)
+			setStreamEnabled(currStream)
+		}
+	}, [showSettings, currStream])
 
 	// 保存配置
 	const saveConfigs = () => {
 		aiAgentConfig.setApiKey(currPlatform, apiKey)
 		aiAgentConfig.save()
+		storage.setAppData({ theme })
+		chatHelper.setStream(streamEnabled)
 		setData({ showSettings: false })
 	}
 
@@ -40,17 +55,28 @@ export const ChatSettings = () => {
 		return true
 	})
 
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			// 被动关闭（不保存修改）
+			chatHelper.restorePersist()
+			if (theme !== currTheme) {
+				setTheme(currTheme)
+				storage.setAppData({ theme: currTheme })
+			}
+		}
+		setData({ showSettings: open })
+	}
+
 	return (
-		<Dialog open={showSettings} onOpenChange={(open) => setData({ showSettings: open })}>
+		<Dialog open={showSettings} onOpenChange={handleOpenChange}>
 			<DialogContent className="sm:max-w-[500px]" aria-describedby="settings">
 				<DialogHeader>
 					<DialogTitle>设置</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-6">
-					{/* 平台选择 */}
-					<div className="flex flex-col gap-4">
-						<Label>AI 平台</Label>
+				<div className="space-y-4">
+					{/* AI 平台 */}
+					<FormTips label="AI 平台" help="选择使用的AI服务平台">
 						<Select value={currPlatform} onValueChange={handlePlatformChange}>
 							<SelectTrigger>
 								<SelectValue />
@@ -63,21 +89,21 @@ export const ChatSettings = () => {
 								))}
 							</SelectContent>
 						</Select>
-					</div>
-
-					<Separator />
+					</FormTips>
 
 					{/* API Key */}
-					<div className="flex flex-col gap-4">
-						<Label htmlFor="apiKey">API Key</Label>
-						<Input id="apiKey" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="请输入API Key" />
-					</div>
-
-					<Separator />
+					<FormTips label="API Key" help="用于访问AI服务的密钥，会安全保存到本地" htmlFor="apiKey">
+						<Input 
+							id="apiKey" 
+							type="password" 
+							value={apiKey} 
+							onChange={(e) => setApiKey(e.target.value)} 
+							placeholder="请输入API Key" 
+						/>
+					</FormTips>
 
 					{/* 主题设置 */}
-					<div className="flex flex-col gap-4">
-						<Label>主题</Label>
+					<FormTips label="主题" help="选择界面的外观主题">
 						<Select value={theme} onValueChange={setTheme}>
 							<SelectTrigger>
 								<SelectValue />
@@ -88,11 +114,24 @@ export const ChatSettings = () => {
 								<SelectItem value="system">跟随系统</SelectItem>
 							</SelectContent>
 						</Select>
-					</div>
+					</FormTips>
+
+					{/* 流式输出设置 */}
+					<FormTips label="流式输出" help="开启后文本将逐字显示，关闭后一次性显示完整回复">
+						<div className="flex items-center justify-between">
+							<div className="text-sm text-muted-foreground">
+								实时显示AI回复内容
+							</div>
+							<Switch
+								checked={streamEnabled}
+								onCheckedChange={setStreamEnabled}
+							/>
+						</div>
+					</FormTips>
 
 					{/* 操作按钮 */}
-					<div className="flex justify-end space-x-2 pt-4">
-						<Button variant="outline" onClick={() => setData({ showSettings: false })}>
+					<div className="flex justify-end gap-2 pt-4">
+						<Button variant="outline" onClick={() => handleOpenChange(false)}>
 							取消
 						</Button>
 						<Button onClick={saveConfigs}>保存</Button>

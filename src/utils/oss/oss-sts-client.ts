@@ -1,5 +1,6 @@
 import OSS, { type Credentials } from 'ali-oss'
 import axios from 'axios'
+import { storage } from '@/utils/storage'
 import { ossConfig } from './oss-config'
 import { OssBaseResp, OssSTSRespData, OssUploadResult } from './oss-types'
 import { ossUtil } from './oss-util'
@@ -42,7 +43,7 @@ class OssStsClient {
 	/** 缓存STS凭证 */
 	private cacheToken(token: Credentials) {
 		const cacheData = { token, expiry: this.getStsExpire(token.Expiration) }
-		localStorage.setItem('oss_sts_cache', JSON.stringify(cacheData))
+		storage.setAppData({ ossStsCache: cacheData })
 	}
 
 	/** 检查并获取有效的STS凭证 */
@@ -53,14 +54,14 @@ class OssStsClient {
 		// 检查localStorage
 		let token: Credentials | null = null
 		try {
-			const cached = localStorage.getItem('oss_sts_cache')
-			if (cached) {
-				const { token: cachedToken, expiry } = JSON.parse(cached)
-				if (Date.now() < expiry) token = cachedToken
+			const appData = storage.getAppData()
+			const cached = appData.ossStsCache
+			if (cached && Date.now() < cached.expiry) {
+				token = cached.token
 			}
 		} catch (error) {
 			if (this.verbose) console.warn('[OSS] Failed to parse STS cache:', error)
-			localStorage.removeItem('oss_sts_cache') // 清除损坏的缓存
+			storage.setAppData({ ossStsCache: undefined })
 		}
 
 		// 获取新凭证

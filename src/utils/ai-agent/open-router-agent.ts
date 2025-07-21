@@ -1,5 +1,4 @@
-import axios from 'axios'
-import { createParser } from 'eventsource-parser'
+import OpenAI from 'openai'
 import { IAiAgent } from './IAiAgent'
 import { AIAgentManager } from './ai-agent-mgr'
 import { StreamCallback, VideoStatusResponse, AIPlatform } from './types'
@@ -11,14 +10,17 @@ import { requestConfig } from '@/config/request-config'
  */
 export class OpenRouterAgent implements IAiAgent {
 	agent: AIAgentManager
-	axiosClient = axios.create({
-		baseURL: aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl,
-		timeout: requestConfig.chatTimeout,
-	})
+	openai: OpenAI
 	currModel: string
 
 	constructor(agent: AIAgentManager) {
 		this.agent = agent
+		this.openai = new OpenAI({
+			baseURL: aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl,
+			apiKey: 'placeholder', // 使用占位符，实际鉴权通过 headers 传递
+			timeout: requestConfig.chatTimeout,
+			dangerouslyAllowBrowser: true,
+		})
 	}
 
 	private getHeaders() {
@@ -30,18 +32,15 @@ export class OpenRouterAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const model = this.currModel
-			const response = await this.axiosClient.post(
-				'/chat/completions',
-				{
-					model,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-					stream: false,
-				},
-				{ headers: this.getHeaders() }
-			)
-			const content = response.data.choices[0]?.message?.content || ''
+			const response = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: false,
+			}, { 
+				headers: this.getHeaders() 
+			})
+			const content = response.choices[0]?.message?.content || ''
 			return content.trim()
 		} catch (error) {
 			console.error('[OpenRouterAgent] generateText error', error)
@@ -51,58 +50,32 @@ export class OpenRouterAgent implements IAiAgent {
 
 	async generateTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
-			const model = this.currModel
-			const response = await fetch(`${aiAgentConfig.data[AIPlatform.OpenRouter].baseUrl}/chat/completions`, {
-				method: 'POST',
-				headers: this.getHeaders(),
-				body: JSON.stringify({
-					model,
-					messages: [{ role: 'user', content: prompt }],
-					max_tokens: 1000,
-					stream: true,
-				}),
+			const stream = await this.openai.chat.completions.create({
+				model: this.currModel,
+				messages: [{ role: 'user', content: prompt }],
+				max_tokens: 1000,
+				stream: true,
+			}, { 
+				headers: this.getHeaders() 
 			})
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
-			}
-
-			const reader = response.body?.getReader()
-			const decoder = new TextDecoder()
 			let fullContent = ''
 			let hasValidContent = false
 
-			const parser = createParser({
-				onEvent: (event) => {
-					if (event.data === '[DONE]') return
-					try {
-						const parsed = JSON.parse(event.data)
-						const content: string = parsed.choices[0]?.delta?.content
-						if (content) {
-							if (!hasValidContent) {
-								if (content.trim().length > 0) {
-									hasValidContent = true
-									const trimmedContent = content.trimStart()
-									onChunk(trimmedContent)
-									fullContent += trimmedContent
-								}
-							} else {
-								onChunk(content)
-								fullContent += content
-							}
+			for await (const chunk of stream) {
+				const content = chunk.choices[0]?.delta?.content || ''
+				if (content) {
+					if (!hasValidContent) {
+						if (content.trim().length > 0) {
+							hasValidContent = true
+							const trimmedContent = content.trimStart()
+							onChunk(trimmedContent)
+							fullContent += trimmedContent
 						}
-					} catch (e) {
-						// ignore parse errors
+					} else {
+						onChunk(content)
+						fullContent += content
 					}
-				},
-			})
-
-			if (reader) {
-				while (true) {
-					const { done, value } = await reader.read()
-					if (done) break
-					const chunk = decoder.decode(value)
-					parser.feed(chunk)
 				}
 			}
 
