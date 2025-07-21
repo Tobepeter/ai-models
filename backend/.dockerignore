@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Development files
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# Testing
+*_test.go
+.coverage/
+coverage.out
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go specific
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+build/
+
+# Environment files
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Docker files (除了当前项目需要的)
+Dockerfile.*
+docker-compose.override.yml
+
+# Temporary directories
+tmp/
+temp/

@@ -1,30 +1,28 @@
-.PHONY: build run test clean dev docker-build docker-run help
+.PHONY: dev docker-dev docker-down build run test clean bootstrap
 
-BINARY_NAME=ai-models-backend
+BINARY_NAME=main
 MAIN_PATH=./cmd/main.go
 
-help:
-	@echo "Available commands:"
-	@echo "  build        - Build the binary"
-	@echo "  run          - Run the application"
-	@echo "  dev          - Run in development mode with auto-reload"
-	@echo "  test         - Run tests"
-	@echo "  clean        - Clean build artifacts"
-	@echo "  docker-build - Build Docker image"
-	@echo "  docker-run   - Run with Docker Compose"
-	@echo "  deps         - Download dependencies"
-	@echo "  fmt          - Format code"
-	@echo "  lint         - Run linter"
+# 主要开发命令
+dev:
+	docker-compose -f docker-compose.yml up -d
+	air -c .air.toml
 
+docker-dev:
+	@echo "🐳 启动 Docker 开发环境..."
+	docker-compose up
+
+docker-down:
+	docker-compose down
+
+# 构建和运行
 build:
 	go build -o $(BINARY_NAME) $(MAIN_PATH)
 
 run:
 	go run $(MAIN_PATH)
 
-dev:
-	go run $(MAIN_PATH)
-
+# 工具命令  
 test:
 	go test -v ./...
 
@@ -32,26 +30,5 @@ clean:
 	go clean
 	rm -f $(BINARY_NAME)
 
-docker-build:
-	docker build -t $(BINARY_NAME) .
-
-docker-run:
-	docker-compose up --build
-
-deps:
-	go mod download
-	go mod tidy
-
-fmt:
-	go fmt ./...
-
-lint:
-	golangci-lint run
-
-install-tools:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-
-setup: deps install-tools
-
-watch:
-	air -c .air.toml
+bootstrap:
+	go install github.com/air-verse/air@latest

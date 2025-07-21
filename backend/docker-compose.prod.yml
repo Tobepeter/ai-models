@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    image: ai-models-app:${TAG:-latest}  # 使用构建好的镜像
+    environment:
+      - GO_ENV=production
+      # 生产环境通过环境变量注入配置
+      - PORT=${PORT:-8080}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - SILICON_API_KEY=${SILICON_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    # depends_on:
+      # - db
+      # - redis
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # db:
+  #   image: mysql:8.0
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+  #     - MYSQL_DATABASE=${DB_NAME}
+  #     - MYSQL_USER=${DB_USER}
+  #     - MYSQL_PASSWORD=${DB_APP_PASSWORD}
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #     - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+  # redis:
+  #   image: redis:7-alpine
+  #   command: redis-server --requirepass ${REDIS_PASSWORD}
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+# volumes:
+#   mysql_data:
+#   redis_data:
+
+networks:
+  app-network:
+    driver: bridge

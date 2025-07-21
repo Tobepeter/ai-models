@@ -254,12 +254,12 @@ func (h *AIHandler) handleOpenAIStreamingChat(c *gin.Context, requestID string, 
 	c.SSEvent("", fmt.Sprintf("data: %s", toJSON(initialChunk)))
 	c.Writer.Flush()
 
-	var lastMessage string
-	if len(req.Messages) > 0 {
-		lastMessage = req.Messages[len(req.Messages)-1].Content
-	}
+	// var lastMessage string
+	// if len(req.Messages) > 0 {
+	// 	lastMessage = req.Messages[len(req.Messages)-1].Content
+	// }
 
-	placeholderResponse := fmt.Sprintf("This is a placeholder streaming response for: %s (Platform: %s)", lastMessage, req.Platform)
+	// placeholderResponse := fmt.Sprintf("This is a placeholder streaming response for: %s (Platform: %s)", lastMessage, req.Platform)
 	
 	words := []string{"This", " is", " a", " placeholder", " streaming", " response"}
 	for _, word := range words {

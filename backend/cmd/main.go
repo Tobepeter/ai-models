@@ -15,6 +15,9 @@ import (
 )
 
 func main() {
+	// 设置 logrus 为 JSON 格式
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	
 	// 加载环境变量
 	if err := godotenv.Load(); err != nil {
 		logrus.Warn("未找到 .env 文件，使用系统环境变量")

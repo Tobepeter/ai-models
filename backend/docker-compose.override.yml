@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .env:/app/.env:ro  # 挂载环境变量文件
+    environment:
+      - GO_ENV=development
+    networks:
+      - app-network
