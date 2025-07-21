@@ -18,9 +18,6 @@ export const TestOssConfigInfo = ({ status, sts, loading, onCheckStatus, onGetSt
 						<CardContent className="p-4">
 							<div className="space-y-1">
 								<div>
-									<strong>OSS服务器:</strong> {ossConfig.serverUrl}
-								</div>
-								<div>
 									<strong>OSS区域:</strong> {ossRegion}
 								</div>
 								<div>
@@ -44,9 +41,7 @@ export const TestOssConfigInfo = ({ status, sts, loading, onCheckStatus, onGetSt
 									<Button variant="outline" size="sm" onClick={() => onGetSts?.()} disabled={loading}>
 										{loading ? '获取中...' : '刷新STS'}
 									</Button>
-									<Badge variant={sts ? 'default' : 'secondary'}>
-										{sts ? `STS有效(${new Date(sts.Expiration).toLocaleTimeString()})` : 'STS未获取'}
-									</Badge>
+									<Badge variant={sts ? 'default' : 'secondary'}>{sts ? `STS有效(${new Date(sts.Expiration).toLocaleTimeString()})` : 'STS未获取'}</Badge>
 								</div>
 							</div>
 						</CardContent>

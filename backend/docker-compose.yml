@@ -5,6 +5,7 @@ services:
   
   db:
     image: mysql:8.0
+    container_name: ai-models-db
     environment:
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_DATABASE=ai_models
@@ -20,6 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: ai-models-redis
     ports:
       - "6379:6379"
     volumes:

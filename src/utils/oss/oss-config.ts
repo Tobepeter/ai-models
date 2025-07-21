@@ -1,9 +1,18 @@
+import { isDev } from '@/utils/env'
+import { requestConfig } from '@/config/request-config'
+
 class OssConfig {
-	serverUrl = 'http://localhost:3001'
 	stsAheadMin = 5 // sts提前过期时间，分钟
 
 	get apiBaseUrl() {
-		return `${this.serverUrl}/api/oss`
+		const useGoDev = true
+		const { devOssNode, devGo, prod } = requestConfig.serverUrls
+
+		if (isDev) {
+			return useGoDev ? devGo : devOssNode
+		} else {
+			return prod
+		}
 	}
 }
 

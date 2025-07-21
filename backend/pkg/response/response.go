@@ -1,26 +1,37 @@
 package response
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
-// Response represents a standard API response structure
+// 标准API响应结构
 type Response struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
-// Success sends a successful response
-func Success(c *gin.Context, code int, message string, data interface{}) {
-	c.JSON(code, Response{
-		Code:    code,
-		Message: message,
+// 成功响应
+func Success(c *gin.Context, data any) {
+	c.JSON(http.StatusOK, Response{
+		Code:    0,
+		Message: "ok",
 		Data:    data,
 	})
 }
 
-// Error sends an error response
+// 成功响应带消息
+func SuccessMsg(c *gin.Context, message string) {
+	c.JSON(200, Response{
+		Code:    0,
+		Message: message,
+		Data:    nil,
+	})
+}
+
+// 错误响应
 func Error(c *gin.Context, code int, message string) {
 	c.JSON(code, Response{
 		Code:    code,
@@ -28,8 +39,8 @@ func Error(c *gin.Context, code int, message string) {
 	})
 }
 
-// ErrorWithData sends an error response with additional data
-func ErrorWithData(c *gin.Context, code int, message string, data interface{}) {
+// 错误响应带数据
+func ErrorWithData(c *gin.Context, code int, message string, data any) {
 	c.JSON(code, Response{
 		Code:    code,
 		Message: message,
@@ -37,7 +48,7 @@ func ErrorWithData(c *gin.Context, code int, message string, data interface{}) {
 	})
 }
 
-// ValidationError sends a validation error response
+// 验证错误响应
 func ValidationError(c *gin.Context, errors map[string]string) {
 	c.JSON(400, Response{
 		Code:    400,
@@ -46,7 +57,7 @@ func ValidationError(c *gin.Context, errors map[string]string) {
 	})
 }
 
-// Unauthorized sends an unauthorized response
+// 未授权响应
 func Unauthorized(c *gin.Context, message string) {
 	if message == "" {
 		message = "Unauthorized"
@@ -57,7 +68,7 @@ func Unauthorized(c *gin.Context, message string) {
 	})
 }
 
-// Forbidden sends a forbidden response
+// 禁止访问响应
 func Forbidden(c *gin.Context, message string) {
 	if message == "" {
 		message = "Forbidden"
@@ -68,7 +79,7 @@ func Forbidden(c *gin.Context, message string) {
 	})
 }
 
-// NotFound sends a not found response
+// 未找到响应
 func NotFound(c *gin.Context, message string) {
 	if message == "" {
 		message = "Resource not found"
@@ -79,7 +90,7 @@ func NotFound(c *gin.Context, message string) {
 	})
 }
 
-// InternalError sends an internal server error response
+// 内部错误响应
 func InternalError(c *gin.Context, message string) {
 	if message == "" {
 		message = "Internal server error"
@@ -90,8 +101,8 @@ func InternalError(c *gin.Context, message string) {
 	})
 }
 
-// Created sends a created response
-func Created(c *gin.Context, message string, data interface{}) {
+// 创建成功响应
+func Created(c *gin.Context, message string, data any) {
 	c.JSON(201, Response{
 		Code:    201,
 		Message: message,
@@ -99,8 +110,8 @@ func Created(c *gin.Context, message string, data interface{}) {
 	})
 }
 
-// Updated sends an updated response
-func Updated(c *gin.Context, message string, data interface{}) {
+// 更新成功响应
+func Updated(c *gin.Context, message string, data any) {
 	c.JSON(200, Response{
 		Code:    200,
 		Message: message,
@@ -108,7 +119,7 @@ func Updated(c *gin.Context, message string, data interface{}) {
 	})
 }
 
-// Deleted sends a deleted response
+// 删除成功响应
 func Deleted(c *gin.Context, message string) {
 	c.JSON(200, Response{
 		Code:    200,

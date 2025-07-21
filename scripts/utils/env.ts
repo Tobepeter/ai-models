@@ -34,3 +34,11 @@ export const isGithub = process.env.GITHUB_ACTIONS === 'true'
 export const githubRepository = process.env.GITHUB_REPOSITORY
 
 export const serverHost = process.env.SERVER_HOST || ''
+
+// Docker 部署配置
+export const dockerRegistry = process.env.DOCKER_REGISTRY || ''
+export const dockerRegistryVpc = process.env.DOCKER_REGISTRY_VPC || ''
+export const dockerNamespace = process.env.DOCKER_NAMESPACE || ''
+export const dockerImageName = process.env.DOCKER_IMAGE_NAME || ''
+export const dockerUsername = process.env.DOCKER_USERNAME || ''
+export const dockerPassword = process.env.DOCKER_PASSWORD || ''

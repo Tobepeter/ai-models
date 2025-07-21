@@ -69,7 +69,7 @@ app.use(generalLimiter) // 应用通用速率限制
 ossAPI.init()
 
 // 获取STS临时凭证
-app.post('/api/oss/sts', async (req, res) => {
+app.post('/oss/sts', async (req, res) => {
 	try {
 		const result = await ossAPI.getStsToken()
 		const { credentials } = result
@@ -90,7 +90,7 @@ app.post('/api/oss/sts', async (req, res) => {
 })
 
 // 生成上传签名
-app.post('/api/oss/sign-to-upload', async (req, res) => {
+app.post('/oss/sign-to-upload', async (req, res) => {
 	try {
 		const { objectKey, fileType } = req.body
 
@@ -122,7 +122,7 @@ app.post('/api/oss/sign-to-upload', async (req, res) => {
 })
 
 // 生成获取签名
-app.post('/api/oss/sign-to-fetch', async (req, res) => {
+app.post('/oss/sign-to-fetch', async (req, res) => {
 	try {
 		const { objectKey } = req.body
 
@@ -154,7 +154,7 @@ app.post('/api/oss/sign-to-fetch', async (req, res) => {
 })
 
 // 生成对象键
-app.post('/api/oss/hashify-name', async (req, res) => {
+app.post('/oss/hashify-name', async (req, res) => {
 	try {
 		const { fileName } = req.body
 
@@ -185,7 +185,7 @@ app.post('/api/oss/hashify-name', async (req, res) => {
 })
 
 // 获取文件列表
-app.get('/api/oss/files', async (req, res) => {
+app.get('/oss/files', async (req, res) => {
 	try {
 		const { prefix = '', maxKeys } = req.query
 
@@ -216,7 +216,7 @@ app.get('/api/oss/files', async (req, res) => {
 // ============================================================================
 
 // 直接上传文件
-app.post('/api/oss/upload', uploadLimiter, upload.single('file'), async (req, res) => {
+app.post('/oss/upload', uploadLimiter, upload.single('file'), async (req, res) => {
 	try {
 		const file = req.file
 		if (!file) {
@@ -287,7 +287,7 @@ app.post('/api/oss/upload', uploadLimiter, upload.single('file'), async (req, re
 })
 
 // 删除文件
-app.post('/api/oss/delete', async (req, res) => {
+app.post('/oss/delete', async (req, res) => {
 	try {
 		const { objectKey } = req.body
 		if (!objectKey) {
@@ -312,7 +312,7 @@ app.post('/api/oss/delete', async (req, res) => {
 })
 
 // 获取文件URL
-app.post('/api/oss/get-url', async (req, res) => {
+app.post('/oss/get-url', async (req, res) => {
 	try {
 		const { objectKey } = req.body
 		if (!objectKey) {

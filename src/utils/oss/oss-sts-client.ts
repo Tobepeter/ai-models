@@ -100,6 +100,7 @@ class OssStsClient {
 	async refreshOss() {
 		if (!this.token) throw new Error('[OSS] Cannot refresh OSS client: STS token not found')
 
+		// NOTE：注意官方的字段是大写开头的
 		this.oss = new OSS({
 			accessKeyId: this.token.AccessKeyId,
 			accessKeySecret: this.token.AccessKeySecret,

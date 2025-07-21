@@ -88,3 +88,56 @@ src/
 3. **组件展示**：测试页面展示了所有可用的 shadcn/ui 组件
 4. **状态管理**：使用 Zustand store 管理全局状态
 5. **数据获取**：使用 TanStack Query 和 ahooks 进行数据管理
+
+## 🚀 部署
+
+### 前端部署
+
+```bash
+# 构建并部署前端（支持 OSS 和服务器部署）
+npm run deploy
+
+# 指定步骤部署
+npm run deploy -- --steps build,upload
+```
+
+### 后端部署
+
+```bash
+# 构建并推送 Docker 镜像
+npm run deploy:be
+
+# 只构建镜像
+npm run deploy:be -- --steps build
+
+# 只推送镜像（跳过登录）
+npm run deploy:be -- --steps push --skip-login
+
+# 显示详细日志
+npm run deploy:be -- --verbose
+```
+
+#### Docker 配置
+
+创建 `.env.local` 文件并配置以下环境变量：
+
+```bash
+# Docker 部署配置
+BE_DOCKER_REGISTRY=your-registry.com
+BE_DOCKER_NAMESPACE=your-namespace
+BE_DOCKER_IMAGE_NAME=ai-models-backend
+BE_DOCKER_USERNAME=your-username
+BE_DOCKER_PASSWORD=your-password  # 可选，用于自动登录
+```
+
+#### 登录选项
+
+1. **自动登录**：设置 `BE_DOCKER_PASSWORD` 环境变量
+2. **手动登录**：先执行 `docker login` 然后使用 `--skip-login`
+3. **跳过登录**：使用 `--skip-login` 参数（推荐）
+
+```bash
+# 推荐方式：手动登录一次，然后跳过登录
+docker login --username=your-username your-registry.com
+npm run deploy:be -- --skip-login
+```

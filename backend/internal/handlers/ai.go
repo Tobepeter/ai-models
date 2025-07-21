@@ -50,7 +50,7 @@ func (h *AIHandler) Chat(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Chat processed successfully", chatResponse)
+	response.Success(c, chatResponse)
 }
 
 func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint, req models.ChatRequest) {
@@ -112,7 +112,7 @@ func (h *AIHandler) Generate(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Content generated successfully", generateResponse)
+	response.Success(c, generateResponse)
 }
 
 // 获取模型列表
@@ -124,7 +124,7 @@ func (h *AIHandler) GetModels(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Models retrieved successfully", models)
+	response.Success(c, models)
 }
 
 // 获取聊天历史
@@ -148,7 +148,7 @@ func (h *AIHandler) GetChatHistory(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Chat history retrieved successfully", history)
+	response.Success(c, history)
 }
 
 // 清除聊天历史
@@ -172,7 +172,7 @@ func (h *AIHandler) ClearChatHistory(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Chat history cleared successfully", nil)
+	response.Success(c, nil)
 }
 
 // OpenAI 兼容接口

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"ai-models-backend/pkg/response"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,7 @@ func (h *HealthHandler) Health(c *gin.Context) {
 		"version":   "1.0.0",
 	}
 
-	response.Success(c, http.StatusOK, "Service is healthy", data)
+	response.Success(c, data)
 }
 
 // 就绪检查
@@ -39,7 +38,7 @@ func (h *HealthHandler) Ready(c *gin.Context) {
 		},
 	}
 
-	response.Success(c, http.StatusOK, "Service is ready", data)
+	response.Success(c, data)
 }
 
 // 存活检查
@@ -50,5 +49,5 @@ func (h *HealthHandler) Live(c *gin.Context) {
 		"uptime":    time.Since(time.Now()).String(),
 	}
 
-	response.Success(c, http.StatusOK, "Service is alive", data)
+	response.Success(c, data)
 }

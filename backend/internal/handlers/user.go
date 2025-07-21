@@ -50,7 +50,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		"token": token,
 	}
 
-	response.Success(c, http.StatusCreated, "User registered successfully", data)
+	response.Success(c, data)
 }
 
 // 用户登录
@@ -81,7 +81,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		"token": token,
 	}
 
-	response.Success(c, http.StatusOK, "Login successful", data)
+	response.Success(c, data)
 }
 
 // 获取用户信息
@@ -99,7 +99,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Profile retrieved successfully", user.ToResponse())
+	response.Success(c, user.ToResponse())
 }
 
 // 更新用户信息
@@ -124,7 +124,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusOK, "Profile updated successfully", user.ToResponse())
+	response.Success(c, user.ToResponse())
 }
 
 // 获取用户列表
@@ -148,5 +148,5 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		},
 	}
 
-	response.Success(c, http.StatusOK, "Users retrieved successfully", data)
+	response.Success(c, data)
 }

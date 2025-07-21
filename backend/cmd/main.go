@@ -17,7 +17,7 @@ import (
 func main() {
 	// 设置 logrus 为 JSON 格式
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	
+
 	// 加载环境变量
 	if err := godotenv.Load(); err != nil {
 		logrus.Warn("未找到 .env 文件，使用系统环境变量")
@@ -26,10 +26,14 @@ func main() {
 	cfg := config.New()
 	userService := services.NewUserService()
 	aiService := services.NewAIService()
+	ossService := services.NewOSSService(cfg)
+
 	userHandler := handlers.NewUserHandler(userService)
 	aiHandler := handlers.NewAIHandler(aiService)
+	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
-	router := setupRouter(cfg, userHandler, aiHandler, healthHandler)
+
+	router := setupRouter(cfg, userHandler, aiHandler, ossHandler, healthHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -37,7 +41,7 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
 	if cfg.Environment == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -49,7 +53,7 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 
 	r.GET("/health", healthHandler.Health)
 
-	api := r.Group("/api")
+	api := r.Group("/")
 	{
 		users := api.Group("/users")
 		{
@@ -66,6 +70,25 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			ai.POST("/generate", aiHandler.Generate)
 			ai.GET("/models", aiHandler.GetModels)
 			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
+		}
+
+		oss := api.Group("/oss")
+		{
+			// 客户端签名模式 - 获取签名和凭证
+			oss.POST("/sts", ossHandler.GetSTSCredentials)
+			oss.POST("/sign-to-upload", ossHandler.SignToUpload)
+			oss.POST("/sign-to-fetch", ossHandler.SignToFetch)
+			oss.POST("/hashify-name", ossHandler.HashifyName)
+			oss.GET("/files", ossHandler.GetFileList)
+
+			// 代理模式 - 后端全权代理操作
+			oss.POST("/upload", handlers.FileSizeMiddleware(), ossHandler.UploadFile)
+			oss.POST("/delete", ossHandler.DeleteFile)
+			oss.POST("/get-url", ossHandler.GetFileURL)
+
+			// 调试和状态接口
+			oss.GET("/health", ossHandler.HealthCheck)
+			oss.GET("/config", ossHandler.GetConfigInfo)
 		}
 	}
 

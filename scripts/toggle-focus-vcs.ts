@@ -11,7 +11,7 @@ const excludes = [
 	'.env*',
 	'.github',
 	'.storybook',
-	'backend/**',
+	// 'backend/**',
 	'dist/',
 	'docs/',
 	'node_modules/',

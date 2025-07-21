@@ -18,7 +18,8 @@
 		"oss-server": "tsx scripts/oss-server.ts",
 		"gen-qrcode": "tsx scripts/gen-qrcode.ts",
 		"deploy": "tsx scripts/deploy.ts",
-		"tog-focus": "tsx scripts/toggle-focus-vcs.ts"
+		"tog-focus": "tsx scripts/toggle-focus-vcs.ts",
+		"deploy:be": "tsx scripts/deploy-be.ts"
 	},
 	"dependencies": {
 		"@alicloud/sts20150401": "^1.1.6",
