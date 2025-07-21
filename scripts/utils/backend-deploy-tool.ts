@@ -162,7 +162,6 @@ class BackendDeployTool {
 		const localComposePath = path.join(backendRoot, localComposeFile)
 		const remoteComposePath = path.join(baseDir, 'docker-compose.yml')
 		await sshClient.putFile(localComposePath, remoteComposePath)
-		this.logCommand('上传 docker-compose', `${localComposePath} -> ${remoteComposePath}`)
 
 		// 上传并修改 .env 文件
 		console.log('📄 上传并修改 .env...')
@@ -181,8 +180,8 @@ class BackendDeployTool {
 		const modifiedContent = `${envContent}\n# 部署时自动添加\nIMAGE_NAME=${imageName}\n`
 
 		// 写入远程文件
+		console.log(`📄 上传并修改 .env...`)
 		await sshClient.execCommand(`cat > ${remotePath} << 'EOF'\n${modifiedContent}EOF`, true)
-		this.logCommand('修改 .env', `添加 IMAGE_NAME=${imageName}`)
 	}
 
 	/** 启动服务 */
@@ -228,11 +227,6 @@ class BackendDeployTool {
 		}
 	}
 
-	/** 日志输出 */
-	logCommand(msg: string, detail?: string) {
-		const output = this.config.verbose && detail ? `${msg}: ${detail}` : msg
-		console.log(`✅ ${output}`)
-	}
 }
 
 export const backendDeployTool = new BackendDeployTool()

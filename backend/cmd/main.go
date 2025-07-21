@@ -5,6 +5,7 @@ import (
 	"ai-models-backend/internal/handlers"
 	"ai-models-backend/internal/middleware"
 	"ai-models-backend/internal/services"
+	"ai-models-backend/internal/services/ai"
 	"ai-models-backend/pkg/response"
 	"log"
 	"net/http"
@@ -25,7 +26,7 @@ func main() {
 
 	cfg := config.New()
 	userService := services.NewUserService()
-	aiService := services.NewAIService()
+	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
 
 	userHandler := handlers.NewUserHandler(userService)
@@ -70,6 +71,13 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			ai.POST("/generate", aiHandler.Generate)
 			ai.GET("/models", aiHandler.GetModels)
 			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
+		}
+
+		// 新的 OpenAI 兼容接口（不需要登录）
+		aiV1 := api.Group("/ai/v1")
+		{
+			aiV1.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
+			aiV1.POST("/images/generations", aiHandler.GenerateImages)
 		}
 
 		oss := api.Group("/oss")

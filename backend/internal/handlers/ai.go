@@ -2,23 +2,20 @@ package handlers
 
 import (
 	"ai-models-backend/internal/models"
-	"ai-models-backend/internal/services"
+	"ai-models-backend/internal/services/ai"
 	"ai-models-backend/pkg/response"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
 // AI请求处理器
 type AIHandler struct {
-	aiService *services.AIService
+	aiService *ai.AIService
 }
-func NewAIHandler(aiService *services.AIService) *AIHandler {
+
+func NewAIHandler(aiService *ai.AIService) *AIHandler {
 	return &AIHandler{
 		aiService: aiService,
 	}
@@ -64,7 +61,7 @@ func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint, req models.
 	go func() {
 		defer close(responseChan)
 		defer close(errChan)
-		
+
 		err := h.aiService.StreamChat(userID, req, responseChan)
 		if err != nil {
 			errChan <- err
@@ -189,135 +186,67 @@ func (h *AIHandler) OpenAIChatCompletion(c *gin.Context) {
 		return
 	}
 
-	requestID := fmt.Sprintf("chatcmpl-%s", uuid.New().String())
-	created := time.Now().Unix()
+	// 获取平台参数
+	platform := ai.Platform(c.Query("platform"))
+
 	if req.Stream {
-		h.handleOpenAIStreamingChat(c, requestID, created, req)
+		h.handleOpenAIStreamingChat(c, platform, req)
 		return
 	}
 
-	var lastMessage string
-	if len(req.Messages) > 0 {
-		lastMessage = req.Messages[len(req.Messages)-1].Content
-	}
-
-	response := models.OpenAIChatCompletionResponse{
-		ID:      requestID,
-		Object:  "chat.completion",
-		Created: created,
-		Model:   req.Model,
-		Choices: []models.OpenAIChoice{
-			{
-				Index: 0,
-				Message: models.OpenAIMessage{
-					Role:    "assistant",
-					Content: fmt.Sprintf("This is a placeholder response for: %s (Platform: %s)", lastMessage, req.Platform),
-				},
-				FinishReason: "stop",
+	resp, err := h.aiService.ChatCompletion(platform, req)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to call AI service")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"message": "Failed to process request",
+				"type":    "internal_error",
 			},
-		},
-		Usage: models.OpenAIUsage{
-			PromptTokens:     len(lastMessage) / 4, // rough token estimation
-			CompletionTokens: 20,
-			TotalTokens:      len(lastMessage)/4 + 20,
-		},
+		})
+		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, resp)
 }
 
-func (h *AIHandler) handleOpenAIStreamingChat(c *gin.Context, requestID string, created int64, req models.OpenAIChatCompletionRequest) {
+func (h *AIHandler) handleOpenAIStreamingChat(c *gin.Context, platform ai.Platform, req models.OpenAIChatCompletionRequest) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
 	c.Header("Access-Control-Allow-Origin", "*")
 
-	initialChunk := models.OpenAIChatCompletionStreamResponse{
-		ID:      requestID,
-		Object:  "chat.completion.chunk",
-		Created: created,
-		Model:   req.Model,
-		Choices: []models.OpenAIStreamChoice{
-			{
-				Index: 0,
-				Delta: struct {
-					Role    string `json:"role,omitempty"`
-					Content string `json:"content,omitempty"`
-				}{
-					Role: "assistant",
-				},
-				FinishReason: nil,
-			},
-		},
-	}
-
-	c.SSEvent("", fmt.Sprintf("data: %s", toJSON(initialChunk)))
-	c.Writer.Flush()
-
-	// var lastMessage string
-	// if len(req.Messages) > 0 {
-	// 	lastMessage = req.Messages[len(req.Messages)-1].Content
-	// }
-
-	// placeholderResponse := fmt.Sprintf("This is a placeholder streaming response for: %s (Platform: %s)", lastMessage, req.Platform)
-	
-	words := []string{"This", " is", " a", " placeholder", " streaming", " response"}
-	for _, word := range words {
-		chunk := models.OpenAIChatCompletionStreamResponse{
-			ID:      requestID,
-			Object:  "chat.completion.chunk",
-			Created: created,
-			Model:   req.Model,
-			Choices: []models.OpenAIStreamChoice{
-				{
-					Index: 0,
-					Delta: struct {
-						Role    string `json:"role,omitempty"`
-						Content string `json:"content,omitempty"`
-					}{
-						Content: word,
-					},
-					FinishReason: nil,
-				},
-			},
-		}
-
-		c.SSEvent("", fmt.Sprintf("data: %s", toJSON(chunk)))
-		c.Writer.Flush()
-		time.Sleep(100 * time.Millisecond) // Small delay to simulate streaming
-	}
-
-	finalChunk := models.OpenAIChatCompletionStreamResponse{
-		ID:      requestID,
-		Object:  "chat.completion.chunk",
-		Created: created,
-		Model:   req.Model,
-		Choices: []models.OpenAIStreamChoice{
-			{
-				Index:        0,
-				Delta:        struct {
-					Role    string `json:"role,omitempty"`
-					Content string `json:"content,omitempty"`
-				}{},
-				FinishReason: stringPtr("stop"),
-			},
-		},
-	}
-
-	c.SSEvent("", fmt.Sprintf("data: %s", toJSON(finalChunk)))
-	c.SSEvent("", "data: [DONE]")
-	c.Writer.Flush()
-}
-
-func toJSON(v interface{}) string {
-	data, err := json.Marshal(v)
+	err := h.aiService.ChatCompletionStream(platform, req, c.Writer)
 	if err != nil {
-		logrus.Error("Failed to marshal JSON:", err)
-		return ""
+		logrus.WithError(err).Error("Failed to stream chat")
+		c.SSEvent("error", err.Error())
+		return
 	}
-	return string(data)
 }
 
-func stringPtr(s string) *string {
-	return &s
+// 图片生成接口
+func (h *AIHandler) GenerateImages(c *gin.Context) {
+	var req struct {
+		Prompt string `json:"prompt" binding:"required"`
+		Model  string `json:"model"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logrus.Error("Invalid image generation request:", err)
+		response.Error(c, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	// 获取平台参数
+	platform := ai.Platform(c.Query("platform"))
+
+	urls, err := h.aiService.GenerateImages(platform, req.Prompt, req.Model)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to generate images")
+		response.Error(c, http.StatusInternalServerError, "Failed to generate images")
+		return
+	}
+
+	response.Success(c, gin.H{
+		"data": urls,
+	})
 }
