@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy FE
 
 on:
   # NOTE: 目前仅支持手动触发，不然一直上传 OSS，浪费流量
@@ -23,9 +23,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VITE_SILICON_API_KEY: ${{ secrets.VITE_SILICON_API_KEY }}
-      VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
-      VITE_DASHSCOPE_API_KEY: ${{ secrets.VITE_DASHSCOPE_API_KEY }}
+      SECRETS_KEY: ${{ secrets.SECRETS_KEY }}
       VERBOSE: true
     steps:
       - name: Checkout
@@ -39,6 +37,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Decrypt secrets
+        run: npm run secrets:decrypt
+
+      - name: Prepare CI/CD environment
+        run: npm run secrets:cicd
 
       - name: Type check
         run: npm run type-check

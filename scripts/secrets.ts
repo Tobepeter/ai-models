@@ -10,9 +10,10 @@ program.option('-d, --decrypt', '解密文件夹')
 program.option('-g, --genkey', '生成密钥')
 program.option('--cicd', '配置cicd环境')
 program.option('--sync', '同步secrets配置')
+program.option('-y, --yes', '自动确认')
 
 program.action(async () => {
-	const { encrypt, decrypt, genkey, cicd, sync } = program.opts()
+	const { encrypt, decrypt, genkey, cicd, sync, yes } = program.opts()
 	if (encrypt) {
 		await secretsTool.encrypt()
 	}
@@ -26,7 +27,7 @@ program.action(async () => {
 		await secretsTool.prepareInCICD()
 	}
 	if (sync) {
-		await secretsEnvTool.syncSecrets()
+		await secretsEnvTool.syncSecrets(yes)
 	}
 })
 

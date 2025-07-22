@@ -12,7 +12,7 @@ const { secretSourceDir } = secretsConfig
  */
 class SecretsEnvTool {
 	/** 同步环境配置 */
-	async syncSecrets() {
+	async syncSecrets(yes: boolean) {
 		const envLocal = join(projectRoot, '.env.local')
 		const envExample = join(projectRoot, '.env.example')
 		const envBe = join(projectRoot, 'backend/.env')
@@ -27,7 +27,7 @@ class SecretsEnvTool {
 			await this.genEnvExample(envLocal, envExample)
 
 			// 2. .env.local -> secrets/.env
-			override = await this.confirmOverwrite(secEnv)
+			override = yes || (await this.confirmOverwrite(secEnv))
 			if (override) {
 				// vite前缀trim掉
 				const filtered = this.genEnvCfg(envLocal, 'VITE_')
@@ -43,7 +43,7 @@ class SecretsEnvTool {
 			await this.genEnvExample(envBe, envBeExample)
 
 			// 4. backend/.env -> secrets/.env.be
-			override = await this.confirmOverwrite(secEnvBe)
+			override = yes || (await this.confirmOverwrite(secEnvBe))
 			if (override) {
 				copyFileSync(envBe, secEnvBe)
 				console.log('🔄 已同步 secrets/.env.be 🗝️')
@@ -76,17 +76,27 @@ class SecretsEnvTool {
 	private genEnvCfg(src: string, prefix?: string) {
 		const txt = readFileSync(src, 'utf8')
 		const lines = txt.split('\n')
-		return lines
-			.map((l) => {
-				const t = l.trim()
-				if (t.startsWith('#') || t === '' || !l.includes('=')) return l
-				// 如果有前缀且以该前缀开头，则 slice 掉前缀
-				if (prefix && t.startsWith(prefix)) {
-					return l.slice(prefix.length)
-				}
-				return l
-			})
-			.join('\n')
+
+		// prefix会删掉，但是尾部保留
+		const extraLines: string[] = []
+
+		const result = lines.map((l) => {
+			const t = l.trim()
+			if (t.startsWith('#') || t === '' || !l.includes('=')) return l
+			if (prefix && t.startsWith(prefix)) {
+				extraLines.push(l)
+				return l.slice(prefix.length)
+			}
+			return l
+		})
+
+		if (extraLines.length > 0) {
+			result.push('')
+			result.push(`# prefix: ${prefix}`)
+			result.push(...extraLines)
+		}
+
+		return result.join('\n')
 	}
 
 	/** 确认覆盖文件 */
