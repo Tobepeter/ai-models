@@ -20,10 +20,11 @@ export const repoVersion = packageJson.version
 
 export const ossEnable = process.env.OSS_DEPLOY_ENABLE === 'true'
 
-export const ossBucket = process.env.VITE_OSS_BUCKET || ''
-export const ossRegion = process.env.VITE_OSS_REGION || ''
-export const ossAccessKeyId = process.env.VITE_OSS_ACCESS_KEY_ID || ''
-export const ossAccessKeySecret = process.env.VITE_OSS_ACCESS_KEY_SECRET || ''
+// NOT：前端是vite注入的，CICD 不用 vite 前缀
+export const ossBucket = process.env.VITE_OSS_BUCKET || process.env.OSS_BUCKET || ''
+export const ossRegion = process.env.VITE_OSS_REGION || process.env.OSS_REGION || ''
+export const ossAccessKeyId = process.env.VITE_OSS_ACCESS_KEY_ID || process.env.OSS_ACCESS_KEY_ID || ''
+export const ossAccessKeySecret = process.env.VITE_OSS_ACCESS_KEY_SECRET || process.env.OSS_ACCESS_KEY_SECRET || ''
 export const ossRoleArn = process.env.OSS_ROLE_ARN || ''
 
 // NOTE: 这个暂时不让配置，防止 oss 弄得太乱了
@@ -42,3 +43,7 @@ export const dockerNamespace = process.env.DOCKER_NAMESPACE || ''
 export const dockerImageName = process.env.DOCKER_IMAGE_NAME || ''
 export const dockerUsername = process.env.DOCKER_USERNAME || ''
 export const dockerPassword = process.env.DOCKER_PASSWORD || ''
+
+// CICD 用这个来ssh登录
+export const sshPrivateKey = process.env.SSH_PRIVATE_KEY || ''
+export const sshKnownHosts = process.env.SSH_KNOWN_HOSTS || ''

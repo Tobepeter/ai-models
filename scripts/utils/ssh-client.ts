@@ -1,7 +1,7 @@
 import { NodeSSH } from 'node-ssh'
 import { homedir } from 'os'
 import path from 'path'
-import { serverHost, verbose } from './env'
+import { serverHost, sshPrivateKey, verbose } from './env'
 
 const privateKeyPath = path.join(homedir(), '.ssh', 'id_rsa')
 
@@ -26,11 +26,13 @@ class SSHClient {
 		}
 
 		try {
-			await this.ssh.connect({
+			const sshConfig = {
 				host: serverHost,
 				username: 'root',
-				privateKeyPath,
-			})
+				...(sshPrivateKey ? { privateKey: sshPrivateKey } : { privateKeyPath }),
+			}
+
+			await this.ssh.connect(sshConfig)
 
 			this.isConnected = true
 
