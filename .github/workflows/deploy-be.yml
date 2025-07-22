@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SECRETS_KEY: ${{ secrets.SECRETS_KEY }}
+      VERBOSE: true
 
     steps:
       - name: Checkout
@@ -40,6 +41,15 @@ jobs:
 
       - name: Prepare CI/CD environment
         run: npm run secrets:cicd
+
+      - name: Fix SSH key permissions
+        run: |
+          if [ -f ~/.ssh/id_rsa ]; then
+            chmod 600 ~/.ssh/id_rsa
+            echo "✅ SSH key permissions fixed"
+          else
+            echo "⚠️ SSH key not found at ~/.ssh/id_rsa"
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

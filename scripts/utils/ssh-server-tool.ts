@@ -39,16 +39,12 @@ class SSHServerTool {
 		const privKeyPath = path.join(targetFolder, keyName)
 		const pubKeyPath = `${privKeyPath}.pub`
 
-		if (await fse.pathExists(privKeyPath)) {
-			throw new Error(`🔑 密钥文件已存在: ${privKeyPath}`)
-		}
-
 		console.log(`🔑 生成 SSH 密钥对: ${keyName}, comment: ${currComment}`)
 		console.log(`📁 目标目录: ${targetFolder}`)
 
 		try {
-			// 生成密钥对
-			const cmd = `ssh-keygen -t rsa -b 4096 -C "${currComment}" -f "${privKeyPath}" -N ""`
+			// 生成密钥对，使用 -m PEM 格式确保兼容性
+			const cmd = `ssh-keygen -t rsa -b 4096 -m PEM -C "${currComment}" -f "${privKeyPath}" -N ""`
 			execSync(cmd, { stdio: verbose ? 'inherit' : 'pipe' })
 
 			await fse.chmod(privKeyPath, 0o600)
