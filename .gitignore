@@ -36,3 +36,5 @@ storybook-static
 temp/
 tmp/
 
+# nginx
+*.conf 

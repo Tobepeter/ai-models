@@ -117,6 +117,19 @@ npm run deploy:be -- --steps push --skip-login
 npm run deploy:be -- --verbose
 ```
 
+### Nginx 配置部署
+
+```bash
+# 部署默认配置文件 (default.conf)
+npm run deploy:nginx
+
+# 部署指定配置文件
+npm run deploy:nginx -- --file=default.conf
+
+# 删除配置文件
+npm run deploy:nginx -- --remove=default.conf
+```
+
 #### Docker 配置
 
 创建 `.env.local` 文件并配置以下环境变量：
