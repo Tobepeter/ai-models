@@ -1,4 +1,4 @@
-import { appendFileSync, copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync } from 'fs'
+import { appendFileSync, copyFileSync, existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import fse from 'fs-extra'
 import { join } from 'path'
 import { cryptoUtil } from '../crypto-util'
@@ -24,21 +24,17 @@ class SecretsTool {
 	async encrypt() {
 		console.log('🔐 正在加密文件...')
 
-		if (!existsSync(secretSourceDir)) {
-			throw new Error(`文件目录不存在: ${secretSourceDir}`)
-		}
+		if (!existsSync(secretSourceDir)) throw new Error(`文件目录不存在: ${secretSourceDir}`)
 
 		const files = readdirSync(secretSourceDir)
-		if (files.length === 0) {
-			throw new Error(`目录中没有文件: ${secretSourceDir}`)
-		}
+		if (files.length === 0) throw new Error(`目录中没有文件: ${secretSourceDir}`)
 
 		console.log(`📦 找到 ${files.length} 个文件:`, files)
 
-		const tempZipFile = join(secretsDir, 'temp.zip')
-		await fsUtil.createZip(secretSourceDir, tempZipFile)
-		await cryptoUtil.encryptFile(tempZipFile, encryptedFile, secretKey)
-		unlinkSync(tempZipFile)
+		const tmpZip = join(secretsDir, 'temp.zip')
+		await fsUtil.createZip(secretSourceDir, tmpZip)
+		await cryptoUtil.encryptFile(tmpZip, encryptedFile, secretKey)
+		unlinkSync(tmpZip)
 
 		console.log(`✅ 文件已加密到: ${encryptedFile}`)
 	}
@@ -47,53 +43,42 @@ class SecretsTool {
 	async decrypt() {
 		console.log('🔓 正在解密文件...')
 
-		if (!existsSync(encryptedFile)) {
-			throw new Error(`加密文件不存在: ${encryptedFile}`)
-		}
+		if (!existsSync(encryptedFile)) throw new Error(`加密文件不存在: ${encryptedFile}`)
 
 		fse.emptyDirSync(secretDecDir)
 
-		// 解压文件到目标位置
-		const tempZipFile = join(secretsDir, 'temp.zip')
-		await cryptoUtil.decryptFile(encryptedFile, tempZipFile, secretKey)
-		await fsUtil.extractZip(tempZipFile, secretDecDir)
+		const tmpZip = join(secretsDir, 'temp.zip')
+		await cryptoUtil.decryptFile(encryptedFile, tmpZip, secretKey)
+		await fsUtil.extractZip(tmpZip, secretDecDir)
+		unlinkSync(tmpZip)
 
-		// 删除临时zip文件
-		unlinkSync(tempZipFile)
-
-		// 打印解密后的文件
 		const files = readdirSync(secretDecDir)
 		console.log(`✅ 已解密 ${files.length} 个文件到 ${secretDecDir}:`, files)
 	}
 
 	/** 配置cicd环境 */
 	async prepareInCICD() {
-		const envFile = join(secretDecDir, '.env')
-		const idRsaFile = join(secretDecDir, 'id_rsa')
-		const idRsaPubFile = join(secretDecDir, 'id_rsa.pub')
-		const knownHostsFile = join(secretDecDir, 'known_hosts')
-		const targetKnownHostsFile = join(sshDir, 'known_hosts')
+		const env = join(secretDecDir, '.env')
+		const envBe = join(secretDecDir, '.env.be')
+		const rsa = join(secretDecDir, 'id_rsa')
+		const rsaPub = join(secretDecDir, 'id_rsa.pub')
+		const hosts = join(secretDecDir, 'known_hosts')
+		const targetHosts = join(sshDir, 'known_hosts')
 
-		// 必须存在
-		const allFiles = [envFile, idRsaFile, idRsaPubFile, knownHostsFile]
-		for (const file of allFiles) {
-			if (!existsSync(file)) {
-				throw new Error(`文件不存在: ${file}`)
-			}
+		const files = [env, envBe, rsa, rsaPub, hosts]
+		for (const f of files) {
+			if (!existsSync(f)) throw new Error(`文件不存在: ${f}`)
 		}
 
-		// 貌似可能不存在 .ssh 目录
 		fse.ensureDirSync(sshDir)
 
-		copyFileSync(envFile, join(projectRoot, '.env'))
-		copyFileSync(idRsaFile, join(sshDir, 'id_rsa'))
+		copyFileSync(env, join(projectRoot, '.env'))
+		copyFileSync(envBe, join(projectRoot, 'backend/.env'))
+		copyFileSync(rsa, join(sshDir, 'id_rsa'))
+		copyFileSync(rsaPub, join(sshDir, 'id_rsa.pub')) // 公钥其实无所谓
 
-		// NOTE: 其实公钥是无所谓的
-		copyFileSync(idRsaPubFile, join(sshDir, 'id_rsa.pub'))
-
-		// 记录known_hosts 追加写入
-		appendFileSync(targetKnownHostsFile, '\n') // 防止和前面的信息尾部拼接起来了
-		appendFileSync(targetKnownHostsFile, readFileSync(knownHostsFile))
+		appendFileSync(targetHosts, '\n') // 防止拼接
+		appendFileSync(targetHosts, readFileSync(hosts))
 	}
 
 	/** 生成加密密钥 */
@@ -101,7 +86,6 @@ class SecretsTool {
 		const key = await cryptoUtil.genSecretKey()
 		console.log(`🔑 生成密钥: ${key}`)
 		console.log('请手动执行以下命令来设置 GitHub Secrets:')
-
 		console.log(`gh secret set SECRETS_KEY --body "${key}"`)
 		console.log('')
 	}

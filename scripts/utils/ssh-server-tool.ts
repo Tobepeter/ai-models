@@ -43,6 +43,7 @@ class SSHServerTool {
 		console.log(`📁 目标目录: ${targetFolder}`)
 
 		try {
+			// NOTE: github ci 遇到过，貌似不支持 OPENSSH 格式，或者 node-ssh 不知道有什么兼容问题，改了就没问题了（自己电脑测试又没问题）
 			// 生成密钥对，使用 -m PEM 格式确保兼容性
 			const cmd = `ssh-keygen -t rsa -b 4096 -m PEM -C "${currComment}" -f "${privKeyPath}" -N ""`
 			execSync(cmd, { stdio: verbose ? 'inherit' : 'pipe' })
