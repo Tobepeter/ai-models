@@ -1,5 +1,8 @@
 import fs from 'fs'
+import fse from 'fs-extra'
 import path from 'path'
+import archiver from 'archiver'
+import { createWriteStream } from 'fs'
 
 class FsUtil {
 	/** 递归获取文件夹中的所有文件 */
@@ -29,8 +32,7 @@ class FsUtil {
 			})
 	}
 
-	/** 获取 Content-Type */
-	getContentType(filePath: string): string {
+	getContentType(filePath: string) {
 		const ext = path.extname(filePath).toLowerCase()
 		const contentTypes: Record<string, string> = {
 			'.html': 'text/html',
@@ -52,8 +54,40 @@ class FsUtil {
 		return contentTypes[ext] || 'application/octet-stream'
 	}
 
-	posixPath(filePath: string): string {
+	posixPath(filePath: string) {
 		return filePath.replace(/\\/g, '/')
+	}
+
+	/** 创建zip */
+	async createZip(sourceDir: string, outputFile: string): Promise<void> {
+		await fse.ensureDir(path.dirname(outputFile))
+
+		return new Promise((resolve, reject) => {
+			const output = createWriteStream(outputFile)
+			const archive = archiver('zip', { zlib: { level: 9 } })
+
+			output.on('close', () => resolve())
+			archive.on('error', reject)
+
+			archive.pipe(output)
+			// 使用 false 作为第二个参数，不创建目录结构，不然解压会有嵌套
+			const destpath = false
+			archive.directory(sourceDir, destpath)
+			archive.finalize()
+		})
+	}
+
+	/** 解压zip */
+	async extractZip(zipFile: string, destDir: string): Promise<void> {
+		await fse.ensureDir(destDir)
+
+		try {
+			const AdmZip = (await import('adm-zip')).default
+			const zip = new AdmZip(zipFile)
+			zip.extractAllTo(destDir, true)
+		} catch (error: any) {
+			throw new Error(`解压失败: ${error.message}`)
+		}
 	}
 }
 

@@ -20,86 +20,29 @@ jobs:
   deploy-backend:
     runs-on: ubuntu-latest
     env:
-      # Docker 配置
-      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-      DOCKER_REGISTRY_VPC: ${{ secrets.DOCKER_REGISTRY_VPC }}
-      DOCKER_NAMESPACE: ${{ secrets.DOCKER_NAMESPACE }}
-      DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      # 服务器配置
-      SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-      # 日志控制
-      VERBOSE: true
+      SECRETS_KEY: ${{ secrets.SECRETS_KEY }}
 
     steps:
-      # steps:
-      #   - name: Checkout
-      #     uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      #   - name: Setup Node.js
-      #     uses: actions/setup-node@v4
-      #     with:
-      #       node-version: '20'
-      #       cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      #   - name: Install dependencies
-      #     run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      #   - name: Set up Docker Buildx
-      #     uses: docker/setup-buildx-action@v3
+      - name: Decrypt secrets
+        run: npm run secrets:decrypt
 
-      # - name: Setup SSH Key
-      #   uses: shimataro/ssh-key-action@v2
-      #   with:
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     name: id_rsa
-      #     known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-        
-      - name: Setup SSH Key (Base64)
-        run: |
-          mkdir -p ~/.ssh
-          echo "=== 检查 base64 输入 ==="
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -c 100
-          echo ""
-          echo "=== 尝试 base64 解码 ==="
-          if echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa 2>/dev/null; then
-            echo "✅ base64 解码成功"
-          else
-            echo "❌ base64 解码失败，尝试直接使用私钥内容"
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          fi
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_rsa
-          chmod 644 ~/.ssh/known_hosts
-          chmod 700 ~/.ssh
+      - name: Prepare CI/CD environment
+        run: npm run secrets:cicd
 
-      - name: Debug SSH Key
-        run: |
-          echo "=== 检查环境变量长度 ==="
-          echo "SSH_PRIVATE_KEY 长度: ${#SSH_PRIVATE_KEY}"
-          echo "SSH_KNOWN_HOSTS 长度: ${#SSH_KNOWN_HOSTS}"
-          echo "SSH_PRIVATE_KEY 前100字符: ${SSH_PRIVATE_KEY:0:100}"
-          echo "=== 检查私钥文件 ==="
-          ls -la ~/.ssh/
-          echo "=== 检查私钥权限 ==="
-          ls -la ~/.ssh/id_rsa
-          echo "=== 检查私钥文件大小 ==="
-          wc -c ~/.ssh/id_rsa
-          echo "=== 检查私钥格式 ==="
-          head -n 1 ~/.ssh/id_rsa
-          tail -n 1 ~/.ssh/id_rsa
-          echo "=== 验证私钥语法 ==="
-          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "私钥格式正确" || echo "私钥格式错误"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Test ssh
-        run: |
-          echo "=== SSH连接测试 ==="
-          ssh -v -o StrictHostKeyChecking=no root@${{ secrets.SERVER_HOST }} "echo 'Hello, world!'" 2>&1 || true
-
-    #   - name: Deploy Backend
-    #     run: npm run deploy:be
-    #     env:
-    #       NODE_ENV: production
+      - name: Deploy Backend
+        run: npm run deploy:be

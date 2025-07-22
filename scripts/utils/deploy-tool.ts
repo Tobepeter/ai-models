@@ -1,8 +1,7 @@
-import archiver from 'archiver'
 import { execSync } from 'child_process'
 import fs from 'fs'
 import fse from 'fs-extra'
-import path, { dirname } from 'path'
+import path from 'path'
 import prettyBytes from 'pretty-bytes'
 import { ossEnable, ossPrefix, projectRoot } from './env'
 import { fsUtil } from './fs-util'
@@ -15,7 +14,7 @@ import { sshClient } from './ssh-client'
  */
 class DeployTool {
 	sourceFolder = path.join(projectRoot, 'dist')
-	sourceFile = path.join(projectRoot, 'temp', 'dist.zip')
+	sourceZip = path.join(projectRoot, 'temp', 'dist.zip')
 	targetZipFolder = '/temp'
 	targetDeployFolder = '/var/www/chat'
 
@@ -51,34 +50,17 @@ class DeployTool {
 
 	/** 打包 dist 文件夹 */
 	async zipDist() {
-		const { sourceFile } = this
-		await fse.ensureDir(dirname(sourceFile))
-
 		console.log('📦 打包 dist 文件夹...')
-		return new Promise<void>((resolve, reject) => {
-			const zipPath = sourceFile
-			const output = fs.createWriteStream(zipPath)
-			const archive = archiver('zip', { zlib: { level: 9 } })
+		await fsUtil.createZip(this.sourceFolder, this.sourceZip)
 
-			output.on('close', () => {
-				console.log('✅ 打包完成，大小:', prettyBytes(archive.pointer()))
-				resolve()
-			})
-
-			archive.on('error', reject)
-			archive.pipe(output)
-			const destpath = 'dist' // 默认嵌套，和 shell zip 命令保持一致
-
-			archive.directory(this.sourceFolder, destpath)
-			archive.finalize()
-
-			console.log(`打包从 ${this.sourceFolder} 到 ${sourceFile}`)
-		})
+		const stats = fs.statSync(this.sourceZip)
+		console.log('✅ 打包完成，大小:', prettyBytes(stats.size))
+		console.log(`打包从 ${this.sourceFolder} 到 ${this.sourceZip}`)
 	}
 
 	clearZipFile() {
-		fse.removeSync(this.sourceFile)
-		console.log('🗑️ 清理临时文件', this.sourceFile)
+		fse.removeSync(this.sourceZip)
+		console.log('🗑️ 清理临时文件', this.sourceZip)
 	}
 
 	/** OSS 上传方法 */
@@ -153,13 +135,13 @@ class DeployTool {
 	/** 上传到服务器 */
 	async uploadToServer() {
 		console.log('🚀 上传文件到服务器...')
-		const { sourceFile, targetZipFolder, targetDeployFolder } = this
+		const { sourceZip, targetZipFolder, targetDeployFolder } = this
 		const targetZipFile = path.join(targetZipFolder, 'dist.zip')
 		await sshClient.connect()
 
-		console.log(`上传文件 ${sourceFile} 到 ${targetZipFile}`)
+		console.log(`上传文件 ${sourceZip} 到 ${targetZipFile}`)
 
-		await sshClient.putFile(sourceFile, targetZipFile)
+		await sshClient.putFile(sourceZip, targetZipFile)
 		console.log('✅ 文件上传完成')
 
 		console.log('🔄 执行服务器端部署...')
@@ -180,8 +162,11 @@ class DeployTool {
 
 		// TODO: 理论上备份一下
 
-		// 复制文件 (解压后是 /temp/dist/xxx，复制 /temp/dist/* 到目标目录)
-		cmd = `cp -r ${targetZipFolder}/dist/* ${targetDeployFolder}/`
+		// 复制加压后文件
+		// NOTE: 压缩方法无嵌套，这里
+		cmd = `cp -r ${targetZipFolder}/* ${targetDeployFolder}/`
+		// cmd = `cp -r ${targetZipFolder}/dist/* ${targetDeployFolder}/`
+
 		await sshClient.execCommand(cmd)
 
 		// 清理解压的临时文件

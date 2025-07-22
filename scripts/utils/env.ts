@@ -43,7 +43,3 @@ export const dockerNamespace = process.env.DOCKER_NAMESPACE || ''
 export const dockerImageName = process.env.DOCKER_IMAGE_NAME || ''
 export const dockerUsername = process.env.DOCKER_USERNAME || ''
 export const dockerPassword = process.env.DOCKER_PASSWORD || ''
-
-// CICD 用这个来ssh登录
-export const sshPrivateKey = process.env.SSH_PRIVATE_KEY || ''
-export const sshKnownHosts = process.env.SSH_KNOWN_HOSTS || ''

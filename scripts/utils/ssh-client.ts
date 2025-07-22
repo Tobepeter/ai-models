@@ -1,7 +1,7 @@
 import { NodeSSH } from 'node-ssh'
 import { homedir } from 'os'
 import path from 'path'
-import { serverHost, sshPrivateKey, verbose } from './env'
+import { serverHost, verbose } from './env'
 
 const privateKeyPath = path.join(homedir(), '.ssh', 'id_rsa')
 
@@ -29,7 +29,7 @@ class SSHClient {
 			const sshConfig = {
 				host: serverHost,
 				username: 'root',
-				...(sshPrivateKey ? { privateKey: sshPrivateKey } : { privateKeyPath }),
+				privateKeyPath,
 			}
 
 			await this.ssh.connect(sshConfig)
@@ -48,8 +48,7 @@ class SSHClient {
 	async disconnect() {
 		if (!this.isConnected) return
 
-		// NOTE: "await" 对此表达式的类型没有影响。ts(80007)
-		//  查阅文档是支持的
+		// NOTE: "await" 对此表达式的类型没有影响。ts(80007)，查阅文档是支持的
 		await this.ssh.dispose()
 		this.isConnected = false
 

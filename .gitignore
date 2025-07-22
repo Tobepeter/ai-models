@@ -39,5 +39,6 @@ tmp/
 # nginx
 *.conf
 
-# SSH keys (for security)
-scripts/utils/ssh-server/private-keys/ 
+# secrets加解密目录
+secrets/files/
+secrets/files-dec/

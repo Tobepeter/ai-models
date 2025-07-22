@@ -21,7 +21,11 @@
 		"deploy": "tsx scripts/deploy.ts",
 		"tog-focus": "tsx scripts/toggle-focus-vcs.ts",
 		"deploy:be": "tsx scripts/deploy-be.ts",
-		"deploy:nginx": "tsx scripts/deploy-nginx.ts"
+		"deploy:nginx": "tsx scripts/deploy-nginx.ts",
+		"secrets:encrypt": "tsx scripts/secrets.ts --encrypt",
+		"secrets:decrypt": "tsx scripts/secrets.ts --decrypt",
+		"secrets:genkey": "tsx scripts/secrets.ts --genkey",
+		"secrets:cicd": "tsx scripts/secrets.ts --cicd"
 	},
 	"dependencies": {
 		"@alicloud/sts20150401": "^1.1.6",
@@ -93,6 +97,7 @@
 		"@storybook/addon-vitest": "^9.0.16",
 		"@storybook/react-vite": "^9.0.16",
 		"@tailwindcss/vite": "^4.1.11",
+		"@types/adm-zip": "^0.5.7",
 		"@types/ali-oss": "^6.16.11",
 		"@types/archiver": "^6.0.3",
 		"@types/cors": "^2.8.19",
@@ -109,6 +114,7 @@
 		"@vitejs/plugin-react": "^4.6.0",
 		"@vitest/browser": "^3.2.4",
 		"@vitest/coverage-v8": "^3.2.4",
+		"adm-zip": "^0.5.16",
 		"archiver": "^7.0.1",
 		"canvas": "^3.1.2",
 		"commander": "^14.0.0",
