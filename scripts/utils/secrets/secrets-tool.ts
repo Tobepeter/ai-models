@@ -82,6 +82,9 @@ class SecretsTool {
 			}
 		}
 
+		// 貌似可能不存在 .ssh 目录
+		fse.ensureDirSync(sshDir)
+
 		copyFileSync(envFile, join(projectRoot, '.env'))
 		copyFileSync(idRsaFile, join(sshDir, 'id_rsa'))
 
