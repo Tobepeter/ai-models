@@ -37,4 +37,7 @@ temp/
 tmp/
 
 # nginx
-*.conf 
+*.conf
+
+# SSH keys (for security)
+scripts/utils/ssh-server/private-keys/ 

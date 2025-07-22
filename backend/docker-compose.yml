@@ -2,18 +2,18 @@ services:
   # app 服务移到 override 中
   
   db:
-    image: mysql:8.0
+    image: postgres:15
     container_name: ai-models-db
     environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=ai_models
-      - MYSQL_USER=app
-      - MYSQL_PASSWORD=apppassword
+      - POSTGRES_DB=ai_models
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=apppassword
+      - POSTGRES_ROOT_PASSWORD=rootpassword
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+      # - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 
@@ -28,7 +28,7 @@ services:
       - app-network
 
 volumes:
-  mysql_data:
+  postgres_data:
   redis_data:
 
 networks:

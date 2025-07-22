@@ -67,14 +67,28 @@ class SSHClient {
 
 		try {
 			const result = await this.ssh.execCommand(command)
-			if (verbose && !noLog) {
-				if (result.stdout) console.log(`📤 输出: ${result.stdout}`)
 
-				// NOTE: 不太明白，为什么执行 docker compose down 居然是打印到错物流的
-				// if (result.stderr) console.log(`⚠️ 错误: ${result.stderr}`)
+			if (verbose && !noLog) {
+				if (result.stdout) {
+					console.log(`📤 输出: ${result.stdout}`)
+				}
+
+				// NOTE: 不太明白，为什么执行 docker compose down 错误信息居然是打印到stderr
+				if (result.stderr) {
+					console.log(`⚠️ 错误: ${result.stderr}`)
+				}
 			}
+
+			// NOTE: 一般远程命令执行错误了，也不会catch，而是通过code区分
+			if (result.code !== 0) {
+				throw new Error(`退出码 ${result.code}`)
+			}
+
+			return result.stdout
 		} catch (error) {
-			console.error(`❌ 命令执行失败: ${error}`)
+			if (verbose) {
+				console.error(`❌ 命令执行失败: ${error}`)
+			}
 			throw error
 		}
 	}

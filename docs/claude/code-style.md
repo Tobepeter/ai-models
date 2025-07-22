@@ -40,6 +40,10 @@
 - 挂载/卸载使用 `useMount` 和 `useUnmount`
 - 如果一个函数可能被间接延迟调用，请考虑使用 `useMemoizedFn`，防止闭包访问旧数据的问题
 
+## nodejs规范
+- 如果fsextra更加优雅，可以代替fs->fse
+- __dirname使用import.meta.url去计算
+
 ## 代码规范
 
 ### 风格

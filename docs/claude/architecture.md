@@ -8,7 +8,7 @@
 
 ### 页面标准结构
 ```
-pages/my-page/
+src/pages/my-page/
 ├── my-page.tsx           # 页面主组件
 ├── my-page-store.ts      # 页面状态管理 (Zustand)
 ├── my-page-type.ts       # 页面类型定义
@@ -50,3 +50,7 @@ pages/my-page/
 - **Helper 类**: 处理复杂业务逻辑，如平台切换、模型选择
 - **Store**: 仅管理状态数据，保持简洁
 - **Manager 类**: 处理底层实例管理和接口封装
+
+## AI 管理
+- temp/ 文件夹不受版本控制，ai输出可以随意写入
+- 通常建议文件夹 temp/ai/

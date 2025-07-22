@@ -2,6 +2,7 @@ package main
 
 import (
 	"ai-models-backend/internal/config"
+	"ai-models-backend/internal/database"
 	"ai-models-backend/internal/handlers"
 	"ai-models-backend/internal/middleware"
 	"ai-models-backend/internal/services"
@@ -25,6 +26,13 @@ func main() {
 	}
 
 	cfg := config.New()
+
+	// 初始化数据库
+	if err := database.Initialize(cfg); err != nil {
+		log.Fatal("数据库初始化失败:", err)
+	}
+	defer database.Close()
+
 	userService := services.NewUserService()
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)

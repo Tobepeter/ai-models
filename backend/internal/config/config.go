@@ -52,9 +52,9 @@ func New() *Config {
 		Environment: getEnv("ENVIRONMENT", "development"),
 
 		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "3306"),
-		DBUser:     getEnv("DB_USER", "root"),
-		DBPassword: getEnv("DB_PASSWORD", ""),
+		DBPort:     getEnv("DB_PORT", "5432"),
+		DBUser:     getEnv("DB_USER", "app"),
+		DBPassword: getEnv("DB_PASSWORD", "apppassword"),
 		DBName:     getEnv("DB_NAME", "ai_models"),
 
 		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
