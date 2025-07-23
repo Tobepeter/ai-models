@@ -9,8 +9,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
 
 # 运行阶段
 FROM alpine:latest
-# 安装 ca-certificates（用于 HTTPS 请求）
-RUN apk --no-cache add ca-certificates
+
+## ca：默认alpine无任何证书，依靠go语言内置证书，但是go语言可能比较旧了
+## tz：时区数据，alpine默认无时区信息，go给数据发送时区时候，是需要从内部读取时区信息的
+RUN apk --no-cache add ca-certificates tzdata
 
 # 创建非 root 用户
 RUN addgroup -g 1001 -S appgroup && \

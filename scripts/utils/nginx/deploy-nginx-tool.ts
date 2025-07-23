@@ -25,7 +25,7 @@ class DeployNginxTool {
 			throw new Error(`配置文件不存在: ${souceConf}`)
 		}
 
-		console.log(`🚀 部署 ${target}.conf...`)
+		console.log(`🚀 部署 ${target}...`)
 		await sshClient.connect()
 		try {
 			if (verbose) console.log(`📤 上传: ${souceConf} -> ${remotePath}`)

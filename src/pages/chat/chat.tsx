@@ -1,4 +1,3 @@
-import { Screen } from '@/components/common/screen'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { useMount } from 'ahooks'
@@ -31,20 +30,7 @@ export const Chat = () => {
 	}, [msgList, isLoading])
 
 	return (
-		<Screen>
-			<div className="flex flex-col h-full">
-				{/* 头部 */}
-				<div className="flex-shrink-0 border-b bg-card px-4 py-3">
-					<h1 className="text-lg font-semibold">
-						AI 助手
-						<span className="text-sm font-normal text-muted-foreground ml-2">
-							{currMediaType === 'text' && '文本对话'}
-							{currMediaType === 'image' && '图片生成'}
-							{currMediaType === 'audio' && '音频生成'}
-							{currMediaType === 'video' && '视频生成'}
-						</span>
-					</h1>
-				</div>
+		<div className="flex flex-col h-full">
 
 				{/* 消息列表 */}
 				<div className="flex-1 overflow-hidden">
@@ -77,10 +63,9 @@ export const Chat = () => {
 					<ChatInput />
 				</div>
 
-				{/* 弹窗 */}
-				<ChatInvalidAlert />
-				<ChatSettings />
-			</div>
-		</Screen>
+			{/* 弹窗 */}
+			<ChatInvalidAlert />
+			<ChatSettings />
+		</div>
 	)
 }

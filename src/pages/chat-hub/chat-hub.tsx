@@ -25,15 +25,7 @@ export const ChatHub = () => {
 	})
 
 	return (
-		<div className="flex flex-col h-screen bg-background">
-			{/* 头部 */}
-			<div className="flex-shrink-0 border-b bg-card px-4 py-3">
-				<h1 className="text-lg font-semibold">
-					AI 对比助手
-					<span className="text-sm font-normal text-muted-foreground ml-2">同时对比多个AI模型的回答</span>
-				</h1>
-			</div>
-
+		<div className="flex flex-col h-full bg-background">
 			{/* 卡片区域 */}
 			<ChatHubWrap cards={cards} />
 

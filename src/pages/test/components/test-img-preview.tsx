@@ -1,14 +1,13 @@
-import { useState } from 'react'
 import { ImagePreview } from '@/components/common/image-preview'
-import { dummy } from '@/utils/dummy'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dummy } from '@/utils/dummy'
+import { useState } from 'react'
 
 /**
  * 测试图片预览组件
  */
-export const TestImagePreview = () => {
+export const TestImgPreview = () => {
 	const [uploadedUrl, setUploadedUrl] = useState<string>('')
 	const [controllableUrl, setControllableUrl] = useState<string>(dummy.images.avatar)
 

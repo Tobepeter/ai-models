@@ -20,7 +20,8 @@ import { TestChatMsg } from './components/test-chat-msg'
 import { TestStreamText } from './components/test-stream-text'
 import { TestCustom } from './components/test-custom'
 import { TestDummy } from './components/test-dummy'
-import { TestImagePreview } from './components/test-image-preview'
+import { TestImgPreview } from './components/test-img-preview'
+import { TestImgPrevSmart } from './components/test-img-prev-smart'
 import { TestMarkdown } from './components/test-markdown'
 import { TestMarkdownMermaid } from './components/test-markdown-mermaid'
 import { TestMarkdownStreaming } from './components/test-markdown-streaming'
@@ -32,6 +33,7 @@ import { TestVideoPreview } from './components/test-video-preview'
 import { TestGrid } from './components/test-grid'
 import { TestMultiSelector } from './components/test-multi-selector'
 import { TestOSS } from './components/test-oss'
+import { TestUserAvatar } from './components/test-user-avatar'
 
 let Test = () => <div>Test</div>
 
@@ -44,7 +46,9 @@ if (isDev) {
 			shadcn: <TestShadcn />,
 			multiSelector: <TestMultiSelector />,
 			dummy: <TestDummy />,
-			image: <TestImagePreview />,
+			image: <TestImgPreview />,
+			imageSmartSizing: <TestImgPrevSmart />,
+			userAvatar: <TestUserAvatar />,
 			video: <TestVideoPreview />,
 			oss: <TestOSS />,
 			aiAgent: <TestAIAgent />,

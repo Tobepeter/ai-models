@@ -60,6 +60,8 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 	r.Use(middleware.Recovery())
 	r.Use(middleware.CORS())
 
+	r.Use(middleware.RateLimitLow()) // 全局 Low 限流
+
 	r.GET("/health", healthHandler.Health)
 
 	api := r.Group("/")
@@ -72,20 +74,12 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			users.PUT("/profile", middleware.AuthRequired(), userHandler.UpdateProfile)
 		}
 
-		ai := api.Group("/ai")
-		ai.Use(middleware.AuthRequired())
+		// 公开AI接口
+		ai := api.Group("/ai/v1")
+		ai.Use(middleware.RateLimitMid()) // 公开AI接口也是 Mid 限流
 		{
-			ai.POST("/chat", aiHandler.Chat)
-			ai.POST("/generate", aiHandler.Generate)
-			ai.GET("/models", aiHandler.GetModels)
 			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
-		}
-
-		// 新的 OpenAI 兼容接口（不需要登录）
-		aiV1 := api.Group("/ai/v1")
-		{
-			aiV1.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
-			aiV1.POST("/images/generations", aiHandler.GenerateImages)
+			ai.POST("/images/generations", aiHandler.GenerateImages)
 		}
 
 		oss := api.Group("/oss")

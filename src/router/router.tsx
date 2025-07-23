@@ -1,10 +1,67 @@
+import React, { ReactElement } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import App from '@/App'
+import { AppLayout } from '@/components/layout/app-layout'
 import { Test } from '@/pages/test/test'
 import { Chat } from '@/pages/chat/chat'
 import { ChatHub } from '@/pages/chat-hub/chat-hub'
 import { Doc } from '@/pages/docs/doc'
+import { Home } from '@/pages/home/home'
+import { User } from '@/pages/user/user'
 import { ossBase, ossBasePrefix } from '@/utils/env'
+
+/** 路由handle类型约束 */
+export interface RouteHandle {
+	title?: string
+}
+
+/** 路由配置类型 */
+export interface AppRoute {
+	path: string
+	element: ReactElement
+	handle: RouteHandle
+	index?: boolean
+}
+
+/** 应用路由配置数组 */
+export const routes: AppRoute[] = [
+	{
+		path: '',
+		element: <Home />,
+		handle: { title: '首页' },
+		index: true,
+	},
+	{
+		path: 'home',
+		element: <Home />,
+		handle: { title: '首页' },
+	},
+	{
+		path: 'chat',
+		element: <Chat />,
+		handle: { title: 'AI助手' },
+	},
+	{
+		path: 'chat-hub',
+		element: <ChatHub />,
+		handle: { title: 'AI对比助手' },
+	},
+	{
+		path: 'user',
+		element: <User />,
+		handle: { title: '用户中心' },
+	},
+	{
+		path: 'test',
+		element: <Test />,
+		handle: { title: '测试页面' },
+	},
+	{
+		path: 'doc',
+		element: <Doc />,
+		handle: { title: '文档' },
+	},
+]
 
 const getBasename = () => {
 	const l = window.location
@@ -37,20 +94,13 @@ export const router = createBrowserRouter(
 			element: <App />,
 			children: [
 				{
-					path: 'test',
-					element: <Test />,
-				},
-				{
-					path: 'chat',
-					element: <Chat />,
-				},
-				{
-					path: 'chat-hub',
-					element: <ChatHub />,
-				},
-				{
-					path: 'doc',
-					element: <Doc />,
+					path: '/',
+					element: <AppLayout />,
+					children: routes.map(route => ({
+						...(route.index ? { index: true } : { path: route.path }),
+						element: route.element,
+						handle: route.handle,
+					})),
 				},
 			],
 		},
