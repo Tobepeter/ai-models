@@ -3,10 +3,10 @@
 BINARY_NAME=main
 MAIN_PATH=./cmd/main.go
 
-# 主要开发命令
+# NOTE: 指定 file 后默认不会应用 docker-compose.override.yml 文件
 dev:
 	docker-compose -f docker-compose.yml up -d
-	air -c .air.toml
+	IS_AIR_DEV=true air -c .air.toml
 
 docker-dev:
 	@echo "🐳 启动 Docker 开发环境..."

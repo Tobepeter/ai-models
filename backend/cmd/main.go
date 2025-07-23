@@ -74,9 +74,8 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			users.PUT("/profile", middleware.AuthRequired(), userHandler.UpdateProfile)
 		}
 
-		// 公开AI接口
 		ai := api.Group("/ai/v1")
-		ai.Use(middleware.RateLimitMid()) // 公开AI接口也是 Mid 限流
+		ai.Use(middleware.RateLimitMid())
 		{
 			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
 			ai.POST("/images/generations", aiHandler.GenerateImages)
@@ -95,13 +94,14 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			oss.POST("/upload", handlers.FileSizeMiddleware(), ossHandler.UploadFile)
 			oss.POST("/delete", ossHandler.DeleteFile)
 			oss.POST("/get-url", ossHandler.GetFileURL)
-
-			// 调试和状态接口
-			oss.GET("/health", ossHandler.HealthCheck)
-			oss.GET("/config", ossHandler.GetConfigInfo)
 		}
 	}
 
+	r.NoMethod(func(c *gin.Context) {
+		response.MethodNotAllowed(c, "该路径不支持 "+c.Request.Method+" 方法")
+	})
+
+	r.HandleMethodNotAllowed = true // 处理 405 错误
 	r.NoRoute(func(c *gin.Context) {
 		response.Error(c, http.StatusNotFound, "路由未找到")
 	})

@@ -293,31 +293,6 @@ func (h *OSSHandler) GetFileList(c *gin.Context) {
 	response.Success(c, result)
 }
 
-/* 健康检查，验证OSS连接 */
-func (h *OSSHandler) HealthCheck(c *gin.Context) {
-	if err := h.ossService.ValidateConfig(); err != nil {
-		response.Error(c, http.StatusServiceUnavailable, fmt.Sprintf("OSS配置错误: %s", err.Error()))
-		return
-	}
-
-	response.Success(c, gin.H{
-		"status":    "ok",
-		"service":   "oss",
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
-}
-
-/* 获取OSS配置信息（脱敏） */
-func (h *OSSHandler) GetConfigInfo(c *gin.Context) {
-	// 返回脱敏的配置信息供前端调试使用
-	response.Success(c, gin.H{
-		"bucket":      h.ossService.ValidateConfig() == nil, // 是否配置了bucket
-		"region":      h.ossService.ValidateConfig() == nil, // 是否配置了region
-		"credentials": h.ossService.ValidateConfig() == nil, // 是否配置了凭证
-		"timestamp":   time.Now().Format(time.RFC3339),
-	})
-}
-
 /* 中间件：验证文件大小 */
 func FileSizeMiddleware() gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
@@ -325,7 +300,7 @@ func FileSizeMiddleware() gin.HandlerFunc {
 		if contentLength := c.Request.Header.Get("Content-Length"); contentLength != "" {
 			if length, err := strconv.ParseInt(contentLength, 10, 64); err == nil {
 				if length > maxFileSize {
-					response.Error(c, http.StatusRequestEntityTooLarge, 
+					response.Error(c, http.StatusRequestEntityTooLarge,
 						fmt.Sprintf("文件大小超出限制，最大允许%dMB", maxFileSize/(1024*1024)))
 					c.Abort()
 					return

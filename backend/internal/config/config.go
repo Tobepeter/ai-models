@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -12,16 +11,17 @@ import (
 type Config struct {
 	Port        string
 	Environment string
+	IsAirDev    bool
 
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
+	PostgresHost     string
+	PostgresPort     string
+	PostgresPassword string
+	PostgresUser     string
+	PostgresDB       string
 
-	RedisAddr     string
+	RedisHost     string
+	RedisPort     string
 	RedisPassword string
-	RedisDB       int
 
 	JWTSecret     string
 	JWTExpiration time.Duration
@@ -47,34 +47,46 @@ func New() *Config {
 		godotenv.Load(".env")
 	}
 
+	isAirDev := os.Getenv("IS_AIR_DEV") == "true"
+	postGresHost := os.Getenv("POSTGRES_HOST")
+	if isAirDev {
+		postGresHost = "localhost"
+	}
+
+	redisHost := os.Getenv("REDIS_HOST")
+	if isAirDev {
+		redisHost = "localhost"
+	}
+
 	config := &Config{
-		Port:        getEnv("PORT", "8080"),
-		Environment: getEnv("ENVIRONMENT", "development"),
+		Port:        os.Getenv("PORT"),
+		Environment: os.Getenv("ENVIRONMENT"),
+		IsAirDev:    isAirDev,
 
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "app"),
-		DBPassword: getEnv("DB_PASSWORD", "apppassword"),
-		DBName:     getEnv("DB_NAME", "ai_models"),
+		PostgresHost:     postGresHost,
+		PostgresPort:     os.Getenv("POSTGRES_PORT"),
+		PostgresPassword: os.Getenv("POSTGRES_PASSWORD"),
+		PostgresUser:     os.Getenv("POSTGRES_USER"),
+		PostgresDB:       os.Getenv("POSTGRES_DB"),
 
-		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
-		RedisPassword: getEnv("REDIS_PASSWORD", ""),
-		RedisDB:       getEnvInt("REDIS_DB", 0),
+		RedisHost:     redisHost,
+		RedisPort:     os.Getenv("REDIS_PORT"),
+		RedisPassword: os.Getenv("REDIS_PASSWORD"),
 
-		JWTSecret:     getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
+		JWTSecret:     os.Getenv("JWT_SECRET"),
 		JWTExpiration: getEnvDuration("JWT_EXPIRATION", "24h"),
 
-		SiliconAPIKey:    getEnv("SILICON_API_KEY", ""),
-		OpenRouterAPIKey: getEnv("OPENROUTER_API_KEY", ""),
-		DashscopeAPIKey:  getEnv("DASHSCOPE_API_KEY", ""),
+		SiliconAPIKey:    os.Getenv("SILICON_API_KEY"),
+		OpenRouterAPIKey: os.Getenv("OPENROUTER_API_KEY"),
+		DashscopeAPIKey:  os.Getenv("DASHSCOPE_API_KEY"),
 
-		OSSAccessKeyID:     getEnv("OSS_ACCESS_KEY_ID", ""),
-		OSSAccessKeySecret: getEnv("OSS_ACCESS_KEY_SECRET", ""),
-		OSSBucket:          getEnv("OSS_BUCKET", ""),
-		OSSRegion:          getEnv("OSS_REGION", ""),
-		OSSRoleArn:         getEnv("OSS_ROLE_ARN", ""),
-		OSSReadAccess:      getEnv("OSS_READ_ACCESS", ""),
-		OSSWriteAccess:     getEnv("OSS_WRITE_ACCESS", ""),
+		OSSAccessKeyID:     os.Getenv("OSS_ACCESS_KEY_ID"),
+		OSSAccessKeySecret: os.Getenv("OSS_ACCESS_KEY_SECRET"),
+		OSSBucket:          os.Getenv("OSS_BUCKET"),
+		OSSRegion:          os.Getenv("OSS_REGION"),
+		OSSRoleArn:         os.Getenv("OSS_ROLE_ARN"),
+		OSSReadAccess:      os.Getenv("OSS_READ_ACCESS"),
+		OSSWriteAccess:     os.Getenv("OSS_WRITE_ACCESS"),
 	}
 
 	if !isProd {
@@ -82,22 +94,6 @@ func New() *Config {
 	}
 
 	return config
-}
-
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}
-
-func getEnvInt(key string, defaultValue int) int {
-	if value := os.Getenv(key); value != "" {
-		if intVal, err := strconv.Atoi(value); err == nil {
-			return intVal
-		}
-	}
-	return defaultValue
 }
 
 func getEnvDuration(key, defaultValue string) time.Duration {

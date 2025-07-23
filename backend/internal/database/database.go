@@ -20,9 +20,9 @@ func Initialize(cfg *config.Config) error {
 
 	// 构建 PostgreSQL DSN
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai",
-		cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
+		cfg.PostgresHost, cfg.PostgresPort, cfg.PostgresUser, cfg.PostgresPassword, cfg.PostgresDB)
 
-	logrus.Infof("正在连接数据库: %s:%s/%s", cfg.DBHost, cfg.DBPort, cfg.DBName)
+	logrus.Infof("正在连接数据库: %s:%s/%s", cfg.PostgresHost, cfg.PostgresPort, cfg.PostgresDB)
 
 	// 配置 GORM
 	gormConfig := &gorm.Config{

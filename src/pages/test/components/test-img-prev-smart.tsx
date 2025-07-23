@@ -99,32 +99,6 @@ export const TestImgPrevSmart = () => {
 							</div>
 						</div>
 					)}
-
-					<div className="mt-6 p-4 border rounded-lg bg-blue-50">
-						<h3 className="text-lg font-semibold mb-2">测试说明</h3>
-						<div className="text-sm text-gray-700 space-y-2">
-							<p>
-								<strong>改进前的问题：</strong>
-							</p>
-							<ul className="list-disc list-inside ml-4 space-y-1">
-								<li>预览窗口固定为正方形 (aspect-square)</li>
-								<li>固定最大宽度 1000px 和 80vw</li>
-								<li>低分辨率图片被强制拉伸，导致模糊</li>
-							</ul>
-
-							<p>
-								<strong>改进后的特性：</strong>
-							</p>
-							<ul className="list-disc list-inside ml-4 space-y-1">
-								<li>动态检测图片原始尺寸</li>
-								<li>根据图片尺寸和屏幕大小智能计算预览窗口尺寸</li>
-								<li>小图片保持原始尺寸，不会被放大</li>
-								<li>大图片按比例缩放到屏幕大小</li>
-								<li>始终保持图片原始宽高比</li>
-								<li>适配不同屏幕尺寸（90% 视口大小）</li>
-							</ul>
-						</div>
-					</div>
 				</CardContent>
 			</Card>
 		</div>

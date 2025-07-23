@@ -126,3 +126,58 @@ func Deleted(c *gin.Context, message string) {
 		Message: message,
 	})
 }
+
+// 方法不允许响应
+func MethodNotAllowed(c *gin.Context, message string) {
+	if message == "" {
+		message = "Method not allowed"
+	}
+	c.JSON(405, Response{
+		Code:    405,
+		Message: message,
+	})
+}
+
+// 冲突响应 (409)
+func Conflict(c *gin.Context, message string) {
+	if message == "" {
+		message = "Conflict occurred"
+	}
+	c.JSON(409, Response{
+		Code:    409,
+		Message: message,
+	})
+}
+
+// 请求过大响应 (413)
+func PayloadTooLarge(c *gin.Context, message string) {
+	if message == "" {
+		message = "Payload too large"
+	}
+	c.JSON(413, Response{
+		Code:    413,
+		Message: message,
+	})
+}
+
+// 请求频率过高响应 (429)
+func TooManyRequests(c *gin.Context, message string) {
+	if message == "" {
+		message = "Too many requests"
+	}
+	c.JSON(429, Response{
+		Code:    429,
+		Message: message,
+	})
+}
+
+// 服务不可用响应 (503)
+func ServiceUnavailable(c *gin.Context, message string) {
+	if message == "" {
+		message = "Service unavailable"
+	}
+	c.JSON(503, Response{
+		Code:    503,
+		Message: message,
+	})
+}

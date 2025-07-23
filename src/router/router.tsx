@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
 import App from '@/App'
 import { AppLayout } from '@/components/layout/app-layout'
 import { Test } from '@/pages/test/test'
@@ -15,16 +15,10 @@ export interface RouteHandle {
 	title?: string
 }
 
-/** 路由配置类型 */
-export interface AppRoute {
-	path: string
-	element: ReactElement
-	handle: RouteHandle
-	index?: boolean
-}
+type CustomRouteObject = RouteObject & { handle?: RouteHandle }
 
 /** 应用路由配置数组 */
-export const routes: AppRoute[] = [
+export const routes: CustomRouteObject[] = [
 	{
 		path: '',
 		element: <Home />,
@@ -33,8 +27,7 @@ export const routes: AppRoute[] = [
 	},
 	{
 		path: 'home',
-		element: <Home />,
-		handle: { title: '首页' },
+		element: <Navigate to="/" replace />,
 	},
 	{
 		path: 'chat',
@@ -96,11 +89,7 @@ export const router = createBrowserRouter(
 				{
 					path: '/',
 					element: <AppLayout />,
-					children: routes.map(route => ({
-						...(route.index ? { index: true } : { path: route.path }),
-						element: route.element,
-						handle: route.handle,
-					})),
+					children: routes,
 				},
 			],
 		},

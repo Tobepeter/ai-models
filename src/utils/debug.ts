@@ -12,13 +12,20 @@ if (isDev) {
 		}
 
 		initGlobal() {
-			this.defineGetter('chatStore', () => useChatStore.getState())
+			console.log(this)
+			this.defineGetter('chatStore', () => {
+				return useChatStore.getState()
+			})
 		}
 
 		private defineGetter(name: string, getter: () => any) {
-			Object.defineProperty(window, name, {
-				get: getter,
-			})
+			// NOTE: hot reoload 多次 define 会报错
+			//  TypeError: Cannot redefine property: chatStore
+			if (!(name in window)) {
+				Object.defineProperty(window, name, {
+					get: getter,
+				})
+			}
 		}
 	}
 
