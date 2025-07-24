@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { DndContext, DragEndEvent, PointerSensor, useDraggable, useSensor, useSensors } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import { useMemoizedFn } from 'ahooks'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 
 const dragId = 'gm-button'
 
@@ -54,11 +54,27 @@ const DraggableButton = (props: { title: string; pos: { x: number; y: number }; 
  * GM 面板
  */
 export const GMPanel = (props: GMPanelProps) => {
-	const { title = 'GM', config, defaultPos: defaultPosition = { x: 20, y: 20 }, className } = props
+	const { title = 'GM', config, defaultPos = { x: 20, y: 20 }, className } = props
 
 	const [isOpen, setIsOpen] = useState(false)
-	const [pos, setPosition] = useState(defaultPosition)
+	const [pos, setPos] = useState(defaultPos)
 	const [isDragging, setIsDragging] = useState(false)
+
+	// 生成存储key，基于title来区分不同的GM面板
+	const storageKey = `gm-panel-pos-${title.toLowerCase()}`
+
+	// 从存储中恢复位置
+	useEffect(() => {
+		try {
+			const savedPosStr = localStorage.getItem(storageKey)
+			if (savedPosStr) {
+				const savedPos = JSON.parse(savedPosStr) as { x: number; y: number }
+				setPos(savedPos)
+			}
+		} catch (error) {
+			console.warn(`[GMPanel] Failed to restore position for ${title}:`, error)
+		}
+	}, [storageKey, title])
 
 	// 配置 sensors，设置激活约束，只有拖拽距离超过 5px 才开始拖拽
 	const sensors = useSensors(
@@ -77,8 +93,15 @@ export const GMPanel = (props: GMPanelProps) => {
 		if (event.over || event.delta) {
 			const rect = event.active.rect.current.translated
 			if (rect) {
+				const newPos = { x: rect.left, y: rect.top }
 				// 更新位置状态为拖拽后的最终位置
-				setPosition({ x: rect.left, y: rect.top })
+				setPos(newPos)
+				// 保存位置到 localStorage
+				try {
+					localStorage.setItem(storageKey, JSON.stringify(newPos))
+				} catch (error) {
+					console.warn(`[GMPanel] Failed to save position for ${title}:`, error)
+				}
 			}
 		}
 	})

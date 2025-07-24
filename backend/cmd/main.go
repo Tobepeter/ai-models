@@ -35,17 +35,24 @@ func main() {
 
 	userService := services.NewUserService(cfg)
 	authService := services.NewAuthService(cfg)
+
+	// 初始化默认管理员用户
+	if err := authService.CreateDefaultAdmin(); err != nil {
+		logrus.Warn("创建默认管理员用户失败:", err)
+	}
+
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
 	crudService := services.NewCrudService()
 
 	userHandler := handlers.NewUserHandler(userService, authService)
+	adminHandler := handlers.NewAdminHandler(userService, authService)
 	aiHandler := handlers.NewAIHandler(aiService)
 	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
 	crudHandler := handlers.NewCrudHandler(crudService)
 
-	router := setupRouter(cfg, authService, userHandler, aiHandler, ossHandler, healthHandler, crudHandler)
+	router := setupRouter(cfg, authService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -53,7 +60,7 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authService *services.AuthService, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authService *services.AuthService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler) *gin.Engine {
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -80,13 +87,25 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, userHand
 			users.GET("/profile", middleware.AuthRequired(authService), userHandler.GetProfile)
 			users.PUT("/profile", middleware.AuthRequired(authService), userHandler.UpdateProfile)
 			users.POST("/change-password", middleware.AuthRequired(authService), userHandler.ChangePassword)
+		}
 
-			// 管理员接口
-			users.GET("/", middleware.AdminRequired(authService), userHandler.GetUsers)                      // 获取用户列表
-			users.GET("/:id", middleware.AdminRequired(authService), userHandler.GetUserByID)                // 根据ID获取用户
-			users.DELETE("/:id", middleware.AdminRequired(authService), userHandler.DeleteUser)              // 删除用户
-			users.POST("/:id/activate", middleware.AdminRequired(authService), userHandler.ActivateUser)     // 激活用户
-			users.POST("/:id/deactivate", middleware.AdminRequired(authService), userHandler.DeactivateUser) // 停用用户
+		// 管理员接口
+		admin := api.Group("/admin")
+		admin.Use(middleware.AdminRequired(authService))
+		{
+			// 系统管理
+			admin.GET("/status", adminHandler.GetSystemStatus) // 获取系统状态
+
+			// 用户管理
+			admin := admin.Group("/users")
+			{
+				admin.GET("/", userHandler.GetUsers)                              // 获取用户列表
+				admin.GET("/:id", userHandler.GetUserByID)                        // 根据ID获取用户
+				admin.DELETE("/:id", userHandler.DeleteUser)                      // 删除用户
+				admin.POST("/:id/activate", userHandler.ActivateUser)             // 激活用户
+				admin.POST("/:id/deactivate", userHandler.DeactivateUser)         // 停用用户
+				admin.POST("/:id/reset-password", adminHandler.ResetUserPassword) // 重置用户密码
+			}
 		}
 
 		// 很多 openai 都是带有 v1 前缀的，之类模拟一下

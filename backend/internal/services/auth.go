@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -176,6 +177,7 @@ func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, stri
 		Username: req.Username,
 		Email:    req.Email,
 		Password: string(hashedPassword),
+		Role:     models.RoleUser, // 默认角色为普通用户
 		IsActive: true,
 	}
 
@@ -235,4 +237,51 @@ func (s *AuthService) Logout(tokenString string) {
 // 获取JWT密钥
 func (s *AuthService) getJWTSecret() string {
 	return s.config.JWTSecret
+}
+
+// 创建默认管理员用户
+func (s *AuthService) CreateDefaultAdmin() error {
+	// 检查是否已存在管理员用户
+	var adminCount int64
+	if err := s.db.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&adminCount).Error; err != nil {
+		return err
+	}
+
+	// 如果已有管理员，跳过创建
+	if adminCount > 0 {
+		return nil
+	}
+
+	// 获取默认管理员配置
+	username := s.config.PostgresUser
+	password := s.config.PostgresPassword
+	email := username + "@localhost" // 使用用户名作为邮箱前缀
+
+	if username == "" || password == "" {
+		return errors.New("无法获取默认管理员账号配置")
+	}
+
+	// 加密密码
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// 创建默认管理员用户
+	admin := &models.User{
+		Username:      username,
+		Email:         email,
+		Password:      string(hashedPassword),
+		PlainPassword: password, // 根据配置决定是否存储
+		Role:          models.RoleAdmin,
+		IsActive:      true,
+	}
+
+	// 保存到数据库
+	if err := s.db.Create(admin).Error; err != nil {
+		return err
+	}
+
+	logrus.Infof("默认管理员用户已创建: %s", username)
+	return nil
 }

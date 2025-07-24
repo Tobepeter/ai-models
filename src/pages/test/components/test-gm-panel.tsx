@@ -162,10 +162,42 @@ export const TestGMPanel = () => {
 		<div className="space-y-8">
 			<div className="text-center p-8 bg-muted/50 rounded-lg">
 				<h2 className="text-lg font-semibold mb-2">GM Panel 测试</h2>
-				<p className="text-sm text-muted-foreground">这是一个可拖拽的 GM 面板，支持各种配置项类型。</p>
+				<p className="text-sm text-muted-foreground mb-4">这是一个可拖拽的 GM 面板，支持各种配置项类型。</p>
+				<div className="text-xs text-muted-foreground space-y-1">
+					<p>
+						✨ <strong>新功能：位置记忆</strong>
+					</p>
+					<p>• 拖拽 GM 按钮到新位置后，位置会自动保存到 localStorage</p>
+					<p>• 刷新页面后，GM 按钮会出现在上次拖拽的位置</p>
+					<p>• 不同 title 的 GM 面板会分别记忆各自的位置</p>
+				</div>
 			</div>
 
 			<GMPanel title="GM" config={gmConfig} defaultPos={{ x: 300, y: 100 }} />
+
+			{/* 第二个GM面板，用于演示不同面板的独立位置记忆 */}
+			<GMPanel
+				title="Debug"
+				config={[
+					{
+						type: 'badge',
+						label: '调试面板',
+						value: '运行中',
+					},
+					{
+						type: 'switch',
+						label: '详细日志',
+						value: debugMode,
+						onChange: setDebugMode,
+					},
+					{
+						type: 'button',
+						label: '清空控制台',
+						onClick: () => console.clear(),
+					},
+				]}
+				defaultPos={{ x: 500, y: 200 }}
+			/>
 		</div>
 	)
 }

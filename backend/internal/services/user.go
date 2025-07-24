@@ -26,7 +26,7 @@ func NewUserService(cfg *config.Config) *UserService {
 	}
 }
 
-// 创建用户 (内部使用，不包含认证逻辑)
+// CreateUser 创建用户
 func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, error) {
 	// 检查用户名是否已存在
 	if s.ExistsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
@@ -64,7 +64,7 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 	return user, nil
 }
 
-// 根据ID获取用户
+// GetUserByID 根据ID获取用户
 func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 	var user models.User
 	if err := s.db.First(&user, id).Error; err != nil {
@@ -76,7 +76,7 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 	return &user, nil
 }
 
-// 更新用户信息
+// UpdateUser 更新用户信息
 func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models.User, error) {
 	var user models.User
 	if err := s.db.First(&user, id).Error; err != nil {
@@ -115,7 +115,7 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 	return &user, nil
 }
 
-// 获取用户列表
+// GetUsers 获取用户列表
 func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
 	var users []models.User
 
@@ -135,22 +135,22 @@ func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
 	return s.CreatePageResp(userResponses, page, limit, total), nil
 }
 
-// DeleteUser 硬删除用户
+// DeleteUser 删除用户
 func (s *UserService) DeleteUser(id uint) error {
 	return s.HardDelete(&models.User{}, id)
 }
 
-// ActivateUser 激活用户
+// ActivateUser 启用用户
 func (s *UserService) ActivateUser(id uint) error {
 	return s.UpdateField(&models.User{}, id, "is_active", true)
 }
 
-// DeactivateUser 停用用户
+// DeactivateUser 禁用用户
 func (s *UserService) DeactivateUser(id uint) error {
 	return s.UpdateField(&models.User{}, id, "is_active", false)
 }
 
-// ChangePassword 修改密码
+// ChangePassword 修改用户密码
 func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordRequest) error {
 	// 获取用户信息
 	var user models.User
@@ -186,4 +186,39 @@ func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordReque
 	}
 
 	return nil
+}
+
+// GetUserCount 获取用户总数
+func (s *UserService) GetUserCount() (int64, error) {
+	var count int64
+	err := s.db.Model(&models.User{}).Count(&count).Error
+	return count, err
+}
+
+// GetAdminUserCount 获取管理员用户数
+func (s *UserService) GetAdminUserCount() (int64, error) {
+	var count int64
+	err := s.db.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&count).Error
+	return count, err
+}
+
+// ResetPassword 重置用户密码
+func (s *UserService) ResetPassword(userID string, newPassword string) error {
+	// 加密新密码
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// 更新数据库中的密码
+	updateData := map[string]interface{}{
+		"password": string(hashedPassword),
+	}
+
+	// 根据配置决定是否更新明文密码
+	if config.UserStorePlainPassword {
+		updateData["plain_password"] = newPassword
+	}
+
+	return s.db.Model(&models.User{}).Where("id = ?", userID).Updates(updateData).Error
 }
