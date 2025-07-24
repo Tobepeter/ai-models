@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ossApi } from './oss-api'
-import { SignRequest, HashifyNameRequest, FileDeleteRequest, FileUrlRequest } from '../types/api-types'
+import { OSSSignReq, OSSHashifyNameReq, OSSFileDeleteReq, OSSFileUrlReq } from '../types/api-types'
 
 /** OSS相关React Query hooks */
 

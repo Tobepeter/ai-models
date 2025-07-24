@@ -1,13 +1,13 @@
-import { UserResponse } from './user-types'
+import { UserResp } from './user-types'
 
 /** 登录请求参数 */
-export interface LoginRequest {
+export interface AuthLoginReq {
   username: string
   password: string
 }
 
 /** 注册请求参数 */
-export interface RegisterRequest {
+export interface AuthRegisterReq {
   username: string
   email: string
   password: string
@@ -15,21 +15,21 @@ export interface RegisterRequest {
 }
 
 /** 修改密码请求参数 */
-export interface ChangePasswordRequest {
+export interface AuthChangePasswordReq {
   oldPassword: string
   newPassword: string
   confirmPassword: string
 }
 
 /** 登录响应 */
-export interface LoginResponse {
-  user: UserResponse
+export interface AuthLoginResp {
+  user: UserResp
   token: string
 }
 
 /** 注册响应 */
-export interface RegisterResponse {
-  user: UserResponse
+export interface AuthRegisterResp {
+  user: UserResp
   token: string
 }
 

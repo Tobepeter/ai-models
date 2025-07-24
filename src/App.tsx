@@ -4,11 +4,13 @@ import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import { useUserStore } from './store/user-store'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
+import { axClient } from './api/ax-client'
 
 function App() {
 	const navigate = useNavigate()
 	// const { initializeAuth } = useUserStore()
 	useGitHubPagesRouter()
+	axClient.init()
 
 	useMount(() => {
 		// initializeAuth()

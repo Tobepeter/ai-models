@@ -8,6 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	CrudDefaultCategory = "general"
+)
+
 /**
  * CRUD服务
  * 提供通用CRUD相关的业务逻辑处理
@@ -24,8 +28,16 @@ func NewCrudService() *CrudService {
 
 // 创建记录 (内部使用，不包含认证逻辑)
 func (s *CrudService) CreateCrud(req models.CrudCreateRequest) (*models.Crud, error) {
+	category := req.Category
+
+	// 如果category为空，使用默认分类
+	if category == "" {
+		category = CrudDefaultCategory
+	}
+
 	model := &models.Crud{
-		Data: req.Data,
+		Category: category,
+		Data:     req.Data,
 	}
 
 	// 保存到数据库
@@ -59,6 +71,9 @@ func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models
 	}
 
 	// 更新数据
+	if req.Category != "" {
+		crud.Category = req.Category
+	}
 	crud.Data = req.Data
 
 	// 保存更新
@@ -70,23 +85,31 @@ func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models
 }
 
 // 获取记录列表
-func (s *CrudService) GetCruds(page, limit int) (map[string]any, error) {
+func (s *CrudService) GetCruds(page, limit int, category string) (map[string]any, error) {
 	var cruds []models.Crud
+	condition := make(map[string]any)
+
+	// 如果指定了category，添加过滤条件
+	if category != "" {
+		condition["category"] = category
+	} else {
+		condition["category"] = CrudDefaultCategory
+	}
 
 	// 使用基础服务的分页方法
-	total, err := s.Paginate(&models.Crud{}, &cruds, page, limit)
+	total, err := s.PaginateWithCondition(&models.Crud{}, &cruds, page, limit, condition)
 	if err != nil {
 		return nil, err
 	}
 
 	// 转换为响应格式
-	var crudResponses []models.CrudResponse
+	var resp []models.CrudResponse
 	for _, crud := range cruds {
-		crudResponses = append(crudResponses, crud.ToResponse())
+		resp = append(resp, crud.ToResponse())
 	}
 
 	// 使用基础服务创建标准分页响应
-	return s.CreatePaginationResponse(crudResponses, page, limit, total), nil
+	return s.CreatePageResp(resp, page, limit, total), nil
 }
 
 // DeleteCrud 硬删除记录

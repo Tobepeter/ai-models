@@ -82,22 +82,19 @@ export const useUserStore = create<UserStore>()(
 				})
 			},
 
-			setAuthError: (error) => {
-				set({ authError: error })
-			},
+					setAuthError: (error) => {
+			set({ authError: error })
+		},
 
-			initializeAuth: () => {
-				const isAuth = authApi.isAuthenticated()
-				if (isAuth) {
-					// 这里可以触发获取用户信息的逻辑
-					const token = localStorage.getItem('auth_token')
-					if (token) {
-						set({ token, isAuthenticated: true })
-					}
-				} else {
-					get().clearAuth()
-				}
-			},
+		initializeAuth: () => {
+			const token = localStorage.getItem('auth_token')
+			if (token) {
+				// 这里可以触发获取用户信息的逻辑
+				set({ token, isAuthenticated: true })
+			} else {
+				get().clearAuth()
+			}
+		},
 
 			// User Actions
 			updateProfile: (updates) => {

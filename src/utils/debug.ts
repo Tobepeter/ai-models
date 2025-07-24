@@ -12,7 +12,6 @@ if (isDev) {
 		}
 
 		initGlobal() {
-			console.log(this)
 			this.defineGetter('chatStore', () => {
 				return useChatStore.getState()
 			})

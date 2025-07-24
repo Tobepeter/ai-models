@@ -5,6 +5,7 @@ import (
 	"ai-models-backend/internal/database"
 	"ai-models-backend/internal/models"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -27,6 +28,51 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
+// Token黑名单 (简单内存实现，生产环境建议使用Redis)
+type TokenBlacklist struct {
+	tokens map[string]time.Time
+	mu     sync.RWMutex
+}
+
+var blacklist = &TokenBlacklist{
+	tokens: make(map[string]time.Time),
+}
+
+// 添加token到黑名单
+func (b *TokenBlacklist) Add(tokenString string, expiry time.Time) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.tokens[tokenString] = expiry
+}
+
+// 检查token是否在黑名单中
+func (b *TokenBlacklist) IsBlacklisted(tokenString string) bool {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+	expiry, exists := b.tokens[tokenString]
+	if !exists {
+		return false
+	}
+	// 如果token已过期，从黑名单中删除
+	if time.Now().After(expiry) {
+		delete(b.tokens, tokenString)
+		return false
+	}
+	return true
+}
+
+// 清理过期的黑名单token (可以在定时任务中调用)
+func (b *TokenBlacklist) Cleanup() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	now := time.Now()
+	for token, expiry := range b.tokens {
+		if now.After(expiry) {
+			delete(b.tokens, token)
+		}
+	}
+}
+
 func NewAuthService(cfg *config.Config) *AuthService {
 	return &AuthService{
 		BaseService: BaseService{db: database.DB},
@@ -39,7 +85,7 @@ func (s *AuthService) GenerateToken(userID uint) (string, error) {
 	claims := JWTClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.config.JWTExpiration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "ai-models-backend",
@@ -52,6 +98,11 @@ func (s *AuthService) GenerateToken(userID uint) (string, error) {
 
 // 验证JWT token
 func (s *AuthService) ValidateToken(tokenString string) (*JWTClaims, error) {
+	// 检查token是否在黑名单中
+	if blacklist.IsBlacklisted(tokenString) {
+		return nil, errors.New("token已失效")
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (any, error) {
 		// 方法类型必须是 HMAC
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -157,9 +208,7 @@ func (s *AuthService) IsAdmin(userID uint) (bool, error) {
 		return false, err
 	}
 
-	// TODO: 这里应该检查用户角色表，现在默认返回 true
-	// 后续可以添加角色表和权限系统
-	return true, nil
+	return user.IsAdmin(), nil
 }
 
 // 刷新token
@@ -171,6 +220,16 @@ func (s *AuthService) RefreshToken(oldToken string) (string, error) {
 
 	// 生成新的token
 	return s.GenerateToken(claims.UserID)
+}
+
+// 退出登录 (将token添加到黑名单)
+func (s *AuthService) Logout(tokenString string) {
+	// 获取token的过期时间
+	claims, err := s.ValidateToken(tokenString)
+	if err == nil && claims != nil {
+		expiry := claims.ExpiresAt.Time
+		blacklist.Add(tokenString, expiry)
+	}
 }
 
 // 获取JWT密钥

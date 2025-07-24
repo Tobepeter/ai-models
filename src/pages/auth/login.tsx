@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Cover } from '@/components/common/cover'
 import { useUserStore } from '@/store/user-store'
 import { useLogin } from '@/api/auth'
-import { FormErrors, LoginRequest } from '@/api/types/auth-types'
+import { FormErrors, AuthLoginReq } from '@/api/types/auth-types'
 import { useMount } from 'ahooks'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -16,7 +16,7 @@ export const Login = () => {
 	const { isAuthenticated, setAuth, setAuthError, authError } = useUserStore()
 	const loginMutation = useLogin()
 
-	const [form, setForm] = useState<LoginRequest>({
+	const [form, setForm] = useState<AuthLoginReq>({
 		username: '',
 		password: '',
 	})
@@ -60,7 +60,7 @@ export const Login = () => {
 		}
 	}
 
-	const handleChange = (field: keyof LoginRequest) => (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (field: keyof AuthLoginReq) => (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm((prev) => ({ ...prev, [field]: e.target.value }))
 		// 清除对应字段的错误
 		if (errors[field]) {

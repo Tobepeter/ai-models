@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from 'axios'
 import { requestConfig } from '@/config/request-config'
 import {
-	LoginRequest,
-	RegisterRequest,
-	LoginResponse,
-	RegisterResponse,
+	AuthLoginReq,
+	AuthRegisterReq,
+	AuthLoginResp,
+	AuthRegisterResp,
 	AuthUser,
-	ChangePasswordRequest
+	AuthChangePasswordReq
 } from '@/api/types/auth-types'
 import { ApiResponse } from '@/api/common'
 
@@ -51,8 +51,8 @@ class AuthApiClient {
 	}
 
 	/** 用户登录 */
-	async login(data: LoginRequest): Promise<LoginResponse> {
-		const response = await this.client.post<ApiResponse<LoginResponse>>('/users/login', data)
+	async login(data: AuthLoginReq): Promise<AuthLoginResp> {
+		const response = await this.client.post<ApiResponse<AuthLoginResp>>('/users/login', data)
 		
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '登录失败')
@@ -65,8 +65,8 @@ class AuthApiClient {
 	}
 
 	/** 用户注册 */
-	async register(data: RegisterRequest): Promise<RegisterResponse> {
-		const response = await this.client.post<ApiResponse<RegisterResponse>>('/users/register', {
+	async register(data: AuthRegisterReq): Promise<AuthRegisterResp> {
+		const response = await this.client.post<ApiResponse<AuthRegisterResp>>('/users/register', {
 			username: data.username,
 			email: data.email,
 			password: data.password,
@@ -105,7 +105,7 @@ class AuthApiClient {
 	}
 
 	/** 修改密码 */
-	async changePassword(data: ChangePasswordRequest): Promise<void> {
+	async changePassword(data: AuthChangePasswordReq): Promise<void> {
 		const response = await this.client.post<ApiResponse<{ message: string }>>('/users/change-password', {
 			old_password: data.oldPassword,
 			new_password: data.newPassword,

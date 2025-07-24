@@ -6,6 +6,7 @@ import (
 	"ai-models-backend/pkg/response"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -231,4 +232,25 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	response.Success(c, gin.H{"message": "密码修改成功"})
+}
+
+// 用户退出登录
+func (h *UserHandler) Logout(c *gin.Context) {
+	// 从请求头中提取token
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		response.Error(c, http.StatusBadRequest, "缺少认证头")
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		response.Error(c, http.StatusBadRequest, "无效的token格式")
+		return
+	}
+
+	// 将token添加到黑名单
+	h.authService.Logout(token)
+
+	response.Success(c, gin.H{"message": "退出登录成功"})
 }

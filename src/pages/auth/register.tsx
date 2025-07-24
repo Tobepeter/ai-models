@@ -8,14 +8,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { FormItem, FormLabel, FormInput, FormPwd } from '@/components/common/form'
 import { useUserStore } from '@/store/user-store'
 import { useRegister } from '@/api/auth'
-import { FormErrors, RegisterRequest } from '@/api/types/auth-types'
+import { FormErrors, AuthRegisterReq } from '@/api/types/auth-types'
 
 export const Register = () => {
 	const navigate = useNavigate()
 	const { isAuthenticated, setAuth, setAuthError, authError } = useUserStore()
 	const registerMutation = useRegister()
 
-	const [form, setForm] = useState<RegisterRequest>({
+	const [form, setForm] = useState<AuthRegisterReq>({
 		username: '',
 		email: '',
 		password: '',
@@ -81,7 +81,7 @@ export const Register = () => {
 		}
 	}
 
-	const handleChange = (field: keyof RegisterRequest) => (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (field: keyof AuthRegisterReq) => (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm((prev) => ({ ...prev, [field]: e.target.value }))
 		// 清除对应字段的错误
 		if (errors[field]) {

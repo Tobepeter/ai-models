@@ -87,8 +87,8 @@ func (s *BaseService) Paginate(model any, dest any, page, limit int) (int64, err
 	return total, nil
 }
 
-// CreatePaginationResponse 创建分页响应结构
-func (s *BaseService) CreatePaginationResponse(data any, page, limit int, total int64) map[string]any {
+// CreatePageResp 创建分页响应结构
+func (s *BaseService) CreatePageResp(data any, page, limit int, total int64) map[string]any {
 	return map[string]any{
 		"data": data,
 		"pagination": models.Pagination{

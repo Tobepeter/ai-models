@@ -1,7 +1,7 @@
 // 统一导出所有API功能
 
 // 基础配置
-export { axiosClient } from './axios-client'
+export { axClient as axiosClient } from './ax-client'
 export { queryClient } from './query-client'
 
 // 通用类型和工具

@@ -34,7 +34,7 @@ func NewOSSHandler(ossService *services.OSSService) *OSSHandler {
 // 获取STS临时凭证
 func (h *OSSHandler) GetSTSCredentials(c *gin.Context) {
 	// 验证OSS配置
-	if err := h.ossService.ValidateConfig(); err != nil {
+	if err := h.ossService.ValidateCfg(); err != nil {
 		response.Error(c, http.StatusInternalServerError, fmt.Sprintf("OSS配置错误: %s", err.Error()))
 		return
 	}

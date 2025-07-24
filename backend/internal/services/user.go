@@ -132,7 +132,7 @@ func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
 	}
 
 	// 使用基础服务创建标准分页响应
-	return s.CreatePaginationResponse(userResponses, page, limit, total), nil
+	return s.CreatePageResp(userResponses, page, limit, total), nil
 }
 
 // DeleteUser 硬删除用户

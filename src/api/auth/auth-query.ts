@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authApi } from './auth-api'
-import { queryKeys } from '../query-client'
+import { axClient } from '../ax-client'
+import { userApi } from '../user/user-api'
 
-const { userProfile } = queryKeys
+/** 认证相关React Query hooks */
+
+// 定义查询键
+const loginQuery = ['auth', 'login']
+const userProfile = ['auth', 'profile']
 
 // 登录
 export const useLogin = () => {
@@ -32,57 +37,6 @@ export const useRegister = () => {
 		},
 		onError: (error) => {
 			console.error('注册失败:', error)
-		},
-	})
-}
-
-// 获取用户信息
-export const useProfile = () => {
-	return useQuery({
-		queryKey: userProfile,
-		queryFn: authApi.getProfile,
-		enabled: authApi.isAuthenticated(),
-		staleTime: 5 * 60 * 1000, // 5分钟
-	})
-}
-
-// 更新用户信息
-export const useUpdateProfile = () => {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationFn: authApi.updateProfile,
-		onSuccess: () => {
-			// 更新成功后刷新用户信息查询
-			queryClient.invalidateQueries({ queryKey: userProfile })
-		},
-		onError: (error) => {
-			console.error('更新用户信息失败:', error)
-		},
-	})
-}
-
-// 修改密码
-export const useChangePassword = () => {
-	return useMutation({
-		mutationFn: authApi.changePassword,
-		onError: (error) => {
-			console.error('修改密码失败:', error)
-		},
-	})
-}
-
-// 登出
-export const useLogout = () => {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationFn: async () => {
-			authApi.logout()
-		},
-		onSuccess: () => {
-			// 登出后清除所有查询缓存
-			queryClient.clear()
 		},
 	})
 }

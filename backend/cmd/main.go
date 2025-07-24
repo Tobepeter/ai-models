@@ -76,6 +76,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, userHand
 			users.POST("/login", userHandler.Login)
 
 			// 用户自己的接口
+			users.POST("/logout", middleware.AuthRequired(authService), userHandler.Logout)
 			users.GET("/profile", middleware.AuthRequired(authService), userHandler.GetProfile)
 			users.PUT("/profile", middleware.AuthRequired(authService), userHandler.UpdateProfile)
 			users.POST("/change-password", middleware.AuthRequired(authService), userHandler.ChangePassword)

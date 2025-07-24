@@ -66,8 +66,9 @@ func (h *CrudHandler) GetByID(c *gin.Context) {
 func (h *CrudHandler) GetList(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	category := c.Query("category") // 获取category查询参数
 
-	data, err := h.crudService.GetCruds(page, limit)
+	data, err := h.crudService.GetCruds(page, limit, category)
 	if err != nil {
 		logrus.Error("Failed to get cruds:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to get records")

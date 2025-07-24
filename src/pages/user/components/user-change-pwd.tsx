@@ -3,7 +3,7 @@ import { FormLabel } from '@/components/common/form/form-label'
 import { FormPwd } from '@/components/common/form/form-pwd'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ChangePasswordRequest, FormErrors } from '@/api/types/auth-types'
+import { AuthChangePasswordReq, FormErrors } from '@/api/types/auth-types'
 import { authApiClient } from '@/utils/auth/auth-api-client'
 import { useMemoizedFn } from 'ahooks'
 import { useState } from 'react'
@@ -11,7 +11,7 @@ import { useState } from 'react'
 export const UserChangePwd = (props: UserChangePwdProps) => {
 	const { open, onOpenChange } = props
 	
-	const [formData, setFormData] = useState<ChangePasswordRequest>({
+	const [formData, setFormData] = useState<AuthChangePasswordReq>({
 		oldPassword: '',
 		newPassword: '',
 		confirmPassword: '',
@@ -20,7 +20,7 @@ export const UserChangePwd = (props: UserChangePwdProps) => {
 	const [errors, setErrors] = useState<FormErrors>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	const handleInputChange = useMemoizedFn((field: keyof ChangePasswordRequest) => (
+	const handleInputChange = useMemoizedFn((field: keyof AuthChangePasswordReq) => (
 		e: React.ChangeEvent<HTMLInputElement>
 	) => {
 		setFormData(prev => ({ ...prev, [field]: e.target.value }))

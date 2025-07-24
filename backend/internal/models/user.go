@@ -8,13 +8,25 @@ import (
  * 用户数据模型
  */
 type User struct {
-	BaseModel                           // 继承基础字段
+	BaseModel            // 继承基础字段
 	Username      string `json:"username" gorm:"uniqueIndex;not null"` // 用户名，系统内唯一标识
 	Email         string `json:"email" gorm:"uniqueIndex;not null"`    // 邮箱地址，用于登录和通知
 	Password      string `json:"-" gorm:"not null"`                    // 密码，存储加密后的值
 	PlainPassword string `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
 	Avatar        string `json:"avatar,omitempty"`                     // 用户头像URL
 	IsActive      bool   `json:"is_active" gorm:"default:true"`        // 用户激活状态
+	Role          string `json:"role" gorm:"default:'user'"`           // 用户角色: admin, user
+}
+
+// 用户角色常量
+const (
+	RoleAdmin = "admin"
+	RoleUser  = "user"
+)
+
+// 检查是否为管理员
+func (u *User) IsAdmin() bool {
+	return u.Role == RoleAdmin
 }
 
 /**

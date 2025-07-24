@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { userApi } from './user-api'
-import { UserListRequest, UpdateProfileRequest } from '../types/user-types'
+import { UserListReq, UserUpdateProfileReq } from '../types/user-types'
 
 /** 用户相关React Query hooks */
 
 /** 获取用户列表（管理员） */
-export const useUsers = (params: UserListRequest = {}) => {
+export const useUsers = (params: UserListReq = {}) => {
   return useQuery({
     queryKey: ['users', 'list', params],
     queryFn: () => userApi.getUsers(params),

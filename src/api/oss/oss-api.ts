@@ -1,14 +1,14 @@
-import { axiosClient } from '../axios-client'
+import { axClient } from '../ax-client'
 import { 
-  STSResponse, 
-  SignRequest, 
-  SignResponse, 
-  HashifyNameRequest, 
-  HashifyNameResponse,
-  FileUploadResponse,
-  FileDeleteRequest,
-  FileUrlRequest,
-  FileUrlResponse
+  OSSSTSResp, 
+  OSSSignReq, 
+  OSSSignResp, 
+  OSSHashifyNameReq, 
+  OSSHashifyNameResp,
+  OSSFileUploadResp,
+  OSSFileDeleteReq,
+  OSSFileUrlReq,
+  OSSFileUrlResp
 } from '../types/api-types'
 import { ApiResponse } from '../common'
 
@@ -17,35 +17,35 @@ class OSSApi {
 
   /** 获取STS临时凭证 */
   async getSTSCredentials() {
-    const response = await axiosClient.post<ApiResponse<STSResponse>>('/oss/sts')
+    const response = await axClient.post<ApiResponse<OSSSTSResp>>('/oss/sts')
     if (response.data.code !== 200) throw new Error(response.data.msg || '获取STS凭证失败')
     return response.data.data!
   }
 
   /** 获取上传签名 */
-  async signToUpload(data: SignRequest) {
-    const response = await axiosClient.post<ApiResponse<SignResponse>>('/oss/sign-to-upload', data)
+  async signToUpload(data: OSSSignReq) {
+    const response = await axClient.post<ApiResponse<OSSSignResp>>('/oss/sign-to-upload', data)
     if (response.data.code !== 200) throw new Error(response.data.msg || '获取上传签名失败')
     return response.data.data!
   }
 
   /** 获取下载签名 */
-  async signToFetch(data: SignRequest) {
-    const response = await axiosClient.post<ApiResponse<SignResponse>>('/oss/sign-to-fetch', data)
+  async signToFetch(data: OSSSignReq) {
+    const response = await axClient.post<ApiResponse<OSSSignResp>>('/oss/sign-to-fetch', data)
     if (response.data.code !== 200) throw new Error(response.data.msg || '获取下载签名失败')
     return response.data.data!
   }
 
   /** 生成哈希文件名 */
-  async hashifyName(data: HashifyNameRequest) {
-    const response = await axiosClient.post<ApiResponse<HashifyNameResponse>>('/oss/hashify-name', data)
+  async hashifyName(data: OSSHashifyNameReq) {
+    const response = await axClient.post<ApiResponse<OSSHashifyNameResp>>('/oss/hashify-name', data)
     if (response.data.code !== 200) throw new Error(response.data.msg || '生成哈希文件名失败')
     return response.data.data!
   }
 
   /** 获取文件列表 */
   async getFileList() {
-    const response = await axiosClient.get<ApiResponse<string[]>>('/oss/files')
+    const response = await axClient.get<ApiResponse<string[]>>('/oss/files')
     if (response.data.code !== 200) throw new Error(response.data.msg || '获取文件列表失败')
     return response.data.data!
   }
@@ -58,7 +58,7 @@ class OSSApi {
       formData.append('objectKey', objectKey)
     }
 
-    const response = await axiosClient.post<ApiResponse<FileUploadResponse>>('/oss/upload', formData, {
+    const response = await axClient.post<ApiResponse<OSSFileUploadResp>>('/oss/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -68,14 +68,14 @@ class OSSApi {
   }
 
   /** 删除文件（代理模式） */
-  async deleteFile(data: FileDeleteRequest) {
-    const response = await axiosClient.post<ApiResponse<void>>('/oss/delete', data)
+  async deleteFile(data: OSSFileDeleteReq) {
+    const response = await axClient.post<ApiResponse<void>>('/oss/delete', data)
     if (response.data.code !== 200) throw new Error(response.data.msg || '删除文件失败')
   }
 
   /** 获取文件URL（代理模式） */
-  async getFileURL(data: FileUrlRequest) {
-    const response = await axiosClient.post<ApiResponse<FileUrlResponse>>('/oss/get-url', data)
+  async getFileURL(data: OSSFileUrlReq) {
+    const response = await axClient.post<ApiResponse<OSSFileUrlResp>>('/oss/get-url', data)
     if (response.data.code !== 200) throw new Error(response.data.msg || '获取文件URL失败')
     return response.data.data!
   }
