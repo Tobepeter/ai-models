@@ -26,7 +26,7 @@ func NewUserService(cfg *config.Config) *UserService {
 	}
 }
 
-// 创建用户
+// 创建用户 (内部使用，不包含认证逻辑)
 func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, error) {
 	// 检查用户名是否已存在
 	if s.ExistsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
@@ -62,31 +62,6 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 	}
 
 	return user, nil
-}
-
-// 用户认证
-func (s *UserService) AuthenticateUser(username, password string) (*models.User, error) {
-	var user models.User
-
-	// 根据用户名或邮箱查找用户
-	if err := s.db.Where("username = ? OR email = ?", username, username).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("用户不存在")
-		}
-		return nil, err
-	}
-
-	// 检查用户是否激活
-	if !user.IsActive {
-		return nil, errors.New("用户已被禁用")
-	}
-
-	// 验证密码
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return nil, errors.New("密码错误")
-	}
-
-	return &user, nil
 }
 
 // 根据ID获取用户

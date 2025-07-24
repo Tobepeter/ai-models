@@ -34,15 +34,16 @@ func main() {
 	defer database.Close()
 
 	userService := services.NewUserService(cfg)
+	authService := services.NewAuthService(cfg)
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
 
-	userHandler := handlers.NewUserHandler(userService)
+	userHandler := handlers.NewUserHandler(userService, authService)
 	aiHandler := handlers.NewAIHandler(aiService)
 	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
 
-	router := setupRouter(cfg, userHandler, aiHandler, ossHandler, healthHandler)
+	router := setupRouter(cfg, authService, userHandler, aiHandler, ossHandler, healthHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -50,7 +51,7 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authService *services.AuthService, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -71,18 +72,18 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 			// 公开接口
 			users.POST("/register", userHandler.Register)
 			users.POST("/login", userHandler.Login)
-			
+
 			// 用户自己的接口
-			users.GET("/profile", middleware.AuthRequired(), userHandler.GetProfile)
-			users.PUT("/profile", middleware.AuthRequired(), userHandler.UpdateProfile)
-			users.POST("/change-password", middleware.AuthRequired(), userHandler.ChangePassword)
-			
+			users.GET("/profile", middleware.AuthRequired(authService), userHandler.GetProfile)
+			users.PUT("/profile", middleware.AuthRequired(authService), userHandler.UpdateProfile)
+			users.POST("/change-password", middleware.AuthRequired(authService), userHandler.ChangePassword)
+
 			// 管理员接口
-			users.GET("/", middleware.AdminRequired(), userHandler.GetUsers)           // 获取用户列表
-			users.GET("/:id", middleware.AdminRequired(), userHandler.GetUserByID)    // 根据ID获取用户
-			users.DELETE("/:id", middleware.AdminRequired(), userHandler.DeleteUser)  // 删除用户
-			users.POST("/:id/activate", middleware.AdminRequired(), userHandler.ActivateUser)     // 激活用户
-			users.POST("/:id/deactivate", middleware.AdminRequired(), userHandler.DeactivateUser) // 停用用户
+			users.GET("/", middleware.AdminRequired(authService), userHandler.GetUsers)                      // 获取用户列表
+			users.GET("/:id", middleware.AdminRequired(authService), userHandler.GetUserByID)                // 根据ID获取用户
+			users.DELETE("/:id", middleware.AdminRequired(authService), userHandler.DeleteUser)              // 删除用户
+			users.POST("/:id/activate", middleware.AdminRequired(authService), userHandler.ActivateUser)     // 激活用户
+			users.POST("/:id/deactivate", middleware.AdminRequired(authService), userHandler.DeactivateUser) // 停用用户
 		}
 
 		ai := api.Group("/ai/v1")

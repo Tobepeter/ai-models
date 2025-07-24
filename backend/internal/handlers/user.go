@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"ai-models-backend/internal/middleware"
 	"ai-models-backend/internal/models"
 	"ai-models-backend/internal/services"
 	"ai-models-backend/pkg/response"
@@ -15,10 +14,13 @@ import (
 // 用户请求处理器
 type UserHandler struct {
 	userService *services.UserService
+	authService *services.AuthService
 }
-func NewUserHandler(userService *services.UserService) *UserHandler {
+
+func NewUserHandler(userService *services.UserService, authService *services.AuthService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
+		authService: authService,
 	}
 }
 
@@ -31,17 +33,10 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.CreateUser(req)
+	user, token, err := h.authService.Register(req)
 	if err != nil {
-		logrus.Error("Failed to create user:", err)
-		response.Error(c, http.StatusInternalServerError, "Failed to create user")
-		return
-	}
-
-	token, err := middleware.GenerateToken(user.ID, user.Username)
-	if err != nil {
-		logrus.Error("Failed to generate token:", err)
-		response.Error(c, http.StatusInternalServerError, "Failed to generate token")
+		logrus.Error("Failed to register user:", err)
+		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -62,17 +57,10 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.AuthenticateUser(req.Username, req.Password)
+	user, token, err := h.authService.Login(req.Username, req.Password)
 	if err != nil {
 		logrus.Error("Authentication failed:", err)
-		response.Error(c, http.StatusUnauthorized, "Invalid credentials")
-		return
-	}
-
-	token, err := middleware.GenerateToken(user.ID, user.Username)
-	if err != nil {
-		logrus.Error("Failed to generate token:", err)
-		response.Error(c, http.StatusInternalServerError, "Failed to generate token")
+		response.Error(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
@@ -232,7 +220,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 
 	if err := h.userService.ChangePassword(userID.(uint), req); err != nil {
 		logrus.Error("Failed to change password:", err)
-		
+
 		// 根据错误信息返回不同的状态码
 		if err.Error() == "原密码错误" {
 			response.Error(c, http.StatusBadRequest, "原密码错误")
