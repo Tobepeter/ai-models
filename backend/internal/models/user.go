@@ -2,43 +2,58 @@ package models
 
 import (
 	"time"
-	"gorm.io/gorm"
 )
 
-// 用户模型
+/**
+ * 用户数据模型
+ */
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	Username  string         `json:"username" gorm:"uniqueIndex;not null"`
-	Email     string         `json:"email" gorm:"uniqueIndex;not null"`
-	Password  string         `json:"-" gorm:"not null"`
-	Avatar    string         `json:"avatar,omitempty"`
-	IsActive  bool           `json:"is_active" gorm:"default:true"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	BaseModel                           // 继承基础字段
+	Username      string `json:"username" gorm:"uniqueIndex;not null"` // 用户名，系统内唯一标识
+	Email         string `json:"email" gorm:"uniqueIndex;not null"`    // 邮箱地址，用于登录和通知
+	Password      string `json:"-" gorm:"not null"`                    // 密码，存储加密后的值
+	PlainPassword string `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
+	Avatar        string `json:"avatar,omitempty"`                     // 用户头像URL
+	IsActive      bool   `json:"is_active" gorm:"default:true"`        // 用户激活状态
 }
 
-// 创建用户请求
+/**
+ * 用户创建请求结构体
+ */
 type UserCreateRequest struct {
 	Username string `json:"username" binding:"required,min=3,max=50"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-// 用户登录请求
+/**
+ * 用户登录请求结构体
+ */
 type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-// 更新用户请求
+/**
+ * 用户信息更新请求结构体
+ */
 type UserUpdateRequest struct {
 	Username string `json:"username,omitempty" binding:"omitempty,min=3,max=50"`
 	Email    string `json:"email,omitempty" binding:"omitempty,email"`
 	Avatar   string `json:"avatar,omitempty"`
 }
 
-// 用户响应
+/**
+ * 修改密码请求结构体
+ */
+type ChangePasswordRequest struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
+}
+
+/**
+ * 用户响应结构体
+ */
 type UserResponse struct {
 	ID        uint      `json:"id"`
 	Username  string    `json:"username"`
@@ -49,6 +64,7 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+/* 将用户模型转换为响应格式 */
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
 		ID:        u.ID,

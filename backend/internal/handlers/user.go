@@ -132,21 +132,115 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
-	users, total, err := h.userService.GetUsers(page, limit)
+	data, err := h.userService.GetUsers(page, limit)
 	if err != nil {
 		logrus.Error("Failed to get users:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to get users")
 		return
 	}
 
-	data := gin.H{
-		"users": users,
-		"pagination": gin.H{
-			"page":  page,
-			"limit": limit,
-			"total": total,
-		},
+	response.Success(c, data)
+}
+
+// 删除用户
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	userID := c.Param("id")
+	id, err := strconv.ParseUint(userID, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid user ID")
+		return
 	}
 
-	response.Success(c, data)
+	if err := h.userService.DeleteUser(uint(id)); err != nil {
+		logrus.Error("Failed to delete user:", err)
+		response.Error(c, http.StatusInternalServerError, "Failed to delete user")
+		return
+	}
+
+	response.Success(c, gin.H{"message": "User deleted successfully"})
+}
+
+// 根据ID获取用户信息（管理员用）
+func (h *UserHandler) GetUserByID(c *gin.Context) {
+	userIDStr := c.Param("id")
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+
+	user, err := h.userService.GetUserByID(uint(userID))
+	if err != nil {
+		logrus.Error("Failed to get user:", err)
+		response.Error(c, http.StatusNotFound, "User not found")
+		return
+	}
+
+	response.Success(c, user.ToResponse())
+}
+
+// 激活用户
+func (h *UserHandler) ActivateUser(c *gin.Context) {
+	userIDStr := c.Param("id")
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+
+	if err := h.userService.ActivateUser(uint(userID)); err != nil {
+		logrus.Error("Failed to activate user:", err)
+		response.Error(c, http.StatusInternalServerError, "Failed to activate user")
+		return
+	}
+
+	response.Success(c, gin.H{"message": "User activated successfully"})
+}
+
+// 停用用户
+func (h *UserHandler) DeactivateUser(c *gin.Context) {
+	userIDStr := c.Param("id")
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+
+	if err := h.userService.DeactivateUser(uint(userID)); err != nil {
+		logrus.Error("Failed to deactivate user:", err)
+		response.Error(c, http.StatusInternalServerError, "Failed to deactivate user")
+		return
+	}
+
+	response.Success(c, gin.H{"message": "User deactivated successfully"})
+}
+
+// 修改密码
+func (h *UserHandler) ChangePassword(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		response.Error(c, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	var req models.ChangePasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		logrus.Error("Invalid request body:", err)
+		response.Error(c, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	if err := h.userService.ChangePassword(userID.(uint), req); err != nil {
+		logrus.Error("Failed to change password:", err)
+		
+		// 根据错误信息返回不同的状态码
+		if err.Error() == "原密码错误" {
+			response.Error(c, http.StatusBadRequest, "原密码错误")
+		} else {
+			response.Error(c, http.StatusInternalServerError, "修改密码失败")
+		}
+		return
+	}
+
+	response.Success(c, gin.H{"message": "密码修改成功"})
 }

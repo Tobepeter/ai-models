@@ -22,9 +22,9 @@ type ChatResponse struct {
 
 // 生成请求
 type GenerateRequest struct {
-	Prompt     string            `json:"prompt" binding:"required"`
-	Model      string            `json:"model,omitempty"`
-	Parameters map[string]interface{} `json:"parameters,omitempty"`
+	Prompt     string         `json:"prompt" binding:"required"`
+	Model      string         `json:"model,omitempty"`
+	Parameters map[string]any `json:"parameters,omitempty"`
 }
 
 // 生成响应
@@ -45,14 +45,14 @@ type Usage struct {
 
 // AI 模型
 type AIModel struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Provider    string   `json:"provider"`
-	Type        string   `json:"type"`
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	Description  string   `json:"description"`
+	Provider     string   `json:"provider"`
+	Type         string   `json:"type"`
 	Capabilities []string `json:"capabilities"`
-	MaxTokens   int      `json:"max_tokens"`
-	IsActive    bool     `json:"is_active"`
+	MaxTokens    int      `json:"max_tokens"`
+	IsActive     bool     `json:"is_active"`
 }
 
 // 对话历史
@@ -64,7 +64,7 @@ type ConversationHistory struct {
 	Content   string    `json:"content" gorm:"type:text;not null"`
 	Model     string    `json:"model"`
 	CreatedAt time.Time `json:"created_at"`
-	
+
 	User User `json:"-" gorm:"foreignKey:UserID"`
 }
 
@@ -97,12 +97,12 @@ type OpenAIUsage struct {
 }
 
 type OpenAIChatCompletionResponse struct {
-	ID      string        `json:"id"`
-	Object  string        `json:"object"`
-	Created int64         `json:"created"`
-	Model   string        `json:"model"`
+	ID      string         `json:"id"`
+	Object  string         `json:"object"`
+	Created int64          `json:"created"`
+	Model   string         `json:"model"`
 	Choices []OpenAIChoice `json:"choices"`
-	Usage   OpenAIUsage   `json:"usage"`
+	Usage   OpenAIUsage    `json:"usage"`
 }
 
 type OpenAIStreamChoice struct {

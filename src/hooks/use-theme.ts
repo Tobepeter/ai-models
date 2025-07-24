@@ -1,4 +1,6 @@
 import { useAppStore } from '@/store/store'
+import { eventBus } from '@/utils/event-bus'
+import { EventType } from '@/utils/event-bus'
 import { storage } from '@/utils/storage'
 import { useMount } from 'ahooks'
 import { useEffect } from 'react'
@@ -28,6 +30,7 @@ export const useTheme = () => {
 		} else {
 			root.classList.remove('dark')
 		}
+		eventBus.emit(EventType.ThemeUpdate, computedTheme)
 	}
 
 	useEffect(() => {

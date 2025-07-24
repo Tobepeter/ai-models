@@ -30,7 +30,7 @@ func Initialize(cfg *config.Config) error {
 	}
 
 	// 如果是生产环境，减少日志输出
-	if cfg.Environment == "production" {
+	if cfg.IsProd {
 		gormConfig.Logger = logger.Default.LogMode(logger.Error)
 	}
 
@@ -83,11 +83,6 @@ func autoMigrate() error {
 
 	logrus.Info("数据库迁移完成")
 	return nil
-}
-
-// GetDB 获取数据库实例
-func GetDB() *gorm.DB {
-	return DB
 }
 
 // Close 关闭数据库连接

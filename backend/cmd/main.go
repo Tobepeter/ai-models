@@ -33,7 +33,7 @@ func main() {
 	}
 	defer database.Close()
 
-	userService := services.NewUserService()
+	userService := services.NewUserService(cfg)
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
 
@@ -51,7 +51,7 @@ func main() {
 }
 
 func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
-	if cfg.Environment == "production" {
+	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -68,10 +68,21 @@ func setupRouter(cfg *config.Config, userHandler *handlers.UserHandler, aiHandle
 	{
 		users := api.Group("/users")
 		{
+			// 公开接口
 			users.POST("/register", userHandler.Register)
 			users.POST("/login", userHandler.Login)
+			
+			// 用户自己的接口
 			users.GET("/profile", middleware.AuthRequired(), userHandler.GetProfile)
 			users.PUT("/profile", middleware.AuthRequired(), userHandler.UpdateProfile)
+			users.POST("/change-password", middleware.AuthRequired(), userHandler.ChangePassword)
+			
+			// 管理员接口
+			users.GET("/", middleware.AdminRequired(), userHandler.GetUsers)           // 获取用户列表
+			users.GET("/:id", middleware.AdminRequired(), userHandler.GetUserByID)    // 根据ID获取用户
+			users.DELETE("/:id", middleware.AdminRequired(), userHandler.DeleteUser)  // 删除用户
+			users.POST("/:id/activate", middleware.AdminRequired(), userHandler.ActivateUser)     // 激活用户
+			users.POST("/:id/deactivate", middleware.AdminRequired(), userHandler.DeactivateUser) // 停用用户
 		}
 
 		ai := api.Group("/ai/v1")

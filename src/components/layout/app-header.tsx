@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useUserStore } from '@/store/user-store'
+import { useAuthStore } from '@/store/auth-store'
 import { Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
 
 export const AppHeader = () => {
-	const { profile } = useUserStore()
+	const { user } = useAuthStore()
 	const navigate = useNavigate()
 	const location = useLocation()
 	const matches = useMatches()
@@ -40,8 +40,8 @@ export const AppHeader = () => {
 				{/* 右侧用户头像 */}
 				<button onClick={() => navigate('/user')} className="flex items-center">
 					<Avatar className="h-8 w-8">
-						<AvatarImage src={profile.avatar} alt={profile.name} />
-						<AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+						<AvatarImage src={user?.avatar} alt={user?.username} />
+						<AvatarFallback>{user?.username?.charAt(0) || 'U'}</AvatarFallback>
 					</Avatar>
 				</button>
 			</div>

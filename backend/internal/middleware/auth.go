@@ -62,7 +62,8 @@ func extractToken(c *gin.Context) (string, error) {
 }
 
 func validateToken(tokenString string) (*JWTClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (any, error) {
+		// 方法类型必须是 HMAC
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
@@ -73,6 +74,7 @@ func validateToken(tokenString string) (*JWTClaims, error) {
 		return nil, err
 	}
 
+	// token必须是指定的Claims类型
 	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
 		return claims, nil
 	}
@@ -95,6 +97,42 @@ func GenerateToken(userID uint, username string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(getJWTSecret()))
+}
+
+// 管理员权限中间件
+func AdminRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 先验证用户身份
+		token, err := extractToken(c)
+		if err != nil {
+			logrus.Error("Failed to extract token:", err)
+			response.Error(c, http.StatusUnauthorized, "Authentication required")
+			c.Abort()
+			return
+		}
+
+		claims, err := validateToken(token)
+		if err != nil {
+			logrus.Error("Invalid token:", err)
+			response.Error(c, http.StatusUnauthorized, "Invalid token")
+			c.Abort()
+			return
+		}
+
+		// 设置用户信息到上下文
+		c.Set("user_id", claims.UserID)
+		c.Set("username", claims.Username)
+
+		// TODO: 这里应该检查用户是否为管理员，现在默认返回 true
+		isAdmin := true // 临时默认为 true，后续需要从数据库查询用户角色
+		if !isAdmin {
+			response.Error(c, http.StatusForbidden, "Admin access required")
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
 }
 
 func getJWTSecret() string {

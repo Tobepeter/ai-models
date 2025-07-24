@@ -1,14 +1,15 @@
-import React, { ReactElement } from 'react'
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
 import App from '@/App'
 import { AppLayout } from '@/components/layout/app-layout'
-import { Test } from '@/pages/test/test'
-import { Chat } from '@/pages/chat/chat'
+import { Login } from '@/pages/auth/login'
+import { Register } from '@/pages/auth/register'
 import { ChatHub } from '@/pages/chat-hub/chat-hub'
+import { Chat } from '@/pages/chat/chat'
 import { Doc } from '@/pages/docs/doc'
 import { Home } from '@/pages/home/home'
+import { Test } from '@/pages/test/test'
 import { User } from '@/pages/user/user'
 import { ossBase, ossBasePrefix } from '@/utils/env'
+import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
 
 /** 路由handle类型约束 */
 export interface RouteHandle {
@@ -86,6 +87,16 @@ export const router = createBrowserRouter(
 			path: '/',
 			element: <App />,
 			children: [
+				// 认证页面 - 不需要应用布局，已登录用户会被重定向
+				{
+					path: 'login',
+					element: <Login />,
+				},
+				{
+					path: 'register',
+					element: <Register />,
+				},
+				// 应用主体 - 需要应用布局和认证
 				{
 					path: '/',
 					element: <AppLayout />,

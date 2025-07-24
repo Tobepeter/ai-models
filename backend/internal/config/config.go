@@ -9,9 +9,11 @@ import (
 )
 
 type Config struct {
-	Port        string
-	Environment string
-	IsAirDev    bool
+	Port     string
+	GoEnv    string
+	IsDev    bool
+	IsProd   bool
+	IsAirDev bool
 
 	PostgresHost     string
 	PostgresPort     string
@@ -40,12 +42,13 @@ type Config struct {
 }
 
 func New() *Config {
-	// 开发环境加载 .env 文件
-	isProd := os.Getenv("GO_ENV") == "production"
 
-	if !isProd {
-		godotenv.Load(".env")
+	// must have .env file
+	if _, err := os.Stat(".env"); os.IsNotExist(err) {
+		logrus.Fatal(".env file not found")
 	}
+
+	godotenv.Load(".env")
 
 	isAirDev := os.Getenv("IS_AIR_DEV") == "true"
 	postGresHost := os.Getenv("POSTGRES_HOST")
@@ -58,10 +61,15 @@ func New() *Config {
 		redisHost = "localhost"
 	}
 
+	goEnv := os.Getenv("GO_ENV")
+	isProd := goEnv == "development"
+
 	config := &Config{
-		Port:        os.Getenv("PORT"),
-		Environment: os.Getenv("ENVIRONMENT"),
-		IsAirDev:    isAirDev,
+		Port:     os.Getenv("PORT"),
+		GoEnv:    goEnv,
+		IsDev:    !isProd,
+		IsProd:   isProd,
+		IsAirDev: isAirDev,
 
 		PostgresHost:     postGresHost,
 		PostgresPort:     os.Getenv("POSTGRES_PORT"),
