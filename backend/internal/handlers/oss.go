@@ -19,19 +19,19 @@ const (
 	errorCode   = 101
 )
 
-/* OSS处理器，处理文件上传相关的HTTP请求 */
+// OSS处理器，处理文件上传相关的HTTP请求
 type OSSHandler struct {
 	ossService *services.OSSService
 }
 
-/* 创建新的OSS处理器 */
+// 创建新的OSS处理器
 func NewOSSHandler(ossService *services.OSSService) *OSSHandler {
 	return &OSSHandler{
 		ossService: ossService,
 	}
 }
 
-/* 获取STS临时凭证 */
+// 获取STS临时凭证
 func (h *OSSHandler) GetSTSCredentials(c *gin.Context) {
 	// 验证OSS配置
 	if err := h.ossService.ValidateConfig(); err != nil {
@@ -51,7 +51,7 @@ func (h *OSSHandler) GetSTSCredentials(c *gin.Context) {
 	})
 }
 
-/* 生成上传签名 */
+// 生成上传签名
 func (h *OSSHandler) SignToUpload(c *gin.Context) {
 	var req models.SignRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -82,7 +82,7 @@ func (h *OSSHandler) SignToUpload(c *gin.Context) {
 	})
 }
 
-/* 生成获取签名 */
+// 生成获取签名
 func (h *OSSHandler) SignToFetch(c *gin.Context) {
 	var req models.SignRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -108,7 +108,7 @@ func (h *OSSHandler) SignToFetch(c *gin.Context) {
 	})
 }
 
-/* 生成哈希文件名 */
+// 生成哈希文件名
 func (h *OSSHandler) HashifyName(c *gin.Context) {
 	var req models.HashifyNameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -127,7 +127,7 @@ func (h *OSSHandler) HashifyName(c *gin.Context) {
 	})
 }
 
-/* 直接上传文件 */
+// 直接上传文件
 func (h *OSSHandler) UploadFile(c *gin.Context) {
 	// 解析multipart表单
 	err := c.Request.ParseMultipartForm(maxFileSize)
@@ -220,7 +220,7 @@ func (h *OSSHandler) UploadFile(c *gin.Context) {
 	})
 }
 
-/* 删除文件 */
+// 删除文件
 func (h *OSSHandler) DeleteFile(c *gin.Context) {
 	var req models.DeleteFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -242,7 +242,7 @@ func (h *OSSHandler) DeleteFile(c *gin.Context) {
 	response.Success(c, gin.H{"message": "删除成功"})
 }
 
-/* 获取文件URL */
+// 获取文件URL
 func (h *OSSHandler) GetFileURL(c *gin.Context) {
 	var req models.GetURLRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -268,7 +268,7 @@ func (h *OSSHandler) GetFileURL(c *gin.Context) {
 	})
 }
 
-/* 获取文件列表 */
+// 获取文件列表
 func (h *OSSHandler) GetFileList(c *gin.Context) {
 	var query models.FileListQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -293,7 +293,7 @@ func (h *OSSHandler) GetFileList(c *gin.Context) {
 	response.Success(c, result)
 }
 
-/* 中间件：验证文件大小 */
+// 中间件：验证文件大小
 func FileSizeMiddleware() gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
 		// 检查Content-Length头

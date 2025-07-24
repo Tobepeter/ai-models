@@ -7,29 +7,25 @@ import (
 	"gorm.io/gorm"
 )
 
-/**
- * 通用服务基础结构体
- * 提供基础的CRUD操作方法
- */
 type BaseService struct {
 	db *gorm.DB
 }
 
-/* 根据ID查找记录是否存在 */
+// ExistsByID 根据ID查找记录是否存在
 func (s *BaseService) ExistsByID(model any, id uint) bool {
 	var count int64
 	s.db.Model(model).Where("id = ?", id).Count(&count)
 	return count > 0
 }
 
-/* 根据条件查找记录是否存在 */
+// ExistsByCondition 根据条件查找记录是否存在
 func (s *BaseService) ExistsByCondition(model any, condition map[string]any) bool {
 	var count int64
 	s.db.Model(model).Where(condition).Count(&count)
 	return count > 0
 }
 
-/* 根据条件查找记录是否存在（排除指定ID） */
+// ExistsByConditionExcludeID 根据条件查找记录是否存在（排除指定ID）
 func (s *BaseService) ExistsByConditionExcludeID(model any, condition map[string]any, excludeID uint) bool {
 	var count int64
 	query := s.db.Model(model).Where(condition).Where("id != ?", excludeID)
@@ -37,7 +33,7 @@ func (s *BaseService) ExistsByConditionExcludeID(model any, condition map[string
 	return count > 0
 }
 
-/* 软删除记录 */
+// SoftDelete 软删除记录
 func (s *BaseService) SoftDelete(model any, id uint) error {
 	result := s.db.Delete(model, id)
 	if result.Error != nil {
@@ -49,7 +45,19 @@ func (s *BaseService) SoftDelete(model any, id uint) error {
 	return nil
 }
 
-/* 更新单个字段 */
+// HardDelete 硬删除记录
+func (s *BaseService) HardDelete(model any, id uint) error {
+	result := s.db.Unscoped().Delete(model, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("记录不存在")
+	}
+	return nil
+}
+
+// UpdateField 更新单个字段
 func (s *BaseService) UpdateField(model any, id uint, field string, value any) error {
 	result := s.db.Model(model).Where("id = ?", id).Update(field, value)
 	if result.Error != nil {
@@ -61,7 +69,7 @@ func (s *BaseService) UpdateField(model any, id uint, field string, value any) e
 	return nil
 }
 
-/* 分页查询 */
+// Paginate 分页查询
 func (s *BaseService) Paginate(model any, dest any, page, limit int) (int64, error) {
 	var total int64
 
@@ -79,7 +87,7 @@ func (s *BaseService) Paginate(model any, dest any, page, limit int) (int64, err
 	return total, nil
 }
 
-/* 创建分页响应结构 */
+// CreatePaginationResponse 创建分页响应结构
 func (s *BaseService) CreatePaginationResponse(data any, page, limit int, total int64) map[string]any {
 	return map[string]any{
 		"data": data,
@@ -89,4 +97,66 @@ func (s *BaseService) CreatePaginationResponse(data any, page, limit int, total 
 			Total:    total,
 		},
 	}
+}
+
+// Create 创建记录
+func (s *BaseService) Create(model any) error {
+	return s.db.Create(model).Error
+}
+
+// GetByID 根据ID获取记录
+func (s *BaseService) GetByID(model any, id uint) error {
+	result := s.db.First(model, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("记录不存在")
+		}
+		return result.Error
+	}
+	return nil
+}
+
+// GetAll 获取所有记录
+func (s *BaseService) GetAll(model any, dest any) error {
+	return s.db.Find(dest).Error
+}
+
+// GetByCondition 根据条件获取记录
+func (s *BaseService) GetByCondition(model any, dest any, condition map[string]any) error {
+	return s.db.Where(condition).Find(dest).Error
+}
+
+// Update 更新记录
+func (s *BaseService) Update(model any, id uint, updates map[string]any) error {
+	result := s.db.Model(model).Where("id = ?", id).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("记录不存在")
+	}
+	return nil
+}
+
+// PaginateWithCondition 根据条件分页查询
+func (s *BaseService) PaginateWithCondition(model any, dest any, page, limit int, condition map[string]any) (int64, error) {
+	var total int64
+
+	query := s.db.Model(model)
+	if len(condition) > 0 {
+		query = query.Where(condition)
+	}
+
+	// 计算总数
+	if err := query.Count(&total).Error; err != nil {
+		return 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * limit
+	if err := query.Offset(offset).Limit(limit).Find(dest).Error; err != nil {
+		return 0, err
+	}
+
+	return total, nil
 }

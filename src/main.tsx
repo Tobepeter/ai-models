@@ -4,7 +4,7 @@ import { PropsWithChildren, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import './index.css'
-import { queryClient } from './lib/react-query'
+import { queryClient } from './api/query-client'
 import { router } from './router/router'
 import { isDev } from './utils/env'
 import { useTheme } from './hooks/use-theme.ts'
@@ -19,7 +19,7 @@ const StrictWrapper = (props: PropsWithChildren) => {
 	return enableStrict ? <StrictMode>{props.children}</StrictMode> : props.children
 }
 
-const AppWithTheme = () => {
+const Main = () => {
 	useTheme()
 	return (
 		<QueryClientProvider client={queryClient}>
@@ -31,6 +31,6 @@ const AppWithTheme = () => {
 
 createRoot(document.getElementById('root')).render(
 	<StrictWrapper>
-		<AppWithTheme />
+		<Main />
 	</StrictWrapper>
 )

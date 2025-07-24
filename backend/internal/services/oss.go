@@ -22,18 +22,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-/* OSS服务，提供阿里云OSS的封装 */
+// OSS服务，提供阿里云OSS的封装
 type OSSService struct {
 	client *oss.Client
 	config *config.Config
 }
 
-/* 创建新的OSS服务实例 */
+// 创建新的OSS服务实例
 func NewOSSService(cfg *config.Config) *OSSService {
 	provider := credentials.NewStaticCredentialsProvider(cfg.OSSAccessKeyID, cfg.OSSAccessKeySecret)
 
+	// 修正region格式：如果包含oss-前缀则移除
+	region, found := strings.CutPrefix(cfg.OSSRegion, "oss-")
+	if found {
+		logrus.Warnf("检测到region包含oss-前缀，已自动修正: %s -> %s", cfg.OSSRegion, region)
+	} else {
+		region = cfg.OSSRegion
+	}
+
 	client := oss.NewClient(&oss.Config{
-		Region:              &cfg.OSSRegion,
+		Region:              &region,
 		CredentialsProvider: provider,
 	})
 
@@ -44,34 +52,34 @@ func NewOSSService(cfg *config.Config) *OSSService {
 	}
 }
 
-/* 获取STS临时凭证 */
+// 获取STS临时凭证
 func (s *OSSService) GetSTSCredentials() (*models.STSCredentials, error) {
 	// 检查必要的配置
 	if s.config.OSSRoleArn == "" {
 		return nil, fmt.Errorf("OSS_ROLE_ARN 未配置")
 	}
 
-	// 创建 STS 客户端配置
+	// 创建STS客户端配置
 	config := &openapi.Config{
 		AccessKeyId:     tea.String(s.config.OSSAccessKeyID),
 		AccessKeySecret: tea.String(s.config.OSSAccessKeySecret),
 		Endpoint:        tea.String("sts.cn-hangzhou.aliyuncs.com"), // 可以根据需要调整区域
 	}
 
-	// 创建 STS 客户端
+	// 创建STS客户端
 	client, err := sts20150401.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("创建STS客户端失败: %w", err)
 	}
 
-	// 创建 AssumeRole 请求
+	// 创建AssumeRole请求
 	request := &sts20150401.AssumeRoleRequest{
 		RoleArn:         tea.String(s.config.OSSRoleArn),
 		RoleSessionName: tea.String("oss-backend-session"),
 		DurationSeconds: tea.Int64(3600), // 1小时有效期
 	}
 
-	// 调用 AssumeRole 获取临时凭证
+	// 调用AssumeRole获取临时凭证
 	response, err := client.AssumeRole(request)
 	if err != nil {
 		return nil, fmt.Errorf("获取STS临时凭证失败: %w", err)
@@ -91,7 +99,7 @@ func (s *OSSService) GetSTSCredentials() (*models.STSCredentials, error) {
 	}, nil
 }
 
-/* 生成上传签名URL */
+// 生成上传签名URL
 func (s *OSSService) SignToUpload(objectKey string, fileType string) (string, error) {
 	if fileType == "" {
 		fileType = "application/octet-stream"
@@ -114,7 +122,7 @@ func (s *OSSService) SignToUpload(objectKey string, fileType string) (string, er
 	return presignResult.URL, nil
 }
 
-/* 生成下载签名URL */
+// 生成下载签名URL
 func (s *OSSService) SignToFetch(objectKey string) (string, error) {
 	request := &oss.GetObjectRequest{
 		Bucket: oss.Ptr(s.config.OSSBucket),
@@ -132,7 +140,7 @@ func (s *OSSService) SignToFetch(objectKey string) (string, error) {
 	return presignResult.URL, nil
 }
 
-/* 生成哈希文件名，防止重名 */
+// 生成哈希文件名，防止重名
 func (s *OSSService) HashifyName(fileName string) string {
 	// 处理路径，只取文件名部分
 	name := filepath.Base(fileName)
@@ -148,18 +156,17 @@ func (s *OSSService) HashifyName(fileName string) string {
 	timestamp := time.Now().UnixMilli()
 
 	// 生成6位36进制随机字符串，与JavaScript版本保持一致
-	// 模拟 Math.random().toString(36).substring(2, 8)
 	randomStr := generateBase36String(6)
 
 	return fmt.Sprintf("%s_%d_%s%s", nameWithoutExt, timestamp, randomStr, ext)
 }
 
-/* 生成指定长度的36进制随机字符串 */
+// 生成指定长度的36进制随机字符串
 func generateBase36String(length int) string {
 	const charset = "0123456789abcdefghijklmnopqrstuvwxyz"
 	result := make([]byte, length)
 
-	// 使用 crypto/rand 生成安全的随机数
+	// 使用crypto/rand生成安全的随机数
 	randomBytes := make([]byte, length)
 	rand.Read(randomBytes)
 
@@ -169,7 +176,7 @@ func generateBase36String(length int) string {
 	return string(result)
 }
 
-/* 直接上传文件到OSS */
+// 直接上传文件到OSS
 func (s *OSSService) UploadFile(file multipart.File, objectKey string, contentType string) error {
 	// 读取文件内容
 	fileBytes, err := io.ReadAll(file)
@@ -198,7 +205,7 @@ func (s *OSSService) UploadFile(file multipart.File, objectKey string, contentTy
 	return nil
 }
 
-/* 删除OSS文件 */
+// 删除OSS文件
 func (s *OSSService) DeleteFile(objectKey string) error {
 	request := &oss.DeleteObjectRequest{
 		Bucket: oss.Ptr(s.config.OSSBucket),
@@ -214,12 +221,12 @@ func (s *OSSService) DeleteFile(objectKey string) error {
 	return nil
 }
 
-/* 获取文件访问URL */
+// 获取文件访问URL
 func (s *OSSService) GetFileURL(objectKey string) (string, error) {
 	return s.SignToFetch(objectKey)
 }
 
-/* 获取文件列表 */
+// 获取文件列表
 func (s *OSSService) GetFileList(prefix string, maxKeys int) (*models.FileListResponse, error) {
 	if maxKeys <= 0 || maxKeys > 1000 {
 		maxKeys = 100 // 默认100，最大1000
@@ -266,7 +273,7 @@ func (s *OSSService) GetFileList(prefix string, maxKeys int) (*models.FileListRe
 	return response, nil
 }
 
-/* 验证文件类型和大小 */
+// 验证文件类型和大小
 func (s *OSSService) ValidateFile(fileHeader *multipart.FileHeader) error {
 	const maxFileSize = 10 * 1024 * 1024 // 10MB
 
@@ -303,7 +310,7 @@ func (s *OSSService) ValidateFile(fileHeader *multipart.FileHeader) error {
 	return nil
 }
 
-/* 检查OSS配置是否完整 */
+// 检查OSS配置是否完整
 func (s *OSSService) ValidateConfig() error {
 	if s.config.OSSAccessKeyID == "" {
 		return fmt.Errorf("OSS_ACCESS_KEY_ID 未配置")
@@ -320,7 +327,7 @@ func (s *OSSService) ValidateConfig() error {
 	return nil
 }
 
-/* 解析maxKeys参数 */
+// 解析maxKeys参数
 func ParseMaxKeys(maxKeysStr string) int {
 	if maxKeysStr == "" {
 		return 100

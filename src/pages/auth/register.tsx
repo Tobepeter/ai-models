@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { FormItem, FormLabel, FormInput, FormPwd } from '@/components/common/form'
-import { useAuthStore } from '@/store/auth-store'
-import { FormErrors, RegisterRequest } from '@/types/auth-types'
+import { useUserStore } from '@/store/user-store'
+import { useRegister } from '@/api/auth'
+import { FormErrors, RegisterRequest } from '@/api/types/auth-types'
 
 export const Register = () => {
 	const navigate = useNavigate()
-	const { register, isLoading, error, clearError, isAuthenticated } = useAuthStore()
+	const { isAuthenticated, setAuth, setAuthError, authError } = useUserStore()
+	const registerMutation = useRegister()
 
 	const [form, setForm] = useState<RegisterRequest>({
 		username: '',
@@ -65,15 +67,17 @@ export const Register = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		clearError()
+		setAuthError(null)
 
 		if (!validate()) return
 
 		try {
-			await register(form)
+			const result = await registerMutation.mutateAsync(form)
+			setAuth(result.user, result.token)
 			navigate('/', { replace: true })
 		} catch (err) {
-			// 错误已在store中处理
+			const errorMsg = err instanceof Error ? err.message : '注册失败'
+			setAuthError(errorMsg)
 		}
 	}
 
@@ -95,9 +99,9 @@ export const Register = () => {
 				<CardContent className="px-6 pb-6">
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 						{/* 全局错误提示 */}
-						{error && (
+						{authError && (
 							<Alert variant="destructive">
-								<AlertDescription>{error}</AlertDescription>
+								<AlertDescription>{authError}</AlertDescription>
 							</Alert>
 						)}
 
@@ -111,7 +115,7 @@ export const Register = () => {
 								placeholder="请输入用户名（3-50个字符）"
 								value={form.username}
 								onChange={handleChange('username')}
-								disabled={isLoading}
+								disabled={registerMutation.isPending}
 								error={errors.username}
 								autoComplete="username"
 							/>
@@ -122,7 +126,7 @@ export const Register = () => {
 							<FormLabel htmlFor="email" required>
 								邮箱地址
 							</FormLabel>
-							<FormInput id="email" type="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange('email')} disabled={isLoading} error={errors.email} autoComplete="email" />
+							<FormInput id="email" type="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange('email')} disabled={registerMutation.isPending} error={errors.email} autoComplete="email" />
 						</FormItem>
 
 						{/* 密码 */}
@@ -135,7 +139,7 @@ export const Register = () => {
 								placeholder="请输入密码（至少6个字符）"
 								value={form.password}
 								onChange={handleChange('password')}
-								disabled={isLoading}
+								disabled={registerMutation.isPending}
 								error={errors.password}
 								autoComplete="new-password"
 							/>
@@ -151,7 +155,7 @@ export const Register = () => {
 								placeholder="请再次输入密码"
 								value={form.confirmPassword}
 								onChange={handleChange('confirmPassword')}
-								disabled={isLoading}
+								disabled={registerMutation.isPending}
 								error={errors.confirmPassword}
 								autoComplete="new-password"
 							/>
@@ -161,10 +165,10 @@ export const Register = () => {
 						<Button
 							type="submit"
 							className="w-full h-11 text-base font-medium bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
-							disabled={isLoading}
+							disabled={registerMutation.isPending}
 						>
-							{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							{isLoading ? '创建账户中...' : '创建账户'}
+							{registerMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							{registerMutation.isPending ? '创建账户中...' : '创建账户'}
 						</Button>
 
 						{/* 登录链接 */}

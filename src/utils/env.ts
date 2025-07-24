@@ -28,8 +28,9 @@ export const ossRegion = import.meta.env.VITE_OSS_REGION || ''
 
 export const ossRoleArn = import.meta.env.VITE_OSS_ROLE_ARN || ''
 
-export const ossReadAccess = (import.meta.env.VITE_OSS_READ_ACCESS as OssAccessType) || OssAccessType.Pub
-export const ossWriteAccess = (import.meta.env.VITE_OSS_WRITE_ACCESS as OssAccessType) || OssAccessType.Sts
+// NOTE: 暂时不放 env 配置了，这个是和后端挂钩的
+export const ossReadAccess = OssAccessType.Pub as OssAccessType
+export const ossWriteAccess = OssAccessType.Sts as OssAccessType
 
 // NOTE: 只有env配置了，ak，这个变量才会注入到前端
 let ossAccessKeyId = ''

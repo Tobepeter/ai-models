@@ -6,14 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
-/**
- * 数据库模型基础结构体
- * 包含所有模型的通用字段
- */
 type BaseModel struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type BaseSoftModel struct {
+	BaseModel
+	// 目前不建议用，很麻烦，特别是uniqueKey比较多时候，软删除还不让加
+	// 除非你每次upadte或者新增时候，如果有占位的软删除字段都要删掉
+	// 一般前端警告一下数据不可恢复就行了
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 

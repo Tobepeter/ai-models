@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useAuthStore } from '@/store/auth-store'
+import { useUserStore } from '@/store/user-store'
 import { Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
 
 export const AppHeader = () => {
-	const { user } = useAuthStore()
+	const { user } = useUserStore()
 	const navigate = useNavigate()
 	const location = useLocation()
 	const matches = useMatches()

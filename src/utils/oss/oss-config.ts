@@ -6,12 +6,12 @@ class OssConfig {
 
 	get apiBaseUrl() {
 		const useGoDev = true
-		const { devOssNode, devGo, prod } = requestConfig.serverUrls
+		const { devOssNode, serverUrl } = requestConfig
 
-		if (isDev) {
-			return useGoDev ? devGo : devOssNode
+		if (isDev && useGoDev) {
+			return devOssNode
 		} else {
-			return prod
+			return serverUrl
 		}
 	}
 }

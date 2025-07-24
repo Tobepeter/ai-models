@@ -22,7 +22,7 @@ build:
 run:
 	go run $(MAIN_PATH)
 
-# 工具命令  
+# 工具命令
 test:
 	go test -v ./...
 
@@ -32,3 +32,14 @@ clean:
 
 bootstrap:
 	go install github.com/air-verse/air@latest
+
+# 测试覆盖率
+test-coverage:
+	go test -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "覆盖率报告已生成: coverage.html"
+
+# 清理测试文件
+test-clean:
+	rm -f coverage.out coverage.html
+

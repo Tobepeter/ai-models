@@ -1,13 +1,13 @@
 import { useMount } from 'ahooks'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
-import { useAuthStore } from './store/auth-store'
+import { useUserStore } from './store/user-store'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
 
 function App() {
 	const navigate = useNavigate()
-	// const { initializeAuth } = useAuthStore()
+	// const { initializeAuth } = useUserStore()
 	useGitHubPagesRouter()
 
 	useMount(() => {

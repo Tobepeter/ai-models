@@ -9,15 +9,12 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 export const User = () => {
-	// const { user, logout } = useAuthStore()
-	const user = useUserStore((state) => state.profile)
-
-	const { stats } = useUserStore()
+	const { profile: user, logout } = useUserStore()
 	const navigate = useNavigate()
 	const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false)
 
 	const handleLogout = () => {
-		// logout()
+		logout()
 		navigate('/login')
 	}
 
@@ -62,37 +59,37 @@ export const User = () => {
 				<CardContent className="space-y-4">
 					<div className="flex justify-between items-center">
 						<span className="text-sm">文本对话次数</span>
-						<span className="font-medium">{stats.textChatCount} 次</span>
+						<span className="font-medium">128 次</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">图像生成次数</span>
-						<span className="font-medium">{stats.imageGenCount} 次</span>
+						<span className="font-medium">45 次</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">音频生成次数</span>
-						<span className="font-medium">{stats.audioGenCount} 次</span>
+						<span className="font-medium">12 次</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">视频生成次数</span>
-						<span className="font-medium">{stats.videoGenCount} 次</span>
+						<span className="font-medium">8 次</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">AI对比使用</span>
-						<span className="font-medium">{stats.chatHubUsageCount} 次</span>
+						<span className="font-medium">23 次</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">本月活跃天数</span>
-						<span className="font-medium">{stats.monthlyActiveDays} 天</span>
+						<span className="font-medium">15 天</span>
 					</div>
 					<Separator />
 					<div className="flex justify-between items-center">
 						<span className="text-sm">总使用天数</span>
-						<span className="font-medium">{stats.totalUsageDays} 天</span>
+						<span className="font-medium">89 天</span>
 					</div>
 				</CardContent>
 			</Card>

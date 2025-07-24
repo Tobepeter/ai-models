@@ -3,8 +3,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Cover } from '@/components/common/cover'
-import { useAuthStore } from '@/store/auth-store'
-import { FormErrors, LoginRequest } from '@/types/auth-types'
+import { useUserStore } from '@/store/user-store'
+import { useLogin } from '@/api/auth'
+import { FormErrors, LoginRequest } from '@/api/types/auth-types'
 import { useMount } from 'ahooks'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -12,7 +13,8 @@ import { Link, useNavigate } from 'react-router-dom'
 
 export const Login = () => {
 	const navigate = useNavigate()
-	const { login, isLoading, error, clearError, isAuthenticated } = useAuthStore()
+	const { isAuthenticated, setAuth, setAuthError, authError } = useUserStore()
+	const loginMutation = useLogin()
 
 	const [form, setForm] = useState<LoginRequest>({
 		username: '',
@@ -44,15 +46,17 @@ export const Login = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		clearError()
+		setAuthError(null)
 
 		if (!validate()) return
 
 		try {
-			await login(form)
+			const result = await loginMutation.mutateAsync(form)
+			setAuth(result.user, result.token)
 			navigate('/', { replace: true })
 		} catch (err) {
-			// 错误已在store中处理
+			const errorMsg = err instanceof Error ? err.message : '登录失败'
+			setAuthError(errorMsg)
 		}
 	}
 
@@ -76,9 +80,9 @@ export const Login = () => {
 				<CardContent className="px-6 pb-6">
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 						{/* 全局错误提示 */}
-						{error && (
+						{authError && (
 							<Alert variant="destructive">
-								<AlertDescription>{error}</AlertDescription>
+								<AlertDescription>{authError}</AlertDescription>
 							</Alert>
 						)}
 
@@ -87,7 +91,7 @@ export const Login = () => {
 							<FormLabel htmlFor="username" required>
 								用户名
 							</FormLabel>
-							<FormInput id="username" placeholder="请输入用户名" value={form.username} onChange={handleChange('username')} disabled={isLoading} error={errors.username} autoComplete="username" />
+							<FormInput id="username" placeholder="请输入用户名" value={form.username} onChange={handleChange('username')} disabled={loginMutation.isPending} error={errors.username} autoComplete="username" />
 						</FormItem>
 
 						{/* 密码 */}
@@ -95,17 +99,17 @@ export const Login = () => {
 							<FormLabel htmlFor="password" required>
 								密码
 							</FormLabel>
-							<FormPwd id="password" placeholder="请输入密码" value={form.password} onChange={handleChange('password')} disabled={isLoading} error={errors.password} autoComplete="current-password" />
+							<FormPwd id="password" placeholder="请输入密码" value={form.password} onChange={handleChange('password')} disabled={loginMutation.isPending} error={errors.password} autoComplete="current-password" />
 						</FormItem>
 
 						{/* 登录按钮 */}
 						<Button
 							type="submit"
 							className="w-full h-11 text-base font-medium bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
-							disabled={isLoading}
+							disabled={loginMutation.isPending}
 						>
-							{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							{isLoading ? '登录中...' : '立即登录'}
+							{loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							{loginMutation.isPending ? '登录中...' : '立即登录'}
 						</Button>
 
 						{/* 注册链接 */}

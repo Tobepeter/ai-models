@@ -175,6 +175,5 @@ func (s *AuthService) RefreshToken(oldToken string) (string, error) {
 
 // 获取JWT密钥
 func (s *AuthService) getJWTSecret() string {
-	// TODO: 从配置文件或环境变量中读取
-	return "your-secret-key-change-in-production"
+	return s.config.JWTSecret
 }

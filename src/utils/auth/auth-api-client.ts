@@ -1,15 +1,14 @@
 import axios, { AxiosInstance } from 'axios'
 import { requestConfig } from '@/config/request-config'
-import { isDev } from '@/utils/env'
-import { 
-	LoginRequest, 
-	RegisterRequest, 
-	LoginResponse, 
-	RegisterResponse, 
-	ApiResponse,
+import {
+	LoginRequest,
+	RegisterRequest,
+	LoginResponse,
+	RegisterResponse,
 	AuthUser,
 	ChangePasswordRequest
-} from '@/types/auth-types'
+} from '@/api/types/auth-types'
+import { ApiResponse } from '@/api/common'
 
 /**
  * 认证API客户端
@@ -19,10 +18,8 @@ class AuthApiClient {
 	private client: AxiosInstance
 
 	constructor() {
-		const baseURL = isDev ? requestConfig.serverUrls.devGo : requestConfig.serverUrls.prod
-		
 		this.client = axios.create({
-			baseURL,
+			baseURL: requestConfig.serverUrl,
 			timeout: requestConfig.timeout,
 			headers: {
 				'Content-Type': 'application/json',

@@ -135,22 +135,22 @@ func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
 	return s.CreatePaginationResponse(userResponses, page, limit, total), nil
 }
 
-// 删除用户 (软删除)
+// DeleteUser 硬删除用户
 func (s *UserService) DeleteUser(id uint) error {
-	return s.SoftDelete(&models.User{}, id)
+	return s.HardDelete(&models.User{}, id)
 }
 
-// 激活用户
+// ActivateUser 激活用户
 func (s *UserService) ActivateUser(id uint) error {
 	return s.UpdateField(&models.User{}, id, "is_active", true)
 }
 
-// 停用用户
+// DeactivateUser 停用用户
 func (s *UserService) DeactivateUser(id uint) error {
 	return s.UpdateField(&models.User{}, id, "is_active", false)
 }
 
-// 修改密码
+// ChangePassword 修改密码
 func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordRequest) error {
 	// 获取用户信息
 	var user models.User

@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -24,15 +23,7 @@ func Initialize(cfg *config.Config) error {
 
 	logrus.Infof("正在连接数据库: %s:%s/%s", cfg.PostgresHost, cfg.PostgresPort, cfg.PostgresDB)
 
-	// 配置 GORM
-	gormConfig := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	}
-
-	// 如果是生产环境，减少日志输出
-	if cfg.IsProd {
-		gormConfig.Logger = logger.Default.LogMode(logger.Error)
-	}
+	gormConfig := GetGormConfig(cfg)
 
 	// 连接数据库
 	DB, err = gorm.Open(postgres.Open(dsn), gormConfig)
@@ -75,6 +66,7 @@ func autoMigrate() error {
 	err := DB.AutoMigrate(
 		&models.User{},
 		&models.ConversationHistory{},
+		&models.Crud{},
 	)
 
 	if err != nil {

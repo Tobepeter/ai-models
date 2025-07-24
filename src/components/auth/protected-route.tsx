@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '@/store/auth-store'
+import { useUserStore } from '@/store/user-store'
 
 /**
  * 路由保护组件
@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/auth-store'
 export const ProtectedRoute = (props: ProtectedRouteProps) => {
 	const { children, requireAuth = true, redirectTo = '/login' } = props
 
-	const { isAuthenticated } = useAuthStore()
+	const { isAuthenticated } = useUserStore()
 	const location = useLocation()
 
 	// 如果需要认证但用户未登录，重定向到登录页

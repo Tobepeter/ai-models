@@ -14,6 +14,7 @@ type Config struct {
 	IsDev    bool
 	IsProd   bool
 	IsAirDev bool
+	IsTest   bool
 
 	PostgresHost     string
 	PostgresPort     string
@@ -70,6 +71,7 @@ func New() *Config {
 		IsDev:    !isProd,
 		IsProd:   isProd,
 		IsAirDev: isAirDev,
+		IsTest:   false,
 
 		PostgresHost:     postGresHost,
 		PostgresPort:     os.Getenv("POSTGRES_PORT"),

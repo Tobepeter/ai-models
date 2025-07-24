@@ -13,8 +13,6 @@ interface ImportMetaEnv {
 	readonly VITE_OSS_ACCESS_KEY_SECRET: string // OSS访问密钥Secret (仅ak模式需要)
 	readonly VITE_OSS_BUCKET: string // OSS存储桶名称
 	readonly VITE_OSS_REGION: string // OSS区域
-	readonly VITE_OSS_READ_ACCESS: string // 读权限模式: sts|api|pub|ak
-	readonly VITE_OSS_WRITE_ACCESS: string // 写权限模式: sts|api|pub|ak
 }
 
 declare const __OSS_BASE__: string

@@ -37,13 +37,15 @@ func main() {
 	authService := services.NewAuthService(cfg)
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
+	crudService := services.NewCrudService()
 
 	userHandler := handlers.NewUserHandler(userService, authService)
 	aiHandler := handlers.NewAIHandler(aiService)
 	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
+	crudHandler := handlers.NewCrudHandler(crudService)
 
-	router := setupRouter(cfg, authService, userHandler, aiHandler, ossHandler, healthHandler)
+	router := setupRouter(cfg, authService, userHandler, aiHandler, ossHandler, healthHandler, crudHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -51,7 +53,7 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authService *services.AuthService, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authService *services.AuthService, userHandler *handlers.UserHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler) *gin.Engine {
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -86,6 +88,7 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, userHand
 			users.POST("/:id/deactivate", middleware.AdminRequired(authService), userHandler.DeactivateUser) // 停用用户
 		}
 
+		// 很多 openai 都是带有 v1 前缀的，之类模拟一下
 		ai := api.Group("/ai/v1")
 		ai.Use(middleware.RateLimitMid())
 		{
@@ -106,6 +109,15 @@ func setupRouter(cfg *config.Config, authService *services.AuthService, userHand
 			oss.POST("/upload", handlers.FileSizeMiddleware(), ossHandler.UploadFile)
 			oss.POST("/delete", ossHandler.DeleteFile)
 			oss.POST("/get-url", ossHandler.GetFileURL)
+		}
+
+		crud := api.Group("/crud")
+		{
+			crud.POST("/", crudHandler.Create)      // 创建记录
+			crud.GET("/:id", crudHandler.GetByID)   // 根据ID获取记录
+			crud.GET("/", crudHandler.GetList)      // 获取列表（支持分页）
+			crud.PUT("/:id", crudHandler.Update)    // 更新记录
+			crud.DELETE("/:id", crudHandler.Delete) // 删除记录
 		}
 	}
 
