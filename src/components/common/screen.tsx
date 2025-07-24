@@ -1,5 +1,3 @@
-import { withCondHook } from '@/hoc/withCondHook'
-import { useLockScroll } from '@/hooks/use-lock-scroll'
 import styled from '@emotion/styled'
 import { PropsWithChildren } from 'react'
 
@@ -14,22 +12,17 @@ const ScreenContainer = styled.div<{ height: string }>`
  *
  * 专门针对移动设备包含，地址栏或者工具栏适配的
  * 使用 dvh, 或者 svh, 如果不支持，默认降级为 vh
+ * 
+ * 方便一些需要全屏适配的页面快速布局
  */
 export const Screen = (props: PropsWithChildren<ScreenProps>) => {
-	const { noLockScroll, dynamicHeight, children } = props
-	const LockScroll = withCondHook(useLockScroll, !noLockScroll)
+	const { dynamicHeight, children } = props
 
 	const height = dynamicHeight ? '100dvh' : '100svh'
 
-	return (
-		<ScreenContainer height={height}>
-			<LockScroll />
-			{children}
-		</ScreenContainer>
-	)
+	return <ScreenContainer height={height}>{children}</ScreenContainer>
 }
 
 export type ScreenProps = {
-	noLockScroll?: boolean
 	dynamicHeight?: boolean
 }

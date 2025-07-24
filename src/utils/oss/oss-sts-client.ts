@@ -27,7 +27,7 @@ class OssStsClient {
 
 	/** 获取STS临时凭证 */
 	async getToken(): Promise<Credentials> {
-		const resp = await axios.post<OssBaseResp<OssSTSRespData>>(`${ossConfig.apiBaseUrl}/sts`)
+		const resp = await axios.post<OssBaseResp<OssSTSRespData>>(`${ossConfig.apiBaseUrl}/oss/sts`)
 		const { data } = resp
 		if (data.code !== 0) throw new Error(data.msg || 'Failed to get STS token')
 		const token = data.data.credentials

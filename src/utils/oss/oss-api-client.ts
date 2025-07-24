@@ -58,7 +58,7 @@ class OssApiClient {
 			hashifyName = uploadInfo.hashifyName
 		}
 
-		const res = await this.client.post<OssBaseResp<OssSignToUploadData>>('/sign-to-upload', {
+		const res = await this.client.post<OssBaseResp<OssSignToUploadData>>('/oss/sign-to-upload', {
 			objectKey,
 			fileType: file.type || 'application/octet-stream',
 		})
@@ -119,7 +119,7 @@ class OssApiClient {
 		}
 
 		try {
-			const res = await this.client.post<OssBaseResp<OssApiUploadData>>('/upload', formData, {
+			const res = await this.client.post<OssBaseResp<OssApiUploadData>>('/oss/upload', formData, {
 				onUploadProgress: (progressEvent) => {
 					if (onProgress && progressEvent.total) {
 						const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -153,17 +153,17 @@ class OssApiClient {
 			console.warn('[oss] ali-oss 签名模式没有删除接口')
 		}
 
-		const res = await this.client.post('/delete', { objectKey })
+		const res = await this.client.post('/oss/delete', { objectKey })
 		return res.data
 	}
 
 	async getFileUrl(objectKey: string) {
 		if (this.signMode) {
-			const res = await this.client.post<OssBaseResp<SignToFetchData>>('/sign-to-fetch', { objectKey })
+			const res = await this.client.post<OssBaseResp<SignToFetchData>>('/oss/sign-to-fetch', { objectKey })
 			if (res.data.code !== 0) throw new Error(res.data.msg)
 			return res.data.data?.signedUrl || ''
 		} else {
-			const res = await this.client.post<OssBaseResp<OssApiGetUrlData>>('/get-url', { objectKey })
+			const res = await this.client.post<OssBaseResp<OssApiGetUrlData>>('/oss/get-url', { objectKey })
 			if (res.data.code !== 0) throw new Error(res.data.msg)
 			return res.data.data?.url || ''
 		}

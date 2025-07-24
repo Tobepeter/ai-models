@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 import { chatHelper } from './chat-helper'
 import { useChatStore } from './chat-store'
 import { ChatInput, ChatInvalidAlert, ChatMsg, ChatSettings, ChatToolbar } from './components'
+import { useLockScroll } from '@/hooks/use-lock-scroll'
 
 /**
  * 聊天页面主组件
@@ -12,6 +13,8 @@ import { ChatInput, ChatInvalidAlert, ChatMsg, ChatSettings, ChatToolbar } from 
 export const Chat = () => {
 	const { msgList, currMediaType, isLoading } = useChatStore()
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+	useLockScroll()
 
 	useMount(() => {
 		aiAgentConfig.restore()

@@ -8,7 +8,7 @@ class OssConfig {
 		const useGoDev = true
 		const { devOssNode, serverUrl } = requestConfig
 
-		if (isDev && useGoDev) {
+		if (isDev && !useGoDev) {
 			return devOssNode
 		} else {
 			return serverUrl
