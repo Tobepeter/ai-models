@@ -5,6 +5,24 @@
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<title>AI Models</title>
+		<script>
+			;(function () {
+				// 主题初始化，防止一开始一开始闪烁
+				try {
+					var storedTheme = localStorage.getItem('theme')
+					var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+					var theme = storedTheme === 'system' ? systemTheme : storedTheme || 'light'
+
+					// 应用主题到文档根元素
+					document.documentElement.setAttribute('data-theme', theme)
+
+					// 如果使用 class 而非 data-theme 属性（如与 Tailwind 集成时）
+					// document.documentElement.classList.toggle('dark', theme === 'dark');
+				} catch (e) {
+					console.error('主题初始化失败:', e)
+				}
+			})()
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>

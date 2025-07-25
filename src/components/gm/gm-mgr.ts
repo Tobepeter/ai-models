@@ -34,6 +34,11 @@ class GMManager {
 	private reconnectTimer: NodeJS.Timeout | null = null
 	private isConnecting = false
 
+	// 重连状态
+	private reconnectId = 0 // 重连 ID，用于终止重连
+	private reconnectAttempts = 0 // 当前重连次数
+	private currentDelay = gmCfg.reconnect.initialDelay // 当前延迟时间
+
 	// 事件回调
 	private onConnChange?: (connected: boolean) => void
 	private onProcUpdate?: (processes: ProcessLog[]) => void
@@ -64,7 +69,7 @@ class GMManager {
 				console.log('✅ GM Server 连接成功')
 				this.isConnecting = false
 				this.onConnChange?.(true)
-				this.clearReconnectTimer()
+				this.resetReconnectState()
 			}
 
 			this.ws.onmessage = (event) => {
@@ -95,7 +100,7 @@ class GMManager {
 	}
 
 	disconnect() {
-		this.clearReconnectTimer()
+		this.clearReconnect()
 		if (this.ws) {
 			this.ws.close()
 			this.ws = null
@@ -241,19 +246,60 @@ class GMManager {
 		}
 	}
 
-	private scheduleReconnect() {
-		this.clearReconnectTimer()
-		this.reconnectTimer = setTimeout(() => {
-			console.log('🔄 尝试重连 GM Server...')
-			this.connect()
-		}, 3000)
+	/** 重置重连状态 */
+	private resetReconnectState() {
+		this.clearReconnect()
+		this.reconnectAttempts = 0
+		this.currentDelay = gmCfg.reconnect.initialDelay
 	}
 
-	private clearReconnectTimer() {
+	/** 清除重连定时器并增加重连 ID */
+	private clearReconnect() {
+		this.reconnectId++ // 增加 ID，使之前的重连回调失效
 		if (this.reconnectTimer) {
 			clearTimeout(this.reconnectTimer)
 			this.reconnectTimer = null
 		}
+	}
+
+	/** 计算带抖动的延迟时间 */
+	private calculateDelayWithJitter(baseDelay: number): number {
+		const jitter = Math.random() * gmCfg.reconnect.jitterMax * baseDelay
+		return Math.floor(baseDelay + jitter)
+	}
+
+	/** 安排下次重连 */
+	private scheduleReconnect() {
+		// 检查是否超过最大重连次数
+		if (gmCfg.reconnect.maxAttempts > 0 && this.reconnectAttempts >= gmCfg.reconnect.maxAttempts) {
+			console.log(`❌ 已达到最大重连次数 (${gmCfg.reconnect.maxAttempts})，停止重连`)
+			return
+		}
+
+		this.clearReconnect()
+		this.reconnectAttempts++
+
+		// 计算延迟时间（带抖动）
+		const delayWithJitter = this.calculateDelayWithJitter(this.currentDelay)
+
+		console.log(`🔄 第 ${this.reconnectAttempts} 次重连，${delayWithJitter}ms 后尝试...`)
+
+		// 保存当前重连 ID
+		const currentReconnectId = this.reconnectId
+
+		this.reconnectTimer = setTimeout(() => {
+			// 检查重连 ID 是否仍然有效（防止被 clearReconnect 取消）
+			if (currentReconnectId !== this.reconnectId) {
+				console.log('🚫 重连已被取消')
+				return
+			}
+
+			console.log('🔄 尝试重连 GM Server...')
+			this.connect()
+		}, delayWithJitter)
+
+		// 更新下次延迟时间（指数退避）
+		this.currentDelay = Math.min(this.currentDelay * gmCfg.reconnect.multiplier, gmCfg.reconnect.maxDelay)
 	}
 }
 

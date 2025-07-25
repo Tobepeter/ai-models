@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { FormTips } from '@/components/common/form-tips'
-import { useAppStore } from '@/store/app-store'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { AIPlatform } from '@/utils/ai-agent/types'
 import { isProd } from '@/utils/env'
+import { useTheme } from 'next-themes'
 
 import { useState, useEffect } from 'react'
 import { chatHelper } from '../chat-helper'
@@ -19,7 +19,7 @@ import { useChatStore } from '../chat-store'
 export const ChatSettings = () => {
 	const { showSettings, setData, currStream } = useChatStore()
 	const { currPlatform } = useChatStore()
-	const { theme, setTheme } = useAppStore()
+	const { theme, setTheme } = useTheme()
 
 	const [apiKey, setApiKey] = useState(aiAgentConfig.getApiKey(currPlatform))
 	const [currTheme, setCurrTheme] = useState(theme)
@@ -32,13 +32,13 @@ export const ChatSettings = () => {
 			setCurrTheme(theme)
 			setStreamEnabled(currStream)
 		}
-	}, [showSettings, currStream])
+	}, [showSettings, currStream, theme])
 
 	// 保存配置
 	const saveConfigs = () => {
 		aiAgentConfig.setApiKey(currPlatform, apiKey)
 		aiAgentConfig.save()
-		setTheme(theme) // 使用 store 的 setTheme，persist 会自动保存
+		setTheme(currTheme || 'system') // next-themes 会自动处理持久化
 		chatHelper.setStream(streamEnabled)
 		setData({ showSettings: false })
 	}
@@ -60,7 +60,8 @@ export const ChatSettings = () => {
 			// 被动关闭（不保存修改）
 			chatHelper.restorePersist()
 			if (theme !== currTheme) {
-				setTheme(currTheme) // 使用 store 的 setTheme，persist 会自动保存
+				// 恢复原来的主题设置
+				setCurrTheme(theme)
 			}
 		}
 		setData({ showSettings: open })
@@ -103,7 +104,7 @@ export const ChatSettings = () => {
 
 					{/* 主题设置 */}
 					<FormTips label="主题" help="选择界面的外观主题">
-						<Select value={theme} onValueChange={setTheme}>
+						<Select value={currTheme} onValueChange={setCurrTheme}>
 							<SelectTrigger>
 								<SelectValue />
 							</SelectTrigger>

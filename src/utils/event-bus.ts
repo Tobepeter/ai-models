@@ -1,4 +1,3 @@
-import { ComputedTheme } from '@/store/app-store'
 import { useUnmount } from 'ahooks'
 import { EventEmitter } from 'eventemitter3'
 
