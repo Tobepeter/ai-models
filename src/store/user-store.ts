@@ -1,6 +1,4 @@
-import { dummy } from '@/utils/dummy'
-import { UserProfile, UserSettings } from '@/types/user-types'
-import { AuthUser } from '@/api/types/auth-types'
+import { UserResp } from '@/api/types/user-types'
 import { authApi } from '@/api/auth'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -8,45 +6,18 @@ import { persist } from 'zustand/middleware'
 export interface UserStore {
 	// Auth相关状态
 	isAuthenticated: boolean
-	user: AuthUser | null
+	user: UserResp | null
 	token: string | null
 	authError: string | null
-
-	// 用户数据
-	profile: UserProfile
-	settings: UserSettings
 	isLoading: boolean
 
 	// Auth Actions
-	setAuth: (user: AuthUser, token: string) => void
+	setAuth: (user: UserResp, token: string) => void
 	clearAuth: () => void
 	setAuthError: (error: string | null) => void
 	initializeAuth: () => void
-
-	// User Actions
-	updateProfile: (updates: Partial<UserProfile>) => void
-	updateSettings: (updates: Partial<UserSettings>) => void
 	setLoading: (loading: boolean) => void
 	logout: () => void
-}
-
-// 默认用户数据
-const defaultProfile: UserProfile = {
-	id: 'demo-user-001',
-	name: '演示用户',
-	email: 'demo@example.com',
-	avatar: dummy.avatar,
-	joinDate: '2024-01-01',
-	lastLoginDate: new Date().toISOString().split('T')[0],
-	isOnline: true,
-}
-
-const defaultSettings: UserSettings = {
-	theme: 'system',
-	language: 'zh-CN',
-	notifications: true,
-	autoSave: true,
-	streamingEnabled: true,
 }
 
 export const useUserStore = create<UserStore>()(
@@ -57,10 +28,6 @@ export const useUserStore = create<UserStore>()(
 			user: null,
 			token: null,
 			authError: null,
-
-			// 用户数据
-			profile: defaultProfile,
-			settings: defaultSettings,
 			isLoading: false,
 
 			// Auth Actions
@@ -82,31 +49,18 @@ export const useUserStore = create<UserStore>()(
 				})
 			},
 
-					setAuthError: (error) => {
-			set({ authError: error })
-		},
-
-		initializeAuth: () => {
-			const token = localStorage.getItem('auth_token')
-			if (token) {
-				// 这里可以触发获取用户信息的逻辑
-				set({ token, isAuthenticated: true })
-			} else {
-				get().clearAuth()
-			}
-		},
-
-			// User Actions
-			updateProfile: (updates) => {
-				set((state) => ({
-					profile: { ...state.profile, ...updates },
-				}))
+			setAuthError: (error) => {
+				set({ authError: error })
 			},
 
-			updateSettings: (updates) => {
-				set((state) => ({
-					settings: { ...state.settings, ...updates },
-				}))
+			initializeAuth: () => {
+				const token = localStorage.getItem('auth_token')
+				if (token) {
+					// 这里可以触发获取用户信息的逻辑
+					set({ token, isAuthenticated: true })
+				} else {
+					get().clearAuth()
+				}
 			},
 
 			setLoading: (loading) => {
@@ -117,12 +71,8 @@ export const useUserStore = create<UserStore>()(
 				authApi.logout()
 				// 清理auth状态
 				get().clearAuth()
-				// 重置用户数据为默认状态
-				set({
-					profile: defaultProfile,
-					settings: defaultSettings,
-					isLoading: false,
-				})
+				// 重置加载状态
+				set({ isLoading: false })
 			},
 		}),
 		{
@@ -132,8 +82,6 @@ export const useUserStore = create<UserStore>()(
 				isAuthenticated: state.isAuthenticated,
 				user: state.user,
 				token: state.token,
-				profile: state.profile,
-				settings: state.settings,
 			}),
 		}
 	)

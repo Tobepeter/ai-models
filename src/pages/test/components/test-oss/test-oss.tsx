@@ -1,4 +1,5 @@
 import { ossAccessKeyId, ossAccessKeySecret, ossReadAccess, ossWriteAccess } from '@/utils/env'
+import { ossApiClient } from '@/utils/oss/oss-api-client'
 import { ossClient } from '@/utils/oss/oss-client'
 import { ossStsClient } from '@/utils/oss/oss-sts-client'
 import { OssAccessType, OssUploadResult } from '@/utils/oss/oss-types'
@@ -36,7 +37,7 @@ export const TestOSS = () => {
 	const [currAkId, setCurrAkId] = useState(ossAccessKeyId)
 	const [currAkSecret, setCurrAkSecret] = useState(ossAccessKeySecret)
 
-	const [backendSignMode, setBackendSignMode] = useState(false)
+	const [backendSignMode, setBackendSignMode] = useState(ossApiClient.signMode)
 
 	const handleReadPermChange = (newPerm: OssAccessType) => {
 		setReadPerm(newPerm)
@@ -52,7 +53,7 @@ export const TestOSS = () => {
 
 	const handleBackendSignModeChange = (enabled: boolean) => {
 		setBackendSignMode(enabled)
-		// TODO: 这里可以调用 ossApiClient.setSignMode(enabled)
+		ossApiClient.setSignMode(enabled)
 		console.log('[后端签名模式] 已更新:', enabled)
 	}
 

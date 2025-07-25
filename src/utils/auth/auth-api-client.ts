@@ -5,9 +5,9 @@ import {
 	AuthRegisterReq,
 	AuthLoginResp,
 	AuthRegisterResp,
-	AuthUser,
 	AuthChangePasswordReq
 } from '@/api/types/auth-types'
+import { UserResp } from '@/api/types/user-types'
 import { ApiResponse } from '@/api/common'
 
 /**
@@ -83,9 +83,9 @@ class AuthApiClient {
 	}
 
 	/** 获取用户信息 */
-	async getProfile(): Promise<AuthUser> {
-		const response = await this.client.get<ApiResponse<AuthUser>>('/users/profile')
-		
+	async getProfile(): Promise<UserResp> {
+		const response = await this.client.get<ApiResponse<UserResp>>('/users/profile')
+
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '获取用户信息失败')
 		}
@@ -94,9 +94,9 @@ class AuthApiClient {
 	}
 
 	/** 更新用户信息 */
-	async updateProfile(data: Partial<AuthUser>): Promise<AuthUser> {
-		const response = await this.client.put<ApiResponse<AuthUser>>('/users/profile', data)
-		
+	async updateProfile(data: Partial<UserResp>): Promise<UserResp> {
+		const response = await this.client.put<ApiResponse<UserResp>>('/users/profile', data)
+
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '更新用户信息失败')
 		}

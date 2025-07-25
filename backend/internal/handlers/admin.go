@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"ai-models-backend/internal/services"
+	"ai-models-backend/internal/services/auth"
 	"ai-models-backend/pkg/response"
 	"net/http"
 
@@ -12,10 +13,10 @@ import (
 // 管理员请求处理器
 type AdminHandler struct {
 	userService *services.UserService
-	authService *services.AuthService
+	authService *auth.AuthService
 }
 
-func NewAdminHandler(userService *services.UserService, authService *services.AuthService) *AdminHandler {
+func NewAdminHandler(userService *services.UserService, authService *auth.AuthService) *AdminHandler {
 	return &AdminHandler{
 		userService: userService,
 		authService: authService,

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 export const User = () => {
-	const { profile: user, logout } = useUserStore()
+	const { user, logout } = useUserStore()
 	const navigate = useNavigate()
 	const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false)
 
@@ -29,17 +29,17 @@ export const User = () => {
 				<CardHeader>
 					<div className="flex items-center space-x-4">
 						<Avatar className="h-16 w-16">
-							<AvatarImage src={user.avatar} alt={user.name} />
-							<AvatarFallback className="text-xl">{user.name.charAt(0)}</AvatarFallback>
+							<AvatarImage src={user.avatar} alt={user.username} />
+							<AvatarFallback className="text-xl">{user.username.charAt(0)}</AvatarFallback>
 						</Avatar>
 						<div className="flex-1">
-							<CardTitle className="text-xl">{user.name}</CardTitle>
+							<CardTitle className="text-xl">{user.username}</CardTitle>
 							<CardDescription>{user.email}</CardDescription>
 							<p className="text-sm text-muted-foreground mt-1">
-								注册时间：2025-01-01
+								注册时间：{new Date(user.created_at).toLocaleDateString()}
 							</p>
 							<p className="text-sm text-muted-foreground">
-								最后更新：2025-01-01
+								最后更新：{new Date(user.updated_at).toLocaleDateString()}
 							</p>
 						</div>
 						<Button variant="outline" size="sm">

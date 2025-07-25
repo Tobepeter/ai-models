@@ -1,6 +1,5 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { isDev } from '@/utils/env'
 import { requestConfig } from '@/config/request-config'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 const tokenKey = 'auth_token'
 

@@ -71,6 +71,7 @@ type UserResponse struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Avatar    string    `json:"avatar,omitempty"`
+	Role      string    `json:"role"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -83,6 +84,7 @@ func (u *User) ToResponse() UserResponse {
 		Username:  u.Username,
 		Email:     u.Email,
 		Avatar:    u.Avatar,
+		Role:      u.Role,
 		IsActive:  u.IsActive,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,

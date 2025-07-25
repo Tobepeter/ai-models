@@ -1,5 +1,6 @@
 import { axClient } from '../ax-client'
-import { AuthLoginReq, AuthRegisterReq, AuthLoginResp, AuthRegisterResp, AuthUser, AuthChangePasswordReq } from '../types/auth-types'
+import { AuthLoginReq, AuthRegisterReq, AuthLoginResp, AuthRegisterResp, AuthChangePasswordReq } from '../types/auth-types'
+import { UserResp } from '../types/user-types'
 import { ApiResponse } from '../common'
 
 /** 认证相关API类 */
@@ -48,7 +49,7 @@ class AuthApi {
 
 	// 获取用户信息
 	async getProfile() {
-		const response = await axClient.get<ApiResponse<AuthUser>>('/users/profile')
+		const response = await axClient.get<ApiResponse<UserResp>>('/users/profile')
 		if (response.data.code !== 200) throw new Error(response.data.msg || '获取用户信息失败')
 		return response.data.data!
 	}

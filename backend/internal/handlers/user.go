@@ -3,6 +3,7 @@ package handlers
 import (
 	"ai-models-backend/internal/models"
 	"ai-models-backend/internal/services"
+	"ai-models-backend/internal/services/auth"
 	"ai-models-backend/pkg/response"
 	"net/http"
 	"strconv"
@@ -15,10 +16,10 @@ import (
 // 用户请求处理器
 type UserHandler struct {
 	userService *services.UserService
-	authService *services.AuthService
+	authService *auth.AuthService
 }
 
-func NewUserHandler(userService *services.UserService, authService *services.AuthService) *UserHandler {
+func NewUserHandler(userService *services.UserService, authService *auth.AuthService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 		authService: authService,

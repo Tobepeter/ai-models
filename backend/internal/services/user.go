@@ -222,3 +222,12 @@ func (s *UserService) ResetPassword(userID string, newPassword string) error {
 
 	return s.db.Model(&models.User{}).Where("id = ?", userID).Updates(updateData).Error
 }
+
+// IsAdmin 检查用户是否为管理员
+func (s *UserService) IsAdmin(userID uint) (bool, error) {
+	user, err := s.GetUserByID(userID)
+	if err != nil {
+		return false, err
+	}
+	return user.IsAdmin(), nil
+}

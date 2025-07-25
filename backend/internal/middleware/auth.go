@@ -3,6 +3,7 @@ package middleware
 import (
 	"ai-models-backend/internal/config"
 	"ai-models-backend/internal/services"
+	"ai-models-backend/internal/services/auth"
 	"ai-models-backend/pkg/response"
 	"net/http"
 	"strings"
@@ -12,8 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 认证中间件
-func AuthRequired(authService *services.AuthService) gin.HandlerFunc {
+// AuthRequired 认证中间件
+func AuthRequired(authService *auth.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := extractToken(c)
 		if err != nil {
@@ -55,8 +56,8 @@ func extractToken(c *gin.Context) (string, error) {
 	return token, nil
 }
 
-// 管理员权限中间件
-func AdminRequired(authService *services.AuthService) gin.HandlerFunc {
+// AdminRequired 管理员权限中间件
+func AdminRequired(authService *auth.AuthService, userService *services.UserService) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
 		if !config.AdminCheck {
 			c.Next()
@@ -81,7 +82,7 @@ func AdminRequired(authService *services.AuthService) gin.HandlerFunc {
 		}
 
 		// 认证成功，检查管理员权限
-		isAdmin, err := authService.IsAdmin(userID.(uint))
+		isAdmin, err := userService.IsAdmin(userID.(uint))
 		if err != nil {
 			logrus.Error("Failed to check admin status:", err)
 			response.Error(c, http.StatusInternalServerError, "Failed to verify admin status")

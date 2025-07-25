@@ -33,26 +33,7 @@ export interface AuthRegisterResp {
   token: string
 }
 
-/** 认证用户信息 */
-export interface AuthUser {
-  id: number
-  username: string
-  email: string
-  avatar?: string
-  role: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
 
-/** 认证状态 */
-export interface AuthState {
-  isAuthenticated: boolean
-  user: AuthUser | null
-  token: string | null
-  isLoading: boolean
-  error: string | null
-}
 
 /** 表单验证错误 */
 export interface FormErrors {
