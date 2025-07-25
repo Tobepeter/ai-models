@@ -5,24 +5,18 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { FloatBtn } from '@/components/common/float-btn'
 import { ProcessOutput } from './process-output'
 import { gmCfg, type GMCommandItem } from './gm-cfg'
-import { gmMgr, type ProcessLog, type PortStatus } from './gm-mgr'
+import { gmMgr } from './gm-mgr'
+import { useGMStore } from './gm-store'
 import { useMemoizedFn, useMount } from 'ahooks'
 import { useState } from 'react'
 
 // GM 应用管理面板
 export const GM = () => {
-	const [ports, setPorts] = useState<PortStatus[]>([])
-	const [procs, setProcs] = useState<ProcessLog[]>([])
-	const [wsConn, setWsConn] = useState(false)
 	const [isOpen, setIsOpen] = useState(false)
+	const { connected, connecting, reconnecting, canOperate, shouldShowReconnect, processes, ports, reconnectAttempts } = useGMStore()
 
 	// 初始化 GM Manager
 	const initGMMgr = useMemoizedFn(() => {
-		gmMgr.setCallbacks({
-			onConnChange: setWsConn,
-			onProcUpdate: setProcs,
-			onPortUpdate: setPorts,
-		})
 		gmMgr.connect()
 		gmMgr.fetchPortStatus()
 	})
@@ -76,7 +70,14 @@ export const GM = () => {
 								{/* 连接状态 */}
 								<div className="flex items-center gap-2 mb-4">
 									<span className="text-sm font-medium">GM Server:</span>
-									<Badge variant={wsConn ? 'default' : 'destructive'}>{wsConn ? '已连接' : '未连接'}</Badge>
+									<Badge variant={connected ? 'default' : 'destructive'}>
+										{connected ? '已连接' : connecting ? '连接中...' : reconnecting ? `重连中(${reconnectAttempts}/${gmCfg.reconnect.maxAttempts})` : '未连接'}
+									</Badge>
+									{shouldShowReconnect && (
+										<Button size="sm" variant="outline" onClick={() => gmMgr.manualReconnect()}>
+											重连
+										</Button>
+									)}
 								</div>
 
 								{/* 端口状态 */}
@@ -100,7 +101,14 @@ export const GM = () => {
 											<div className="text-xs text-muted-foreground">{group.groupName}</div>
 											<div className="grid grid-cols-3 gap-1">
 												{group.list.map((cmd: GMCommandItem, cIdx: number) => (
-													<Button key={cIdx} size="sm" variant={cmd.variant} onClick={() => execCmd(cmd.command)} className="text-xs">
+													<Button
+														key={cIdx}
+														size="sm"
+														variant={cmd.variant}
+														onClick={() => execCmd(cmd.command)}
+														className="text-xs"
+														disabled={!canOperate}
+													>
 														{cmd.label}
 													</Button>
 												))}
@@ -116,7 +124,7 @@ export const GM = () => {
 						</div>
 
 						{/* 右侧：进程输出 */}
-						<ProcessOutput processes={procs} onKillProc={killProc} onClearLogs={clearLogs} />
+						<ProcessOutput processes={processes} onKillProc={killProc} onClearLogs={clearLogs} />
 					</div>
 				</DialogContent>
 			</Dialog>

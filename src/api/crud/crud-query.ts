@@ -1,8 +1,11 @@
 import { CRUDQueryConditions } from '../types/crud-types'
 
-/** CRUD查询基类，提供通用的查询构建方法 */
-export class CrudQueryBase {
-  protected conditions: CRUDQueryConditions = {}
+/**
+ * CRUD查询构建器
+ * 提供通用的查询条件构建方法
+ */
+class CrudQuery {
+  private conditions: CRUDQueryConditions = {}
 
   /* 设置分类过滤 */
   category(category: string) {
@@ -59,3 +62,6 @@ export class CrudQueryBase {
     return this.getConditions()
   }
 }
+
+export const crudQuery = new CrudQuery()
+export { CrudQuery }

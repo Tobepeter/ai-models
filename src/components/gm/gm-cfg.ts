@@ -10,16 +10,13 @@ export interface GMCommandGroup {
 }
 
 class GMCfg {
-	gmPort = 4755
+	gmPort = 7177
 	ports = [5173, 3000, 6006, this.gmPort] // 端口配置
 
 	// 重连配置
 	reconnect = {
-		initialDelay: 1000, // 初始延迟 1s
-		maxDelay: 30000, // 最大延迟 30s
-		multiplier: 2, // 指数倍数
-		jitterMax: 0.3, // 最大抖动 30%
-		maxAttempts: 10, // 最大重连次数，0 表示无限制
+		delay: 5000, // 重连延迟 5s
+		maxAttempts: 3, // 最大重连次数
 	}
 
 	// 命令组配置

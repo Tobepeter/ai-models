@@ -17,26 +17,24 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { TestAIAgent } from './components/test-ai-agent'
 import { TestChatMsg } from './components/test-chat-msg'
-import { TestStreamText } from './components/test-stream-text'
 import { TestCustom } from './components/test-custom'
 import { TestDummy } from './components/test-dummy'
-import { TestImgPreview } from './components/test-img-preview'
+import { TestGrid } from './components/test-grid'
 import { TestImgPrevSmart } from './components/test-img-prev-smart'
+import { TestImgPreview } from './components/test-img-preview'
 import { TestMarkdown } from './components/test-markdown'
 import { TestMarkdownMermaid } from './components/test-markdown-mermaid'
 import { TestMarkdownStreaming } from './components/test-markdown-streaming'
+import { TestMultiSelector } from './components/test-multi-selector'
+import { TestNotify } from './components/test-notify'
+import { TestOSS } from './components/test-oss'
 import { TestShadcn } from './components/test-shadcn'
 import { TestShimmer } from './components/test-shimmer'
 import { TestShimmerOp } from './components/test-shimmer-op'
+import { TestStreamText } from './components/test-stream-text'
 import { TestTwBreakpoint } from './components/test-tw-breakpoint'
-import { TestVideoPreview } from './components/test-video-preview'
-import { TestGrid } from './components/test-grid'
-import { TestMultiSelector } from './components/test-multi-selector'
-import { TestOSS } from './components/test-oss'
 import { TestUserAvatar } from './components/test-user-avatar'
-import { TestNotify } from './components/test-notify'
-
-import { TestGMServer } from './components/test-gm-server'
+import { TestVideoPreview } from './components/test-video-preview'
 
 let Test = () => <div>Test</div>
 
@@ -65,7 +63,6 @@ if (isDev) {
 			streamText: <TestStreamText />,
 			twBreakpoint: <TestTwBreakpoint />,
 			grid: <TestGrid />,
-			gmServer: <TestGMServer />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>

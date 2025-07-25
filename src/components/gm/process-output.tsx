@@ -1,16 +1,10 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-
-interface ProcessLog {
-	processId: string
-	command: string
-	logs: string[]
-	status: 'running' | 'finished' | 'error'
-}
+import { type GMLog } from './gm-store'
 
 interface ProcessOutputProps {
-	processes: ProcessLog[]
+	processes: GMLog[]
 	onKillProc: (procId: string) => void
 	onClearLogs: () => void
 }
