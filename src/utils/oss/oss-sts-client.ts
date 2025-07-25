@@ -1,6 +1,6 @@
 import OSS, { type Credentials } from 'ali-oss'
 import axios from 'axios'
-import { storage } from '@/utils/storage'
+import { storageKeys } from '@/utils/storage'
 import { ossConfig } from './oss-config'
 import { OssBaseResp, OssSTSRespData, OssUploadResult } from './oss-types'
 import { ossUtil } from './oss-util'
@@ -43,7 +43,11 @@ class OssStsClient {
 	/** 缓存STS凭证 */
 	private cacheToken(token: Credentials) {
 		const cacheData = { token, expiry: this.getStsExpire(token.Expiration) }
-		storage.setAppData({ ossStsCache: cacheData })
+		try {
+			localStorage.setItem(storageKeys.sts, JSON.stringify(cacheData))
+		} catch (error) {
+			console.warn('[OSS] Failed to cache STS token:', error)
+		}
 	}
 
 	/** 检查并获取有效的STS凭证 */
@@ -54,14 +58,16 @@ class OssStsClient {
 		// 检查localStorage
 		let token: Credentials | null = null
 		try {
-			const appData = storage.getAppData()
-			const cached = appData.ossStsCache
-			if (cached && Date.now() < cached.expiry) {
-				token = cached.token
+			const cachedStr = localStorage.getItem(storageKeys.sts)
+			if (cachedStr) {
+				const cached = JSON.parse(cachedStr)
+				if (cached && Date.now() < cached.expiry) {
+					token = cached.token
+				}
 			}
 		} catch (error) {
 			if (this.verbose) console.warn('[OSS] Failed to parse STS cache:', error)
-			storage.setAppData({ ossStsCache: undefined })
+			localStorage.removeItem(storageKeys.sts)
 		}
 
 		// 获取新凭证

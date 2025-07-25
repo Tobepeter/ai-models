@@ -1,39 +1,29 @@
-import { useAppStore } from '@/store/store'
-import { eventBus } from '@/utils/event-bus'
-import { EventType } from '@/utils/event-bus'
-import { storage } from '@/utils/storage'
+import { useAppStore } from '@/store/app-store'
 import { useMount } from 'ahooks'
 import { useEffect } from 'react'
 
 export const useTheme = () => {
-	const { theme, getComputedTheme, setTheme } = useAppStore()
+	const { computedTheme, updateTheme } = useAppStore()
 
+	// 监听系统主题
 	useMount(() => {
-		// 从存储恢复主题
-		const appData = storage.getAppData()
-		if (appData.theme) {
-			setTheme(appData.theme)
-		}
-
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-		mediaQuery.addEventListener('change', updateTheme)
+		const handleChange = () => {
+			updateTheme()
+		}
+		mediaQuery.addEventListener('change', handleChange)
 		return () => {
-			mediaQuery.removeEventListener('change', updateTheme)
+			mediaQuery.removeEventListener('change', handleChange)
 		}
 	})
 
-	const updateTheme = () => {
-		const computedTheme = getComputedTheme()
+	// 响应ui变化
+	useEffect(() => {
 		const root = document.documentElement
 		if (computedTheme === 'dark') {
 			root.classList.add('dark')
 		} else {
 			root.classList.remove('dark')
 		}
-		eventBus.emit(EventType.ThemeUpdate, computedTheme)
-	}
-
-	useEffect(() => {
-		updateTheme()
-	}, [theme])
+	}, [computedTheme])
 }

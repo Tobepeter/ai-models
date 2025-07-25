@@ -1,88 +1,56 @@
 import { UserResp } from '@/api/types/user-types'
-import { authApi } from '@/api/auth'
+import { JwtPayloadApp, jwt } from '@/utils/jwt'
+import { storageKeys } from '@/utils/storage'
+import { Nullable } from '@/utils/types'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { combine, persist } from 'zustand/middleware'
 
-export interface UserStore {
-	// Auth相关状态
-	isAuthenticated: boolean
-	user: UserResp | null
-	token: string | null
-	authError: string | null
-	isLoading: boolean
-
-	// Auth Actions
-	setAuth: (user: UserResp, token: string) => void
-	clearAuth: () => void
-	setAuthError: (error: string | null) => void
-	initializeAuth: () => void
-	setLoading: (loading: boolean) => void
-	logout: () => void
+const defaultUser: UserResp = {
+	id: 0,
+	username: 'anonymous',
+	email: 'anonymous@example.com',
+	avatar: '',
+	role: 'user',
+	is_active: false,
+	created_at: '',
+	updated_at: '',
 }
 
-export const useUserStore = create<UserStore>()(
-	persist(
-		(set, get) => ({
-			// Auth状态
-			isAuthenticated: false,
-			user: null,
-			token: null,
-			authError: null,
-			isLoading: false,
+// 初始状态
+const userState = {
+	info: defaultUser,
+	token: '',
+	tokenPayload: null as Nullable<JwtPayloadApp>,
+}
 
-			// Auth Actions
-			setAuth: (user, token) => {
-				set({
-					isAuthenticated: true,
-					user,
-					token,
-					authError: null,
-				})
-			},
+type UserState = typeof userState
 
-			clearAuth: () => {
-				set({
-					isAuthenticated: false,
-					user: null,
-					token: null,
-					authError: null,
-				})
-			},
+const stateCreator = () => {
+	return combine(userState, (set, get) => ({
+		setData: (data: Partial<UserState>) => set(data),
+		setToken: (token: string) => {
+			if (!token) {
+				set({ tokenPayload: null, token })
+				return
+			}
 
-			setAuthError: (error) => {
-				set({ authError: error })
-			},
+			const payload = jwt.parse(token)
+			if (payload && jwt.isValid(payload)) {
+				set({ tokenPayload: payload, token })
+			}
+		},
+		clear: () => set(userState),
+	}))
+}
 
-			initializeAuth: () => {
-				const token = localStorage.getItem('auth_token')
-				if (token) {
-					// 这里可以触发获取用户信息的逻辑
-					set({ token, isAuthenticated: true })
-				} else {
-					get().clearAuth()
-				}
-			},
-
-			setLoading: (loading) => {
-				set({ isLoading: loading })
-			},
-
-			logout: () => {
-				authApi.logout()
-				// 清理auth状态
-				get().clearAuth()
-				// 重置加载状态
-				set({ isLoading: false })
-			},
+export const useUserStore = create(
+	persist(stateCreator(), {
+		name: storageKeys.user,
+		partialize: (state) => ({
+			info: state.info,
+			token: state.token,
 		}),
-		{
-			name: 'user-storage',
-			// 只持久化必要的状态
-			partialize: (state) => ({
-				isAuthenticated: state.isAuthenticated,
-				user: state.user,
-				token: state.token,
-			}),
-		}
-	)
+	})
 )
+
+export type UserStore = ReturnType<ReturnType<typeof stateCreator>>

@@ -20,9 +20,10 @@ function App() {
 		} else {
 			msg += `buildTimeLocal: ${buildTimeLocal}`
 		}
-		console.log(`%c[App] ${msg}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
-
-		axClient.init()
+		console.log(
+			`%c[App] ${msg}`,
+			'color: white; background: black; border-radius: 5px; padding: 5px;'
+		)
 
 		// auto nagivat to chat
 		if (isProd) {

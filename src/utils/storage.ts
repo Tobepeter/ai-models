@@ -72,6 +72,11 @@ export interface StorageAppData {
 		model: string
 		stream?: boolean
 	}
+}
 
-	theme?: 'light' | 'dark' | 'system'
+export const storageKeys = {
+	sts: 'oss-sts-cache',
+	app: 'app-storage',
+	user: 'user-storage',
+	authToken: 'auth-token',
 }

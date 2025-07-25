@@ -1,16 +1,10 @@
 import { requestConfig } from '@/config/request-config'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-
-const tokenKey = 'auth_token'
+import { useUserStore } from '@/store/user-store'
 
 /* 统一的axios客户端 */
 class AxClient {
 	client: AxiosInstance
-	token: string
-
-	init() {
-		this.token = localStorage.getItem(tokenKey) || ''
-	}
 
 	constructor() {
 		this.client = axios.create({
@@ -28,11 +22,12 @@ class AxClient {
 		// 请求拦截器
 		this.client.interceptors.request.use(
 			(config) => {
-				const token = this.token
-				if (token) {
-					config.headers.Authorization = `Bearer ${token}`
+				const axConfig = config as AxReqCfg
+				if (!axConfig.noAuth) {
+					const { token } = useUserStore.getState()
+					if (token) axConfig.headers = { ...axConfig.headers, Authorization: `Bearer ${token}` }
 				}
-				return config
+				return axConfig as any
 			},
 			(error) => Promise.reject(error)
 		)
@@ -52,29 +47,32 @@ class AxClient {
 	}
 
 	clearToken() {
-		this.token = ''
-		localStorage.removeItem(tokenKey)
+		useUserStore.setState({ token: '' })
 	}
 
-	get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+	get<T = any>(url: string, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.get(url, config)
 	}
 
-	post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+	post<T = any>(url: string, data?: T, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.post(url, data, config)
 	}
 
-	put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+	put<T = any>(url: string, data?: any, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.put(url, data, config)
 	}
 
-	delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+	delete<T = any>(url: string, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.delete(url, config)
 	}
 
-	patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+	patch<T = any>(url: string, data?: any, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.patch(url, data, config)
 	}
+}
+
+export interface AxReqCfg extends AxiosRequestConfig {
+	noAuth?: boolean
 }
 
 export const axClient = new AxClient()

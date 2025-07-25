@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { FormTips } from '@/components/common/form-tips'
-import { useAppStore } from '@/store/store'
+import { useAppStore } from '@/store/app-store'
 import { aiAgentConfig } from '@/utils/ai-agent/ai-agent-config'
 import { AIPlatform } from '@/utils/ai-agent/types'
 import { isProd } from '@/utils/env'
-import { storage } from '@/utils/storage'
+
 import { useState, useEffect } from 'react'
 import { chatHelper } from '../chat-helper'
 import { useChatStore } from '../chat-store'
@@ -38,7 +38,7 @@ export const ChatSettings = () => {
 	const saveConfigs = () => {
 		aiAgentConfig.setApiKey(currPlatform, apiKey)
 		aiAgentConfig.save()
-		storage.setAppData({ theme })
+		setTheme(theme) // 使用 store 的 setTheme，persist 会自动保存
 		chatHelper.setStream(streamEnabled)
 		setData({ showSettings: false })
 	}
@@ -60,8 +60,7 @@ export const ChatSettings = () => {
 			// 被动关闭（不保存修改）
 			chatHelper.restorePersist()
 			if (theme !== currTheme) {
-				setTheme(currTheme)
-				storage.setAppData({ theme: currTheme })
+				setTheme(currTheme) // 使用 store 的 setTheme，persist 会自动保存
 			}
 		}
 		setData({ showSettings: open })
