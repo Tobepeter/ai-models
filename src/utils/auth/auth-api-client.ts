@@ -8,7 +8,7 @@ import {
 	AuthChangePasswordReq
 } from '@/api/types/auth-types'
 import { UserResp } from '@/api/types/user-types'
-import { ApiResponse } from '@/api/common'
+import { ApiResp } from '@/api/common'
 
 /**
  * 认证API客户端
@@ -52,7 +52,7 @@ class AuthApiClient {
 
 	/** 用户登录 */
 	async login(data: AuthLoginReq): Promise<AuthLoginResp> {
-		const response = await this.client.post<ApiResponse<AuthLoginResp>>('/users/login', data)
+		const response = await this.client.post<ApiResp<AuthLoginResp>>('/users/login', data)
 		
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '登录失败')
@@ -66,7 +66,7 @@ class AuthApiClient {
 
 	/** 用户注册 */
 	async register(data: AuthRegisterReq): Promise<AuthRegisterResp> {
-		const response = await this.client.post<ApiResponse<AuthRegisterResp>>('/users/register', {
+		const response = await this.client.post<ApiResp<AuthRegisterResp>>('/users/register', {
 			username: data.username,
 			email: data.email,
 			password: data.password,
@@ -84,7 +84,7 @@ class AuthApiClient {
 
 	/** 获取用户信息 */
 	async getProfile(): Promise<UserResp> {
-		const response = await this.client.get<ApiResponse<UserResp>>('/users/profile')
+		const response = await this.client.get<ApiResp<UserResp>>('/users/profile')
 
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '获取用户信息失败')
@@ -95,7 +95,7 @@ class AuthApiClient {
 
 	/** 更新用户信息 */
 	async updateProfile(data: Partial<UserResp>): Promise<UserResp> {
-		const response = await this.client.put<ApiResponse<UserResp>>('/users/profile', data)
+		const response = await this.client.put<ApiResp<UserResp>>('/users/profile', data)
 
 		if (response.data.code !== 200) {
 			throw new Error(response.data.msg || '更新用户信息失败')
@@ -106,7 +106,7 @@ class AuthApiClient {
 
 	/** 修改密码 */
 	async changePassword(data: AuthChangePasswordReq): Promise<void> {
-		const response = await this.client.post<ApiResponse<{ message: string }>>('/users/change-password', {
+		const response = await this.client.post<ApiResp<{ message: string }>>('/users/change-password', {
 			old_password: data.oldPassword,
 			new_password: data.newPassword,
 		})

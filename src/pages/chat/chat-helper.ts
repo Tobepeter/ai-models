@@ -1,14 +1,15 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
 import { AIPlatform, MediaType } from '@/utils/ai-agent/types'
 import { isDev } from '@/utils/env'
-import { storage } from '@/utils/storage'
+import { storage, storageKeys } from '@/utils/storage'
 import { Film, Image, MessageCircle, Volume2 } from 'lucide-react'
 import { ElementType } from 'react'
 import { useChatStore } from './chat-store'
 import { ChatPersist } from './chat-type'
 
 class ChatHelper {
-	switchPlatform(platform: AIPlatform) {
+	// 切换平台 自动选择model 和 mediaType
+	changePlatf(platform: AIPlatform) {
 		const store = useChatStore.getState()
 		aiAgentMgr.switchPlatform(platform)
 
@@ -34,18 +35,21 @@ class ChatHelper {
 		})
 	}
 
+	// 恢复持久化数据
 	restorePersist() {
-		const persistData = this.loadPersist()
-		if (!persistData) {
-			const defaultPlatform = isDev ? AIPlatform.Mock : AIPlatform.Silicon
-			this.switchPlatform(defaultPlatform)
+		const data = this.loadPersist()
+		if (!data) {
+			const defPf = isDev ? AIPlatform.Mock : AIPlatform.Silicon
+			this.changePlatf(defPf)
 			return
 		}
-		this.switchPlatform(persistData.platform)
-		this.setModel(persistData.model, true)
-		this.setStream(persistData.stream ?? true, true) // 默认启用流式
+		const { platform, model, stream } = data
+		this.changePlatf(platform)
+		this.setModel(model, true)
+		this.setStream(stream ?? true, true) // 默认启用流式
 	}
 
+	// 设置model 自动选择mediaType
 	setModel(model: string, fromPersist = false) {
 		const store = useChatStore.getState()
 
@@ -65,6 +69,7 @@ class ChatHelper {
 		}
 	}
 
+	// 设置mediaType 自动选择model
 	setMedia(media: MediaType) {
 		const store = useChatStore.getState()
 
@@ -83,6 +88,7 @@ class ChatHelper {
 		this.persist()
 	}
 
+	// 根据mediaType 选择model
 	pickModel(media: MediaType) {
 		const platformConfig = aiAgentMgr.getPlatformConfig()
 		return platformConfig.models[media][0]
@@ -115,27 +121,32 @@ class ChatHelper {
 	}
 
 	setStream(stream: boolean, fromPersist = false) {
-		const store = useChatStore.getState()
-		store.setData({ currStream: stream })
-		
+		useChatStore.setState({ currStream: stream })
+
 		if (!fromPersist) {
 			this.persist()
 		}
 	}
 
 	persist() {
-		const store = useChatStore.getState()
+		const s = useChatStore.getState()
 		const chatPersist: ChatPersist = {
-			platform: store.currPlatform,
-			model: store.currModel,
-			stream: store.currStream,
+			platform: s.currPlatform,
+			model: s.currModel,
+			stream: s.currStream,
 		}
-		storage.setAppData({ chatPersist })
+		// storage.setAppData({ chatPersist })
+		localStorage.setItem(storageKeys.chat, JSON.stringify(chatPersist))
 	}
 
 	loadPersist(): ChatPersist | null {
-		const appData = storage.getAppData()
-		return appData.chatPersist || null
+		try {
+			const chatPersist = localStorage.getItem(storageKeys.chat)
+			return chatPersist ? JSON.parse(chatPersist) : null
+		} catch (e) {
+			console.error(`[ChatHelper] loadPersist error: ${e}`)
+			return null
+		}
 	}
 }
 

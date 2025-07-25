@@ -22,7 +22,7 @@ type CrudService struct {
 
 func NewCrudService() *CrudService {
 	return &CrudService{
-		BaseService: BaseService{db: database.DB},
+		BaseService: BaseService{DB: database.DB},
 	}
 }
 
@@ -41,7 +41,7 @@ func (s *CrudService) CreateCrud(req models.CrudCreateRequest) (*models.Crud, er
 	}
 
 	// 保存到数据库
-	if err := s.db.Create(model).Error; err != nil {
+	if err := s.DB.Create(model).Error; err != nil {
 		return nil, err
 	}
 
@@ -51,7 +51,7 @@ func (s *CrudService) CreateCrud(req models.CrudCreateRequest) (*models.Crud, er
 // 根据ID获取记录
 func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
 	var crud models.Crud
-	if err := s.db.First(&crud, id).Error; err != nil {
+	if err := s.DB.First(&crud, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("记录不存在")
 		}
@@ -63,7 +63,7 @@ func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
 // 更新记录信息
 func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models.Crud, error) {
 	var crud models.Crud
-	if err := s.db.First(&crud, id).Error; err != nil {
+	if err := s.DB.First(&crud, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("记录不存在")
 		}
@@ -77,7 +77,7 @@ func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models
 	crud.Data = req.Data
 
 	// 保存更新
-	if err := s.db.Save(&crud).Error; err != nil {
+	if err := s.DB.Save(&crud).Error; err != nil {
 		return nil, err
 	}
 

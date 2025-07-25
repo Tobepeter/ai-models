@@ -1,18 +1,15 @@
 import { useMount } from 'ahooks'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { axClient } from './api/ax-client'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
+import { NotifyHub } from './components/common/notify'
 
 function App() {
 	const navigate = useNavigate()
-	// const { initializeAuth } = useUserStore()
 	useGitHubPagesRouter()
 
 	useMount(() => {
-		// initializeAuth()
-
 		let msg = ''
 		if (isDev) {
 			debug.init()
@@ -20,12 +17,8 @@ function App() {
 		} else {
 			msg += `buildTimeLocal: ${buildTimeLocal}`
 		}
-		console.log(
-			`%c[App] ${msg}`,
-			'color: white; background: black; border-radius: 5px; padding: 5px;'
-		)
+		console.log(`%c[App] ${msg}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
 
-		// auto nagivat to chat
 		if (isProd) {
 			navigate('/chat')
 		}
@@ -34,6 +27,7 @@ function App() {
 	return (
 		<div className="bg-background text-foreground">
 			<Outlet />
+			<NotifyHub />
 		</div>
 	)
 }

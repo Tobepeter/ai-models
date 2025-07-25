@@ -48,7 +48,7 @@ export class OpenRouterAgent implements IAiAgent {
 		}
 	}
 
-	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
 			const stream = await this.openai.chat.completions.create({
 				model: this.currModel,
@@ -81,7 +81,7 @@ export class OpenRouterAgent implements IAiAgent {
 
 			return fullContent
 		} catch (error) {
-			console.error('[OpenRouterAgent] generateTextStream error', error)
+			console.error('[OpenRouterAgent] genTextStream error', error)
 			return ''
 		}
 	}

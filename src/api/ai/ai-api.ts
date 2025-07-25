@@ -1,80 +1,56 @@
+import { requestConfig } from '@/config/request-config'
 import { axClient } from '../ax-client'
-import { AITextGenReq, AIImageGenReq, AIImageGenResp, AIChatCompletionReq, AIChatCompletionResp } from '../types/api-types'
-import { ApiResponse } from '../common'
+import { ApiResp } from '../common'
+import { AIChatCompletionReq, AIChatCompletionResp, AIImageGenReq, AIImageGenResp } from '../types/api-types'
+import OpenAI from 'openai'
 
-/** AI相关API类 */
 class AIApi {
-	/** 聊天完成 */
+	// 聊天
 	async chat(data: AIChatCompletionReq) {
-		const response = await axClient.post<ApiResponse<AIChatCompletionResp>>('/ai/v1/chat/completions', data)
-		if (response.data.code !== 200) throw new Error(response.data.msg || '聊天完成失败')
-		return response.data.data!
+		const res = await axClient.post<ApiResp<AIChatCompletionResp>>('/ai/v1/chat/completions', data)
+		if (res.data.code !== 200) throw new Error(res.data.msg || '聊天完成失败')
+		return res.data.data!
 	}
 
-	/** 图片生成 */
+	// 图片生成
 	async genImages(data: AIImageGenReq) {
-		const response = await axClient.post<ApiResponse<AIImageGenResp>>('/ai/v1/images/generations', data)
-		if (response.data.code !== 200) throw new Error(response.data.msg || '图片生成失败')
-		return response.data.data!
+		const res = await axClient.post<ApiResp<AIImageGenResp>>('/ai/v1/images/generations', data)
+		if (res.data.code !== 200) throw new Error(res.data.msg || '图片生成失败')
+		return res.data.data!
 	}
 
-	/** 流式聊天完成 */
+	// 流式聊天 - 使用 OpenAI SDK
 	async streamChat(data: AIChatCompletionReq, onChunk: (chunk: string) => void) {
-		const streamData = { ...data, stream: true }
-
-		const response = await fetch(`http://localhost:8080/ai/v1/chat/completions`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-			},
-			body: JSON.stringify(streamData),
-		})
-
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`)
-		}
-
-		const reader = response.body?.getReader()
-		if (!reader) {
-			throw new Error('无法获取响应流')
-		}
-
-		const decoder = new TextDecoder()
-
 		try {
-			while (true) {
-				const { done, value } = await reader.read()
+			const tk = axClient.getToken()
+			if (!tk) throw new Error('未登录')
 
-				if (done) break
+			const cli = new OpenAI({
+				baseURL: `${requestConfig.serverUrl}/ai/v1`,
+				apiKey: tk || 'dummy-key',
+				timeout: requestConfig.chatTimeout || 30000,
+				dangerouslyAllowBrowser: true,
+			})
 
-				const chunk = decoder.decode(value, { stream: true })
-				const lines = chunk.split('\n')
+			const stream = await cli.chat.completions.create({
+				model: data.model,
+				messages: data.messages,
+				temperature: data.temperature,
+				max_tokens: data.max_tokens,
+				stream: true,
+			})
 
-				for (const line of lines) {
-					if (line.startsWith('data: ')) {
-						const data = line.slice(6)
-						if (data === '[DONE]') {
-							return
-						}
-
-						try {
-							const parsed = JSON.parse(data)
-							const content = parsed.choices?.[0]?.delta?.content
-							if (content) {
-								onChunk(content)
-							}
-						} catch (e) {
-							// 忽略解析错误
-						}
-					}
+			for await (const ch of stream) {
+				const c = ch.choices[0]?.delta?.content || ''
+				if (c) {
+					onChunk(c)
 				}
 			}
-		} finally {
-			reader.releaseLock()
+		} catch (err) {
+			console.error('[AIApi] streamChat error', err)
+			throw err
 		}
 	}
 }
 
-/** 导出单例实例 */
 export const aiApi = new AIApi()

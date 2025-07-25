@@ -54,7 +54,7 @@ export class MockAgent implements IAiAgent {
 		}
 	}
 
-	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
 			const stream = await this.openai.chat.completions.create({
 				model: this.currModel,
@@ -74,7 +74,7 @@ export class MockAgent implements IAiAgent {
 
 			return fullContent
 		} catch (error) {
-			console.error('[MockAgent] generateTextStream error', error)
+			console.error('[MockAgent] genTextStream error', error)
 			return ''
 		}
 	}

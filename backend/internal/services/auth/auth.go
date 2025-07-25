@@ -15,7 +15,7 @@ func (s *AuthService) Login(username, password string) (*models.User, string, er
 	var user models.User
 
 	// 根据用户名或邮箱查找用户
-	if err := s.db.Where("username = ? OR email = ?", username, username).First(&user).Error; err != nil {
+	if err := s.DB.Where("username = ? OR email = ?", username, username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, "", errors.New("用户不存在")
 		}
@@ -44,12 +44,12 @@ func (s *AuthService) Login(username, password string) (*models.User, string, er
 // Register 用户注册
 func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, string, error) {
 	// 检查用户名是否已存在
-	if s.existsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
+	if s.ExistsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
 		return nil, "", errors.New("用户名已存在")
 	}
 
 	// 检查邮箱是否已存在
-	if s.existsByCondition(&models.User{}, map[string]any{"email": req.Email}) {
+	if s.ExistsByCondition(&models.User{}, map[string]any{"email": req.Email}) {
 		return nil, "", errors.New("邮箱已存在")
 	}
 
@@ -73,7 +73,7 @@ func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, stri
 	}
 
 	// 保存到数据库
-	if err := s.db.Create(user).Error; err != nil {
+	if err := s.DB.Create(user).Error; err != nil {
 		return nil, "", err
 	}
 
@@ -100,7 +100,7 @@ func (s *AuthService) Logout(tokenString string) {
 func (s *AuthService) CreateDefaultAdmin() error {
 	// 检查是否已存在管理员用户
 	var adminCount int64
-	if err := s.db.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&adminCount).Error; err != nil {
+	if err := s.DB.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&adminCount).Error; err != nil {
 		return err
 	}
 
@@ -135,7 +135,7 @@ func (s *AuthService) CreateDefaultAdmin() error {
 	}
 
 	// 保存到数据库
-	if err := s.db.Create(admin).Error; err != nil {
+	if err := s.DB.Create(admin).Error; err != nil {
 		return err
 	}
 
@@ -143,9 +143,3 @@ func (s *AuthService) CreateDefaultAdmin() error {
 	return nil
 }
 
-// existsByCondition 根据条件查找记录是否存在（内部方法）
-func (s *AuthService) existsByCondition(model any, condition map[string]any) bool {
-	var count int64
-	s.db.Model(model).Where(condition).Count(&count)
-	return count > 0
-}

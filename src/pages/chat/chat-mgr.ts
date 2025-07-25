@@ -1,148 +1,108 @@
 import { aiAgentMgr } from '@/utils/ai-agent/ai-agent-mgr'
-import { dummy } from '@/utils/dummy'
 import { isMock } from '@/utils/env'
 import { eventBus, EventType } from '@/utils/event-bus'
 import { MediaType } from '@/utils/ai-agent/types'
 import { useChatStore } from './chat-store'
+import { chatMock } from './chat-mock'
 
-/**
- * 聊天管理器 - 处理AI生成相关的工作
- */
-class ChatManager {
-	private mockDur = 300 // mock延迟时间
+// 聊天管理器 - 处理AI生成相关的工作
+class ChatMgr {
+	// 文本生成
+	async genText(input: string, id: string) {
+		const s = useChatStore.getState()
 
-	/** 模拟延迟 */
-	private async mockDelay() {
-		return new Promise((resolve) => setTimeout(resolve, this.mockDur + Math.random() * 1000))
-	}
-
-	/** mock 响应数据 */
-	private genMockResp(userInput: string, mediaType: MediaType) {
-		const responses = {
-			text: {
-				content: `这是对"${userInput}"的AI回复。我是一个AI助手，很高兴为您服务！`,
-				mediaData: undefined,
-			},
-			image: {
-				content: `已为您生成图片：${userInput}`,
-				mediaData: {
-					url: dummy.image,
-					filename: 'generated-image.jpg',
-					size: '2.5MB',
-				},
-			},
-			audio: {
-				content: `已为您生成音频：${userInput}`,
-				mediaData: {
-					url: dummy.audio,
-					filename: 'generated-audio.mp3',
-					size: '3.2MB',
-					duration: '0:45',
-				},
-			},
-			video: {
-				content: `已为您生成视频：${userInput}`,
-				mediaData: {
-					url: dummy.video,
-					filename: 'generated-video.mp4',
-					size: '15.8MB',
-					duration: '1:30',
-				},
-			},
-		}
-
-		return responses[mediaType]
-	}
-
-	/** 文本生成 */
-	async genText(userInput: string, msgId: string) {
-		const store = useChatStore.getState()
+		// TODO: loading理论进不来这里，不然loading计数有问题
 
 		if (isMock) {
-			await this.mockDelay()
-			const mockResponse = this.genMockResp(userInput, 'text')
-			store.updateMsg(msgId, {
-				content: mockResponse.content,
+			await chatMock.mockDelay()
+			const m = chatMock.genMockResp(input, 'text')
+			s.updateMsg(id, {
+				content: m.content,
 				status: 'success',
-				mediaData: mockResponse.mediaData,
+				mediaData: m.mediaData,
 			})
 			return
 		}
 
-		store.setLoading(true)
-
+		s.setLoading(true)
 		try {
-			const isStreamEnabled = store.currStream
-
-			if (isStreamEnabled) {
-				// 流式输出
-				let fullContent = ''
-
-				// TODO: 如果chat卸载了，要完全防止写入 store 了，否则二次进入可能会有问题
-
-				await aiAgentMgr.generateTextStream(userInput, (chunk: string) => {
-					// 检查是否还在loading状态
-					if (useChatStore.getState().isLoading) {
-						fullContent += chunk
-						store.updateMsg(msgId, { content: fullContent, status: 'generating' })
-					}
-				})
-
-				// 完成后更新状态
-				if (useChatStore.getState().isLoading) {
-					store.updateMsg(msgId, { status: 'success' })
-					store.setLoading(false)
-				} else {
-					console.error('不太可能不loading')
-				}
+			if (s.currStream) {
+				await this.genTextStream(input, id)
 			} else {
-				// 非流式输出，直接获取完整结果
-				const result = await aiAgentMgr.generateText(userInput)
-				
-				if (useChatStore.getState().isLoading) {
-					store.updateMsg(msgId, { 
-						content: result, 
-						status: 'success'
-					})
-					store.setLoading(false)
-				}
+				await this.genTextDirect(input, id)
 			}
-		} catch (error) {
-			if (useChatStore.getState().isLoading) {
-				store.updateMsg(msgId, {
-					status: 'error',
-					error: error instanceof Error ? error.message : '生成失败',
-				})
-				store.setLoading(false)
-			}
-			throw error
+		} catch (e) {
+			s.updateMsg(id, {
+				status: 'error',
+				error: e instanceof Error ? e.message : '生成失败',
+			})
+		} finally {
+			s.setLoading(false)
 		}
 	}
 
-	/** 图片生成处理 */
-	async genImage(userInput: string, msgId: string) {
-		const store = useChatStore.getState()
+	// 流式生成文本
+	private async genTextStream(input: string, id: string) {
+		let content = ''
+		await aiAgentMgr.genTextStream(input, (c: string) => {
+			const s = useChatStore.getState()
+			// 只是是代码保护，不过应该不会不loading
+			if (s.isLoading) {
+				content += c
+				s.updateMsg(id, { content, status: 'generating' })
+			} else {
+				console.error('不太可能不loading')
+			}
+		})
+
+		const s = useChatStore.getState()
+		if (s.isLoading) {
+			s.updateMsg(id, { status: 'success' })
+			s.setLoading(false)
+		} else {
+			console.error('不太可能不loading')
+		}
+	}
+
+	// 直接生成文本
+	private async genTextDirect(input: string, id: string) {
+		const res = await aiAgentMgr.generateText(input)
+		const s = useChatStore.getState()
+		if (s.isLoading) {
+			s.updateMsg(id, {
+				content: res,
+				status: 'success',
+			})
+			s.setLoading(false)
+		} else {
+			console.error('不太可能不loading')
+		}
+	}
+
+	// 图片生成处理
+	async genImage(input: string, id: string) {
+		const s = useChatStore.getState()
 
 		if (isMock) {
-			await this.mockDelay()
-			const mockResponse = this.genMockResp(userInput, 'image')
-			store.updateMsg(msgId, {
-				content: mockResponse.content,
+			await chatMock.mockDelay()
+			const m = chatMock.genMockResp(input, 'image')
+			s.updateMsg(id, {
+				content: m.content,
 				status: 'success',
-				mediaData: mockResponse.mediaData,
+				mediaData: m.mediaData,
 			})
 			return
 		}
 
-		const images = await aiAgentMgr.generateImages(userInput)
+		const imgs = await aiAgentMgr.generateImages(input)
 
-		if (images && images.length > 0) {
-			const imageUrl = images[0]
-			store.updateMsg(msgId, {
-				content: `已为您生成图片：${userInput}`,
+		if (imgs && imgs.length > 0) {
+			const url = imgs[0]
+			s.updateMsg(id, {
+				content: `已为您生成图片：${input}`,
 				status: 'success',
 				mediaData: {
-					url: imageUrl,
+					url,
 					filename: 'generated-image.jpg',
 				},
 			})
@@ -151,42 +111,40 @@ class ChatManager {
 		}
 	}
 
-	/** 音频生成处理（暂时使用模拟数据） */
-	async genAudio(userInput: string, msgId: string) {
-		const store = useChatStore.getState()
-
-		await this.mockDelay()
-		const mockResponse = this.genMockResp(userInput, 'audio')
-
-		store.updateMsg(msgId, {
-			content: mockResponse.content,
+	// 音频生成处理（暂时使用模拟数据）
+	async genAudio(input: string, id: string) {
+		const s = useChatStore.getState()
+		await chatMock.mockDelay()
+		const m = chatMock.genMockResp(input, 'audio')
+		s.updateMsg(id, {
+			content: m.content,
 			status: 'success',
-			mediaData: mockResponse.mediaData,
+			mediaData: m.mediaData,
 		})
 	}
 
-	/** 视频生成处理 */
-	async genVideo(userInput: string, msgId: string) {
-		const store = useChatStore.getState()
+	// 视频生成处理
+	async genVideo(input: string, id: string) {
+		const s = useChatStore.getState()
 
 		if (isMock) {
-			await this.mockDelay()
-			const mockResponse = this.genMockResp(userInput, 'video')
-			store.updateMsg(msgId, {
-				content: mockResponse.content,
+			await chatMock.mockDelay()
+			const m = chatMock.genMockResp(input, 'video')
+			s.updateMsg(id, {
+				content: m.content,
 				status: 'success',
-				mediaData: mockResponse.mediaData,
+				mediaData: m.mediaData,
 			})
 			return
 		}
 
-		const videos = await aiAgentMgr.generateVideos(userInput)
-		if (videos && videos.length > 0) {
-			store.updateMsg(msgId, {
-				content: `已为您生成视频：${userInput}`,
+		const vids = await aiAgentMgr.generateVideos(input)
+		if (vids && vids.length > 0) {
+			s.updateMsg(id, {
+				content: `已为您生成视频：${input}`,
 				status: 'success',
 				mediaData: {
-					url: videos[0],
+					url: vids[0],
 					filename: 'generated-video.mp4',
 				},
 			})
@@ -195,59 +153,52 @@ class ChatManager {
 		}
 	}
 
-	/**
-	 * AI响应生成入口
-	 *
-	 * NOTE: 使用前请设置好 model
-	 */
-	async genAIResp(userInput: string, mediaType: MediaType, msgId: string) {
+	// 生成AI响应
+	async genAIResp(input: string, media: MediaType, id: string) {
 		try {
-			switch (mediaType) {
+			switch (media) {
 				case 'text':
-					await this.genText(userInput, msgId)
+					await this.genText(input, id)
 					break
 				case 'image':
-					await this.genImage(userInput, msgId)
+					await this.genImage(input, id)
 					break
 				case 'audio':
-					await this.genAudio(userInput, msgId)
+					await this.genAudio(input, id)
 					break
 				case 'video':
-					await this.genVideo(userInput, msgId)
+					await this.genVideo(input, id)
 					break
 				default:
-					throw new Error(`不支持的媒体类型: ${mediaType}`)
+					throw new Error(`不支持的媒体类型: ${media}`)
 			}
-		} catch (error) {
-			console.error('AI generation failed:', error)
-			const store = useChatStore.getState()
-			store.updateMsg(msgId, {
+		} catch (e) {
+			console.error('AI generation failed:', e)
+			const s = useChatStore.getState()
+			s.updateMsg(id, {
 				status: 'error',
-				error: error instanceof Error ? error.message : '生成失败',
+				error: e instanceof Error ? e.message : '生成失败',
 			})
 		}
 	}
 
-	/** 停止生成 */
+	// 停止生成
 	stop() {
-		const store = useChatStore.getState()
-		const msgList = store.msgList
+		const s = useChatStore.getState()
+		const list = s.msgList
 
-		if (msgList.length >= 2) {
-			let userQuestion = ''
-			const aiMsg = msgList[msgList.length - 1]
-
-			// 必须是text类型
+		if (list.length >= 2) {
+			let q = ''
+			const aiMsg = list[list.length - 1]
 			if (aiMsg.mediaType !== 'text') {
 				console.error('只有文本对话可以停止')
 				return
 			}
-
-			const userMsg = msgList[msgList.length - 2]
+			const userMsg = list[list.length - 2]
 			if (userMsg.type === 'user') {
-				userQuestion = userMsg.content
-				useChatStore.setState({ msgList: msgList.slice(0, -2) })
-				eventBus.emit(EventType.ChatStop, userQuestion)
+				q = userMsg.content
+				useChatStore.setState({ msgList: list.slice(0, -2) })
+				eventBus.emit(EventType.ChatStop, q)
 			} else {
 				console.error('倒数第二条消息不是用户消息')
 			}
@@ -256,48 +207,45 @@ class ChatManager {
 		}
 	}
 
-	/** 重试消息 */
-	async retryMsg(msgId: string) {
-		const store = useChatStore.getState()
-		const msgList = store.msgList
-		const msgIndex = msgList.findIndex((msg) => msg.id === msgId)
+	// 重试消息
+	async retryMsg(id: string) {
+		const s = useChatStore.getState()
+		const list = s.msgList
+		const idx = list.findIndex((m) => m.id === id)
 
-		if (msgIndex === -1) {
+		if (idx === -1) {
 			console.error('未找到要重试的消息')
 			return
 		}
 
-		const msg = msgList[msgIndex]
-		if (msg.type !== 'assistant') {
+		const m = list[idx]
+		if (m.type !== 'assistant') {
 			console.error('只能重试AI消息')
 			return
 		}
 
-		// 查找对应的用户消息（通常是前一条消息）
-		let userInput = ''
-		for (let i = msgIndex - 1; i >= 0; i--) {
-			const prevMsg = msgList[i]
-			if (prevMsg.type === 'user') {
-				userInput = prevMsg.content
+		let input = ''
+		for (let i = idx - 1; i >= 0; i--) {
+			const prev = list[i]
+			if (prev.type === 'user') {
+				input = prev.content
 				break
 			}
 		}
 
-		if (!userInput) {
+		if (!input) {
 			console.error('未找到对应的用户输入')
 			return
 		}
 
-		// 重置消息状态
-		store.updateMsg(msgId, {
+		s.updateMsg(id, {
 			status: 'pending',
 			content: '',
 			error: undefined,
 		})
 
-		// 重新生成响应
-		await this.genAIResp(userInput, msg.mediaType, msgId)
+		await this.genAIResp(input, m.mediaType, id)
 	}
 }
 
-export const chatMgr = new ChatManager()
+export const chatMgr = new ChatMgr()

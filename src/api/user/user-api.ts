@@ -4,7 +4,7 @@ import {
   UserListReq,
   UserUpdateProfileReq
 } from '../types/user-types'
-import { ApiResponse as ApiResp, PaginatedResponse as PaginatedRes } from '../common'
+import { ApiResp, PaginatedResponse as PaginatedRes } from '../common'
 
 /** 用户管理API类 */
 class UserApi {

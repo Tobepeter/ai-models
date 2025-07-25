@@ -21,7 +21,7 @@ type UserService struct {
 
 func NewUserService(cfg *config.Config) *UserService {
 	return &UserService{
-		BaseService: BaseService{db: database.DB},
+		BaseService: BaseService{DB: database.DB},
 		config:      cfg,
 	}
 }
@@ -57,7 +57,7 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 	}
 
 	// 保存到数据库
-	if err := s.db.Create(user).Error; err != nil {
+	if err := s.DB.Create(user).Error; err != nil {
 		return nil, err
 	}
 
@@ -67,7 +67,7 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 // GetUserByID 根据ID获取用户
 func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 	var user models.User
-	if err := s.db.First(&user, id).Error; err != nil {
+	if err := s.DB.First(&user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("用户不存在")
 		}
@@ -79,7 +79,7 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 // UpdateUser 更新用户信息
 func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models.User, error) {
 	var user models.User
-	if err := s.db.First(&user, id).Error; err != nil {
+	if err := s.DB.First(&user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("用户不存在")
 		}
@@ -108,7 +108,7 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 	}
 
 	// 保存更新
-	if err := s.db.Save(&user).Error; err != nil {
+	if err := s.DB.Save(&user).Error; err != nil {
 		return nil, err
 	}
 
@@ -154,7 +154,7 @@ func (s *UserService) DeactivateUser(id uint) error {
 func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordRequest) error {
 	// 获取用户信息
 	var user models.User
-	if err := s.db.First(&user, userID).Error; err != nil {
+	if err := s.DB.First(&user, userID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("用户不存在")
 		}
@@ -181,7 +181,7 @@ func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordReque
 		updates["plain_password"] = req.NewPassword
 	}
 
-	if err := s.db.Model(&user).Updates(updates).Error; err != nil {
+	if err := s.DB.Model(&user).Updates(updates).Error; err != nil {
 		return err
 	}
 
@@ -191,14 +191,14 @@ func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordReque
 // GetUserCount 获取用户总数
 func (s *UserService) GetUserCount() (int64, error) {
 	var count int64
-	err := s.db.Model(&models.User{}).Count(&count).Error
+	err := s.DB.Model(&models.User{}).Count(&count).Error
 	return count, err
 }
 
 // GetAdminUserCount 获取管理员用户数
 func (s *UserService) GetAdminUserCount() (int64, error) {
 	var count int64
-	err := s.db.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&count).Error
+	err := s.DB.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&count).Error
 	return count, err
 }
 
@@ -220,7 +220,7 @@ func (s *UserService) ResetPassword(userID string, newPassword string) error {
 		updateData["plain_password"] = newPassword
 	}
 
-	return s.db.Model(&models.User{}).Where("id = ?", userID).Updates(updateData).Error
+	return s.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateData).Error
 }
 
 // IsAdmin 检查用户是否为管理员

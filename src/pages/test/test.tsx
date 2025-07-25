@@ -34,7 +34,9 @@ import { TestGrid } from './components/test-grid'
 import { TestMultiSelector } from './components/test-multi-selector'
 import { TestOSS } from './components/test-oss'
 import { TestUserAvatar } from './components/test-user-avatar'
-import { TestGMPanel } from './components/test-gm-panel'
+import { TestNotify } from './components/test-notify'
+
+import { TestGMServer } from './components/test-gm-server'
 
 let Test = () => <div>Test</div>
 
@@ -45,6 +47,7 @@ if (isDev) {
 		const config = {
 			custom: <TestCustom />,
 			shadcn: <TestShadcn />,
+			notify: <TestNotify />,
 			multiSelector: <TestMultiSelector />,
 			dummy: <TestDummy />,
 			image: <TestImgPreview />,
@@ -62,7 +65,7 @@ if (isDev) {
 			streamText: <TestStreamText />,
 			twBreakpoint: <TestTwBreakpoint />,
 			grid: <TestGrid />,
-			gmPanel: <TestGMPanel />,
+			gmServer: <TestGMServer />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>

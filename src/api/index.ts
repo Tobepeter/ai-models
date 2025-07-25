@@ -37,5 +37,5 @@ export * from './oss'
 // AI相关
 export * from './ai'
 
-// CRUD相关
-export { crudApi, TypedCRUDApi, createTypedCRUD } from './crud'
+// CRUD相关 - 统一的CRUD操作
+export * from './crud'

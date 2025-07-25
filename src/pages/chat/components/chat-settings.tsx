@@ -45,7 +45,7 @@ export const ChatSettings = () => {
 
 	// 切换平台
 	const handlePlatformChange = (platform: AIPlatform) => {
-		chatHelper.switchPlatform(platform)
+		chatHelper.changePlatf(platform)
 		setApiKey(aiAgentConfig.getApiKey(platform))
 	}
 

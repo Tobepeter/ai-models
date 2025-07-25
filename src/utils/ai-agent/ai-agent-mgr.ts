@@ -84,9 +84,9 @@ export class AIAgentManager {
 		return this.agent.generateText(prompt)
 	}
 
-	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		if (!this.checkValid()) return
-		return this.agent.generateTextStream(prompt, onChunk)
+		return this.agent.genTextStream(prompt, onChunk)
 	}
 
 	async generateImages(prompt: string) {

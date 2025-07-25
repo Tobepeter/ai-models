@@ -55,7 +55,7 @@ export class SiliconFlowAgent implements IAiAgent {
 		}
 	}
 
-	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
 			const stream = await this.openai.chat.completions.create({
 				model: this.currModel,
@@ -90,7 +90,7 @@ export class SiliconFlowAgent implements IAiAgent {
 
 			return fullContent
 		} catch (error) {
-			console.error('[SiliconFlowAgent] generateTextStream error', error)
+			console.error('[SiliconFlowAgent] genTextStream error', error)
 			return ''
 		}
 	}

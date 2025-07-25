@@ -55,7 +55,7 @@ export class DashScopeAgent implements IAiAgent {
 		}
 	}
 
-	async generateTextStream(prompt: string, onChunk: StreamCallback) {
+	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
 			const model = this.currModel
 			const response = await fetch(`${aiAgentConfig.data[AIPlatform.DashScope].baseUrl}/chat/completions`, {
@@ -119,7 +119,7 @@ export class DashScopeAgent implements IAiAgent {
 
 			return fullContent
 		} catch (error) {
-			console.error('[DashScopeAgent] generateTextStream error', error)
+			console.error('[DashScopeAgent] genTextStream error', error)
 			return ''
 		}
 	}

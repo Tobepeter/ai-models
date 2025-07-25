@@ -93,7 +93,7 @@ export const TestAIAgent = () => {
 		if (streaming) {
 			// 流式生成
 			let fullResponse = ''
-			const result = await aiAgentMgr.generateTextStream(question, (chunk: string) => {
+			const result = await aiAgentMgr.genTextStream(question, (chunk: string) => {
 				fullResponse += chunk
 				setTextResponse(fullResponse)
 			})

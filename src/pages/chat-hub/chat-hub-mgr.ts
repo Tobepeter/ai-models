@@ -67,7 +67,7 @@ class ChatHubManager {
 			let isFirstChunk = true
 
 			// 流式生成
-			await agent.generateTextStream(question, (chunk: string) => {
+			await agent.genTextStream(question, (chunk: string) => {
 				// 第一次收到内容时，更新状态为生成中
 				if (isFirstChunk) {
 					store.updateCard(cardId, {

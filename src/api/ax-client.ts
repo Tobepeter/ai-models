@@ -1,3 +1,4 @@
+
 import { requestConfig } from '@/config/request-config'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useUserStore } from '@/store/user-store'
@@ -46,15 +47,23 @@ class AxClient {
 		)
 	}
 
+	getToken() {
+		return useUserStore.getState().token
+	}
+
 	clearToken() {
 		useUserStore.setState({ token: '' })
+	}
+
+	setToken(token: string) {
+		useUserStore.setState({ token })
 	}
 
 	get<T = any>(url: string, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.get(url, config)
 	}
 
-	post<T = any>(url: string, data?: T, config?: AxReqCfg): Promise<AxiosResponse<T>> {
+	post<T = any>(url: string, data?: any, config?: AxReqCfg): Promise<AxiosResponse<T>> {
 		return this.client.post(url, data, config)
 	}
 
