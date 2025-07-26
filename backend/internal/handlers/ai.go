@@ -10,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// AI请求处理器
 type AIHandler struct {
 	aiService *ai.AIService
 }
@@ -21,7 +20,12 @@ func NewAIHandler(aiService *ai.AIService) *AIHandler {
 	}
 }
 
-// 聊天接口
+// @Summary AI聊天
+// @Description 与AI模型进行对话聊天，支持流式和非流式响应，可以指定使用的AI模型
+// @Tags AI
+// @Param request body models.ChatRequest true "聊天请求"
+// @Success 200 {object} response.Response{data=models.ChatResponse}
+// @Router /ai/chat [post]
 func (h *AIHandler) Chat(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -87,7 +91,12 @@ func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint, req models.
 	}
 }
 
-// 文本生成接口
+// @Summary 文本生成
+// @Description 基于提示词生成文本内容，支持自定义参数和不同的AI模型
+// @Tags AI
+// @Param request body models.GenerateRequest true "生成请求"
+// @Success 200 {object} response.Response{data=models.GenerateResponse}
+// @Router /ai/generate [post]
 func (h *AIHandler) Generate(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -112,7 +121,11 @@ func (h *AIHandler) Generate(c *gin.Context) {
 	response.Success(c, generateResponse)
 }
 
-// 获取模型列表
+// @Summary 获取模型列表
+// @Description 获取可用的AI模型列表，支持不同的AI平台和模型类型
+// @Tags AI
+// @Success 200 {object} response.Response{data=[]models.AIModel}
+// @Router /ai/models [get]
 func (h *AIHandler) GetModels(c *gin.Context) {
 	models, err := h.aiService.GetAvailableModels()
 	if err != nil {
@@ -124,7 +137,12 @@ func (h *AIHandler) GetModels(c *gin.Context) {
 	response.Success(c, models)
 }
 
-// 获取聊天历史
+// @Summary 获取聊天历史
+// @Description 获取用户的历史聊天记录，支持分页和过滤
+// @Tags AI
+// @Param session_id query string true "会话ID"
+// @Success 200 {object} response.Response{data=[]models.ChatMessage}
+// @Router /ai/chat/history [get]
 func (h *AIHandler) GetChatHistory(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -148,7 +166,12 @@ func (h *AIHandler) GetChatHistory(c *gin.Context) {
 	response.Success(c, history)
 }
 
-// 清除聊天历史
+// @Summary 清除聊天历史
+// @Description 清除用户的历史聊天记录，支持按会话ID清除
+// @Tags AI
+// @Param session_id query string true "会话ID"
+// @Success 200 {object} response.Response
+// @Router /ai/chat/history [delete]
 func (h *AIHandler) ClearChatHistory(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -172,7 +195,13 @@ func (h *AIHandler) ClearChatHistory(c *gin.Context) {
 	response.Success(c, nil)
 }
 
-// OpenAI 兼容接口
+// @Summary OpenAI兼容聊天接口
+// @Description OpenAI兼容聊天接口，支持流式和非流式响应，可以指定使用的AI模型
+// @Tags AI
+// @Param platform query string false "平台"
+// @Param request body models.OpenAIChatCompletionRequest true "OpenAI聊天请求"
+// @Success 200 {object} models.OpenAIChatCompletionResponse
+// @Router /ai/v1/chat/completions [post]
 func (h *AIHandler) OpenAIChatCompletion(c *gin.Context) {
 	var req models.OpenAIChatCompletionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -223,7 +252,13 @@ func (h *AIHandler) handleOpenAIStreamingChat(c *gin.Context, platform ai.Platfo
 	}
 }
 
-// 图片生成接口
+// @Summary 图片生成
+// @Description 基于提示词生成图片，支持自定义参数和不同的AI模型
+// @Tags AI
+// @Param platform query string false "平台"
+// @Param request body object{prompt=string,model=string} true "图片生成请求"
+// @Success 200 {object} response.Response{data=[]string}
+// @Router /ai/v1/images/generations [post]
 func (h *AIHandler) GenerateImages(c *gin.Context) {
 	var req struct {
 		Prompt string `json:"prompt" binding:"required"`

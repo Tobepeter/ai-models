@@ -16,14 +16,14 @@ class GMManager {
 	connect() {
 		const store = this.getStore()
 
-		if (this.ws?.readyState === WebSocket.OPEN || store.connecting) {
+		if (this.ws?.readyState === WebSocket.OPEN || store.connectionStatus === 'connecting') {
 			return
 		}
 
 		// 如果是主动连接，清除重连定时器
 		this.clearReconnectTimer()
 
-		store.setData({ connecting: true })
+		store.setData({ connectionStatus: 'connecting' })
 		console.log('🔗 正在连接 GM Server...')
 
 		try {
@@ -33,9 +33,7 @@ class GMManager {
 				console.log('✅ GM Server 连接成功')
 				const store = this.getStore()
 				store.setData({
-					connecting: false,
-					connected: true,
-					reconnecting: false,
+					connectionStatus: 'connected',
 					reconnectAttempts: 0,
 				})
 			}
@@ -53,8 +51,7 @@ class GMManager {
 				console.log('❌ GM Server 连接已断开')
 				const store = this.getStore()
 				store.setData({
-					connecting: false,
-					connected: false,
+					connectionStatus: 'disconnected',
 				})
 				this.scheduleReconnect()
 			}
@@ -62,12 +59,12 @@ class GMManager {
 			this.ws.onerror = (error) => {
 				console.error('❌ WebSocket 错误:', error)
 				const store = this.getStore()
-				store.setData({ connecting: false })
+				store.setData({ connectionStatus: 'disconnected' })
 			}
 		} catch (error) {
 			console.error('❌ 创建 WebSocket 连接失败:', error)
 			const store = this.getStore()
-			store.setData({ connecting: false })
+			store.setData({ connectionStatus: 'disconnected' })
 			this.scheduleReconnect()
 		}
 	}
@@ -79,7 +76,7 @@ class GMManager {
 			this.ws = null
 		}
 		const store = this.getStore()
-		store.setData({ connected: false, connecting: false, reconnecting: false })
+		store.setData({ connectionStatus: 'disconnected' })
 	}
 
 	execCmd(command: string) {
@@ -214,7 +211,7 @@ class GMManager {
 		const store = this.getStore()
 
 		// 防止重复重连
-		if (store.reconnecting) {
+		if (store.connectionStatus === 'reconnecting') {
 			return
 		}
 
@@ -225,7 +222,7 @@ class GMManager {
 		}
 
 		store.setData({
-			reconnecting: true,
+			connectionStatus: 'reconnecting',
 			reconnectAttempts: store.reconnectAttempts + 1,
 		})
 
@@ -245,7 +242,7 @@ class GMManager {
 		this.clearReconnectTimer()
 		store.setData({
 			reconnectAttempts: 0,
-			reconnecting: false,
+			connectionStatus: 'disconnected',
 		})
 		this.connect()
 	}

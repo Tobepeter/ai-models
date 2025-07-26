@@ -50,7 +50,7 @@ func Recovery() gin.HandlerFunc {
 					"error": r,
 					"path":  c.Request.URL.Path,
 				}).Error("Panic recovered")
-				
+
 				response.Error(c, http.StatusInternalServerError, "Internal server error")
 				c.Abort()
 			}
@@ -60,12 +60,17 @@ func Recovery() gin.HandlerFunc {
 }
 
 // CORS returns a gin.HandlerFunc for handling CORS
-func CORS() gin.HandlerFunc {
+func CORS(isDev bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
+
+		// dev 不要缓存 CORS
+		if isDev {
+			c.Header("Access-Control-Max-Age", "0")
+		}
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)

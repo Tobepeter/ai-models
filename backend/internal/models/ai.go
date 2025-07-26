@@ -55,6 +55,14 @@ type AIModel struct {
 	IsActive     bool     `json:"is_active"`
 }
 
+// 聊天消息
+type ChatMessage struct {
+	Role      string    `json:"role"`
+	Content   string    `json:"content"`
+	Model     string    `json:"model,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 // 对话历史
 type ConversationHistory struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`

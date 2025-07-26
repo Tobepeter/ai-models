@@ -1,3 +1,23 @@
+// @title AI Models API
+// @version 1.0
+// @description AI Models Backend API documentation
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@example.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http https
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 package main
 
 import (
@@ -15,6 +35,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "ai-models-backend/docs" // 导入生成的docs包
 )
 
 func main() {
@@ -52,8 +76,9 @@ func main() {
 	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
 	crudHandler := handlers.NewCrudHandler(crudService)
+	testHandler := handlers.NewTestHandler()
 
-	router := setupRouter(cfg, authService, userService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler)
+	router := setupRouter(cfg, authService, userService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler, testHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -61,19 +86,33 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authService *auth.AuthService, userService *services.UserService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authService *auth.AuthService, userService *services.UserService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler, testHandler *handlers.TestHandler) *gin.Engine {
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	r := gin.New()
+
+	// 注意，gin对于 /crud 如果找不到，会尝试使用 /crud/ 来处理
+	// 但是 gin 会调用 c.Redirect 来处理，而 c.Redirect 会快速 Abort，所有中间件都不会处理
+	// 如果前端重定向基本必定跨域，所以没必要支持
+	r.RedirectTrailingSlash = false // 禁用尾部斜杠自动重定向
+	r.HandleMethodNotAllowed = true // 处理 405 错误
+
 	r.Use(middleware.Logger())
 	r.Use(middleware.Recovery())
-	r.Use(middleware.CORS())
+	r.Use(middleware.CORS(cfg.IsDev))
 
 	r.Use(middleware.RateLimitLow()) // 全局 Low 限流
 
 	r.GET("/health", healthHandler.Health)
+	r.GET("/ready", healthHandler.Ready)
+	r.GET("/live", healthHandler.Live)
+
+	// Swagger文档路由 (仅在开发环境)
+	if !cfg.IsProd {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	api := r.Group("/")
 	{
@@ -90,26 +129,7 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 			users.POST("/change-password", middleware.AuthRequired(authService), userHandler.ChangePassword)
 		}
 
-		// 管理员接口
-		admin := api.Group("/admin")
-		admin.Use(middleware.AdminRequired(authService, userService))
-		{
-			// 系统管理
-			admin.GET("/status", adminHandler.GetSystemStatus) // 获取系统状态
-
-			// 用户管理
-			admin := admin.Group("/users")
-			{
-				admin.GET("/", userHandler.GetUsers)                              // 获取用户列表
-				admin.GET("/:id", userHandler.GetUserByID)                        // 根据ID获取用户
-				admin.DELETE("/:id", userHandler.DeleteUser)                      // 删除用户
-				admin.POST("/:id/activate", userHandler.ActivateUser)             // 激活用户
-				admin.POST("/:id/deactivate", userHandler.DeactivateUser)         // 停用用户
-				admin.POST("/:id/reset-password", adminHandler.ResetUserPassword) // 重置用户密码
-			}
-		}
-
-		// 很多 openai 都是带有 v1 前缀的，之类模拟一下
+		// 很多 openai 都是带有 v1 前缀的，模拟一下
 		ai := api.Group("/ai/v1")
 		ai.Use(middleware.RateLimitMid())
 		{
@@ -134,11 +154,45 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 
 		crud := api.Group("/crud")
 		{
-			crud.POST("/", crudHandler.Create)      // 创建记录
+			crud.POST("", crudHandler.Create)       // 创建记录
 			crud.GET("/:id", crudHandler.GetByID)   // 根据ID获取记录
-			crud.GET("/", crudHandler.GetList)      // 获取列表（支持分页）
+			crud.GET("", crudHandler.GetList)       // 获取列表（支持分页）
 			crud.PUT("/:id", crudHandler.Update)    // 更新记录
 			crud.DELETE("/:id", crudHandler.Delete) // 删除记录
+		}
+
+		// 管理员接口
+		admin := api.Group("/admin")
+		admin.Use(middleware.AdminRequired(authService, userService))
+		{
+			// 系统管理
+			admin.GET("/status", adminHandler.GetSystemStatus) // 获取系统状态
+
+			// 用户管理
+			adminUsers := admin.Group("/users")
+			{
+				adminUsers.GET("", userHandler.GetUsers)                               // 获取用户列表
+				adminUsers.GET("/:id", userHandler.GetUserByID)                        // 根据ID获取用户
+				adminUsers.DELETE("/:id", userHandler.DeleteUser)                      // 删除用户
+				adminUsers.POST("/:id/activate", userHandler.ActivateUser)             // 激活用户
+				adminUsers.POST("/:id/deactivate", userHandler.DeactivateUser)         // 停用用户
+				adminUsers.POST("/:id/reset-password", adminHandler.ResetUserPassword) // 重置用户密码
+			}
+		}
+
+		// 测试接口 - 用于测试各种错误码和响应
+		test := api.Group("/test")
+		{
+			// 错误测试分组 - 所有测试接口都放在这里
+			err := test.Group("/err")
+			{
+				err.GET("", testHandler.TestErrors)                       // 测试各种错误码
+				err.POST("", testHandler.TestPostErrors)                  // 测试POST请求错误
+				err.GET("/param/:id", testHandler.TestParamErrors)        // 测试路径参数错误
+				err.GET("/code/:code", testHandler.TestSpecificError)     // 测试特定错误码
+				err.GET("/network/:type", testHandler.TestNetworkError)   // 测试网络错误
+				err.GET("/business/:type", testHandler.TestBusinessError) // 测试业务错误
+			}
 		}
 	}
 
@@ -146,7 +200,6 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 		response.MethodNotAllowed(c, "该路径不支持 "+c.Request.Method+" 方法")
 	})
 
-	r.HandleMethodNotAllowed = true // 处理 405 错误
 	r.NoRoute(func(c *gin.Context) {
 		response.Error(c, http.StatusNotFound, "路由未找到")
 	})

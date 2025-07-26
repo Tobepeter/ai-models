@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { type GMLog } from './gm-store'
 
-interface ProcessOutputProps {
-	processes: GMLog[]
+interface GMOutputProps {
+	logs: GMLog[]
 	onKillProc: (procId: string) => void
 	onClearLogs: () => void
 }
@@ -12,8 +12,8 @@ interface ProcessOutputProps {
 /**
  * 进程输出组件
  */
-export const ProcessOutput = (props: ProcessOutputProps) => {
-	const { processes, onKillProc, onClearLogs } = props
+export const GMOutput = (props: GMOutputProps) => {
+	const { logs, onKillProc, onClearLogs } = props
 
 	return (
 		<div className="col-span-3 flex flex-col">
@@ -27,12 +27,12 @@ export const ProcessOutput = (props: ProcessOutputProps) => {
 			<div className="flex-1 border rounded bg-muted/30 overflow-hidden">
 				<ScrollArea className="h-[75vh]">
 					<div className="p-3">
-						{processes.length === 0 ? (
+						{logs.length === 0 ? (
 							<div className="text-sm text-muted-foreground text-center py-8">
 								暂无运行进程
 							</div>
 						) : (
-							processes.map(proc => (
+							logs.map(proc => (
 								<div key={proc.processId} className="mb-4 border rounded bg-background overflow-hidden">
 									<div className="flex justify-between items-center p-3 bg-muted/50 border-b">
 										<span className="font-medium text-sm font-mono">{proc.command}</span>

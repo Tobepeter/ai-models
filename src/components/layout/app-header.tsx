@@ -4,8 +4,15 @@ import { Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
 
+
+// TODO: 临时解决类型问题
+const user = {
+	avatar: '',
+	username: 'anonymous',
+}
+
 export const AppHeader = () => {
-	const { user } = useUserStore()
+	// const { user } = useUserStore()
 	const navigate = useNavigate()
 	const location = useLocation()
 	const matches = useMatches()

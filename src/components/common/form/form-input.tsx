@@ -21,7 +21,7 @@ export const FormInput = (props: FormInputProps) => {
 }
 
 export interface FormInputProps {
-	id: string
+	id?: string
 	type?: string
 	placeholder?: string
 	value: string

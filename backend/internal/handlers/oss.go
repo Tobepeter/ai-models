@@ -19,19 +19,22 @@ const (
 	errorCode   = 101
 )
 
-// OSS处理器，处理文件上传相关的HTTP请求
 type OSSHandler struct {
 	ossService *services.OSSService
 }
 
-// 创建新的OSS处理器
 func NewOSSHandler(ossService *services.OSSService) *OSSHandler {
 	return &OSSHandler{
 		ossService: ossService,
 	}
 }
 
-// 获取STS临时凭证
+// @Summary STS临时凭证
+// @Description 获取STS临时凭证，用于上传文件，或者浏览
+// @ID getStsCredentials
+// @Tags OSS
+// @Success 200 {object} response.Response{data=models.STSResponse}
+// @Router /oss/sts [get]
 func (h *OSSHandler) GetSTSCredentials(c *gin.Context) {
 	// 验证OSS配置
 	if err := h.ossService.ValidateCfg(); err != nil {
@@ -51,7 +54,13 @@ func (h *OSSHandler) GetSTSCredentials(c *gin.Context) {
 	})
 }
 
-// 生成上传签名
+// @Summary 生成上传签名
+// @Description 生成上传签名，用于上传文件
+// @ID signToUpload
+// @Tags OSS
+// @Param request body models.SignRequest true "签名请求"
+// @Success 200 {object} response.Response{data=models.SignResponse}
+// @Router /oss/sign-to-upload [post]
 func (h *OSSHandler) SignToUpload(c *gin.Context) {
 	var req models.SignRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -82,7 +91,13 @@ func (h *OSSHandler) SignToUpload(c *gin.Context) {
 	})
 }
 
-// 生成获取签名
+// @Summary 生成获取签名
+// @Description 生成获取签名，用于下载文件
+// @ID signToFetch
+// @Tags OSS
+// @Param request body models.SignRequest true "签名请求"
+// @Success 200 {object} response.Response{data=models.SignResponse}
+// @Router /oss/sign-to-fetch [post]
 func (h *OSSHandler) SignToFetch(c *gin.Context) {
 	var req models.SignRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -108,7 +123,13 @@ func (h *OSSHandler) SignToFetch(c *gin.Context) {
 	})
 }
 
-// 生成哈希文件名
+// @Summary 生成哈希文件名
+// @Description 生成哈希文件名，防止重名
+// @ID hashifyName
+// @Tags OSS
+// @Param request body models.HashifyNameRequest true "文件名请求"
+// @Success 200 {object} response.Response{data=models.HashifyNameResponse}
+// @Router /oss/hashify [post]
 func (h *OSSHandler) HashifyName(c *gin.Context) {
 	var req models.HashifyNameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -127,7 +148,17 @@ func (h *OSSHandler) HashifyName(c *gin.Context) {
 	})
 }
 
-// 直接上传文件
+// @Summary 直接上传文件
+// @Description 直接上传文件到OSS
+// @ID uploadFile
+// @Tags OSS
+// @Accept multipart/form-data
+// @Param file formData file true "文件"
+// @Param fileName formData string false "文件名"
+// @Param prefix formData string false "前缀"
+// @Param noPreview formData string false "不预览"
+// @Success 200 {object} response.Response{data=models.FileUploadResponse}
+// @Router /oss/upload [post]
 func (h *OSSHandler) UploadFile(c *gin.Context) {
 	// 解析multipart表单
 	err := c.Request.ParseMultipartForm(maxFileSize)
@@ -220,7 +251,13 @@ func (h *OSSHandler) UploadFile(c *gin.Context) {
 	})
 }
 
-// 删除文件
+// @Summary 删除
+// @Description 删除OSS文件
+// @ID delete
+// @Tags OSS
+// @Param request body models.DeleteFileRequest true "删除请求"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /oss/delete [delete]
 func (h *OSSHandler) DeleteFile(c *gin.Context) {
 	var req models.DeleteFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -242,7 +279,12 @@ func (h *OSSHandler) DeleteFile(c *gin.Context) {
 	response.Success(c, gin.H{"message": "删除成功"})
 }
 
-// 获取文件URL
+// @Summary 获取文件URL
+// @ID getFileURL
+// @Tags OSS
+// @Param request body models.GetURLRequest true "URL请求"
+// @Success 200 {object} response.Response{data=models.GetURLResponse}
+// @Router /oss/url [post]
 func (h *OSSHandler) GetFileURL(c *gin.Context) {
 	var req models.GetURLRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -268,7 +310,14 @@ func (h *OSSHandler) GetFileURL(c *gin.Context) {
 	})
 }
 
-// 获取文件列表
+// @Summary 获取文件列表
+// @Description 获取OSS文件列表
+// @ID getFileList
+// @Tags OSS
+// @Param prefix query string false "前缀"
+// @Param maxKeys query int false "最大数量"
+// @Success 200 {object} response.Response{data=models.FileListResponse}
+// @Router /oss/files [get]
 func (h *OSSHandler) GetFileList(c *gin.Context) {
 	var query models.FileListQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -293,7 +342,6 @@ func (h *OSSHandler) GetFileList(c *gin.Context) {
 	response.Success(c, result)
 }
 
-// 中间件：验证文件大小
 func FileSizeMiddleware() gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
 		// 检查Content-Length头

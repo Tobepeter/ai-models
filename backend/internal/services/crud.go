@@ -26,7 +26,7 @@ func NewCrudService() *CrudService {
 	}
 }
 
-// 创建记录 (内部使用，不包含认证逻辑)
+// CreateCrud 创建记录
 func (s *CrudService) CreateCrud(req models.CrudCreateRequest) (*models.Crud, error) {
 	category := req.Category
 
@@ -48,7 +48,7 @@ func (s *CrudService) CreateCrud(req models.CrudCreateRequest) (*models.Crud, er
 	return model, nil
 }
 
-// 根据ID获取记录
+// GetCrudByID 根据ID获取记录
 func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
 	var crud models.Crud
 	if err := s.DB.First(&crud, id).Error; err != nil {
@@ -60,7 +60,7 @@ func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
 	return &crud, nil
 }
 
-// 更新记录信息
+// UpdateCrud 更新记录信息
 func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models.Crud, error) {
 	var crud models.Crud
 	if err := s.DB.First(&crud, id).Error; err != nil {
@@ -84,7 +84,7 @@ func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models
 	return &crud, nil
 }
 
-// 获取记录列表
+// GetCruds 获取记录列表
 func (s *CrudService) GetCruds(page, limit int, category string) (map[string]any, error) {
 	var cruds []models.Crud
 	condition := make(map[string]any)

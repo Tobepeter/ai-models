@@ -1,9 +1,9 @@
 import { useMount } from 'ahooks'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { NotifyHub } from './components/common/notify'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
-import { NotifyHub } from './components/common/notify'
 
 function App() {
 	const navigate = useNavigate()
@@ -28,6 +28,7 @@ function App() {
 		<div className="bg-background text-foreground">
 			<Outlet />
 			<NotifyHub />
+			{/* {isDev && <GM />} */}
 		</div>
 	)
 }

@@ -63,7 +63,7 @@ func New() *Config {
 	}
 
 	goEnv := os.Getenv("GO_ENV")
-	isProd := goEnv == "development"
+	isProd := goEnv == "production"
 
 	config := &Config{
 		Port:     os.Getenv("PORT"),

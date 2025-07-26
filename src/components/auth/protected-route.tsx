@@ -9,20 +9,21 @@ import { useUserStore } from '@/store/user-store'
 export const ProtectedRoute = (props: ProtectedRouteProps) => {
 	const { children, requireAuth = true, redirectTo = '/login' } = props
 
-	const { isAuthenticated } = useUserStore()
-	const location = useLocation()
+	// TODO: 暂时注释了
+	// const { isAuthenticated } = useUserStore()
+	// const location = useLocation()
 
-	// 如果需要认证但用户未登录，重定向到登录页
-	if (requireAuth && !isAuthenticated) {
-		return <Navigate to={redirectTo} state={{ from: location }} replace />
-	}
+	// // 如果需要认证但用户未登录，重定向到登录页
+	// if (requireAuth && !isAuthenticated) {
+	// 	return <Navigate to={redirectTo} state={{ from: location }} replace />
+	// }
 
-	// 如果不需要认证但用户已登录，可以选择重定向到首页
-	// 这里主要用于登录/注册页面，已登录用户不应该再看到这些页面
-	if (!requireAuth && isAuthenticated) {
-		const from = location.state?.from?.pathname || '/'
-		return <Navigate to={from} replace />
-	}
+	// // 如果不需要认证但用户已登录，可以选择重定向到首页
+	// // 这里主要用于登录/注册页面，已登录用户不应该再看到这些页面
+	// if (!requireAuth && isAuthenticated) {
+	// 	const from = location.state?.from?.pathname || '/'
+	// 	return <Navigate to={from} replace />
+	// }
 
 	return <>{children}</>
 }

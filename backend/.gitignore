@@ -41,3 +41,6 @@ Thumbs.db
 
 # Air热重载
 tmp/
+
+# Swagger
+docs/

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { FloatBtn } from '@/components/common/float-btn'
-import { ProcessOutput } from './process-output'
+import { GMOutput } from './gm-output'
 import { gmCfg, type GMCommandItem } from './gm-cfg'
 import { gmMgr } from './gm-mgr'
 import { useGMStore } from './gm-store'
@@ -13,7 +13,14 @@ import { useState } from 'react'
 // GM 应用管理面板
 export const GM = () => {
 	const [isOpen, setIsOpen] = useState(false)
-	const { connected, connecting, reconnecting, canOperate, shouldShowReconnect, processes, ports, reconnectAttempts } = useGMStore()
+	const { connectionStatus, processes, ports, reconnectAttempts } = useGMStore()
+
+	// 计算派生状态
+	const connected = connectionStatus === 'connected'
+	const connecting = connectionStatus === 'connecting'
+	const reconnecting = connectionStatus === 'reconnecting'
+	const canOperate = connected && !connecting && !reconnecting
+	const shouldShowReconnect = connectionStatus === 'disconnected'
 
 	// 初始化 GM Manager
 	const initGMMgr = useMemoizedFn(() => {
@@ -124,7 +131,7 @@ export const GM = () => {
 						</div>
 
 						{/* 右侧：进程输出 */}
-						<ProcessOutput processes={processes} onKillProc={killProc} onClearLogs={clearLogs} />
+						<GMOutput logs={processes} onKillProc={killProc} onClearLogs={clearLogs} />
 					</div>
 				</DialogContent>
 			</Dialog>

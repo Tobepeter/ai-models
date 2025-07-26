@@ -25,14 +25,15 @@ export interface GMPortStatus {
 	active: boolean
 }
 
+// 连接状态类型
+export type GMConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
+
 // 初始状态
 const gmState = {
-	connected: false,
-	connecting: false,
-	reconnecting: false,
-	reconnectAttempts: 0,
-	processes: [] as GMLog[],
-	ports: [] as GMPortStatus[],
+	connectionStatus: 'disconnected' as GMConnectionStatus,
+	reconnectAttempts: 0, // 重连次数
+	processes: [] as GMLog[], // 进程日志
+	ports: [] as GMPortStatus[], // 端口状态
 }
 
 type GMState = typeof gmState
@@ -50,25 +51,12 @@ const stateCreator = () => {
 		updateProcess: (processId: string, updates: Partial<GMLog>) => {
 			const { processes } = get()
 			set({
-				processes: processes.map(p =>
-					p.processId === processId ? { ...p, ...updates } : p
-				)
+				processes: processes.map((p) => (p.processId === processId ? { ...p, ...updates } : p)),
 			})
 		},
 
 		// 重置状态
-		reset: () => set(gmState),
-		
-		// 计算属性
-		get canOperate() {
-			const { connected, connecting, reconnecting } = get()
-			return connected && !connecting && !reconnecting
-		},
-		
-		get shouldShowReconnect() {
-			const { connected, connecting, reconnecting } = get()
-			return !connected && !connecting && !reconnecting
-		},
+		reset: () => set({ ...gmState }),
 	}))
 }
 

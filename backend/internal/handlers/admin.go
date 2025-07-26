@@ -10,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 管理员请求处理器
 type AdminHandler struct {
 	userService *services.UserService
 	authService *auth.AuthService
@@ -23,7 +22,11 @@ func NewAdminHandler(userService *services.UserService, authService *auth.AuthSe
 	}
 }
 
-// 获取系统状态
+// @Summary 获取系统状态
+// @Description 获取系统运行状态信息，包括用户统计数据和系统基本信息，用于管理员监控
+// @Tags Admin
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/status [get]
 func (h *AdminHandler) GetSystemStatus(c *gin.Context) {
 	// 获取用户统计
 	totalUsers, err := h.userService.GetUserCount()
@@ -52,7 +55,13 @@ func (h *AdminHandler) GetSystemStatus(c *gin.Context) {
 	response.Success(c, data)
 }
 
-// 重置用户密码 (管理员功能)
+// @Summary 重置用户密码
+// @Description 管理员重置指定用户的密码，通常用于用户忘记密码或管理员主动重置的场景
+// @Tags Admin
+// @Param id path string true "用户ID"
+// @Param request body object{new_password=string} true "新密码"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/users/{id}/reset-password [post]
 func (h *AdminHandler) ResetUserPassword(c *gin.Context) {
 	userID := c.Param("id")
 

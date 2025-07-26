@@ -1,11 +1,11 @@
-import { UserResp } from '@/api/types/user-types'
 import { JwtPayloadApp, jwt } from '@/utils/jwt'
 import { storageKeys } from '@/utils/storage'
 import { Nullable } from '@/utils/types'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 
-const defaultUser: UserResp = {
+// TODO: fix it
+const defaultUser: any = {
 	id: 0,
 	username: 'anonymous',
 	email: 'anonymous@example.com',

@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 用户请求处理器
 type UserHandler struct {
 	userService *services.UserService
 	authService *auth.AuthService
@@ -26,7 +25,12 @@ func NewUserHandler(userService *services.UserService, authService *auth.AuthSer
 	}
 }
 
-// 用户注册
+// @Summary 用户注册
+// @Description 新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证
+// @Tags Auth
+// @Param request body models.UserCreateRequest true "注册请求"
+// @Success 200 {object} response.Response{data=object{user=models.UserResponse,token=string}}
+// @Router /users/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req models.UserCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -50,7 +54,12 @@ func (h *UserHandler) Register(c *gin.Context) {
 	response.Success(c, data)
 }
 
-// 用户登录
+// @Summary 用户登录
+// @Description 用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息
+// @Tags Auth
+// @Param request body models.UserLoginRequest true "登录请求"
+// @Success 200 {object} response.Response{data=object{user=models.UserResponse,token=string}}
+// @Router /users/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 	var req models.UserLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -74,7 +83,11 @@ func (h *UserHandler) Login(c *gin.Context) {
 	response.Success(c, data)
 }
 
-// 获取用户信息
+// @Summary 获取用户信息
+// @Description 获取当前登录用户的个人资料信息，包括基本信息、角色等
+// @Tags User
+// @Success 200 {object} response.Response{data=models.UserResponse}
+// @Router /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -92,7 +105,12 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 	response.Success(c, user.ToResponse())
 }
 
-// 更新用户信息
+// @Summary 更新用户信息
+// @Description 更新当前登录用户的个人资料，如用户名、邮箱、头像等信息
+// @Tags User
+// @Param request body models.UserUpdateRequest true "更新请求"
+// @Success 200 {object} response.Response{data=models.UserResponse}
+// @Router /users/profile [put]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -117,7 +135,13 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	response.Success(c, user.ToResponse())
 }
 
-// 获取用户列表
+// @Summary 获取用户列表
+// @Description 管理员分页获取系统中所有用户的列表，支持分页查询
+// @Tags Admin
+// @Param page query int true "页码"
+// @Param limit query int true "每页数量"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -132,7 +156,12 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	response.Success(c, data)
 }
 
-// 删除用户
+// @Summary 删除用户
+// @Description 管理员删除指定用户账户，此操作将永久删除用户数据，请谨慎使用
+// @Tags Admin
+// @Param id path string true "用户ID"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 	id, err := strconv.ParseUint(userID, 10, 32)
@@ -150,7 +179,12 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	response.Success(c, gin.H{"message": "User deleted successfully"})
 }
 
-// 根据ID获取用户信息（管理员用）
+// @Summary 根据ID获取用户信息
+// @Description 管理员根据用户ID获取指定用户的详细信息，用于用户管理
+// @Tags Admin
+// @Param id path string true "用户ID"
+// @Success 200 {object} response.Response{data=models.UserResponse}
+// @Router /admin/users/{id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := strconv.ParseUint(userIDStr, 10, 32)
@@ -167,9 +201,15 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	}
 
 	response.Success(c, user.ToResponse())
+
 }
 
-// 激活用户
+// @Summary 激活用户
+// @Description 管理员激活指定用户账户，激活后用户可以正常登录和使用系统
+// @Tags Admin
+// @Param id path string true "用户ID"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/users/{id}/activate [post]
 func (h *UserHandler) ActivateUser(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := strconv.ParseUint(userIDStr, 10, 32)
@@ -187,7 +227,12 @@ func (h *UserHandler) ActivateUser(c *gin.Context) {
 	response.Success(c, gin.H{"message": "User activated successfully"})
 }
 
-// 停用用户
+// @Summary 停用用户
+// @Description 管理员停用指定用户账户，停用后用户无法登录和使用系统功能
+// @Tags Admin
+// @Param id path string true "用户ID"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /admin/users/{id}/deactivate [post]
 func (h *UserHandler) DeactivateUser(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := strconv.ParseUint(userIDStr, 10, 32)
@@ -205,7 +250,12 @@ func (h *UserHandler) DeactivateUser(c *gin.Context) {
 	response.Success(c, gin.H{"message": "User deactivated successfully"})
 }
 
-// 修改密码
+// @Summary 修改密码
+// @Description 用户修改自己的登录密码，需要提供旧密码进行验证
+// @Tags User
+// @Param request body models.ChangePasswordRequest true "修改密码请求"
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /users/change-password [post]
 func (h *UserHandler) ChangePassword(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -235,7 +285,11 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	response.Success(c, gin.H{"message": "密码修改成功"})
 }
 
-// 用户退出登录
+// @Summary 用户退出登录
+// @Description 用户主动退出登录，清除服务端的登录状态和token
+// @Tags Auth
+// @Success 200 {object} response.Response{data=map[string]any}
+// @Router /users/logout [post]
 func (h *UserHandler) Logout(c *gin.Context) {
 	// 从请求头中提取token
 	authHeader := c.GetHeader("Authorization")
