@@ -1,18 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ThemeToggle } from '@/components/common/theme-toggle'
 import { useUserStore } from '@/store/user-store'
 import { Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
 
-
-// TODO: 临时解决类型问题
-const user = {
-	avatar: '',
-	username: 'anonymous',
-}
-
 export const AppHeader = () => {
-	// const { user } = useUserStore()
+	const { info: user } = useUserStore()
 	const navigate = useNavigate()
 	const location = useLocation()
 	const matches = useMatches()
@@ -44,13 +38,16 @@ export const AppHeader = () => {
 					<h1 className="text-lg font-semibold">{title}</h1>
 				</div>
 
-				{/* 右侧用户头像 */}
-				<button onClick={() => navigate('/user')} className="flex items-center">
-					<Avatar className="h-8 w-8">
-						<AvatarImage src={user?.avatar} alt={user?.username} />
-						<AvatarFallback>{user?.username?.charAt(0) || 'U'}</AvatarFallback>
-					</Avatar>
-				</button>
+				{/* 右侧操作区 */}
+				<div className="flex items-center gap-3">
+					<ThemeToggle />
+					<button onClick={() => navigate('/user')} className="flex items-center">
+						<Avatar className="h-8 w-8">
+							<AvatarImage src={user?.avatar} alt={user?.username} />
+							<AvatarFallback>{user?.username?.charAt(0) || 'U'}</AvatarFallback>
+						</Avatar>
+					</button>
+				</div>
 			</div>
 		</header>
 	)

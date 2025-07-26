@@ -4,6 +4,7 @@ import { PropsWithChildren, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { ThemeProvider } from 'next-themes'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import './index.css'
 import { queryClient } from './api/query-client'
 import { router } from './router/router'
@@ -22,10 +23,12 @@ const StrictWrapper = (props: PropsWithChildren) => {
 const Main = () => {
 	return (
 		<ThemeProvider attribute="class">
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-				{isDev && enableReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
-			</QueryClientProvider>
+			<TooltipProvider>
+				<QueryClientProvider client={queryClient}>
+					<RouterProvider router={router} />
+					{isDev && enableReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
+				</QueryClientProvider>
+			</TooltipProvider>
 		</ThemeProvider>
 	)
 }

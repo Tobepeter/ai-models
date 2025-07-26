@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
 	[
 		{
-			ignores: ['dist/**/*']
+			ignores: ['dist/**/*', 'temp/**/*', 'backend/**/*']
 		},
 		{
 			files: ['**/*.{ts,tsx}'],

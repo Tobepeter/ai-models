@@ -1,5 +1,5 @@
 import { useState, useRef, CSSProperties, useEffect } from 'react'
-import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
+import { Eye, Plus, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
@@ -10,9 +10,10 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
  * 图片预览组件
  */
 export const ImagePreview = (props: ImagePreviewProps) => {
-	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size, aspectRatio, base64Mode = false, noInteraction = false } = props
-	const editable = !notEditable && !noInteraction
-	const [intUrl, setIntUrl] = useState(defaultUrl || '')
+	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, onCustomUpload, onCustomDelete, onCustomUploadError, className, style, children, width, height, size, aspectRatio, base64Mode = false, noInteraction = false, noHover = false } = props
+	const [intUrl, setInternalUrl] = useState(defaultUrl || '')
+	const [loading, setLoading] = useState(false)
+	const editable = !notEditable && !noInteraction && !loading
 	const objUrlRef = useRef('') // object url
 	const curUrl = url ?? intUrl
 
@@ -21,7 +22,7 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 	const ar = aspectRatio || (h ? 'unset' : '1/1')
 	const [open, setOpen] = useState(false)
 	const [hover, setHover] = useState(false)
-	const [imgDim, setImgDim] = useState<{ width: number; height: number } | null>(null)
+	const [imgDimension, setImgDimension] = useState<{ width: number; height: number } | null>(null)
 	const fileRef = useRef<HTMLInputElement>(null)
 
 	const revokeObjUrl = () => {
@@ -31,25 +32,25 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 		}
 	}
 
-	const loadImgDim = useMemoizedFn((imgUrl: string) => {
+	const loadImgDimension = useMemoizedFn((imgUrl: string) => {
 		if (!imgUrl) {
-			setImgDim(null)
+			setImgDimension(null)
 			return
 		}
 		const img = new window.Image()
-		img.onload = () => setImgDim({ width: img.naturalWidth, height: img.naturalHeight })
-		img.onerror = () => setImgDim(null)
+		img.onload = () => setImgDimension({ width: img.naturalWidth, height: img.naturalHeight })
+		img.onerror = () => setImgDimension(null)
 		img.src = imgUrl
 	})
 
 	useEffect(() => {
-		loadImgDim(curUrl)
-	}, [curUrl, loadImgDim])
+		loadImgDimension(curUrl)
+	}, [curUrl, loadImgDimension])
 
 	// 计算图片预览弹窗的最大尺寸，保证图片不会超出视口且保持原始宽高比
-	const getPreviewDim = () => {
-		if (!imgDim) return { maxWidth: '90vw', maxHeight: '90vh', aspectRatio: 'auto' } // 没有图片信息时默认最大限制
-		const { width: iw, height: ih } = imgDim
+	const getPreviewDimension = () => {
+		if (!imgDimension) return { maxWidth: '90vw', maxHeight: '90vh', aspectRatio: 'auto' } // 没有图片信息时默认最大限制
+		const { width: iw, height: ih } = imgDimension
 		const iar = iw / ih // 图片宽高比
 		const mw = window.innerWidth * 0.9 // 视口宽度的90%
 		const mh = window.innerHeight * 0.9 // 视口高度的90%
@@ -72,37 +73,70 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 		return { maxWidth: `${Math.round(dw)}px`, maxHeight: `${Math.round(dh)}px`, aspectRatio: `${iw}/${ih}` }
 	}
 
-	const handleFileUpload = useMemoizedFn((e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileUpload = useMemoizedFn(async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const f = e.target.files?.[0]
-		if (f) {
-			revokeObjUrl()
-			onUpload?.(f)
+		if (!f) return
+
+		revokeObjUrl()
+
+		// 如果有自定义上传函数，使用异步上传
+		if (onCustomUpload) {
+			setLoading(true)
+			try {
+				const uploadedUrl = await onCustomUpload(f)
+				if (uploadedUrl) {
+					if (url === undefined) setInternalUrl(uploadedUrl)
+					onChange?.(uploadedUrl)
+					onUpload?.(f, uploadedUrl)
+				} else {
+					// 没有返回URL，触发错误回调
+					onCustomUploadError?.(new Error('Upload failed: no URL returned'), f)
+				}
+			} catch (error) {
+				onCustomUploadError?.(error as Error, f)
+			} finally {
+				setLoading(false)
+			}
+		} else {
+			// 原有逻辑：本地预览
 			if (base64Mode) {
 				const r = new FileReader()
 				r.onload = (ev) => {
 					const b64 = ev.target?.result as string
-					if (url === undefined) setIntUrl(b64)
+					if (url === undefined) setInternalUrl(b64)
 					onChange?.(b64)
+					onUpload?.(f, b64)
 				}
 				r.readAsDataURL(f)
 			} else {
 				const fUrl = URL.createObjectURL(f)
 				objUrlRef.current = fUrl
-				if (url === undefined) setIntUrl(fUrl)
+				if (url === undefined) setInternalUrl(fUrl)
 				onChange?.(fUrl)
+				onUpload?.(f, fUrl)
 			}
 		}
 	})
 
 	const handleUploadClick = () => fileRef.current?.click()
 
-	const handleDelete = (e: React.MouseEvent) => {
+	const handleDelete = useMemoizedFn((e: React.MouseEvent) => {
 		e.stopPropagation()
+
+		// 立即执行UI删除逻辑
 		revokeObjUrl()
-		if (url === undefined) setIntUrl('')
+		if (url === undefined) setInternalUrl('')
 		onChange?.('')
 		onDelete?.()
-	}
+
+		// 如果有自定义删除函数，后台静默执行（不等待）
+		if (onCustomDelete) {
+			onCustomDelete().catch(error => {
+				console.error('[ImagePreview] Custom delete failed:', error)
+				// 静默处理错误，不影响UI
+			})
+		}
+	})
 
 	useUnmount(() => {
 		// 手动上传的图片是 blob url 方便预览
@@ -118,6 +152,7 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 	const isCustom = !!children
 
+	// 如果没有URL，显示空状态或上传按钮
 	if (!curUrl && !isCustom) {
 		return (
 			<>
@@ -135,25 +170,42 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 	return (
 		<>
-			<Dialog open={open} onOpenChange={setOpen}>
+			<Dialog open={open} onOpenChange={noHover || noInteraction || loading ? undefined : setOpen}>
 				<DialogTrigger asChild>
 					{isCustom ? (
 						<div className={className} style={cardStyle}>
 							{children}
 						</div>
 					) : (
-						<div className={cn('relative cursor-pointer overflow-hidden rounded-lg', className)} style={cardStyle} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+						<div className={cn('relative overflow-hidden rounded-lg', !noHover && !noInteraction && !loading && 'cursor-pointer', className)} style={cardStyle} onMouseEnter={!noHover && !noInteraction && !loading ? () => setHover(true) : undefined} onMouseLeave={!noHover && !noInteraction && !loading ? () => setHover(false) : undefined}>
+							{/* 图片 */}
 							<div className="absolute inset-0">
 								<img src={curUrl} alt="预览图片" className="w-full h-full object-cover" />
 							</div>
-							<div className={cn('absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity', hover ? 'opacity-100' : 'opacity-0')}>
-								<Eye className="w-6 h-6 text-white" />
-							</div>
-							{editable && <Trash2 className="absolute top-1 right-1 w-6 h-6 text-white hover:text-red-400 p-1 cursor-pointer transition-colors" onClick={handleDelete} />}
+
+							{/* 预览眼睛 */}
+							{!noHover && !noInteraction && !loading && (
+								<div className={cn('absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity', hover ? 'opacity-100' : 'opacity-0')}>
+									<Eye className="w-6 h-6 text-white" />
+								</div>
+							)}
+
+							{/* Loading浮层 */}
+							{loading && (
+								<div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+									<div className="flex flex-col items-center gap-2">
+										<Loader2 className="w-6 h-6 animate-spin text-white" />
+										<span className="text-xs text-white">处理中...</span>
+									</div>
+								</div>
+							)}
+
+							{/* 删除按钮 */}
+							{editable && !loading && <Trash2 className="absolute top-1 right-1 w-6 h-6 text-white hover:text-red-400 p-1 cursor-pointer transition-colors" onClick={handleDelete} />}
 						</div>
 					)}
 				</DialogTrigger>
-				<DialogContent showCloseButton={false} className="p-0 border-none" style={getPreviewDim()}>
+				<DialogContent showCloseButton={false} className="p-0 border-none" style={getPreviewDimension()}>
 					<VisuallyHidden>
 						<DialogTitle>预览图片</DialogTitle>
 					</VisuallyHidden>
@@ -180,9 +232,13 @@ export type ImagePreviewProps = {
 	defaultUrl?: string // 默认图片URL，仅在组件初始化时生效
 	notEditable?: boolean // 是否不可编辑，默认false（即默认可编辑）
 	noInteraction?: boolean // 是否禁用所有交互功能（上传、删除、悬停效果），默认false
-	onUpload?: (file: File) => void // 文件上传回调
-	onDelete?: () => void // 删除回调
+	noHover?: boolean // 是否禁用悬停效果和点击预览，默认false
+	onUpload?: (file: File, url?: string) => void // 文件上传完成回调，返回文件和URL（如有）
+	onDelete?: () => void // 删除完成回调
 	onChange?: (url: string | undefined) => void // URL变化回调，上传和删除时都会调用
+	onCustomUpload?: (file: File) => Promise<string | undefined> // 自定义异步上传函数，返回URL
+	onCustomDelete?: () => Promise<void> // 自定义异步删除函数
+	onCustomUploadError?: (error: Error, file: File) => void // 自定义上传错误回调
 	className?: string // 样式类名
 	style?: CSSProperties // 内联样式
 	children?: React.ReactNode // 插槽内容，优先级高于默认图片渲染

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { CreatableCombobox, ComboboxOption } from '@/components/ui/creatable-combobox'
+import { FormItem, FormLabel } from '@/components/common/form'
 import { toast } from 'sonner'
 import { Edit, Trash2, Plus, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -23,7 +24,7 @@ interface CreateEditForm {
 	category: string
 }
 
-export function TestCrud() {
+export const Crud = () => {
 	const [items, setItems] = useState<CrudItem[]>([])
 	const [loading, setLoading] = useState(false)
 	const [createDialogOpen, setCreateDialogOpen] = useState(false)
@@ -166,6 +167,11 @@ export function TestCrud() {
 
 	return (
 		<div className="p-6 space-y-6">
+			<div className="mb-6">
+				<h1 className="text-2xl font-bold mb-2">通用型CRUD体验</h1>
+				<p className="text-muted-foreground">这是一个通用的数据管理界面，支持数据的增删改查操作</p>
+			</div>
+
 			{/* 操作栏 */}
 			<Card>
 				<CardContent className="py-4">
@@ -205,16 +211,22 @@ export function TestCrud() {
 								<DialogDescription>创建一条新的数据记录</DialogDescription>
 							</DialogHeader>
 							<div className="space-y-4">
-								<div>
-									<Label>分类</Label>
+								<FormItem>
+									<FormLabel htmlFor="create-category">分类</FormLabel>
 									<div className="px-3 py-2 border rounded-md bg-muted text-sm">
 										{selectedCategory}
 									</div>
-								</div>
-								<div>
-									<Label>数据内容</Label>
-									<Textarea value={createForm.data} onChange={(e) => setCreateForm((prev) => ({ ...prev, data: e.target.value }))} placeholder="输入数据内容" rows={4} />
-								</div>
+								</FormItem>
+								<FormItem>
+									<FormLabel htmlFor="create-data">数据内容</FormLabel>
+									<Textarea 
+										id="create-data"
+										value={createForm.data} 
+										onChange={(e) => setCreateForm((prev) => ({ ...prev, data: e.target.value }))} 
+										placeholder="输入数据内容" 
+										rows={4} 
+									/>
+								</FormItem>
 							</div>
 							<DialogFooter>
 								<Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
@@ -291,8 +303,8 @@ export function TestCrud() {
 					<DialogDescription>编辑数据记录 ID: {currentItem?.id}</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4">
-					<div>
-						<Label>分类</Label>
+					<FormItem>
+						<FormLabel htmlFor="edit-category">分类</FormLabel>
 						<CreatableCombobox
 							options={categoryOptions}
 							value={editForm.category}
@@ -301,11 +313,17 @@ export function TestCrud() {
 							placeholder="选择或添加分类"
 							addButtonText={(input) => `添加 "${input}"`}
 						/>
-					</div>
-					<div>
-						<Label>数据内容</Label>
-						<Textarea value={editForm.data} onChange={(e) => setEditForm((prev) => ({ ...prev, data: e.target.value }))} placeholder="输入数据内容" rows={4} />
-					</div>
+					</FormItem>
+					<FormItem>
+						<FormLabel htmlFor="edit-data">数据内容</FormLabel>
+						<Textarea 
+							id="edit-data"
+							value={editForm.data} 
+							onChange={(e) => setEditForm((prev) => ({ ...prev, data: e.target.value }))} 
+							placeholder="输入数据内容" 
+							rows={4} 
+						/>
+					</FormItem>
 				</div>
 				<DialogFooter>
 					<Button variant="outline" onClick={() => setEditDialogOpen(false)}>

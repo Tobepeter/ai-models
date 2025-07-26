@@ -239,9 +239,19 @@ const ModelGroupSelector = () => {
 			<div className="flex flex-wrap gap-2 mb-4">
 				<span className="text-sm text-muted-foreground">已选择:</span>
 				{selectedModels.map((model) => (
-					<Badge key={model.id} variant="secondary" className="cursor-pointer" onClick={() => handleModelToggle(model)}>
-						{model.name}
-						<button className="ml-1 hover:bg-muted-foreground/20 rounded-full w-3 h-3 flex items-center justify-center text-xs">×</button>
+					<Badge key={model.id} variant="secondary" className="flex items-center gap-1">
+						<span onClick={() => handleModelToggle(model)} className="cursor-pointer">
+							{model.name}
+						</span>
+						<button 
+							onClick={(e) => {
+								e.stopPropagation()
+								handleModelToggle(model)
+							}} 
+							className="ml-1 hover:bg-muted-foreground/20 rounded-full w-3 h-3 flex items-center justify-center text-xs"
+						>
+							×
+						</button>
 					</Badge>
 				))}
 				{selectedModels.length === 0 && <span className="text-sm text-muted-foreground">未选择任何模型</span>}
@@ -261,17 +271,15 @@ const ModelGroupSelector = () => {
 									<span className="font-medium">{group.title}</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<Button
-										variant="ghost"
-										size="sm"
+									<span
 										onClick={(e) => {
 											e.stopPropagation()
 											handleGroupToggle(group.models, allSelected)
 										}}
-										className="h-6 px-2 text-xs"
+										className="h-6 px-2 text-xs bg-transparent hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer flex items-center"
 									>
 										{allSelected ? '取消全选' : '全选'}
-									</Button>
+									</span>
 									<Badge variant="outline" className="text-xs">
 										{selectedCount}/{group.models.length}
 									</Badge>

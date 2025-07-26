@@ -160,6 +160,41 @@ func (s *OSSService) HashifyName(fileName string) string {
 	return fmt.Sprintf("%s_%d_%s%s", nameWithoutExt, timestamp, randomStr, ext)
 }
 
+// GetUploadInfo 生成上传信息，与前端ossUtil.getUploadInfo逻辑保持一致
+func (s *OSSService) GetUploadInfo(fileName string, fileType string) (objectKey, pathPrefix, hashifyName string) {
+	hashifyName = s.HashifyName(fileName)
+
+	// 根据文件类型确定路径前缀
+	basePath := "assets/"
+	if fileType != "" {
+		pathPrefix = basePath + s.getFolderByType(fileType)
+	} else {
+		pathPrefix = basePath
+	}
+
+	objectKey = pathPrefix + hashifyName
+	return objectKey, pathPrefix, hashifyName
+}
+
+// getFolderByType 根据文件类型获取子文件夹，与前端逻辑保持一致
+func (s *OSSService) getFolderByType(fileType string) string {
+	folderByType := map[string]string{
+		"image": "images/",
+		"video": "videos/",
+		"audio": "audios/",
+	}
+
+	// 检查文件类型前缀
+	for prefix, folder := range folderByType {
+		if strings.HasPrefix(fileType, prefix) {
+			return folder
+		}
+	}
+
+	// 默认文件夹
+	return "files/"
+}
+
 // UploadFile 直接上传文件到OSS
 func (s *OSSService) UploadFile(file multipart.File, objectKey string, contentType string) error {
 	// 读取文件内容

@@ -2,6 +2,17 @@ import axios from 'axios'
 import { ossConfig } from './oss-config'
 import { ossUtil } from './oss-util'
 import { OssBaseResp, OssSignToUploadData, SignToFetchData, OssHashifyNameData, OssApiUploadData, OssApiGetUrlData, OssUploadResult, OssUploadOpt } from './oss-types'
+import { requestConfig } from '@/config/request-config'
+
+/** 内部使用的上传解析选项 */
+interface OssUploadParseOpt {
+	prefix?: string
+	fileName?: string
+	objectKey: string
+	hashifyName: string
+	noPreview?: boolean
+	onProgress?: (percent: number) => void
+}
 
 /**
  * OSS 基于后端的API
@@ -20,7 +31,7 @@ class OssApiClient {
 
 	private client = axios.create({
 		baseURL: ossConfig.apiBaseUrl,
-		timeout: 3000,
+		timeout: requestConfig.timeout,
 	})
 
 	setSignMode(enabled: boolean) {
@@ -28,43 +39,74 @@ class OssApiClient {
 	}
 
 	async uploadFile(file: File, options?: OssUploadOpt): Promise<OssUploadResult> {
+		const { prefix, fileName, objectKey: providedObjectKey, noProcessObjectKey, noPreview, onProgress } = options || {}
+
+		let objectKey: string
+		let hashifyName: string
+
+		// 优先级1: 如果直接提供了objectKey，直接使用
+		if (providedObjectKey) {
+			objectKey = providedObjectKey
+			// 从objectKey中提取hashifyName（取最后一个/后的部分）
+			hashifyName = objectKey.split('/').pop() || objectKey
+		}
+		// 优先级2: 默认前端计算路径（除非设置了noProcessObjectKey=true）
+		else if (!noProcessObjectKey) {
+			const uploadInfo = ossUtil.getUploadInfo(fileName || file.name, file.type)
+			hashifyName = uploadInfo.hashifyName
+
+			// 如果还有prefix，拼接在智能路径和hashifyName之间
+			if (prefix) {
+				const normalizedPrefix = prefix.endsWith('/') ? prefix : `${prefix}/`
+				objectKey = uploadInfo.pathPrefix + normalizedPrefix + hashifyName
+			} else {
+				objectKey = uploadInfo.objectKey
+			}
+		}
+		// 优先级3: noProcessObjectKey=true，传给后端计算
+		else {
+			// 这种情况下objectKey为空，让后端计算
+			objectKey = ''
+			hashifyName = '' // 后端会计算
+		}
+
+		const parseOpt: OssUploadParseOpt = {
+			objectKey,
+			hashifyName,
+			prefix,
+			fileName,
+			noPreview,
+			onProgress,
+		}
+
 		if (this.signMode) {
-			return this.uploadFileBySign(file, options)
+			return this.uploadFileBySign(file, parseOpt)
 		} else {
-			return this.uploadFileByAPI(file, options)
+			return this.uploadFileByAPI(file, parseOpt)
 		}
 	}
 
-	private async uploadFileBySign(file: File, options?: OssUploadOpt): Promise<OssUploadResult> {
-		let objectKey: string
-		let hashifyName: string
-		const { prefix, fileName, noPreview, onProgress } = options || {}
+	private async uploadFileBySign(file: File, opt: OssUploadParseOpt): Promise<OssUploadResult> {
+		const { objectKey, hashifyName, prefix, fileName, noPreview, onProgress } = opt
 
-		if (prefix || fileName) {
-			// 自定义路径和文件名
-			const finalFileName = fileName || file.name
-			hashifyName = ossUtil.hashifyName(finalFileName)
-
-			if (prefix) {
-				const normalizedPrefix = prefix.endsWith('/') ? prefix : `${prefix}/`
-				objectKey = normalizedPrefix + hashifyName
-			} else {
-				objectKey = hashifyName
-			}
-		} else {
-			// 使用默认的智能路径生成
-			const uploadInfo = ossUtil.getUploadInfo(file.name, file.type)
-			objectKey = uploadInfo.objectKey
-			hashifyName = uploadInfo.hashifyName
+		// 构建签名请求
+		const signRequest: any = {
+			fileType: file.type || 'application/octet-stream',
 		}
 
-		const res = await this.client.post<OssBaseResp<OssSignToUploadData>>('/oss/sign-to-upload', {
-			objectKey,
-			fileType: file.type || 'application/octet-stream',
-		})
+		// 如果有完整的objectKey，直接使用
+		if (objectKey) {
+			signRequest.objectKey = objectKey
+		} else {
+			// 否则传递prefix和fileName，让后端计算路径
+			if (prefix) signRequest.prefix = prefix
+			if (fileName) signRequest.fileName = fileName
+		}
+
+		const res = await this.client.post<OssBaseResp<OssSignToUploadData>>('/oss/sign-to-upload', signRequest)
 
 		if (res.data.code !== 0) throw new Error(res.data.msg)
-		const { signedUrl } = res.data.data!
+		const { signedUrl, objectKey: finalObjectKey } = res.data.data!
 
 		// 直接上传到OSS
 		try {
@@ -78,34 +120,41 @@ class OssApiClient {
 					}
 				},
 			})
-			console.log(`[OSS] 签名模式上传成功: ${objectKey}, 大小: ${file.size}, 类型: ${file.type}`)
+			console.log(`[OSS] 签名模式上传成功: ${finalObjectKey}, 大小: ${file.size}, 类型: ${file.type}`)
 		} catch (error: any) {
-			console.error(`[OSS] 签名模式上传失败: ${objectKey}`, error)
+			console.error(`[OSS] 签名模式上传失败: ${finalObjectKey}`, error)
 			throw new Error(`OSS上传失败: ${error.message}`)
 		}
 
 		let url: string | undefined = undefined
 		if (!noPreview) {
 			// NOTE: oss 签名的put和fetch是分开的，需要重新签名url
-			url = await this.getFileUrl(objectKey)
+			url = await this.getFileUrl(finalObjectKey)
 		}
+
+		// 计算最终的hashifyName
+		const finalHashifyName = hashifyName || finalObjectKey.split('/').pop() || finalObjectKey
 
 		return {
 			url,
-			objectKey,
-			hashifyName,
+			objectKey: finalObjectKey,
+			hashifyName: finalHashifyName,
 			size: file.size,
 			type: file.type,
 			uploadTime: new Date().toISOString(),
 		}
 	}
 
-	private async uploadFileByAPI(file: File, options?: OssUploadOpt): Promise<OssUploadResult> {
-		// 代理模式：后端全权处理，支持传递 prefix 和 fileName
-		const { prefix, fileName, noPreview, onProgress } = options || {}
+	private async uploadFileByAPI(file: File, opt: OssUploadParseOpt): Promise<OssUploadResult> {
+		const { objectKey, hashifyName, prefix, fileName, noPreview, onProgress } = opt
 
 		const formData = new FormData()
 		formData.append('file', file)
+
+		// 如果有完整的objectKey，直接传递给后端
+		if (objectKey) {
+			formData.append('objectKey', objectKey)
+		}
 
 		// 添加可选参数
 		if (prefix) {
@@ -133,10 +182,13 @@ class OssApiClient {
 
 			console.log(`[OSS] 代理模式上传成功: ${data.objectKey}, 大小: ${data.size}, 类型: ${data.type}`)
 
+			// 如果后端返回了hashifyName，使用后端的；否则使用前端计算的
+			const finalHashifyName = data.hashifyName || hashifyName || data.objectKey.split('/').pop() || data.objectKey
+
 			return {
 				url: data.url,
 				objectKey: data.objectKey,
-				hashifyName: data.objectKey, // 后端已经处理了哈希化
+				hashifyName: finalHashifyName,
 				size: data.size,
 				type: data.type,
 				uploadTime: data.uploadTime,

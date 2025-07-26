@@ -1,48 +1,37 @@
 import { Cover } from '@/components/common/cover'
 import { FormInput, FormItem, FormLabel, FormPwd } from '@/components/common/form'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ThemeToggle } from '@/components/common/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useUserStore } from '@/store/user-store'
+import { authApi } from '@/api/auth/auth-api'
+import type { UserLoginRequest } from '@/api/types/generated'
 import { useMount } from 'ahooks'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
-// TODO: 临时解决类型问题
-const isAuthenticated = true
-const setAuth = (user: any, token: string) => {
-	useUserStore.getState().setToken(token)
-}
-const setAuthError = (error: string) => {
-	useUserStore.getState().setToken('')
-}
-const authError = ''
-const useLogin = () => {
-	return {
-		mutateAsync: (form: AuthLoginReq) => Promise.resolve({ user: {}, token: '' }),
-		isPending: false,
-	}
-}
-type AuthLoginReq = any
-type FormErrors = any
+type FormErrors = Record<string, string | undefined>
 
 export const Login = () => {
 	const navigate = useNavigate()
-	// const { isAuthenticated, setAuth, setAuthError, authError } = useUserStore()
+	const [searchParams] = useSearchParams()
+	const { token } = useUserStore()
 
-	const loginMutation = useLogin()
-
-	const [form, setForm] = useState<AuthLoginReq>({
+	const [form, setForm] = useState<UserLoginRequest>({
 		username: '',
 		password: '',
 	})
 	const [errors, setErrors] = useState<FormErrors>({})
+	const [isLoading, setIsLoading] = useState(false)
 
-	// 如果已登录，重定向到首页
+	// 获取重定向地址
+	const redirectTo = searchParams.get('redirect') || '/'
+
+	// 如果已登录，重定向到目标页面
 	useMount(() => {
-		if (isAuthenticated) {
-			navigate('/', { replace: true })
+		if (token) {
+			navigate(redirectTo, { replace: true })
 		}
 	})
 
@@ -63,21 +52,25 @@ export const Login = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		setAuthError(null)
 
 		if (!validate()) return
 
+		setIsLoading(true)
 		try {
-			const result = await loginMutation.mutateAsync(form)
-			setAuth(result.user, result.token)
-			navigate('/', { replace: true })
+			const result = await authApi.login(form)
+			// 登录成功后跳转到重定向地址，使用replace清空回退历史
+			if (result) {
+				navigate(redirectTo, { replace: true })
+			}
 		} catch (err) {
-			const errorMsg = err instanceof Error ? err.message : '登录失败'
-			setAuthError(errorMsg)
+			// API拦截器已经处理了错误显示，这里不需要额外处理
+			console.error('Login failed:', err)
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
-	const handleChange = (field: keyof AuthLoginReq) => (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (field: keyof UserLoginRequest) => (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm((prev) => ({ ...prev, [field]: e.target.value }))
 		// 清除对应字段的错误
 		if (errors[field]) {
@@ -86,22 +79,20 @@ export const Login = () => {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-background p-4">
+		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
 			<Cover />
 
-			<Card className="w-full max-w-md shadow-lg border-0 bg-card/95 backdrop-blur">
+			<Card className="w-full max-w-md shadow-lg border-0 bg-card/95 backdrop-blur relative">
+				{/* 主题切换按钮 */}
+				<div className="absolute top-4 right-4 z-10">
+					<ThemeToggle />
+				</div>
 				<CardHeader className="text-center space-y-3 pb-6">
 					<CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">欢迎回来</CardTitle>
 					<CardDescription className="text-base text-muted-foreground">登录您的账户，继续AI智能体验</CardDescription>
 				</CardHeader>
 				<CardContent className="px-6 pb-6">
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-						{/* 全局错误提示 */}
-						{authError && (
-							<Alert variant="destructive">
-								<AlertDescription>{authError}</AlertDescription>
-							</Alert>
-						)}
 
 						{/* 用户名 */}
 						<FormItem>
@@ -113,7 +104,7 @@ export const Login = () => {
 								placeholder="请输入用户名"
 								value={form.username}
 								onChange={handleChange('username')}
-								disabled={loginMutation.isPending}
+								disabled={isLoading}
 								error={errors.username}
 								autoComplete="username"
 							/>
@@ -129,7 +120,7 @@ export const Login = () => {
 								placeholder="请输入密码"
 								value={form.password}
 								onChange={handleChange('password')}
-								disabled={loginMutation.isPending}
+								disabled={isLoading}
 								error={errors.password}
 								autoComplete="current-password"
 							/>
@@ -139,16 +130,19 @@ export const Login = () => {
 						<Button
 							type="submit"
 							className="w-full h-11 text-base font-medium bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
-							disabled={loginMutation.isPending}
+							disabled={isLoading}
 						>
-							{loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							{loginMutation.isPending ? '登录中...' : '立即登录'}
+							{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							{isLoading ? '登录中...' : '立即登录'}
 						</Button>
 
 						{/* 注册链接 */}
 						<div className="text-center pt-2">
 							<span className="text-sm text-muted-foreground">还没有账户？</span>
-							<Link to="/register" className="text-sm text-primary hover:text-primary/80 font-medium ml-1 transition-colors">
+							<Link
+								to={redirectTo === '/' ? '/register' : `/register?redirect=${encodeURIComponent(redirectTo)}`}
+								className="text-sm text-primary hover:text-primary/80 font-medium ml-1 transition-colors"
+							>
 								立即注册
 							</Link>
 						</div>

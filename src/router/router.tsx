@@ -4,6 +4,7 @@ import { Login } from '@/pages/auth/login'
 import { Register } from '@/pages/auth/register'
 import { ChatHub } from '@/pages/chat-hub/chat-hub'
 import { Chat } from '@/pages/chat/chat'
+import { Crud } from '@/pages/crud/crud'
 import { Doc } from '@/pages/docs/doc'
 import { Home } from '@/pages/home/home'
 import { Test } from '@/pages/test/test'
@@ -39,6 +40,11 @@ export const routes: CustomRouteObject[] = [
 		path: 'chat-hub',
 		element: <ChatHub />,
 		handle: { title: 'AI对比助手' },
+	},
+	{
+		path: 'crud',
+		element: <Crud />,
+		handle: { title: '通用型CRUD体验' },
 	},
 	{
 		path: 'user',

@@ -1,5 +1,6 @@
 import { useMount } from 'ahooks'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { authApi } from './api/auth/auth-api'
 import { NotifyHub } from './components/common/notify'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import debug from './utils/debug'
@@ -18,6 +19,9 @@ function App() {
 			msg += `buildTimeLocal: ${buildTimeLocal}`
 		}
 		console.log(`%c[App] ${msg}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
+
+		// 静默登录状态
+		authApi.checkLogin()
 
 		if (isProd) {
 			navigate('/chat')

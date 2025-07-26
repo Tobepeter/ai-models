@@ -87,6 +87,8 @@ export interface FileListResponse {
 }
 
 export interface FileUploadResponse {
+  /** 哈希化文件名 */
+  hashifyName?: string;
   objectKey?: string;
   size?: number;
   type?: string;
@@ -174,8 +176,14 @@ export interface STSResponse {
 }
 
 export interface SignRequest {
+  /** 文件名 */
+  fileName?: string;
+  /** 文件类型，用于路径计算 */
   fileType?: string;
-  objectKey: string;
+  /** 完整的objectKey，如果提供则直接使用 */
+  objectKey?: string;
+  /** 路径前缀 */
+  prefix?: string;
 }
 
 export interface SignResponse {

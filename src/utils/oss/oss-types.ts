@@ -43,6 +43,7 @@ export interface OssHashifyNameData {
 export interface OssApiUploadData {
 	objectKey: string
 	url: string
+	hashifyName?: string // 后端计算的hashifyName
 	size: number
 	type: string
 	uploadTime: string
@@ -58,6 +59,8 @@ export interface OssApiGetUrlData {
 export interface OssUploadOpt {
 	prefix?: string
 	fileName?: string
+	objectKey?: string // 直接指定完整的objectKey，优先级最高
+	noProcessObjectKey?: boolean // 是否禁用前端计算objectKey，默认false（前端处理）
 	noPreview?: boolean // 不需要预览URL，可以跳过获取URL步骤
 	onProgress?: (percent: number) => void // 上传进度回调
 }

@@ -1,6 +1,7 @@
 import { notify } from '@/components/common/notify'
 import { requestConfig } from '@/config/request-config'
 import { useUserStore } from '@/store/user-store'
+import { jwt } from '@/utils/jwt'
 import { Api } from './types/generated'
 
 const api = new Api({
@@ -13,13 +14,21 @@ api.instance.interceptors.request.use((config) => {
 	if (config.noAuth) {
 		return config
 	}
-	const { token } = useUserStore.getState()
+
+	const { token, tokenPayload, goLogin } = useUserStore.getState()
+
+	// 如果有token但已过期，跳转登录
+	if (token && tokenPayload && !jwt.isValid(tokenPayload)) {
+		goLogin()
+		return Promise.reject(new Error('Token expired'))
+	}
+
+	// 如果有有效token，添加到请求头
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`
-	} else {
-		// NOTE: 暂时先放开
-		// throw new Error('No token')
 	}
+	// 没有token的情况暂时放开，不强制要求所有接口都需要token
+
 	return config
 })
 

@@ -68,9 +68,29 @@ func (h *OSSHandler) SignToUpload(c *gin.Context) {
 		return
 	}
 
-	if req.ObjectKey == "" {
-		response.Error(c, http.StatusBadRequest, "objectKey不能为空")
-		return
+	var finalObjectKey string
+
+	// 优先级1: 如果直接提供了objectKey，直接使用
+	if req.ObjectKey != "" {
+		finalObjectKey = req.ObjectKey
+	} else {
+		// 优先级2: 后端计算objectKey（prefix + fileName模式）
+		fileName := req.FileName
+		if fileName == "" {
+			response.Error(c, http.StatusBadRequest, "fileName不能为空")
+			return
+		}
+
+		// 使用后端路径计算逻辑
+		objectKey, pathPrefix, hashifyName := h.ossService.GetUploadInfo(fileName, req.FileType)
+
+		// 如果指定了prefix，拼接在智能路径和hashifyName之间
+		if req.Prefix != "" {
+			normalizedPrefix := strings.TrimSuffix(req.Prefix, "/") + "/"
+			finalObjectKey = pathPrefix + normalizedPrefix + hashifyName
+		} else {
+			finalObjectKey = objectKey
+		}
 	}
 
 	fileType := req.FileType
@@ -78,7 +98,7 @@ func (h *OSSHandler) SignToUpload(c *gin.Context) {
 		fileType = "application/octet-stream"
 	}
 
-	signedURL, err := h.ossService.SignToUpload(req.ObjectKey, fileType)
+	signedURL, err := h.ossService.SignToUpload(finalObjectKey, fileType)
 	if err != nil {
 		logrus.WithError(err).Error("生成上传签名失败")
 		response.Error(c, http.StatusInternalServerError, fmt.Sprintf("生成上传签名失败: %s", err.Error()))
@@ -87,7 +107,7 @@ func (h *OSSHandler) SignToUpload(c *gin.Context) {
 
 	response.Success(c, models.SignResponse{
 		SignedURL: signedURL,
-		ObjectKey: req.ObjectKey,
+		ObjectKey: finalObjectKey,
 	})
 }
 
@@ -187,21 +207,40 @@ func (h *OSSHandler) UploadFile(c *gin.Context) {
 		logrus.WithError(err).Debug("绑定上传参数失败，使用默认值")
 	}
 
-	// 确定最终文件名
-	finalFileName := uploadReq.FileName
-	if finalFileName == "" {
-		finalFileName = fileHeader.Filename
-	}
+	var objectKey, hashifyName string
 
-	// 生成哈希化文件名
-	hashifyName := h.ossService.HashifyName(finalFileName)
+	// 优先级1: 如果直接提供了objectKey，直接使用
+	if uploadReq.ObjectKey != "" {
+		objectKey = uploadReq.ObjectKey
+		// 从objectKey中提取hashifyName（取最后一个/后的部分）
+		hashifyName = objectKey[strings.LastIndex(objectKey, "/")+1:]
+		if hashifyName == "" {
+			hashifyName = objectKey
+		}
+	} else {
+		// 优先级2: prefix + fileName 模式，后端计算完整路径
+		// 确定最终文件名
+		finalFileName := uploadReq.FileName
+		if finalFileName == "" {
+			finalFileName = fileHeader.Filename
+		}
 
-	// 生成最终的objectKey
-	objectKey := hashifyName
-	if uploadReq.Prefix != "" {
-		// 确保prefix以/结尾
-		normalizedPrefix := strings.TrimSuffix(uploadReq.Prefix, "/") + "/"
-		objectKey = normalizedPrefix + hashifyName
+		contentType := fileHeader.Header.Get("Content-Type")
+		if contentType == "" {
+			contentType = "application/octet-stream"
+		}
+
+		// 使用后端路径计算逻辑
+		calculatedObjectKey, pathPrefix, calculatedHashifyName := h.ossService.GetUploadInfo(finalFileName, contentType)
+		hashifyName = calculatedHashifyName
+
+		// 如果指定了prefix，拼接在智能路径和hashifyName之间
+		if uploadReq.Prefix != "" {
+			normalizedPrefix := strings.TrimSuffix(uploadReq.Prefix, "/") + "/"
+			objectKey = pathPrefix + normalizedPrefix + hashifyName
+		} else {
+			objectKey = calculatedObjectKey
+		}
 	}
 
 	// 打开文件
@@ -243,11 +282,12 @@ func (h *OSSHandler) UploadFile(c *gin.Context) {
 	}
 
 	response.Success(c, models.FileUploadResponse{
-		ObjectKey:  objectKey,
-		URL:        url,
-		Size:       fileHeader.Size,
-		Type:       contentType,
-		UploadTime: time.Now().Format(time.RFC3339),
+		ObjectKey:   objectKey,
+		URL:         url,
+		HashifyName: hashifyName,
+		Size:        fileHeader.Size,
+		Type:        contentType,
+		UploadTime:  time.Now().Format(time.RFC3339),
 	})
 }
 

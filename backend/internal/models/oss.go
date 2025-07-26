@@ -18,8 +18,10 @@ type STSResponse struct {
 
 // 签名请求
 type SignRequest struct {
-	ObjectKey string `json:"objectKey" binding:"required"`
-	FileType  string `json:"fileType,omitempty"`
+	ObjectKey string `json:"objectKey,omitempty"` // 完整的objectKey，如果提供则直接使用
+	FileType  string `json:"fileType,omitempty"`  // 文件类型，用于路径计算
+	Prefix    string `json:"prefix,omitempty"`    // 路径前缀
+	FileName  string `json:"fileName,omitempty"`  // 文件名
 }
 
 // 签名响应
@@ -42,16 +44,18 @@ type HashifyNameResponse struct {
 type FileUploadRequest struct {
 	Prefix    string `form:"prefix"`
 	FileName  string `form:"fileName"`
+	ObjectKey string `form:"objectKey"` // 直接指定完整的objectKey，优先级最高
 	NoPreview string `form:"noPreview"`
 }
 
 // 文件上传响应
 type FileUploadResponse struct {
-	ObjectKey  string `json:"objectKey"`
-	URL        string `json:"url,omitempty"`
-	Size       int64  `json:"size"`
-	Type       string `json:"type"`
-	UploadTime string `json:"uploadTime"`
+	ObjectKey   string `json:"objectKey"`
+	URL         string `json:"url,omitempty"`
+	HashifyName string `json:"hashifyName,omitempty"` // 哈希化文件名
+	Size        int64  `json:"size"`
+	Type        string `json:"type"`
+	UploadTime  string `json:"uploadTime"`
 }
 
 // 获取URL请求

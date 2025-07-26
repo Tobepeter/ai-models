@@ -1,11 +1,12 @@
 import { JwtPayloadApp, jwt } from '@/utils/jwt'
 import { storageKeys } from '@/utils/storage'
 import { Nullable } from '@/utils/types'
+import type { UserResponse } from '@/api/types/generated'
+import { router } from '@/router/router'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 
-// TODO: fix it
-const defaultUser: any = {
+const defaultUser: UserResponse = {
 	id: 0,
 	username: 'anonymous',
 	email: 'anonymous@example.com',
@@ -26,7 +27,7 @@ const userState = {
 type UserState = typeof userState
 
 const stateCreator = () => {
-	return combine(userState, (set, get) => ({
+	return combine(userState, (set) => ({
 		setData: (data: Partial<UserState>) => set(data),
 		setToken: (token: string) => {
 			if (!token) {
@@ -40,6 +41,15 @@ const stateCreator = () => {
 			}
 		},
 		clear: () => set(userState),
+		/** 跳转到登录页，支持重定向参数 */
+		goLogin: (redirectTo?: string) => {
+			// 获取当前路径作为默认重定向地址
+			const currentPath = redirectTo || window.location.pathname
+			const loginUrl = currentPath === '/login' ? '/login' : `/login?redirect=${encodeURIComponent(currentPath)}`
+
+			// 清空历史
+			router.navigate(loginUrl, { replace: true })
+		},
 	}))
 }
 

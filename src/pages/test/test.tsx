@@ -35,7 +35,6 @@ import { TestStreamText } from './components/test-stream-text'
 import { TestTwBreakpoint } from './components/test-tw-breakpoint'
 import { TestUserAvatar } from './components/test-user-avatar'
 import { TestVideoPreview } from './components/test-video-preview'
-import { TestCrud } from './components/test-crud'
 import { TestErrorHandling } from './components/test-error-handling'
 
 let Test = () => <div>Test</div>
@@ -66,7 +65,6 @@ if (isDev) {
 			streamText: <TestStreamText />,
 			twBreakpoint: <TestTwBreakpoint />,
 			grid: <TestGrid />,
-			crud: <TestCrud />,
 		} as const
 
 		const keys = Object.keys(config) as Array<keyof typeof config>

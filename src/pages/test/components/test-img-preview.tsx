@@ -1,8 +1,10 @@
 import { ImagePreview } from '@/components/common/image-preview'
+import { OssImagePreview } from '@/components/common/oss-image-preview'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dummy } from '@/utils/dummy'
 import { useState } from 'react'
+import { OssUploadResult } from '@/utils/oss/oss-types'
 
 /**
  * 测试图片预览组件
@@ -10,6 +12,7 @@ import { useState } from 'react'
 export const TestImgPreview = () => {
 	const [uploadedUrl, setUploadedUrl] = useState<string>('')
 	const [controllableUrl, setControllableUrl] = useState<string>(dummy.images.avatar)
+	const [ossUrl, setOssUrl] = useState<string>('')
 
 	const handleUpload = (file: File) => {
 		console.log('文件上传:', file)
@@ -27,6 +30,23 @@ export const TestImgPreview = () => {
 	const handleControllableChange = (url: string | undefined) => {
 		console.log('可控URL变化:', url)
 		// 外部控制的场景不需要设置状态，由外部按钮控制
+	}
+
+	const handleOssUpload = (result: OssUploadResult, file: File) => {
+		console.log('OSS上传成功:', result, file)
+		setOssUrl(result.url || '')
+	}
+
+	const handleOssChange = (url: string | undefined) => {
+		console.log('OSS URL变化:', url)
+		setOssUrl(url || '')
+	}
+
+	const handleOssDelete = async (objectKey: string) => {
+		console.log('OSS删除请求:', objectKey)
+		// 这里可以直接使用 objectKey 调用 OSS 删除 API
+		// 简化示例：直接返回
+		return Promise.resolve()
 	}
 
 	return (
@@ -132,14 +152,14 @@ export const TestImgPreview = () => {
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">内部状态管理（无URL属性）</p>
 							<p className="text-xs text-gray-500">当前URL: {uploadedUrl || '无'}</p>
-							<ImagePreview onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
+							<ImagePreview onUpload={handleUpload} size={128} onDelete={handleDelete} onChange={handleChange} />
 						</div>
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">外部状态控制（有URL属性）</p>
 							<p className="text-xs text-gray-500">当前URL: {controllableUrl || '无'}</p>
 							<div className="flex items-center gap-2">
-								<ImagePreview url={controllableUrl} onUpload={handleUpload} onDelete={handleDelete} onChange={handleControllableChange} />
+								<ImagePreview url={controllableUrl} size={128} onUpload={handleUpload} onDelete={handleDelete} onChange={handleControllableChange} />
 								<div className="space-y-1">
 									<Button size="sm" variant="outline" onClick={() => setControllableUrl(dummy.images.landscape)}>
 										设置风景图
@@ -184,6 +204,51 @@ export const TestImgPreview = () => {
 									</CardContent>
 								</Card>
 							</ImagePreview>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* OSS 图片预览测试 */}
+			<Card>
+				<CardHeader>
+					<CardTitle>OSS 图片预览测试</CardTitle>
+					<CardDescription>测试OSS上传功能和加载状态</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<p className="text-sm text-gray-600">OSS 上传预览</p>
+							<p className="text-xs text-gray-500">当前URL: {ossUrl || '无'}</p>
+							<OssImagePreview 
+								url={ossUrl}
+								size={128}
+								onOssUpload={handleOssUpload}
+								onOssDelete={handleOssDelete}
+								onChange={handleOssChange}
+							/>
+						</div>
+
+						<div className="space-y-2">
+							<p className="text-sm text-gray-600">交互控制测试</p>
+							<div className="flex items-center gap-4">
+								<div className="space-y-1">
+									<p className="text-xs text-gray-500">普通模式</p>
+									<ImagePreview defaultUrl={dummy.images.portrait} size={80} onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
+								</div>
+								<div className="space-y-1">
+									<p className="text-xs text-gray-500">noHover</p>
+									<ImagePreview defaultUrl={dummy.images.portrait} size={80} noHover onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
+								</div>
+								<div className="space-y-1">
+									<p className="text-xs text-gray-500">notEditable</p>
+									<ImagePreview defaultUrl={dummy.images.portrait} size={80} notEditable />
+								</div>
+								<div className="space-y-1">
+									<p className="text-xs text-gray-500">noInteraction</p>
+									<ImagePreview defaultUrl={dummy.images.portrait} size={80} noInteraction />
+								</div>
+							</div>
 						</div>
 					</div>
 				</CardContent>

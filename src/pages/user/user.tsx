@@ -4,34 +4,35 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UserChangePwd } from '@/pages/user/components/user-change-pwd'
 import { useUserStore } from '@/store/user-store'
-import { Edit, LogOut, Settings, Key } from 'lucide-react'
+import { authApi } from '@/api/auth/auth-api'
+import { Edit, LogOut, Settings, Key, LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-// TODO: 临时解决类型问题
-const user = {
-	avatar: '',
-	username: 'anonymous',
-	email: 'anonymous@example.com',
-	created_at: '',
-	updated_at: '',
-}
-const logout = () => {
-	useUserStore.getState().setToken('')
-}
-
 export const User = () => {
-	// const { user, logout } = useUserStore()
+	const { info: user, token, goLogin } = useUserStore()
 	const navigate = useNavigate()
 	const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false)
 
-	const handleLogout = () => {
-		logout()
+	const handleLogout = async () => {
+		try {
+			await authApi.logout()
+		} catch (error) {
+			console.error('Logout failed:', error)
+		}
 		navigate('/login')
 	}
 
-	if (!user) {
-		return null // 这种情况不应该发生，因为有路由保护
+	// 判断是否已登录（有token且用户名不是anonymous）
+	const isLoggedIn = token && user && user.username !== 'anonymous'
+
+	// 显示的用户信息（登录时显示真实信息，未登录时显示默认值）
+	const displayUser = isLoggedIn ? user : {
+		username: 'anonymous',
+		email: 'anonymous@example.com',
+		avatar: '',
+		created_at: '',
+		updated_at: ''
 	}
 
 	return (
@@ -41,19 +42,32 @@ export const User = () => {
 				<CardHeader>
 					<div className="flex items-center space-x-4">
 						<Avatar className="h-16 w-16">
-							<AvatarImage src={user.avatar} alt={user.username} />
-							<AvatarFallback className="text-xl">{user.username.charAt(0)}</AvatarFallback>
+							<AvatarImage src={displayUser.avatar} alt={displayUser.username} />
+							<AvatarFallback className="text-xl">{displayUser.username.charAt(0).toUpperCase()}</AvatarFallback>
 						</Avatar>
 						<div className="flex-1">
-							<CardTitle className="text-xl">{user.username}</CardTitle>
-							<CardDescription>{user.email}</CardDescription>
-							<p className="text-sm text-muted-foreground mt-1">注册时间：{new Date(user.created_at).toLocaleDateString()}</p>
-							<p className="text-sm text-muted-foreground">最后更新：{new Date(user.updated_at).toLocaleDateString()}</p>
+							<CardTitle className="text-xl">{displayUser.username}</CardTitle>
+							<CardDescription>{displayUser.email}</CardDescription>
+							{isLoggedIn ? (
+								<>
+									<p className="text-sm text-muted-foreground mt-1">注册时间：{new Date(displayUser.created_at).toLocaleDateString()}</p>
+									<p className="text-sm text-muted-foreground">最后更新：{new Date(displayUser.updated_at).toLocaleDateString()}</p>
+								</>
+							) : (
+								<p className="text-sm text-muted-foreground mt-1">请登录以查看详细信息</p>
+							)}
 						</div>
-						<Button variant="outline" size="sm">
-							<Edit className="h-4 w-4 mr-2" />
-							编辑
-						</Button>
+						{isLoggedIn ? (
+							<Button variant="outline" size="sm">
+								<Edit className="h-4 w-4 mr-2" />
+								编辑
+							</Button>
+						) : (
+							<Button onClick={() => goLogin()} size="sm">
+								<LogIn className="h-4 w-4 mr-2" />
+								登录
+							</Button>
+						)}
 					</div>
 				</CardHeader>
 			</Card>
@@ -113,19 +127,25 @@ export const User = () => {
 						<Settings className="h-4 w-4 mr-2" />
 						应用设置
 					</Button>
-					<Button variant="ghost" className="w-full justify-start" onClick={() => setShowChangePasswordDialog(true)}>
-						<Key className="h-4 w-4 mr-2" />
-						修改密码
-					</Button>
-					<Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-						<LogOut className="h-4 w-4 mr-2" />
-						退出登录
-					</Button>
+					{isLoggedIn && (
+						<>
+							<Button variant="ghost" className="w-full justify-start" onClick={() => setShowChangePasswordDialog(true)}>
+								<Key className="h-4 w-4 mr-2" />
+								修改密码
+							</Button>
+							<Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+								<LogOut className="h-4 w-4 mr-2" />
+								退出登录
+							</Button>
+						</>
+					)}
 				</CardContent>
 			</Card>
 
-			{/* 修改密码对话框 */}
-			<UserChangePwd open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />
+			{/* 修改密码对话框 - 只在已登录时显示 */}
+			{isLoggedIn && (
+				<UserChangePwd open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />
+			)}
 		</div>
 	)
 }
