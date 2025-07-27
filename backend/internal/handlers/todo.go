@@ -12,23 +12,15 @@ import (
 )
 
 type TodoHandler struct {
+	BaseHandler
 	todoService *services.TodoService
 }
 
 func NewTodoHandler(todoService *services.TodoService) *TodoHandler {
 	return &TodoHandler{
+		BaseHandler: BaseHandler{},
 		todoService: todoService,
 	}
-}
-
-// getUserID 从上下文获取用户ID
-func (h *TodoHandler) getUserID(c *gin.Context) (uint, bool) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
-		return 0, false
-	}
-	return userID.(uint), true
 }
 
 // @Summary 创建TODO
@@ -39,7 +31,7 @@ func (h *TodoHandler) getUserID(c *gin.Context) (uint, bool) {
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos [post]
 func (h *TodoHandler) Create(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -68,7 +60,7 @@ func (h *TodoHandler) Create(c *gin.Context) {
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id} [get]
 func (h *TodoHandler) GetByID(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -104,7 +96,7 @@ func (h *TodoHandler) GetByID(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos [get]
 func (h *TodoHandler) GetList(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -139,7 +131,7 @@ func (h *TodoHandler) GetList(c *gin.Context) {
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id} [put]
 func (h *TodoHandler) Update(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -179,7 +171,7 @@ func (h *TodoHandler) Update(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos/positions [put]
 func (h *TodoHandler) UpdatePositions(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -207,7 +199,7 @@ func (h *TodoHandler) UpdatePositions(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos/rebalance [post]
 func (h *TodoHandler) RebalancePositions(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -230,7 +222,7 @@ func (h *TodoHandler) RebalancePositions(c *gin.Context) {
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id}/toggle [patch]
 func (h *TodoHandler) Toggle(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -264,7 +256,7 @@ func (h *TodoHandler) Toggle(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos/{id} [delete]
 func (h *TodoHandler) Delete(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -297,7 +289,7 @@ func (h *TodoHandler) Delete(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos/stats [get]
 func (h *TodoHandler) GetStats(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
 	}

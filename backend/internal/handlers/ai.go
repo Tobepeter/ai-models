@@ -11,12 +11,14 @@ import (
 )
 
 type AIHandler struct {
+	BaseHandler
 	aiService *ai.AIService
 }
 
 func NewAIHandler(aiService *ai.AIService) *AIHandler {
 	return &AIHandler{
-		aiService: aiService,
+		BaseHandler: BaseHandler{},
+		aiService:   aiService,
 	}
 }
 
@@ -27,9 +29,8 @@ func NewAIHandler(aiService *ai.AIService) *AIHandler {
 // @Success 200 {object} response.Response{data=models.ChatResponse}
 // @Router /ai/chat [post]
 func (h *AIHandler) Chat(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -41,10 +42,10 @@ func (h *AIHandler) Chat(c *gin.Context) {
 	}
 
 	if req.Stream {
-		h.handleStreamingChat(c, userID.(uint), req)
+		h.handleStreamingChat(c, userID, req)
 		return
 	}
-	chatResponse, err := h.aiService.Chat(userID.(uint), req)
+	chatResponse, err := h.aiService.Chat(userID, req)
 	if err != nil {
 		logrus.Error("Failed to process chat:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to process chat request")
@@ -98,9 +99,8 @@ func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint, req models.
 // @Success 200 {object} response.Response{data=models.GenerateResponse}
 // @Router /ai/generate [post]
 func (h *AIHandler) Generate(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *AIHandler) Generate(c *gin.Context) {
 		return
 	}
 
-	generateResponse, err := h.aiService.Generate(userID.(uint), req)
+	generateResponse, err := h.aiService.Generate(userID, req)
 	if err != nil {
 		logrus.Error("Failed to generate content:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to generate content")
@@ -144,9 +144,8 @@ func (h *AIHandler) GetModels(c *gin.Context) {
 // @Success 200 {object} response.Response{data=[]models.ChatMessage}
 // @Router /ai/chat/history [get]
 func (h *AIHandler) GetChatHistory(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -156,7 +155,7 @@ func (h *AIHandler) GetChatHistory(c *gin.Context) {
 		return
 	}
 
-	history, err := h.aiService.GetChatHistory(userID.(uint), sessionID)
+	history, err := h.aiService.GetChatHistory(userID, sessionID)
 	if err != nil {
 		logrus.Error("Failed to get chat history:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to get chat history")
@@ -173,9 +172,8 @@ func (h *AIHandler) GetChatHistory(c *gin.Context) {
 // @Success 200 {object} response.Response
 // @Router /ai/chat/history [delete]
 func (h *AIHandler) ClearChatHistory(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -185,7 +183,7 @@ func (h *AIHandler) ClearChatHistory(c *gin.Context) {
 		return
 	}
 
-	err := h.aiService.ClearChatHistory(userID.(uint), sessionID)
+	err := h.aiService.ClearChatHistory(userID, sessionID)
 	if err != nil {
 		logrus.Error("Failed to clear chat history:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to clear chat history")

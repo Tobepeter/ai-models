@@ -14,12 +14,14 @@ import (
 )
 
 type UserHandler struct {
+	BaseHandler
 	userService *services.UserService
 	authService *auth.AuthService
 }
 
 func NewUserHandler(userService *services.UserService, authService *auth.AuthService) *UserHandler {
 	return &UserHandler{
+		BaseHandler: BaseHandler{},
 		userService: userService,
 		authService: authService,
 	}
@@ -92,13 +94,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Success 200 {object} response.Response{data=models.UserResponse}
 // @Router /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
-	user, err := h.userService.GetUserByID(userID.(uint))
+	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		logrus.Error("Failed to get user:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to get user profile")
@@ -116,9 +117,8 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 // @Success 200 {object} response.Response{data=models.UserResponse}
 // @Router /users/profile [put]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -129,7 +129,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.UpdateUser(userID.(uint), req)
+	user, err := h.userService.UpdateUser(userID, req)
 	if err != nil {
 		logrus.Error("Failed to update user:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to update profile")
@@ -265,9 +265,8 @@ func (h *UserHandler) DeactivateUser(c *gin.Context) {
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /users/change-password [post]
 func (h *UserHandler) ChangePassword(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User not found in context")
+	userID, ok := h.GetUserID(c)
+	if !ok {
 		return
 	}
 
@@ -278,7 +277,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	if err := h.userService.ChangePassword(userID.(uint), req); err != nil {
+	if err := h.userService.ChangePassword(userID, req); err != nil {
 		logrus.Error("Failed to change password:", err)
 
 		// 根据错误信息返回不同的状态码
