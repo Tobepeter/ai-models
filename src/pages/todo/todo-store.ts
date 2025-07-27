@@ -1,44 +1,11 @@
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { TodoItem, TodoCreateRequest, TodoUpdateRequest } from './todo-types'
+import type { TodoResponse, TodoCreateRequest, TodoUpdateRequest } from '@/api/types/generated'
+import { todoUtil } from './todo-util'
 
-// 模拟数据 - 暂时写死
-const mockTodos: TodoItem[] = [
-	{
-		id: 1,
-		title: '完成项目文档',
-		description: '整理项目的技术文档和用户手册',
-		completed: false,
-		priority: 2,
-		due_date: '2025-01-30T10:00:00.000Z',
-		created_at: '2025-01-25T08:00:00.000Z',
-		updated_at: '2025-01-25T08:00:00.000Z',
-	},
-	{
-		id: 2,
-		title: '学习新技术',
-		description: '深入学习 React 18 的新特性',
-		completed: true,
-		priority: 1,
-		due_date: null,
-		created_at: '2025-01-24T14:30:00.000Z',
-		updated_at: '2025-01-25T09:15:00.000Z',
-	},
-	{
-		id: 3,
-		title: '修复线上bug',
-		description: '解决用户反馈的登录问题',
-		completed: false,
-		priority: 3,
-		due_date: '2025-01-28T18:00:00.000Z',
-		created_at: '2025-01-25T10:45:00.000Z',
-		updated_at: '2025-01-25T10:45:00.000Z',
-	},
-]
-
-// 初始状态
+// 初始状态为空数组
 const todoState = {
-	todos: mockTodos,
+	todos: [] as TodoResponse[],
 }
 
 type TodoState = typeof todoState
@@ -46,13 +13,14 @@ type TodoState = typeof todoState
 interface TodoActions {
 	// 基础操作
 	setData: (data: Partial<TodoState>) => void
-	setTodos: (todos: TodoItem[]) => void
+	setTodos: (todos: TodoResponse[]) => void
 
 	// TODO 操作
 	addTodo: (todo: TodoCreateRequest) => void
 	updateTodo: (id: number, updates: TodoUpdateRequest) => void
 	deleteTodo: (id: number) => void
 	toggleTodo: (id: number) => void
+	reorderTodo: (id: number, newPosition: number) => void
 
 	// 重置状态
 	reset: () => void
@@ -61,13 +29,33 @@ interface TodoActions {
 const stateCreator = () => {
 	return combine(todoState, (set, get) => ({
 		// 基础操作
-		setData: (data: Partial<TodoState>) => set(data),
-		setTodos: (todos: TodoItem[]) => set({ todos }),
+		setData: (data: Partial<TodoState>) => {
+			set(data)
+			// 保存到持久化存储
+			todoUtil.savePersist(get().todos)
+		},
+		setTodos: (todos: TodoResponse[]) => {
+			// 确保todos按position排序
+			const sortedTodos = [...todos].sort((a, b) => (a.position || 0) - (b.position || 0));
+			set({ todos: sortedTodos })
+			// 保存到持久化存储
+			todoUtil.savePersist(sortedTodos)
+		},
 
 		// TODO 操作
 		addTodo: (todo: TodoCreateRequest) => {
 			const now = new Date().toISOString()
-			const newTodo: TodoItem = {
+			const currentTodos = get().todos;
+			
+			// 计算新todo的position
+			let newPosition = 100;
+			if (currentTodos.length > 0) {
+				// 添加到顶部，位置为第一个元素位置减去100
+				const firstPosition = currentTodos[0].position || 100;
+				newPosition = Math.max(firstPosition - 100, 0); // 确保不小于0
+			}
+			
+			const newTodo: TodoResponse = {
 				...todo,
 				id: Date.now(), // 简单的ID生成
 				created_at: now,
@@ -76,30 +64,61 @@ const stateCreator = () => {
 				priority: todo.priority ?? 1,
 				due_date: todo.due_date ?? null,
 				completed: false,
+				position: newPosition,
 			}
 
-			// 新增的todo添加到顶部
-			const todos = [newTodo, ...get().todos]
+			// 新增的todo添加到数组并保持排序
+			const todos = [newTodo, ...currentTodos];
 			set({ todos })
+			// 保存到持久化存储
+			todoUtil.savePersist(todos)
 		},
 
 		updateTodo: (id: number, updates: TodoUpdateRequest) => {
-			const todos = get().todos.map((todo) => (todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo))
+			const todos = get().todos.map((todo) => 
+				todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo
+			).sort((a, b) => (a.position || 0) - (b.position || 0));
+			
 			set({ todos })
+			// 保存到持久化存储
+			todoUtil.savePersist(todos)
 		},
 
 		deleteTodo: (id: number) => {
 			const todos = get().todos.filter((todo) => todo.id !== id)
+				.sort((a, b) => (a.position || 0) - (b.position || 0));
+				
 			set({ todos })
+			// 保存到持久化存储
+			todoUtil.savePersist(todos)
 		},
 
 		toggleTodo: (id: number) => {
-			const todos = get().todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo))
+			const todos = get().todos.map((todo) => 
+				todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo
+			).sort((a, b) => (a.position || 0) - (b.position || 0));
+			
 			set({ todos })
+			// 保存到持久化存储
+			todoUtil.savePersist(todos)
+		},
+
+		reorderTodo: (id: number, newPosition: number) => {
+			const todos = get().todos.map((todo) => 
+				todo.id === id ? { ...todo, position: newPosition, updated_at: new Date().toISOString() } : todo
+			).sort((a, b) => (a.position || 0) - (b.position || 0));
+			
+			set({ todos })
+			// 保存到持久化存储
+			todoUtil.savePersist(todos)
 		},
 
 		// 重置状态
-		reset: () => set(todoState),
+		reset: () => {
+			set(todoState)
+			// 保存到持久化存储
+			todoUtil.savePersist(todoState.todos)
+		},
 	}))
 }
 

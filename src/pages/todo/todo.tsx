@@ -2,16 +2,24 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
+import { useMount } from 'ahooks'
 import { useTodoStore } from './todo-store'
 import { notify } from '@/components/common/notify'
 import { TodoItem } from './components/todo-item'
 import { DragList } from '@/components/common/drag-list'
-import type { TodoItem as TodoItemType } from './todo-types'
+import type { TodoResponse } from '@/api/types/generated'
 import type { DragListItem } from '@/components/common/drag-list'
+import { todoUtil } from './todo-util'
 
 export const Todo = () => {
-	const { todos, addTodo, updateTodo, deleteTodo, setTodos } = useTodoStore()
+	const { todos, addTodo, updateTodo, deleteTodo, setTodos, toggleTodo, reorderTodo } = useTodoStore()
 	const [newTodoTitle, setNewTodoTitle] = useState('')
+
+	useMount(() => {
+		// 组件挂载时加载持久化数据
+		const persistedTodos = todoUtil.loadPersist()
+		setTodos(persistedTodos)
+	})
 
 	const handleAddTodo = () => {
 		if (newTodoTitle.trim()) {
@@ -61,7 +69,7 @@ export const Todo = () => {
 	// 自定义渲染函数，用于 DragList 组件
 	const renderTodoItem = (item: DragListItem) => {
 		// 找到对应的 todo 对象
-		const todo = todos.find((t) => t.id.toString() === item.id) as TodoItemType
+		const todo = todos.find((t) => t.id?.toString() === item.id)
 		if (!todo) return null
 
 		return (
@@ -71,11 +79,33 @@ export const Todo = () => {
 		)
 	}
 
+	// 计算插入位置
+	const calculateInsertPosition = (fromIndex: number, toIndex: number) => {
+		const todosArray = [...todos];
+		
+		// 如果移动到顶部
+		if (toIndex === 0) {
+			const firstPosition = todosArray[0]?.position || 100;
+			return Math.max(firstPosition - 100, 0);
+		}
+		
+		// 如果移动到底部
+		if (toIndex >= todosArray.length) {
+			const lastPosition = todosArray[todosArray.length - 1]?.position || 100;
+			return lastPosition + 100;
+		}
+		
+		// 如果移动到中间
+		const prevPosition = todosArray[toIndex - 1]?.position || 0;
+		const nextPosition = todosArray[toIndex]?.position || 100;
+		return (prevPosition + nextPosition) / 2;
+	};
+
 	return (
 		<div className="max-w-2xl mx-auto p-6 space-y-6">
 			{/* 顶部大输入框 */}
 			<div className="space-y-4">
-				<h1 className="text-2xl font-bold text-center">Todo List</h1>
+				<p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>
 				<div className="flex gap-2">
 					<Input
 						placeholder="添加新任务..."
@@ -104,13 +134,17 @@ export const Todo = () => {
 					</div>
 				) : (
 					<DragList
-						items={todos.map((todo) => ({ id: todo.id.toString(), title: todo.title }))}
-						onItemsChange={(items) => {
-							// 将排序后的items映射回todos数组
-							const updatedTodos = items.map((item) => {
-								return todos.find((t) => t.id.toString() === item.id)!
-							})
-							setTodos(updatedTodos)
+						items={todos.map((todo) => ({ id: todo.id?.toString() || '', title: todo.title }))}
+						onItemMove={(fromIndex, toIndex) => {
+							// 获取被移动的todo
+							const movedTodo = todos[fromIndex];
+							if (!movedTodo) return;
+							
+							// 计算新位置
+							const newPosition = calculateInsertPosition(fromIndex, toIndex);
+							
+							// 更新位置
+							reorderTodo(movedTodo.id!, newPosition);
 						}}
 						renderItem={renderTodoItem}
 					/>

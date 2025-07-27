@@ -80,4 +80,5 @@ export const storageKeys = {
 	user: 'user-storage',
 	authToken: 'auth-token',
 	chat: 'chat',
+	todo: 'todo',
 }

@@ -5,10 +5,10 @@ import { cn } from '@/lib/utils'
 import { Edit, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTodoStore } from '@/pages/todo/todo-store'
-import type { TodoItem as TodoItemType } from '@/pages/todo/todo-types'
+import type { TodoResponse } from '@/api/types/generated'
 
 export interface TodoItemProps {
-	todo: TodoItemType
+	todo: TodoResponse
 	onEdit?: (id: number, title: string) => void
 	onDelete?: (id: number) => void
 }
@@ -18,14 +18,14 @@ export const TodoItem = (props: TodoItemProps) => {
 	const { todo, onEdit, onDelete } = props
 	const { toggleTodo } = useTodoStore()
 	const [isEditing, setIsEditing] = useState(false)
-	const [editTitle, setEditTitle] = useState(todo.title)
+	const [editTitle, setEditTitle] = useState(todo.title || '')
 
 	const handleEdit = () => {
 		setIsEditing(true)
 	}
 
 	const handleSave = () => {
-		if (editTitle.trim() && onEdit) {
+		if (editTitle.trim() && onEdit && todo.id) {
 			onEdit(todo.id, editTitle.trim())
 		}
 		setIsEditing(false)
@@ -35,13 +35,15 @@ export const TodoItem = (props: TodoItemProps) => {
 		if (e.key === 'Enter') {
 			handleSave()
 		} else if (e.key === 'Escape') {
-			setEditTitle(todo.title)
+			setEditTitle(todo.title || '')
 			setIsEditing(false)
 		}
 	}
 
 	const handleToggle = () => {
-		toggleTodo(todo.id)
+		if (todo.id) {
+			toggleTodo(todo.id)
+		}
 	}
 
 	return (
@@ -64,15 +66,15 @@ export const TodoItem = (props: TodoItemProps) => {
 					maxLength={50}
 				/>
 			) : (
-					<div className="flex items-center gap-2">
-						<span className={cn('text-sm', todo.completed && 'line-through text-muted-foreground')}>{todo.title}</span>
-						<div>
-							<Button variant="ghost" size="sm" onClick={handleEdit} className="h-6 w-6 p-0">
-								<Edit className="h-3 w-3" />
-							</Button>
-						</div>
+				<div className="flex items-center gap-2">
+					<span className={cn('text-sm', todo.completed && 'line-through text-muted-foreground')}>{todo.title}</span>
+					<div>
+						<Button variant="ghost" size="sm" onClick={handleEdit} className="h-6 w-6 p-0">
+							<Edit className="h-3 w-3" />
+						</Button>
 					</div>
-				)}
+				</div>
+			)}
 			</div>
 
 			{/* 删除按钮 */}
@@ -80,7 +82,7 @@ export const TodoItem = (props: TodoItemProps) => {
 				<Button
 					variant="ghost"
 					size="sm"
-					onClick={() => onDelete?.(todo.id)}
+					onClick={() => onDelete?.(todo.id!)}
 					className="h-8 w-8 p-0"
 				>
 					<Trash2 className="h-4 w-4" />
