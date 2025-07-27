@@ -157,4 +157,4 @@ for i in range(10):
 	)
 }
 
-export default TestMarkdown;
+export default TestMarkdown

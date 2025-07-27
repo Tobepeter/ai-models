@@ -339,4 +339,4 @@ classDiagram
 	)
 }
 
-export default TestChatMsg;
+export default TestChatMsg

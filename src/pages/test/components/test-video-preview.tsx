@@ -294,4 +294,4 @@ const TestVideoPreview = () => {
 	)
 }
 
-export default TestVideoPreview;
+export default TestVideoPreview

@@ -12,7 +12,7 @@ export const Cover = () => {
 
 	// light 图片默认有点blur的感觉了，所以不需要额外blur了
 	const imgCls = cn('w-full h-full object-cover', resolvedTheme === 'dark' ? 'blur-sm' : '')
-	
+
 	return (
 		<div className="absolute inset-0">
 			<img src={resolvedTheme === 'dark' ? darkImg : lightImg} alt="cover" className={imgCls} />

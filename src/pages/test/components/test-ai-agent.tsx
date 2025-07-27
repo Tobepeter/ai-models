@@ -206,7 +206,7 @@ const TestAIAgent = () => {
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form className='space-y-4'>
+					<form className="space-y-4">
 						{/* 隐藏的用户名字段，用于满足浏览器对密码表单的无障碍要求 */}
 						<input type="text" name="username" autoComplete="username" className="hidden" />
 						<div>
@@ -312,4 +312,4 @@ const TestAIAgent = () => {
 	)
 }
 
-export default TestAIAgent;
+export default TestAIAgent

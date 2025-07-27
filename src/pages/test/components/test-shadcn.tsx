@@ -265,4 +265,4 @@ const TestShadcn = () => {
 	)
 }
 
-export default TestShadcn;
+export default TestShadcn

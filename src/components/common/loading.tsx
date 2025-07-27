@@ -14,7 +14,7 @@ export const Loading = forwardRef<LoadingRef, LoadingProps>((props, ref) => {
 
 	// 暴露设置内部loading状态的方法
 	useImperativeHandle(ref, () => ({
-		setLoading: setInternalLoading
+		setLoading: setInternalLoading,
 	}))
 
 	// 当loading状态变化时，触发回调

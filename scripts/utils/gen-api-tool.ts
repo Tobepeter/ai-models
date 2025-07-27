@@ -31,7 +31,7 @@ class GenApiTool {
 
 	/**
 	 * 找到名为 "Response" 的接口，为 data 属性添加泛型 T
-	 * 
+	 *
 	 * eg. Response -> Response<T>
 	 */
 	private enhanceResponseInterface(sourceFile: any) {
@@ -58,7 +58,7 @@ class GenApiTool {
 
 	/**
 	 * 找到继承 Response 且有 {data: dataType} 的接口，改为 Response<dataType>
-	 * 
+	 *
 	 * eg. type MyType = Resposne & {data: OtherType} -> Response<OtherType>
 	 */
 	private enhanceResponseExtensions(sourceFile: any) {

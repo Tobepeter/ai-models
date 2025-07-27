@@ -49,4 +49,4 @@ class ChatMock {
 	}
 }
 
-export const chatMock = new ChatMock() 
+export const chatMock = new ChatMock()

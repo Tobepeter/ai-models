@@ -14,9 +14,7 @@ export const AppHeader = () => {
 	const isHome = location.pathname === '/' || location.pathname === '/home'
 
 	// 从当前路由匹配中获取标题
-	const currentTitle = matches
-		.filter(match => match.handle && typeof match.handle === 'object' && 'title' in match.handle)
-		.pop()?.handle as RouteHandle | undefined
+	const currentTitle = matches.filter((match) => match.handle && typeof match.handle === 'object' && 'title' in match.handle).pop()?.handle as RouteHandle | undefined
 
 	const title = currentTitle?.title || 'AI对话'
 

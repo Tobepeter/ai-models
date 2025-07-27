@@ -25,7 +25,7 @@ export const TestOssPermissions = ({
 	onAkDialogOpenChange,
 	onAccessKeyIdChange,
 	onAccessKeySecretChange,
-	onSaveAkConfig
+	onSaveAkConfig,
 }: TestOssPermissionsProps) => {
 	return (
 		<Card>
@@ -75,18 +75,12 @@ export const TestOssPermissions = ({
 					<div className="space-y-2">
 						<Label>后端签名模式</Label>
 						<div className="flex items-center space-x-2 h-10 px-3 py-2 border border-input bg-background rounded-md">
-							<Switch
-								id="backend-sign-mode"
-								checked={backendSignMode}
-								onCheckedChange={onBackendSignModeChange}
-							/>
+							<Switch id="backend-sign-mode" checked={backendSignMode} onCheckedChange={onBackendSignModeChange} />
 							<Label htmlFor="backend-sign-mode" className="text-sm">
 								{backendSignMode ? '启用' : '禁用'}
 							</Label>
 						</div>
-						<div className="text-xs text-gray-500">
-							启用后使用后端签名URL，禁用后使用后端代理模式
-						</div>
+						<div className="text-xs text-gray-500">启用后使用后端签名URL，禁用后使用后端代理模式</div>
 					</div>
 				</div>
 
@@ -105,22 +99,11 @@ export const TestOssPermissions = ({
 							<div className="space-y-4">
 								<div className="space-y-2">
 									<Label htmlFor="access-key-id">Access Key ID</Label>
-									<Input
-										id="access-key-id"
-										placeholder="请输入Access Key ID"
-										value={currAccessKeyId}
-										onChange={(e) => onAccessKeyIdChange?.(e.target.value)}
-									/>
+									<Input id="access-key-id" placeholder="请输入Access Key ID" value={currAccessKeyId} onChange={(e) => onAccessKeyIdChange?.(e.target.value)} />
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor="access-key-secret">Access Key Secret</Label>
-									<Input
-										id="access-key-secret"
-										type="password"
-										placeholder="请输入Access Key Secret"
-										value={currAccessKeySecret}
-										onChange={(e) => onAccessKeySecretChange?.(e.target.value)}
-									/>
+									<Input id="access-key-secret" type="password" placeholder="请输入Access Key Secret" value={currAccessKeySecret} onChange={(e) => onAccessKeySecretChange?.(e.target.value)} />
 								</div>
 								<div className="flex justify-end gap-2">
 									<Button variant="outline" onClick={() => onAkDialogOpenChange?.(false)}>
@@ -170,5 +153,3 @@ export type TestOssPermissionsProps = {
 	onAccessKeySecretChange?: (value: string) => void
 	onSaveAkConfig?: () => void
 }
-
-

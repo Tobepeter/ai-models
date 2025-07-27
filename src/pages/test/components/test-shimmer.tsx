@@ -152,4 +152,4 @@ const TestShimmer = () => {
 	)
 }
 
-export default TestShimmer;
+export default TestShimmer

@@ -244,4 +244,4 @@ const TestGrid = () => {
 	)
 }
 
-export default TestGrid;
+export default TestGrid

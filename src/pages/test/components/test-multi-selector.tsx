@@ -243,11 +243,11 @@ const ModelGroupSelector = () => {
 						<span onClick={() => handleModelToggle(model)} className="cursor-pointer">
 							{model.name}
 						</span>
-						<button 
+						<button
 							onClick={(e) => {
 								e.stopPropagation()
 								handleModelToggle(model)
-							}} 
+							}}
 							className="ml-1 hover:bg-muted-foreground/20 rounded-full w-3 h-3 flex items-center justify-center text-xs"
 						>
 							×
@@ -798,4 +798,4 @@ const TestMultiSelector = () => {
 	)
 }
 
-export default TestMultiSelector;
+export default TestMultiSelector

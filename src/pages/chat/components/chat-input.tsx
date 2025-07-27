@@ -91,7 +91,16 @@ export const ChatInput = () => {
 		<div className="flex gap-2 p-4 border-t bg-background">
 			<ChatMediaSelector />
 			<div className="flex-1">
-				<Input ref={inputRef} value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} disabled={isLoading} className="w-full" autoComplete="off" />
+				<Input
+					ref={inputRef}
+					value={inputVal}
+					onChange={(e) => setInputVal(e.target.value)}
+					onKeyDown={handleKeyDown}
+					placeholder={getPlaceholder()}
+					disabled={isLoading}
+					className="w-full"
+					autoComplete="off"
+				/>
 			</div>
 			<Button type="button" size="sm" variant={isLoading ? 'outline' : 'default'} onClick={handleClick} disabled={buttonDisabled} className="px-3">
 				{isLoading ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}

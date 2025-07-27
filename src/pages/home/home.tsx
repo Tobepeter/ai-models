@@ -40,11 +40,7 @@ export const Home = () => {
 				{navCards.map((card) => {
 					const Icon = card.icon
 					return (
-						<Card 
-							key={card.path}
-							className="cursor-pointer hover:shadow-lg transition-shadow"
-							onClick={() => navigate(card.path)}
-						>
+						<Card key={card.path} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(card.path)}>
 							<CardHeader className="text-center">
 								<div className="flex flex-col items-center space-y-3">
 									<Icon className="h-12 w-12" />

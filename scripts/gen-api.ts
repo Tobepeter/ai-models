@@ -87,10 +87,6 @@ async function genSwagger() {
 	})
 }
 
-
-
-
-
 // 生成 api types 文件
 async function genApiTypes() {
 	console.log('🔧 生成 TypeScript API 类型...')

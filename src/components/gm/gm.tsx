@@ -108,14 +108,7 @@ export const GM = () => {
 											<div className="text-xs text-muted-foreground">{group.groupName}</div>
 											<div className="grid grid-cols-3 gap-1">
 												{group.list.map((cmd: GMCommandItem, cIdx: number) => (
-													<Button
-														key={cIdx}
-														size="sm"
-														variant={cmd.variant}
-														onClick={() => execCmd(cmd.command)}
-														className="text-xs"
-														disabled={!canOperate}
-													>
+													<Button key={cIdx} size="sm" variant={cmd.variant} onClick={() => execCmd(cmd.command)} className="text-xs" disabled={!canOperate}>
 														{cmd.label}
 													</Button>
 												))}

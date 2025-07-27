@@ -149,16 +149,7 @@ export const Register = () => {
 							<FormLabel htmlFor="email" required tips="随便填写就行，不会真的进行邮箱验证码验证">
 								邮箱地址
 							</FormLabel>
-							<FormInput 
-								id="email" 
-								type="email" 
-								placeholder="请输入邮箱地址" 
-								value={form.email} 
-								onChange={handleChange('email')} 
-								disabled={isLoading} 
-								error={errors.email} 
-								autoComplete="email"
-							/>
+							<FormInput id="email" type="email" placeholder="请输入邮箱地址" value={form.email} onChange={handleChange('email')} disabled={isLoading} error={errors.email} autoComplete="email" />
 						</FormItem>
 
 						{/* 密码 */}

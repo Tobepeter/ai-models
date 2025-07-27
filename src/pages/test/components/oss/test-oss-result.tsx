@@ -14,9 +14,7 @@ export const TestOssResult = ({ result }: TestOssResultProps) => {
 				<CardTitle>最后上传结果</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
-					{JSON.stringify(result, null, 2)}
-				</pre>
+				<pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">{JSON.stringify(result, null, 2)}</pre>
 			</CardContent>
 		</Card>
 	)
@@ -25,5 +23,3 @@ export const TestOssResult = ({ result }: TestOssResultProps) => {
 export type TestOssResultProps = {
 	result: OssUploadResult | null
 }
-
-

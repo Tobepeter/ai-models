@@ -249,29 +249,15 @@ const TestImgPreview = () => {
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">外部控制 Loading</p>
 							<p className="text-xs text-gray-500">固定显示 loading 状态</p>
-							<ImagePreview
-								defaultUrl={dummy.images.landscape}
-								loading={true}
-								size={128}
-								onLoadingChange={(loading) => console.log('Loading changed:', loading)}
-							/>
+							<ImagePreview defaultUrl={dummy.images.landscape} loading={true} size={128} onLoadingChange={(loading) => console.log('Loading changed:', loading)} />
 						</div>
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">外部控制开关</p>
 							<div className="space-y-2">
-								<Button
-									size="sm"
-									variant={externalLoading ? "default" : "outline"}
-									onClick={() => setExternalLoading(!externalLoading)}
-								>
+								<Button size="sm" variant={externalLoading ? 'default' : 'outline'} onClick={() => setExternalLoading(!externalLoading)}>
 									{externalLoading ? 'Loading 开启' : 'Loading 关闭'}
 								</Button>
-								<ImagePreview
-									defaultUrl={dummy.images.square}
-									loading={externalLoading}
-									size={128}
-									onLoadingChange={(loading) => console.log('External loading changed:', loading)}
-								/>
+								<ImagePreview defaultUrl={dummy.images.square} loading={externalLoading} size={128} onLoadingChange={(loading) => console.log('External loading changed:', loading)} />
 							</div>
 						</div>
 						<div className="space-y-2">
@@ -283,7 +269,7 @@ const TestImgPreview = () => {
 								onLoadingChange={(loading) => console.log('Internal loading changed:', loading)}
 								onCustomUpload={async (file) => {
 									// 模拟异步上传
-									await new Promise(resolve => setTimeout(resolve, 2000))
+									await new Promise((resolve) => setTimeout(resolve, 2000))
 									return URL.createObjectURL(file)
 								}}
 							/>
@@ -303,13 +289,7 @@ const TestImgPreview = () => {
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">OSS 上传预览</p>
 							<p className="text-xs text-gray-500">当前URL: {ossUrl || '无'}</p>
-							<OssImagePreview
-								url={ossUrl}
-								size={128}
-								onOssUpload={handleOssUpload}
-								onOssDelete={handleOssDelete}
-								onChange={handleOssChange}
-							/>
+							<OssImagePreview url={ossUrl} size={128} onOssUpload={handleOssUpload} onOssDelete={handleOssDelete} onChange={handleOssChange} />
 						</div>
 					</div>
 				</CardContent>
@@ -318,4 +298,4 @@ const TestImgPreview = () => {
 	)
 }
 
-export default TestImgPreview;
+export default TestImgPreview

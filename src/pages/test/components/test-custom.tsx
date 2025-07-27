@@ -48,4 +48,4 @@ const TestCustom = () => {
 	)
 }
 
-export default TestCustom;
+export default TestCustom

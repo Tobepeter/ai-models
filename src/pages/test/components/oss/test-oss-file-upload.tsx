@@ -27,13 +27,7 @@ export const TestOssFileUpload = ({ uploading, result, fileRef, onUpload, onSele
 						)}
 					</div>
 
-					<input 
-						ref={fileRef} 
-						type="file" 
-						accept="image/*" 
-						className="hidden" 
-						onChange={onUpload} 
-					/>
+					<input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onUpload} />
 
 					{result && (
 						<div className="space-y-4">
@@ -89,5 +83,3 @@ export type TestOssFileUploadProps = {
 	onSelectFile?: () => void
 	onDeleteResult?: () => void
 }
-
-

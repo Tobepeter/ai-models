@@ -48,4 +48,4 @@ const TestShimmerOp = () => {
 	)
 }
 
-export default TestShimmerOp;
+export default TestShimmerOp

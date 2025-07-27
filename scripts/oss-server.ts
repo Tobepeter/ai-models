@@ -17,8 +17,8 @@ const uploadLimiter = rateLimit({
 	message: {
 		code: ERROR_CODE,
 		msg: '上传请求过于频繁，请稍后再试',
-		error: 'RATE_LIMIT_EXCEEDED'
-	}
+		error: 'RATE_LIMIT_EXCEEDED',
+	},
 })
 
 const generalLimiter = rateLimit({
@@ -27,8 +27,8 @@ const generalLimiter = rateLimit({
 	message: {
 		code: ERROR_CODE,
 		msg: '请求过于频繁，请稍后再试',
-		error: 'RATE_LIMIT_EXCEEDED'
-	}
+		error: 'RATE_LIMIT_EXCEEDED',
+	},
 })
 
 // 配置 multer 用于文件上传
@@ -48,12 +48,19 @@ const validateFile = (file: Express.Multer.File) => {
 
 	// 文件类型白名单验证
 	const allowedTypes = [
-		'image/', 'video/', 'audio/',
-		'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument',
-		'text/', 'application/json', 'application/zip', 'application/x-rar-compressed'
+		'image/',
+		'video/',
+		'audio/',
+		'application/pdf',
+		'application/msword',
+		'application/vnd.openxmlformats-officedocument',
+		'text/',
+		'application/json',
+		'application/zip',
+		'application/x-rar-compressed',
 	]
 
-	if (!allowedTypes.some(type => file.mimetype.startsWith(type))) {
+	if (!allowedTypes.some((type) => file.mimetype.startsWith(type))) {
 		throw new Error(`不支持的文件类型: ${file.mimetype}`)
 	}
 

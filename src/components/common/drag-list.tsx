@@ -117,7 +117,7 @@ export const DragList = <T extends DragListItem>(props: DragListProps<T>) => {
 				const oldIdx = curr.findIndex((item) => item.id === active.id)
 				const newIdx = curr.findIndex((item) => item.id === over.id)
 				const item = curr[oldIdx]
-				
+
 				setCurr((items) => arrayMove(items, oldIdx, newIdx))
 				onItemMove?.(oldIdx, newIdx, item)
 			}

@@ -105,4 +105,4 @@ const TestImgPrevSmart = () => {
 	)
 }
 
-export default TestImgPrevSmart;
+export default TestImgPrevSmart

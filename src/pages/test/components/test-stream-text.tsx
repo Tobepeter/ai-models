@@ -117,4 +117,4 @@ function hello(name) {
 	)
 }
 
-export default TestStreamText;
+export default TestStreamText

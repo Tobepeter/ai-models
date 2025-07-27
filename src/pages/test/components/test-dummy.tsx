@@ -180,4 +180,4 @@ const TestDummy = () => {
 	)
 }
 
-export default TestDummy;
+export default TestDummy

@@ -111,4 +111,4 @@ const TestErrorHandling = () => {
 	)
 }
 
-export default TestErrorHandling;
+export default TestErrorHandling

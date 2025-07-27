@@ -189,9 +189,7 @@ export const Crud = () => {
 									className="w-48"
 								/>
 							</div>
-							<div className="text-sm text-muted-foreground">
-								共 {items.length} 条记录
-							</div>
+							<div className="text-sm text-muted-foreground">共 {items.length} 条记录</div>
 						</div>
 						<div className="flex gap-2">
 							<Button variant="outline" onClick={fetchItems} disabled={loading}>
@@ -205,45 +203,37 @@ export const Crud = () => {
 										新建数据
 									</Button>
 								</DialogTrigger>
-						<DialogContent>
-							<DialogHeader>
-								<DialogTitle>新建数据</DialogTitle>
-								<DialogDescription>创建一条新的数据记录</DialogDescription>
-							</DialogHeader>
-							<div className="space-y-4">
-								<FormItem>
-									<FormLabel htmlFor="create-category">分类</FormLabel>
-									<div className="px-3 py-2 border rounded-md bg-muted text-sm">
-										{selectedCategory}
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>新建数据</DialogTitle>
+										<DialogDescription>创建一条新的数据记录</DialogDescription>
+									</DialogHeader>
+									<div className="space-y-4">
+										<FormItem>
+											<FormLabel htmlFor="create-category">分类</FormLabel>
+											<div className="px-3 py-2 border rounded-md bg-muted text-sm">{selectedCategory}</div>
+										</FormItem>
+										<FormItem>
+											<FormLabel htmlFor="create-data">数据内容</FormLabel>
+											<Textarea id="create-data" value={createForm.data} onChange={(e) => setCreateForm((prev) => ({ ...prev, data: e.target.value }))} placeholder="输入数据内容" rows={4} />
+										</FormItem>
 									</div>
-								</FormItem>
-								<FormItem>
-									<FormLabel htmlFor="create-data">数据内容</FormLabel>
-									<Textarea 
-										id="create-data"
-										value={createForm.data} 
-										onChange={(e) => setCreateForm((prev) => ({ ...prev, data: e.target.value }))} 
-										placeholder="输入数据内容" 
-										rows={4} 
-									/>
-								</FormItem>
-							</div>
-							<DialogFooter>
-								<Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
-									取消
-								</Button>
-								<Button onClick={handleCreate}>创建</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
-				</div>
-			</div>
-		</CardContent>
-	</Card>
+									<DialogFooter>
+										<Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+											取消
+										</Button>
+										<Button onClick={handleCreate}>创建</Button>
+									</DialogFooter>
+								</DialogContent>
+							</Dialog>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
 
-	{/* 数据表格 */}
-	<Card>
-			<CardContent className="p-0">
+			{/* 数据表格 */}
+			<Card>
+				<CardContent className="p-0">
 					{loading ? (
 						<div className="p-6">
 							<div className="text-center text-muted-foreground">加载中...</div>
@@ -270,9 +260,7 @@ export const Crud = () => {
 										<TableCell>
 											<div className="max-w-md">
 												<div className="truncate text-sm">{item.data}</div>
-												{item.data.length > 50 && (
-													<div className="text-xs text-muted-foreground mt-1">...</div>
-												)}
+												{item.data.length > 50 && <div className="text-xs text-muted-foreground mt-1">...</div>}
 											</div>
 										</TableCell>
 										<TableCell className="text-xs">{formatTime(item.created_at)}</TableCell>
@@ -295,69 +283,63 @@ export const Crud = () => {
 				</CardContent>
 			</Card>
 
-		{/* 编辑对话框 */}
-		<Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>编辑数据</DialogTitle>
-					<DialogDescription>编辑数据记录 ID: {currentItem?.id}</DialogDescription>
-				</DialogHeader>
-				<div className="space-y-4">
-					<FormItem>
-						<FormLabel htmlFor="edit-category">分类</FormLabel>
-						<CreatableCombobox
-							options={categoryOptions}
-							value={editForm.category}
-							onValueChange={(value) => setEditForm((prev) => ({ ...prev, category: value }))}
-							onAddOption={handleAddCategory}
-							placeholder="选择或添加分类"
-							addButtonText={(input) => `添加 "${input}"`}
-						/>
-					</FormItem>
-					<FormItem>
-						<FormLabel htmlFor="edit-data">数据内容</FormLabel>
-						<Textarea 
-							id="edit-data"
-							value={editForm.data} 
-							onChange={(e) => setEditForm((prev) => ({ ...prev, data: e.target.value }))} 
-							placeholder="输入数据内容" 
-							rows={4} 
-						/>
-					</FormItem>
-				</div>
-				<DialogFooter>
-					<Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-						取消
-					</Button>
-					<Button onClick={handleUpdate}>更新</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-
-		{/* 删除确认对话框 */}
-		<Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>确认删除</DialogTitle>
-					<DialogDescription>确定要删除数据记录 ID: {currentItem?.id} 吗？此操作不可逆。</DialogDescription>
-				</DialogHeader>
-				<div className="my-4 p-4 bg-muted rounded-lg">
-					<div className="text-sm font-medium mb-2">数据内容预览:</div>
-					<div className="text-sm whitespace-pre-wrap">
-						{currentItem?.data?.slice(0, 100)}
-						{(currentItem?.data?.length || 0) > 100 && '...'}
+			{/* 编辑对话框 */}
+			<Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>编辑数据</DialogTitle>
+						<DialogDescription>编辑数据记录 ID: {currentItem?.id}</DialogDescription>
+					</DialogHeader>
+					<div className="space-y-4">
+						<FormItem>
+							<FormLabel htmlFor="edit-category">分类</FormLabel>
+							<CreatableCombobox
+								options={categoryOptions}
+								value={editForm.category}
+								onValueChange={(value) => setEditForm((prev) => ({ ...prev, category: value }))}
+								onAddOption={handleAddCategory}
+								placeholder="选择或添加分类"
+								addButtonText={(input) => `添加 "${input}"`}
+							/>
+						</FormItem>
+						<FormItem>
+							<FormLabel htmlFor="edit-data">数据内容</FormLabel>
+							<Textarea id="edit-data" value={editForm.data} onChange={(e) => setEditForm((prev) => ({ ...prev, data: e.target.value }))} placeholder="输入数据内容" rows={4} />
+						</FormItem>
 					</div>
-				</div>
-				<DialogFooter>
-					<Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-						取消
-					</Button>
-					<Button variant="destructive" onClick={handleDelete}>
-						删除
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	</div>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+							取消
+						</Button>
+						<Button onClick={handleUpdate}>更新</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* 删除确认对话框 */}
+			<Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>确认删除</DialogTitle>
+						<DialogDescription>确定要删除数据记录 ID: {currentItem?.id} 吗？此操作不可逆。</DialogDescription>
+					</DialogHeader>
+					<div className="my-4 p-4 bg-muted rounded-lg">
+						<div className="text-sm font-medium mb-2">数据内容预览:</div>
+						<div className="text-sm whitespace-pre-wrap">
+							{currentItem?.data?.slice(0, 100)}
+							{(currentItem?.data?.length || 0) > 100 && '...'}
+						</div>
+					</div>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+							取消
+						</Button>
+						<Button variant="destructive" onClick={handleDelete}>
+							删除
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</div>
 	)
 }

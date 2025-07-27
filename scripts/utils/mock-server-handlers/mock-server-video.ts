@@ -2,12 +2,7 @@ import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import weighted from 'weighted'
 import { delay } from '../common'
-import {
-	VideoSubmitResp,
-	VideoStatusResp,
-	VideoStatus,
-	MOCK_VIDEO
-} from './types'
+import { VideoSubmitResp, VideoStatusResp, VideoStatus, MOCK_VIDEO } from './types'
 
 const statusWeight: Record<VideoStatus, number> = {
 	InQueue: 0.3,

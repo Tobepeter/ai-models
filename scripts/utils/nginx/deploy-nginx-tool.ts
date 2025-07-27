@@ -9,7 +9,7 @@ const souceConf = path.join(__dirname, 'default.conf')
 
 /**
  * 部署nginx工具
- * 
+ *
  * NOTE：其实一般不需要经常调用，只是需要时候改一下就行了
  * nginx conf 不是标准的json 文件，就不做动态注入了
  * 需要时候

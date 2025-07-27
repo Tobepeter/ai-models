@@ -13,10 +13,7 @@ export const TestOssUploadProgress = ({ uploading, progress }: TestOssUploadProg
 				<div className="flex items-center gap-2">
 					<div>上传中...</div>
 					<div className="flex-1 bg-gray-200 rounded-full h-2">
-						<div 
-							className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-							style={{ width: `${progress}%` }} 
-						/>
+						<div className="bg-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
 					</div>
 					<div>{progress}%</div>
 				</div>
@@ -29,5 +26,3 @@ export type TestOssUploadProgressProps = {
 	uploading: boolean
 	progress: number
 }
-
-

@@ -93,13 +93,7 @@ export const ChatSettings = () => {
 
 					{/* API Key */}
 					<FormTips label="API Key" help="用于访问AI服务的密钥，会安全保存到本地" htmlFor="apiKey">
-						<Input 
-							id="apiKey" 
-							type="password" 
-							value={apiKey} 
-							onChange={(e) => setApiKey(e.target.value)} 
-							placeholder="请输入API Key" 
-						/>
+						<Input id="apiKey" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="请输入API Key" />
 					</FormTips>
 
 					{/* 主题设置 */}
@@ -119,13 +113,8 @@ export const ChatSettings = () => {
 					{/* 流式输出设置 */}
 					<FormTips label="流式输出" help="开启后文本将逐字显示，关闭后一次性显示完整回复">
 						<div className="flex items-center justify-between">
-							<div className="text-sm text-muted-foreground">
-								实时显示AI回复内容
-							</div>
-							<Switch
-								checked={streamEnabled}
-								onCheckedChange={setStreamEnabled}
-							/>
+							<div className="text-sm text-muted-foreground">实时显示AI回复内容</div>
+							<Switch checked={streamEnabled} onCheckedChange={setStreamEnabled} />
 						</div>
 					</FormTips>
 

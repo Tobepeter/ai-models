@@ -203,4 +203,4 @@ flowchart LR
 	)
 }
 
-export default TestMarkdownMermaid;
+export default TestMarkdownMermaid

@@ -32,14 +32,17 @@ export class OpenRouterAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const response = await this.openai.chat.completions.create({
-				model: this.currModel,
-				messages: [{ role: 'user', content: prompt }],
-				max_tokens: 1000,
-				stream: false,
-			}, { 
-				headers: this.getHeaders() 
-			})
+			const response = await this.openai.chat.completions.create(
+				{
+					model: this.currModel,
+					messages: [{ role: 'user', content: prompt }],
+					max_tokens: 1000,
+					stream: false,
+				},
+				{
+					headers: this.getHeaders(),
+				}
+			)
 			const content = response.choices[0]?.message?.content || ''
 			return content.trim()
 		} catch (error) {
@@ -50,14 +53,17 @@ export class OpenRouterAgent implements IAiAgent {
 
 	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
-			const stream = await this.openai.chat.completions.create({
-				model: this.currModel,
-				messages: [{ role: 'user', content: prompt }],
-				max_tokens: 1000,
-				stream: true,
-			}, { 
-				headers: this.getHeaders() 
-			})
+			const stream = await this.openai.chat.completions.create(
+				{
+					model: this.currModel,
+					messages: [{ role: 'user', content: prompt }],
+					max_tokens: 1000,
+					stream: true,
+				},
+				{
+					headers: this.getHeaders(),
+				}
+			)
 
 			let fullContent = ''
 			let hasValidContent = false

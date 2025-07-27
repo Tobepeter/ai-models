@@ -148,4 +148,4 @@ const TestTwBreakpoint = () => {
 	)
 }
 
-export default TestTwBreakpoint;
+export default TestTwBreakpoint

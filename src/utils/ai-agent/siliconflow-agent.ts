@@ -35,14 +35,17 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateText(prompt: string) {
 		try {
-			const response = await this.openai.chat.completions.create({
-				model: this.currModel,
-				messages: [{ role: 'user', content: prompt }],
-				max_tokens: 1000,
-				stream: false,
-			}, { 
-				headers: this.getHeaders() 
-			})
+			const response = await this.openai.chat.completions.create(
+				{
+					model: this.currModel,
+					messages: [{ role: 'user', content: prompt }],
+					max_tokens: 1000,
+					stream: false,
+				},
+				{
+					headers: this.getHeaders(),
+				}
+			)
 			let content = response.choices[0]?.message?.content || ''
 			const reasoningContent = response.choices[0]?.message?.['reasoning_content'] || ''
 			if (reasoningContent) {
@@ -57,14 +60,17 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async genTextStream(prompt: string, onChunk: StreamCallback) {
 		try {
-			const stream = await this.openai.chat.completions.create({
-				model: this.currModel,
-				messages: [{ role: 'user', content: prompt }],
-				max_tokens: 1000,
-				stream: true,
-			}, { 
-				headers: this.getHeaders() 
-			})
+			const stream = await this.openai.chat.completions.create(
+				{
+					model: this.currModel,
+					messages: [{ role: 'user', content: prompt }],
+					max_tokens: 1000,
+					stream: true,
+				},
+				{
+					headers: this.getHeaders(),
+				}
+			)
 
 			let fullContent = ''
 			let hasValidContent = false
@@ -97,14 +103,17 @@ export class SiliconFlowAgent implements IAiAgent {
 
 	async generateImages(prompt: string) {
 		try {
-			const response = await this.openai.images.generate({
-				model: this.currModel,
-				prompt: prompt,
-				size: '1024x1024',
-				n: 1,
-			}, { 
-				headers: this.getHeaders() 
-			})
+			const response = await this.openai.images.generate(
+				{
+					model: this.currModel,
+					prompt: prompt,
+					size: '1024x1024',
+					n: 1,
+				},
+				{
+					headers: this.getHeaders(),
+				}
+			)
 
 			return response.data.map((item) => item.url).filter(Boolean) as string[]
 		} catch (error) {

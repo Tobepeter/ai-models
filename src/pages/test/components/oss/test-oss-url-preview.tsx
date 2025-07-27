@@ -30,9 +30,7 @@ export const TestOssUrlPreview = ({ path, preview, onPathChange, onGetSignedUrl 
 							/>
 							<Button onClick={onGetSignedUrl}>获取URL</Button>
 						</div>
-						<div className="text-xs text-gray-500">
-							输入OSS路径后点击获取URL按钮将生成带STS签名的临时访问链接
-						</div>
+						<div className="text-xs text-gray-500">输入OSS路径后点击获取URL按钮将生成带STS签名的临时访问链接</div>
 					</div>
 
 					{preview && (
@@ -76,5 +74,3 @@ export type TestOssUrlPreviewProps = {
 	onPathChange?: (path: string) => void
 	onGetSignedUrl?: () => void
 }
-
-

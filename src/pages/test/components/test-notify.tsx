@@ -158,4 +158,4 @@ const TestNotify = () => {
 	)
 }
 
-export default TestNotify;
+export default TestNotify

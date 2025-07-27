@@ -27,13 +27,15 @@ export const User = () => {
 	const isLoggedIn = token && user && user.username !== 'anonymous'
 
 	// 显示的用户信息（登录时显示真实信息，未登录时显示默认值）
-	const displayUser = isLoggedIn ? user : {
-		username: 'anonymous',
-		email: 'anonymous@example.com',
-		avatar: '',
-		created_at: '',
-		updated_at: ''
-	}
+	const displayUser = isLoggedIn
+		? user
+		: {
+				username: 'anonymous',
+				email: 'anonymous@example.com',
+				avatar: '',
+				created_at: '',
+				updated_at: '',
+			}
 
 	return (
 		<div className="p-6 max-w-2xl mx-auto space-y-6">
@@ -143,9 +145,7 @@ export const User = () => {
 			</Card>
 
 			{/* 修改密码对话框 - 只在已登录时显示 */}
-			{isLoggedIn && (
-				<UserChangePwd open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />
-			)}
+			{isLoggedIn && <UserChangePwd open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />}
 		</div>
 	)
 }

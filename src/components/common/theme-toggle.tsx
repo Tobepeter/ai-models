@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 
 /**
  * 主题切换开关组件
- * 
+ *
  * 智能切换，会尝试同步回系统偏好
  */
 export const ThemeToggle = () => {

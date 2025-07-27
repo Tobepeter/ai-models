@@ -38,7 +38,9 @@ src/api/
 ## 核心文件说明
 
 ### common.ts
+
 包含所有API的基础结构：
+
 - `ApiResponse<T>`: 标准API响应格式 (code, msg, data)
 - `BaseModel`: 后端固定的基础模型结构 (id, created_at, updated_at)
 - `Pagination`: 分页信息结构
@@ -46,14 +48,18 @@ src/api/
 - 其他通用类型
 
 ### types/ 文件夹
+
 按功能模块分类的类型定义，与后端API保持一致：
+
 - **auth-types.ts**: 登录、注册、用户认证相关类型
 - **user-types.ts**: 用户管理、用户资料相关类型（与后端UserResponse等保持一致）
 - **crud-types.ts**: 通用CRUD操作相关类型
 - **api-types.ts**: OSS、AI等其他API相关类型
 
 ### 各功能模块
+
 每个功能模块包含：
+
 - **xxx-api.ts**: API类，包含所有HTTP请求方法
 - **xxx-query.ts**: React Query hooks，提供缓存、状态管理等功能
 - **index.ts**: 模块导出文件
@@ -61,6 +67,7 @@ src/api/
 ## 使用方式
 
 ### 1. 直接使用API类
+
 ```typescript
 import { authApi, userApi, ossApi, aiApi } from '@/api'
 
@@ -72,16 +79,17 @@ const users = await userApi.getUsers({ page: 1, limit: 10 })
 ```
 
 ### 2. 使用React Query hooks（推荐）
+
 ```typescript
 import { useLogin, useUsers, useUploadFile } from '@/api'
 
 function LoginForm() {
   const loginMutation = useLogin()
-  
+
   const handleLogin = (data) => {
     loginMutation.mutate(data)
   }
-  
+
   return (
     // JSX...
   )
@@ -89,9 +97,9 @@ function LoginForm() {
 
 function UserList() {
   const { data: users, isLoading } = useUsers({ page: 1, limit: 10 })
-  
+
   if (isLoading) return <div>Loading...</div>
-  
+
   return (
     // JSX...
   )
@@ -99,16 +107,12 @@ function UserList() {
 ```
 
 ### 3. 使用类型
+
 ```typescript
-import type { 
-  LoginRequest, 
-  UserResponse, 
-  PaginatedResponse,
-  ApiResponse 
-} from '@/api'
+import type { LoginRequest, UserResponse, PaginatedResponse, ApiResponse } from '@/api'
 
 const handleUserData = (user: UserResponse) => {
-  // 处理用户数据
+	// 处理用户数据
 }
 ```
 
@@ -117,7 +121,7 @@ const handleUserData = (user: UserResponse) => {
 API结构与后端路由保持一致：
 
 - `/users/*` → `user/user-api.ts`
-- `/auth/*` → `auth/auth-api.ts` 
+- `/auth/*` → `auth/auth-api.ts`
 - `/oss/*` → `oss/oss-api.ts`
 - `/ai/v1/*` → `ai/ai-api.ts`
 - `/crud/*` → `crud.ts`

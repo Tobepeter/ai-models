@@ -23,11 +23,11 @@ const DraggableButton = (props: DraggableButtonProps) => {
 				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
 				left: pos.x,
 				top: pos.y,
-		  }
+			}
 		: {
 				left: pos.x,
 				top: pos.y,
-		  }
+			}
 
 	return (
 		<button

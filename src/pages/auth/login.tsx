@@ -93,21 +93,12 @@ export const Login = () => {
 				</CardHeader>
 				<CardContent className="px-6 pb-6">
 					<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
 						{/* 用户名 */}
 						<FormItem>
 							<FormLabel htmlFor="username" required>
 								用户名
 							</FormLabel>
-							<FormInput
-								id="username"
-								placeholder="请输入用户名"
-								value={form.username}
-								onChange={handleChange('username')}
-								disabled={isLoading}
-								error={errors.username}
-								autoComplete="username"
-							/>
+							<FormInput id="username" placeholder="请输入用户名" value={form.username} onChange={handleChange('username')} disabled={isLoading} error={errors.username} autoComplete="username" />
 						</FormItem>
 
 						{/* 密码 */}
@@ -115,15 +106,7 @@ export const Login = () => {
 							<FormLabel htmlFor="password" required>
 								密码
 							</FormLabel>
-							<FormPwd
-								id="password"
-								placeholder="请输入密码"
-								value={form.password}
-								onChange={handleChange('password')}
-								disabled={isLoading}
-								error={errors.password}
-								autoComplete="current-password"
-							/>
+							<FormPwd id="password" placeholder="请输入密码" value={form.password} onChange={handleChange('password')} disabled={isLoading} error={errors.password} autoComplete="current-password" />
 						</FormItem>
 
 						{/* 登录按钮 */}

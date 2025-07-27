@@ -2,7 +2,6 @@ import { storage } from '@/utils/storage'
 import { AIPlatform, PlatformConfig } from './types'
 
 class AIAgentConfig {
-
 	data: Record<AIPlatform, PlatformConfig> = {
 		[AIPlatform.Unknown]: {
 			apiKey: 'unknown-token',

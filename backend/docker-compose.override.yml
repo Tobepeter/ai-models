@@ -3,12 +3,12 @@ services:
     build: .
     container_name: ai-models-backend
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - db
       - redis
     volumes:
-      - .env:/app/.env:ro  # 挂载环境变量文件
+      - .env:/app/.env:ro # 挂载环境变量文件
     environment:
       - GO_ENV=development
     networks:

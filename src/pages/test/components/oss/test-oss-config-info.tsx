@@ -59,4 +59,3 @@ export type TestOssConfigInfoProps = {
 	onCheckStatus?: () => void
 	onGetSts?: () => Promise<Credentials>
 }
-

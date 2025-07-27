@@ -15,7 +15,7 @@ export const OssImagePreview = (props: OssImagePreviewProps) => {
 	const handleCustomUpload = useMemoizedFn(async (file: File): Promise<string | undefined> => {
 		// 如果有旧的 objectKey，静默删除旧文件（不等待）
 		if (currentObjectKeyRef.current) {
-			ossClient.deleteFile(currentObjectKeyRef.current).catch(error => {
+			ossClient.deleteFile(currentObjectKeyRef.current).catch((error) => {
 				console.warn('[OssImagePreview] Failed to delete old file:', error)
 			})
 		}

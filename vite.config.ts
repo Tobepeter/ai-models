@@ -20,10 +20,10 @@ export default defineConfig({
 		},
 	},
 	define: {
-		'__OSS_BASE__': JSON.stringify(pathUtil.getOssBase()),
-		'__OSS_BASE_PREFIX__': JSON.stringify(pathUtil.getOssBasePrefix()),
-		'__BUILD_TIME__': JSON.stringify(new Date().toISOString()),
-		'__BUILD_TIME_LOCAL__': JSON.stringify(new Date().toLocaleString()),
+		__OSS_BASE__: JSON.stringify(pathUtil.getOssBase()),
+		__OSS_BASE_PREFIX__: JSON.stringify(pathUtil.getOssBasePrefix()),
+		__BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+		__BUILD_TIME_LOCAL__: JSON.stringify(new Date().toLocaleString()),
 	},
 	test: {
 		projects: [

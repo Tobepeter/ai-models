@@ -160,4 +160,4 @@ const TestUserAvatar = () => {
 	)
 }
 
-export default TestUserAvatar;
+export default TestUserAvatar

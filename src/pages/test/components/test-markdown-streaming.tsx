@@ -135,4 +135,4 @@ function hello() {
 	)
 }
 
-export default TestMarkdownStreaming;
+export default TestMarkdownStreaming
