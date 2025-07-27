@@ -166,15 +166,15 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 		todos := api.Group("/todos")
 		todos.Use(middleware.AuthRequired(authService)) // 需要认证
 		{
-			todos.POST("", todoHandler.Create)                       // 创建TODO
+			todos.POST("", todoHandler.CreateTodo)                   // 创建TODO
 			todos.GET("/stats", todoHandler.GetStats)                // 获取TODO统计信息
 			todos.PUT("/positions", todoHandler.UpdatePositions)     // 批量更新位置（拖拽排序）
 			todos.POST("/rebalance", todoHandler.RebalancePositions) // 重新平衡位置
-			todos.GET("/:id", todoHandler.GetByID)                   // 根据ID获取TODO
-			todos.GET("", todoHandler.GetList)                       // 获取TODO列表（按位置排序）
-			todos.PUT("/:id", todoHandler.Update)                    // 更新TODO
-			todos.PATCH("/:id/toggle", todoHandler.Toggle)           // 切换TODO完成状态
-			todos.DELETE("/:id", todoHandler.Delete)                 // 删除TODO
+			todos.GET("/:id", todoHandler.GetTodoByID)               // 根据ID获取TODO
+			todos.GET("", todoHandler.GetTodoList)                   // 获取TODO列表（按位置排序）
+			todos.PUT("/:id", todoHandler.UpdateTodo)                // 更新TODO
+			todos.PATCH("/:id/toggle", todoHandler.ToggleTodoComplete) // 切换TODO完成状态
+			todos.DELETE("/:id", todoHandler.DeleteTodo)             // 删除TODO
 		}
 
 		// 管理员接口

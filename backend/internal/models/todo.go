@@ -13,7 +13,7 @@ type Todo struct {
 	Completed   bool       `json:"completed" gorm:"default:false"`
 	Priority    int        `json:"priority" gorm:"default:0"`       // 简化为 int，前端自定义含义
 	Position    float64    `json:"position" gorm:"default:0;index"` // 排序位置，支持拖拽
-	DueDate     *time.Time `json:"due_date" gorm:"type:datetime"`
+	DueDate     *time.Time `json:"due_date" gorm:"type:timestamp"`
 }
 
 // TodoCreateRequest TODO创建请求结构体

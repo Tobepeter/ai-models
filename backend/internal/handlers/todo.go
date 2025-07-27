@@ -30,7 +30,7 @@ func NewTodoHandler(todoService *services.TodoService) *TodoHandler {
 // @Param request body models.TodoCreateRequest true "创建请求"
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos [post]
-func (h *TodoHandler) Create(c *gin.Context) {
+func (h *TodoHandler) CreateTodo(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -59,7 +59,7 @@ func (h *TodoHandler) Create(c *gin.Context) {
 // @Param id path string true "TODO ID"
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id} [get]
-func (h *TodoHandler) GetByID(c *gin.Context) {
+func (h *TodoHandler) GetTodoByID(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -95,7 +95,7 @@ func (h *TodoHandler) GetByID(c *gin.Context) {
 // @Param completed query boolean false "完成状态"
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos [get]
-func (h *TodoHandler) GetList(c *gin.Context) {
+func (h *TodoHandler) GetTodoList(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -130,7 +130,7 @@ func (h *TodoHandler) GetList(c *gin.Context) {
 // @Param request body models.TodoUpdateRequest true "更新请求"
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id} [put]
-func (h *TodoHandler) Update(c *gin.Context) {
+func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -221,7 +221,7 @@ func (h *TodoHandler) RebalancePositions(c *gin.Context) {
 // @Param id path string true "TODO ID"
 // @Success 200 {object} response.Response{data=models.TodoResponse}
 // @Router /todos/{id}/toggle [patch]
-func (h *TodoHandler) Toggle(c *gin.Context) {
+func (h *TodoHandler) ToggleTodoComplete(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -255,7 +255,7 @@ func (h *TodoHandler) Toggle(c *gin.Context) {
 // @Param id path string true "TODO ID"
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /todos/{id} [delete]
-func (h *TodoHandler) Delete(c *gin.Context) {
+func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
