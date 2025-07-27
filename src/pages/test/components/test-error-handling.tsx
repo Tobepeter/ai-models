@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
  * 错误处理测试组件
  * 测试 noErrorToast 功能和业务错误处理
  */
-export const TestErrorHandling = () => {
+const TestErrorHandling = () => {
 	const testConfigs = [
 		{
 			label: 'HTTP 500 错误 (默认处理)',
@@ -110,3 +110,5 @@ export const TestErrorHandling = () => {
 		</Card>
 	)
 }
+
+export default TestErrorHandling;

@@ -18,7 +18,7 @@ import { TestOssUrlPreview } from './test-oss-url-preview'
  * OSS功能测试页面
  * 提供文件上传、权限配置、URL预览等功能
  */
-export const TestOSS = () => {
+const TestOSS = () => {
 	const [uploading, setUploading] = useState(false)
 	const [progress, setProgress] = useState(0)
 	const [status, setStatus] = useState('unknown')
@@ -229,3 +229,5 @@ export const TestOSS = () => {
 		</div>
 	)
 }
+
+export default TestOss;

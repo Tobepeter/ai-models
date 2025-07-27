@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 /**
  * AI Agent 测试组件
  */
-export const TestAIAgent = () => {
+const TestAIAgent = () => {
 	const [question, setQuestion] = useState('你好，请介绍一下自己')
 	const [token, setToken] = useState('')
 	const [model, setModel] = useState('Pro/deepseek-ai/DeepSeek-R1')
@@ -311,3 +311,5 @@ export const TestAIAgent = () => {
 		</div>
 	)
 }
+
+export default TestAiAgent;

@@ -116,7 +116,7 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 }
 
 // GetUsers 获取用户列表
-func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
+func (s *UserService) GetUsers(page, limit int) (*models.UserListResponse, error) {
 	var users []models.User
 
 	// 使用基础服务的分页方法
@@ -131,8 +131,17 @@ func (s *UserService) GetUsers(page, limit int) (map[string]any, error) {
 		userResponses = append(userResponses, user.ToResponse())
 	}
 
-	// 使用基础服务创建标准分页响应
-	return s.CreatePageResp(userResponses, page, limit, total), nil
+	// 创建分页响应
+	response := &models.UserListResponse{
+		Data: userResponses,
+		Pagination: models.Pagination{
+			Current:  page,
+			PageSize: limit,
+			Total:    total,
+		},
+	}
+
+	return response, nil
 }
 
 // DeleteUser 删除用户

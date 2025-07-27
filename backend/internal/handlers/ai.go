@@ -206,10 +206,10 @@ func (h *AIHandler) OpenAIChatCompletion(c *gin.Context) {
 	var req models.OpenAIChatCompletionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logrus.Error("Invalid OpenAI request body:", err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": gin.H{
-				"message": "Invalid request body",
-				"type":    "invalid_request_error",
+		c.JSON(http.StatusBadRequest, models.OpenAIErrorResponse{
+			Error: models.OpenAIError{
+				Message: "Invalid request body",
+				Type:    "invalid_request_error",
 			},
 		})
 		return
@@ -226,10 +226,10 @@ func (h *AIHandler) OpenAIChatCompletion(c *gin.Context) {
 	resp, err := h.aiService.ChatCompletion(platform, req)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to call AI service")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": gin.H{
-				"message": "Failed to process request",
-				"type":    "internal_error",
+		c.JSON(http.StatusInternalServerError, models.OpenAIErrorResponse{
+			Error: models.OpenAIError{
+				Message: "Failed to process request",
+				Type:    "internal_error",
 			},
 		})
 		return
@@ -281,7 +281,7 @@ func (h *AIHandler) GenerateImages(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{
-		"data": urls,
+	response.Success(c, models.ImageGenerationResponse{
+		Data: urls,
 	})
 }

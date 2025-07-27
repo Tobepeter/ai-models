@@ -129,3 +129,18 @@ type OpenAIChatCompletionStreamResponse struct {
 	Model   string               `json:"model"`
 	Choices []OpenAIStreamChoice `json:"choices"`
 }
+
+// OpenAI错误响应
+type OpenAIErrorResponse struct {
+	Error OpenAIError `json:"error"`
+}
+
+type OpenAIError struct {
+	Message string `json:"message"`
+	Type    string `json:"type"`
+}
+
+// 图片生成响应
+type ImageGenerationResponse struct {
+	Data []string `json:"data"`
+}

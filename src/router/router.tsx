@@ -9,6 +9,7 @@ import { Doc } from '@/pages/docs/doc'
 import { Home } from '@/pages/home/home'
 import { Test } from '@/pages/test/test'
 import { User } from '@/pages/user/user'
+import { Todo } from '@/pages/todo/todo'
 import { ossBase, ossBasePrefix } from '@/utils/env'
 import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
 
@@ -50,6 +51,11 @@ export const routes: CustomRouteObject[] = [
 		path: 'user',
 		element: <User />,
 		handle: { title: '用户中心' },
+	},
+	{
+		path: 'todo',
+		element: <Todo />,
+		handle: { title: 'TODO管理' },
 	},
 	{
 		path: 'test',

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 /**
  * Shimmer 效果测试组件
  */
-export const TestShimmer = () => {
+const TestShimmer = () => {
 	// 颜色配置
 	const colors = {
 		white: 'white',
@@ -151,3 +151,5 @@ export const TestShimmer = () => {
 		</div>
 	)
 }
+
+export default TestShimmer;

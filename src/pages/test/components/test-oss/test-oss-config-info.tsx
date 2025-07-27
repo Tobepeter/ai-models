@@ -9,7 +9,7 @@ import { ossRegion, ossBucket } from '@/utils/env'
  * OSS配置信息组件
  * 显示OSS服务器配置和STS状态信息
  */
-export const TestOssConfigInfo = ({ status, sts, loading, onCheckStatus, onGetSts }: TestOssConfigInfoProps) => {
+const TestOssConfigInfo = ({ status, sts, loading, onCheckStatus, onGetSts }: TestOssConfigInfoProps) => {
 	return (
 		<Card>
 			<CardContent className="pt-6">
@@ -59,3 +59,5 @@ export type TestOssConfigInfoProps = {
 	onCheckStatus?: () => void
 	onGetSts?: () => Promise<Credentials>
 }
+
+export default TestOssConfigInfo;

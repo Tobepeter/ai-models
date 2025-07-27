@@ -1,25 +1,23 @@
+import { router } from '@/router/router'
 import { JwtPayloadApp, jwt } from '@/utils/jwt'
 import { storageKeys } from '@/utils/storage'
 import { Nullable } from '@/utils/types'
-import type { UserResponse } from '@/api/types/generated'
-import { router } from '@/router/router'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
-
-const defaultUser: UserResponse = {
-	id: 0,
-	username: 'anonymous',
-	email: 'anonymous@example.com',
-	avatar: '',
-	role: 'user',
-	is_active: false,
-	created_at: '',
-	updated_at: '',
-}
+import type { UserResponse } from '@/api/types/generated'
 
 // 初始状态
 const userState = {
-	info: defaultUser,
+	info: {
+		id: 0,
+		username: 'anonymous',
+		email: 'anonymous@example.com',
+		avatar: '',
+		role: 'user',
+		is_active: false,
+		created_at: '',
+		updated_at: '',
+	} as UserResponse,
 	token: '',
 	tokenPayload: null as Nullable<JwtPayloadApp>,
 }

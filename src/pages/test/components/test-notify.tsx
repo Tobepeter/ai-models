@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { notify } from '@/components/common/notify'
 import { useState } from 'react'
 
-export const TestNotify = () => {
+const TestNotify = () => {
 	const [loadingId, setLoadingId] = useState<string | number | null>(null)
 
 	const btnConfigs = [
@@ -157,3 +157,5 @@ export const TestNotify = () => {
 		</Card>
 	)
 }
+
+export default TestNotify;

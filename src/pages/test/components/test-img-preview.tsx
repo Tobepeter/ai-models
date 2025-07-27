@@ -9,10 +9,11 @@ import { OssUploadResult } from '@/utils/oss/oss-types'
 /**
  * 测试图片预览组件
  */
-export const TestImgPreview = () => {
+const TestImgPreview = () => {
 	const [uploadedUrl, setUploadedUrl] = useState<string>('')
 	const [controllableUrl, setControllableUrl] = useState<string>(dummy.images.avatar)
 	const [ossUrl, setOssUrl] = useState<string>('')
+	const [externalLoading, setExternalLoading] = useState<boolean>(false)
 
 	const handleUpload = (file: File) => {
 		console.log('文件上传:', file)
@@ -68,7 +69,7 @@ export const TestImgPreview = () => {
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">无URL，不可编辑</p>
-							<ImagePreview notEditable />
+							<ImagePreview noEditable />
 						</div>
 
 						<div className="space-y-2">
@@ -78,7 +79,7 @@ export const TestImgPreview = () => {
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">有defaultUrl，不可编辑</p>
-							<ImagePreview defaultUrl={dummy.images.portrait} notEditable />
+							<ImagePreview defaultUrl={dummy.images.portrait} noEditable />
 						</div>
 					</div>
 				</CardContent>
@@ -94,22 +95,22 @@ export const TestImgPreview = () => {
 					<div className="flex items-end gap-4">
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">默认尺寸 (128px)</p>
-							<ImagePreview defaultUrl={dummy.images.square} notEditable />
+							<ImagePreview defaultUrl={dummy.images.square} noEditable />
 						</div>
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">小尺寸 (80px)</p>
-							<ImagePreview defaultUrl={dummy.images.dummyRed} notEditable size={80} />
+							<ImagePreview defaultUrl={dummy.images.dummyRed} noEditable size={80} />
 						</div>
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">大尺寸 (200px)</p>
-							<ImagePreview defaultUrl={dummy.images.dummyBlue} notEditable size={200} />
+							<ImagePreview defaultUrl={dummy.images.dummyBlue} noEditable size={200} />
 						</div>
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">自定义宽高</p>
-							<ImagePreview defaultUrl={dummy.images.dummyGreen} notEditable width={160} height={120} />
+							<ImagePreview defaultUrl={dummy.images.dummyGreen} noEditable width={160} height={120} />
 						</div>
 					</div>
 				</CardContent>
@@ -125,12 +126,12 @@ export const TestImgPreview = () => {
 					<div className="flex items-center gap-4">
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">男性头像</p>
-							<ImagePreview defaultUrl={dummy.images.avatarMale} notEditable size={64} className="rounded-full overflow-hidden" />
+							<ImagePreview defaultUrl={dummy.images.avatarMale} noEditable size={64} className="rounded-full overflow-hidden" />
 						</div>
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">女性头像</p>
-							<ImagePreview defaultUrl={dummy.images.avatarFemale} notEditable size={64} className="rounded-full overflow-hidden" />
+							<ImagePreview defaultUrl={dummy.images.avatarFemale} noEditable size={64} className="rounded-full overflow-hidden" />
 						</div>
 
 						<div className="space-y-2">
@@ -187,7 +188,7 @@ export const TestImgPreview = () => {
 					<div className="flex items-center gap-4">
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">自定义内容</p>
-							<ImagePreview defaultUrl={dummy.images.dummyYellow} notEditable className="w-32 h-24">
+							<ImagePreview defaultUrl={dummy.images.dummyYellow} noEditable className="w-32 h-24">
 								<div className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
 									<span className="text-white font-bold">自定义内容</span>
 								</div>
@@ -196,7 +197,7 @@ export const TestImgPreview = () => {
 
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">卡片样式</p>
-							<ImagePreview defaultUrl={dummy.images.dummyPink} notEditable className="w-32 h-24">
+							<ImagePreview defaultUrl={dummy.images.dummyPink} noEditable className="w-32 h-24">
 								<Card className="w-full h-full">
 									<CardContent className="p-4 flex flex-col items-center justify-center">
 										<div className="text-xs text-gray-600">卡片内容</div>
@@ -204,6 +205,88 @@ export const TestImgPreview = () => {
 									</CardContent>
 								</Card>
 							</ImagePreview>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* 交互控制测试 */}
+			<Card>
+				<CardHeader>
+					<CardTitle>交互控制测试</CardTitle>
+					<CardDescription>测试不同交互模式的图片预览</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="flex items-center gap-4">
+						<div className="space-y-1">
+							<p className="text-xs text-gray-500">普通模式</p>
+							<ImagePreview defaultUrl={dummy.images.portrait} size={80} onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
+						</div>
+						<div className="space-y-1">
+							<p className="text-xs text-gray-500">noHover</p>
+							<ImagePreview defaultUrl={dummy.images.portrait} size={80} noHover onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
+						</div>
+						<div className="space-y-1">
+							<p className="text-xs text-gray-500">notEditable</p>
+							<ImagePreview defaultUrl={dummy.images.portrait} size={80} noEditable />
+						</div>
+						<div className="space-y-1">
+							<p className="text-xs text-gray-500">noInteraction</p>
+							<ImagePreview defaultUrl={dummy.images.portrait} size={80} noInteraction />
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Loading 状态测试 */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Loading 状态测试</CardTitle>
+					<CardDescription>测试内部和外部 loading 状态控制</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="flex items-center gap-4">
+						<div className="space-y-2">
+							<p className="text-sm text-gray-600">外部控制 Loading</p>
+							<p className="text-xs text-gray-500">固定显示 loading 状态</p>
+							<ImagePreview
+								defaultUrl={dummy.images.landscape}
+								loading={true}
+								size={128}
+								onLoadingChange={(loading) => console.log('Loading changed:', loading)}
+							/>
+						</div>
+						<div className="space-y-2">
+							<p className="text-sm text-gray-600">外部控制开关</p>
+							<div className="space-y-2">
+								<Button
+									size="sm"
+									variant={externalLoading ? "default" : "outline"}
+									onClick={() => setExternalLoading(!externalLoading)}
+								>
+									{externalLoading ? 'Loading 开启' : 'Loading 关闭'}
+								</Button>
+								<ImagePreview
+									defaultUrl={dummy.images.square}
+									loading={externalLoading}
+									size={128}
+									onLoadingChange={(loading) => console.log('External loading changed:', loading)}
+								/>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<p className="text-sm text-gray-600">内部状态管理</p>
+							<p className="text-xs text-gray-500">使用内部 loading 状态</p>
+							<ImagePreview
+								defaultUrl={dummy.images.dummyBlue}
+								size={128}
+								onLoadingChange={(loading) => console.log('Internal loading changed:', loading)}
+								onCustomUpload={async (file) => {
+									// 模拟异步上传
+									await new Promise(resolve => setTimeout(resolve, 2000))
+									return URL.createObjectURL(file)
+								}}
+							/>
 						</div>
 					</div>
 				</CardContent>
@@ -220,7 +303,7 @@ export const TestImgPreview = () => {
 						<div className="space-y-2">
 							<p className="text-sm text-gray-600">OSS 上传预览</p>
 							<p className="text-xs text-gray-500">当前URL: {ossUrl || '无'}</p>
-							<OssImagePreview 
+							<OssImagePreview
 								url={ossUrl}
 								size={128}
 								onOssUpload={handleOssUpload}
@@ -228,31 +311,11 @@ export const TestImgPreview = () => {
 								onChange={handleOssChange}
 							/>
 						</div>
-
-						<div className="space-y-2">
-							<p className="text-sm text-gray-600">交互控制测试</p>
-							<div className="flex items-center gap-4">
-								<div className="space-y-1">
-									<p className="text-xs text-gray-500">普通模式</p>
-									<ImagePreview defaultUrl={dummy.images.portrait} size={80} onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
-								</div>
-								<div className="space-y-1">
-									<p className="text-xs text-gray-500">noHover</p>
-									<ImagePreview defaultUrl={dummy.images.portrait} size={80} noHover onUpload={handleUpload} onDelete={handleDelete} onChange={handleChange} />
-								</div>
-								<div className="space-y-1">
-									<p className="text-xs text-gray-500">notEditable</p>
-									<ImagePreview defaultUrl={dummy.images.portrait} size={80} notEditable />
-								</div>
-								<div className="space-y-1">
-									<p className="text-xs text-gray-500">noInteraction</p>
-									<ImagePreview defaultUrl={dummy.images.portrait} size={80} noInteraction />
-								</div>
-							</div>
-						</div>
 					</div>
 				</CardContent>
 			</Card>
 		</div>
 	)
 }
+
+export default TestImgPreview;

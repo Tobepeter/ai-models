@@ -67,6 +67,7 @@ func autoMigrate() error {
 		&models.User{},
 		&models.ConversationHistory{},
 		&models.Crud{},
+		&models.Todo{},
 	)
 
 	if err != nil {

@@ -69,6 +69,7 @@ func main() {
 	aiService := ai.NewAIService(cfg)
 	ossService := services.NewOSSService(cfg)
 	crudService := services.NewCrudService()
+	todoService := services.NewTodoService()
 
 	userHandler := handlers.NewUserHandler(userService, authService)
 	adminHandler := handlers.NewAdminHandler(userService, authService)
@@ -76,9 +77,10 @@ func main() {
 	ossHandler := handlers.NewOSSHandler(ossService)
 	healthHandler := handlers.NewHealthHandler()
 	crudHandler := handlers.NewCrudHandler(crudService)
+	todoHandler := handlers.NewTodoHandler(todoService)
 	testHandler := handlers.NewTestHandler()
 
-	router := setupRouter(cfg, authService, userService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler, testHandler)
+	router := setupRouter(cfg, authService, userService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler, todoHandler, testHandler)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -86,7 +88,7 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authService *auth.AuthService, userService *services.UserService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler, testHandler *handlers.TestHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authService *auth.AuthService, userService *services.UserService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler, todoHandler *handlers.TodoHandler, testHandler *handlers.TestHandler) *gin.Engine {
 	if cfg.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -159,6 +161,20 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 			crud.GET("", crudHandler.GetList)       // 获取列表（支持分页）
 			crud.PUT("/:id", crudHandler.Update)    // 更新记录
 			crud.DELETE("/:id", crudHandler.Delete) // 删除记录
+		}
+
+		todos := api.Group("/todos")
+		todos.Use(middleware.AuthRequired(authService)) // 需要认证
+		{
+			todos.POST("", todoHandler.Create)                       // 创建TODO
+			todos.GET("/stats", todoHandler.GetStats)                // 获取TODO统计信息
+			todos.PUT("/positions", todoHandler.UpdatePositions)     // 批量更新位置（拖拽排序）
+			todos.POST("/rebalance", todoHandler.RebalancePositions) // 重新平衡位置
+			todos.GET("/:id", todoHandler.GetByID)                   // 根据ID获取TODO
+			todos.GET("", todoHandler.GetList)                       // 获取TODO列表（按位置排序）
+			todos.PUT("/:id", todoHandler.Update)                    // 更新TODO
+			todos.PATCH("/:id/toggle", todoHandler.Toggle)           // 切换TODO完成状态
+			todos.DELETE("/:id", todoHandler.Delete)                 // 删除TODO
 		}
 
 		// 管理员接口

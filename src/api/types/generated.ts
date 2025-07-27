@@ -163,6 +163,12 @@ export interface OpenAIUsage {
   total_tokens?: number;
 }
 
+export interface Pagination {
+  current?: number;
+  pageSize?: number;
+  total?: number;
+}
+
 export interface STSCredentials {
   /** NOTE：注意官方的字段是大写开头的 */
   AccessKeyId?: string;
@@ -191,6 +197,58 @@ export interface SignResponse {
   signedUrl?: string;
 }
 
+export interface TodoCreateRequest {
+  /** 可选 */
+  description?: string;
+  /** 可选 */
+  due_date?: string;
+  /** 可选，不传则自动分配 */
+  position?: number;
+  /** 可选 */
+  priority?: number;
+  /** 必填 */
+  title: string;
+}
+
+export interface TodoPositionItem {
+  /** 必填 */
+  id: number;
+  /** 必填 */
+  position: number;
+}
+
+export interface TodoPositionUpdateRequest {
+  /** 必填，dive验证数组元素 */
+  items: TodoPositionItem[];
+}
+
+export interface TodoResponse {
+  completed?: boolean;
+  created_at?: string;
+  description?: string;
+  due_date?: string;
+  id?: number;
+  position?: number;
+  priority?: number;
+  title?: string;
+  updated_at?: string;
+}
+
+export interface TodoUpdateRequest {
+  /** 可选，使用指针区分false和未设置 */
+  completed?: boolean;
+  /** 可选，不传不更新 */
+  description?: string;
+  /** 可选，不传不更新 */
+  due_date?: string;
+  /** 可选，支持更新排序位置 */
+  position?: number;
+  /** 可选，不传不更新 */
+  priority?: number;
+  /** 可选，不传不更新 */
+  title?: string;
+}
+
 export interface Usage {
   completion_tokens?: number;
   prompt_tokens?: number;
@@ -208,9 +266,24 @@ export interface UserCreateRequest {
   username: string;
 }
 
+export interface UserCreateResponse {
+  token?: string;
+  user?: UserResponse;
+}
+
+export interface UserListResponse {
+  data?: UserResponse[];
+  pagination?: Pagination;
+}
+
 export interface UserLoginRequest {
   password: string;
   username: string;
+}
+
+export interface UserLoginResponse {
+  token?: string;
+  user?: UserResponse;
 }
 
 export interface UserResponse {
@@ -244,26 +317,26 @@ export type StatusListData = Response & {
   data?: Record<string, any>;
 };
 
-export interface UsersListParams {
+export interface GetUsersParams {
   /** 页码 */
   page: number;
   /** 每页数量 */
   limit: number;
 }
 
-export type UsersListData = Response & {
-  data?: Record<string, any>;
+export type GetUsersData = Response & {
+  data?: UserListResponse;
 };
 
-export type UsersDetailData = Response & {
+export type GetUserByIdData = Response & {
   data?: UserResponse;
 };
 
-export type UsersDeleteData = Response & {
+export type DeleteUserData = Response & {
   data?: Record<string, any>;
 };
 
-export type UsersActivateCreateData = Response & {
+export type ActivateUserData = Response & {
   data?: Record<string, any>;
 };
 
@@ -359,14 +432,6 @@ export type DeleteData = Response & {
   data?: Record<string, any>;
 };
 
-export type HealthCheckData = Response & {
-  data?: Record<string, any>;
-};
-
-export type LiveCheckData = Response & {
-  data?: Record<string, any>;
-};
-
 export type DeleteResult = Response & {
   data?: Record<string, any>;
 };
@@ -420,10 +485,6 @@ export type GetFileUrlData = Response & {
   data?: GetURLResponse;
 };
 
-export type ReadyCheckData = Response & {
-  data?: Record<string, any>;
-};
-
 export interface GetTestParams {
   /** 错误类型 */
   type?:
@@ -470,34 +531,73 @@ export type ErrParamDetailData = Response & {
   data?: Record<string, any>;
 };
 
+export interface GetTodoListParams {
+  /** 页码 */
+  page?: number;
+  /** 每页数量 */
+  limit?: number;
+  /** 完成状态 */
+  completed?: boolean;
+}
+
+export type GetTodoListData = Response & {
+  data?: Record<string, any>;
+};
+
+export type CreateTodoData = Response & {
+  data?: TodoResponse;
+};
+
+export type UpdateTodoPositionsData = Response & {
+  data?: Record<string, any>;
+};
+
+export type RebalanceTodoPositionsData = Response & {
+  data?: Record<string, any>;
+};
+
+export type GetTodoStatsData = Response & {
+  data?: Record<string, any>;
+};
+
+export type GetTodoByIdData = Response & {
+  data?: TodoResponse;
+};
+
+export type UpdateTodoData = Response & {
+  data?: TodoResponse;
+};
+
+export type DeleteTodoData = Response & {
+  data?: Record<string, any>;
+};
+
+export type ToggleTodoCompleteData = Response & {
+  data?: TodoResponse;
+};
+
 export type ChangePasswordCreateData = Response & {
   data?: Record<string, any>;
 };
 
-export type LoginCreateData = Response & {
-  data?: {
-    token?: string;
-    user?: UserResponse;
-  };
+export type LoginData = Response & {
+  data?: UserLoginResponse;
 };
 
 export type LogoutCreateData = Response & {
   data?: Record<string, any>;
 };
 
-export type ProfileListData = Response & {
+export type GetProfileData = Response & {
   data?: UserResponse;
 };
 
-export type ProfileUpdateData = Response & {
+export type UpdateProfileData = Response & {
   data?: UserResponse;
 };
 
-export type RegisterCreateData = Response & {
-  data?: {
-    token?: string;
-    user?: UserResponse;
-  };
+export type RegisterData = Response & {
+  data?: UserCreateResponse;
 };
 
 import type {
@@ -709,12 +809,12 @@ export class Api<
      * @description 管理员分页获取系统中所有用户的列表，支持分页查询
      *
      * @tags Admin
-     * @name UsersList
+     * @name GetUsers
      * @summary 获取用户列表
      * @request GET:/admin/users
      */
-    usersList: (query: UsersListParams, params: RequestParams = {}) =>
-      this.request<UsersListData, any>({
+    getUsers: (query: GetUsersParams, params: RequestParams = {}) =>
+      this.request<GetUsersData, any>({
         path: `/admin/users`,
         method: "GET",
         query: query,
@@ -725,12 +825,12 @@ export class Api<
      * @description 管理员根据用户ID获取指定用户的详细信息，用于用户管理
      *
      * @tags Admin
-     * @name UsersDetail
+     * @name GetUserById
      * @summary 根据ID获取用户信息
      * @request GET:/admin/users/{id}
      */
-    usersDetail: (id: string, params: RequestParams = {}) =>
-      this.request<UsersDetailData, any>({
+    getUserById: (id: string, params: RequestParams = {}) =>
+      this.request<GetUserByIdData, any>({
         path: `/admin/users/${id}`,
         method: "GET",
         ...params,
@@ -740,12 +840,12 @@ export class Api<
      * @description 管理员删除指定用户账户，此操作将永久删除用户数据，请谨慎使用
      *
      * @tags Admin
-     * @name UsersDelete
+     * @name DeleteUser
      * @summary 删除用户
      * @request DELETE:/admin/users/{id}
      */
-    usersDelete: (id: string, params: RequestParams = {}) =>
-      this.request<UsersDeleteData, any>({
+    deleteUser: (id: string, params: RequestParams = {}) =>
+      this.request<DeleteUserData, any>({
         path: `/admin/users/${id}`,
         method: "DELETE",
         ...params,
@@ -755,12 +855,12 @@ export class Api<
      * @description 管理员激活指定用户账户，激活后用户可以正常登录和使用系统
      *
      * @tags Admin
-     * @name UsersActivateCreate
+     * @name ActivateUser
      * @summary 激活用户
      * @request POST:/admin/users/{id}/activate
      */
-    usersActivateCreate: (id: string, params: RequestParams = {}) =>
-      this.request<UsersActivateCreateData, any>({
+    activateUser: (id: string, params: RequestParams = {}) =>
+      this.request<ActivateUserData, any>({
         path: `/admin/users/${id}/activate`,
         method: "POST",
         ...params,
@@ -1019,38 +1119,6 @@ export class Api<
         ...params,
       }),
   };
-  health = {
-    /**
-     * @description 检查应用程序的基本健康状态，返回服务信息和版本号
-     *
-     * @tags Health
-     * @name HealthCheck
-     * @summary 健康检查
-     * @request GET:/health
-     */
-    healthCheck: (params: RequestParams = {}) =>
-      this.request<HealthCheckData, any>({
-        path: `/health`,
-        method: "GET",
-        ...params,
-      }),
-  };
-  live = {
-    /**
-     * @description 检查应用程序的 liveness 状态，返回服务信息和版本号
-     *
-     * @tags Health
-     * @name LiveCheck
-     * @summary 存活检查
-     * @request GET:/live
-     */
-    liveCheck: (params: RequestParams = {}) =>
-      this.request<LiveCheckData, any>({
-        path: `/live`,
-        method: "GET",
-        ...params,
-      }),
-  };
   oss = {
     /**
      * @description 删除OSS文件
@@ -1185,22 +1253,6 @@ export class Api<
         ...params,
       }),
   };
-  ready = {
-    /**
-     * @description 检查应用程序的 readiness 状态，返回服务信息和版本号
-     *
-     * @tags Health
-     * @name ReadyCheck
-     * @summary 就绪检查
-     * @request GET:/ready
-     */
-    readyCheck: (params: RequestParams = {}) =>
-      this.request<ReadyCheckData, any>({
-        path: `/ready`,
-        method: "GET",
-        ...params,
-      }),
-  };
   test = {
     /**
      * @description 用于测试前端对各种HTTP状态码和错误响应的处理，支持通过参数指定错误类型
@@ -1314,6 +1366,156 @@ export class Api<
         ...params,
       }),
   };
+  todos = {
+    /**
+     * @description 分页获取TODO列表，按position升序排列，支持按完成状态筛选
+     *
+     * @tags TODO
+     * @name GetTodoList
+     * @summary 获取TODO列表
+     * @request GET:/todos
+     */
+    getTodoList: (query: GetTodoListParams, params: RequestParams = {}) =>
+      this.request<GetTodoListData, any>({
+        path: `/todos`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description 创建新的TODO项，支持设置标题、描述、优先级、位置和截止日期。不指定position时自动分配到最后
+     *
+     * @tags TODO
+     * @name CreateTodo
+     * @summary 创建TODO
+     * @request POST:/todos
+     */
+    createTodo: (request: TodoCreateRequest, params: RequestParams = {}) =>
+      this.request<CreateTodoData, any>({
+        path: `/todos`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 批量更新TODO项的位置，支持拖拽排序功能
+     *
+     * @tags TODO
+     * @name UpdateTodoPositions
+     * @summary 批量更新TODO位置
+     * @request PUT:/todos/positions
+     */
+    updateTodoPositions: (
+      request: TodoPositionUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<UpdateTodoPositionsData, any>({
+        path: `/todos/positions`,
+        method: "PUT",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 重新平衡所有TODO项的位置值，当位置值变得过小时使用
+     *
+     * @tags TODO
+     * @name RebalanceTodoPositions
+     * @summary 重新平衡TODO位置
+     * @request POST:/todos/rebalance
+     */
+    rebalanceTodoPositions: (params: RequestParams = {}) =>
+      this.request<RebalanceTodoPositionsData, any>({
+        path: `/todos/rebalance`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * @description 获取TODO的统计信息，包括总数、完成数、待完成数
+     *
+     * @tags TODO
+     * @name GetTodoStats
+     * @summary 获取TODO统计信息
+     * @request GET:/todos/stats
+     */
+    getTodoStats: (params: RequestParams = {}) =>
+      this.request<GetTodoStatsData, any>({
+        path: `/todos/stats`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * @description 根据唯一标识符获取指定的TODO项详细信息
+     *
+     * @tags TODO
+     * @name GetTodoById
+     * @summary 根据ID获取TODO
+     * @request GET:/todos/{id}
+     */
+    getTodoById: (id: string, params: RequestParams = {}) =>
+      this.request<GetTodoByIdData, any>({
+        path: `/todos/${id}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * @description 根据ID更新现有TODO项的内容，支持更新标题、描述、完成状态、优先级、位置等
+     *
+     * @tags TODO
+     * @name UpdateTodo
+     * @summary 更新TODO
+     * @request PUT:/todos/{id}
+     */
+    updateTodo: (
+      id: string,
+      request: TodoUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<UpdateTodoData, any>({
+        path: `/todos/${id}`,
+        method: "PUT",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 根据ID永久删除指定的TODO项，操作不可逆
+     *
+     * @tags TODO
+     * @name DeleteTodo
+     * @summary 删除TODO
+     * @request DELETE:/todos/{id}
+     */
+    deleteTodo: (id: string, params: RequestParams = {}) =>
+      this.request<DeleteTodoData, any>({
+        path: `/todos/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * @description 快速切换TODO项的完成状态（完成/未完成）
+     *
+     * @tags TODO
+     * @name ToggleTodoComplete
+     * @summary 切换TODO完成状态
+     * @request PATCH:/todos/{id}/toggle
+     */
+    toggleTodoComplete: (id: string, params: RequestParams = {}) =>
+      this.request<ToggleTodoCompleteData, any>({
+        path: `/todos/${id}/toggle`,
+        method: "PATCH",
+        ...params,
+      }),
+  };
   users = {
     /**
      * @description 用户修改自己的登录密码，需要提供旧密码进行验证
@@ -1339,12 +1541,12 @@ export class Api<
      * @description 用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息
      *
      * @tags Auth
-     * @name LoginCreate
+     * @name Login
      * @summary 用户登录
      * @request POST:/users/login
      */
-    loginCreate: (request: UserLoginRequest, params: RequestParams = {}) =>
-      this.request<LoginCreateData, any>({
+    login: (request: UserLoginRequest, params: RequestParams = {}) =>
+      this.request<LoginData, any>({
         path: `/users/login`,
         method: "POST",
         body: request,
@@ -1371,12 +1573,12 @@ export class Api<
      * @description 获取当前登录用户的个人资料信息，包括基本信息、角色等
      *
      * @tags User
-     * @name ProfileList
+     * @name GetProfile
      * @summary 获取用户信息
      * @request GET:/users/profile
      */
-    profileList: (params: RequestParams = {}) =>
-      this.request<ProfileListData, any>({
+    getProfile: (params: RequestParams = {}) =>
+      this.request<GetProfileData, any>({
         path: `/users/profile`,
         method: "GET",
         ...params,
@@ -1386,12 +1588,12 @@ export class Api<
      * @description 更新当前登录用户的个人资料，如用户名、邮箱、头像等信息
      *
      * @tags User
-     * @name ProfileUpdate
+     * @name UpdateProfile
      * @summary 更新用户信息
      * @request PUT:/users/profile
      */
-    profileUpdate: (request: UserUpdateRequest, params: RequestParams = {}) =>
-      this.request<ProfileUpdateData, any>({
+    updateProfile: (request: UserUpdateRequest, params: RequestParams = {}) =>
+      this.request<UpdateProfileData, any>({
         path: `/users/profile`,
         method: "PUT",
         body: request,
@@ -1403,12 +1605,12 @@ export class Api<
      * @description 新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证
      *
      * @tags Auth
-     * @name RegisterCreate
+     * @name Register
      * @summary 用户注册
      * @request POST:/users/register
      */
-    registerCreate: (request: UserCreateRequest, params: RequestParams = {}) =>
-      this.request<RegisterCreateData, any>({
+    register: (request: UserCreateRequest, params: RequestParams = {}) =>
+      this.request<RegisterData, any>({
         path: `/users/register`,
         method: "POST",
         body: request,

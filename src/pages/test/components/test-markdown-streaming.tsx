@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 /** Markdown流式测试 */
-export const TestMarkdownStreaming = () => {
+const TestMarkdownStreaming = () => {
 	const [content, setContent] = useState('')
 	const [isStreaming, setIsStreaming] = useState(false)
 	const [isStream, setIsStream] = useState(true)
@@ -134,3 +134,5 @@ function hello() {
 		</div>
 	)
 }
+
+export default TestMarkdownStreaming;

@@ -160,5 +160,5 @@ func (h *CrudHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "Record deleted successfully"})
+	response.SuccessMsg(c, "Record deleted successfully")
 }

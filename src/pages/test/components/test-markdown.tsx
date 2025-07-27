@@ -3,7 +3,7 @@ import { Markdown } from '@/components/common/markdown'
 /**
  * Markdown 组件测试
  */
-export const TestMarkdown = () => {
+const TestMarkdown = () => {
 	const testCases = [
 		{
 			title: '基础语法',
@@ -156,3 +156,5 @@ for i in range(10):
 		</div>
 	)
 }
+
+export default TestMarkdown;

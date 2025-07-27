@@ -1,19 +1,46 @@
 import { useState, useRef, CSSProperties, useEffect } from 'react'
-import { Eye, Plus, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn, useUnmount } from 'ahooks'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { Loading } from './loading'
 
 /**
  * 图片预览组件
  */
 export const ImagePreview = (props: ImagePreviewProps) => {
-	const { url, defaultUrl, notEditable = false, onUpload, onDelete, onChange, onCustomUpload, onCustomDelete, onCustomUploadError, className, style, children, width, height, size, aspectRatio, base64Mode = false, noInteraction = false, noHover = false } = props
+	const {
+		url,
+		defaultUrl,
+		loading,
+		noEditable = false,
+		noPreview = false,
+		noHover = false,
+		noInteraction = false,
+		onUpload,
+		onDelete,
+		onChange,
+		onCustomUpload,
+		onCustomDelete,
+		onCustomUploadError,
+		onLoadingChange,
+		className,
+		style,
+		children,
+		width,
+		height,
+		size,
+		aspectRatio,
+		base64Mode = false,
+	} = props
 	const [intUrl, setInternalUrl] = useState(defaultUrl || '')
-	const [loading, setLoading] = useState(false)
-	const editable = !notEditable && !noInteraction && !loading
+	const [internalLoading, setInternalLoading] = useState(false)
+
+	// 当前实际的loading状态：外部传入优先，否则使用内部状态
+	const currentLoading = loading !== undefined ? loading : internalLoading
+
 	const objUrlRef = useRef('') // object url
 	const curUrl = url ?? intUrl
 
@@ -81,7 +108,8 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 		// 如果有自定义上传函数，使用异步上传
 		if (onCustomUpload) {
-			setLoading(true)
+			setInternalLoading(true)
+			onLoadingChange?.(true)
 			try {
 				const uploadedUrl = await onCustomUpload(f)
 				if (uploadedUrl) {
@@ -95,7 +123,8 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 			} catch (error) {
 				onCustomUploadError?.(error as Error, f)
 			} finally {
-				setLoading(false)
+				setInternalLoading(false)
+				onLoadingChange?.(false)
 			}
 		} else {
 			// 原有逻辑：本地预览
@@ -131,7 +160,7 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 		// 如果有自定义删除函数，后台静默执行（不等待）
 		if (onCustomDelete) {
-			onCustomDelete().catch(error => {
+			onCustomDelete().catch((error) => {
 				console.error('[ImagePreview] Custom delete failed:', error)
 				// 静默处理错误，不影响UI
 			})
@@ -150,9 +179,18 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 		...style,
 	}
 
+	const canHover = !noHover && !noPreview && !noInteraction && !currentLoading // preview不允许，也没有hover
+	const canPreview = !noPreview && !noInteraction && !currentLoading
+	const editable = !noEditable && !noInteraction && !currentLoading
+
+	const handleOpenChange = (open: boolean) => {
+		if (!canPreview) return
+		setOpen(open)
+	}
+
 	const isCustom = !!children
 
-	// 如果没有URL，显示空状态或上传按钮
+	// 如果没有URL，并且非自定义，显示空状态或上传按钮
 	if (!curUrl && !isCustom) {
 		return (
 			<>
@@ -170,38 +208,37 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 
 	return (
 		<>
-			<Dialog open={open} onOpenChange={noHover || noInteraction || loading ? undefined : setOpen}>
+			<Dialog open={open} onOpenChange={handleOpenChange}>
 				<DialogTrigger asChild>
+					{/* custom仅实现点击 preview，其他hover loading自行处理 */}
 					{isCustom ? (
 						<div className={className} style={cardStyle}>
 							{children}
 						</div>
 					) : (
-						<div className={cn('relative overflow-hidden rounded-lg', !noHover && !noInteraction && !loading && 'cursor-pointer', className)} style={cardStyle} onMouseEnter={!noHover && !noInteraction && !loading ? () => setHover(true) : undefined} onMouseLeave={!noHover && !noInteraction && !loading ? () => setHover(false) : undefined}>
+						<div
+							className={cn('relative overflow-hidden rounded-lg', canHover && 'cursor-pointer', className)}
+							style={cardStyle}
+							onMouseEnter={canHover ? () => setHover(true) : undefined}
+							onMouseLeave={canHover ? () => setHover(false) : undefined}
+						>
 							{/* 图片 */}
 							<div className="absolute inset-0">
 								<img src={curUrl} alt="预览图片" className="w-full h-full object-cover" />
 							</div>
 
 							{/* 预览眼睛 */}
-							{!noHover && !noInteraction && !loading && (
+							{canHover && (
 								<div className={cn('absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity', hover ? 'opacity-100' : 'opacity-0')}>
 									<Eye className="w-6 h-6 text-white" />
 								</div>
 							)}
 
 							{/* Loading浮层 */}
-							{loading && (
-								<div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-									<div className="flex flex-col items-center gap-2">
-										<Loader2 className="w-6 h-6 animate-spin text-white" />
-										<span className="text-xs text-white">处理中...</span>
-									</div>
-								</div>
-							)}
+							<Loading loading={currentLoading} className="text-white" />
 
 							{/* 删除按钮 */}
-							{editable && !loading && <Trash2 className="absolute top-1 right-1 w-6 h-6 text-white hover:text-red-400 p-1 cursor-pointer transition-colors" onClick={handleDelete} />}
+							{editable && <Trash2 className="absolute top-1 right-1 w-6 h-6 text-white hover:text-red-400 p-1 cursor-pointer transition-colors" onClick={handleDelete} />}
 						</div>
 					)}
 				</DialogTrigger>
@@ -230,15 +267,18 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 export type ImagePreviewProps = {
 	url?: string // 外部控制的图片URL，优先级高于内部状态
 	defaultUrl?: string // 默认图片URL，仅在组件初始化时生效
-	notEditable?: boolean // 是否不可编辑，默认false（即默认可编辑）
-	noInteraction?: boolean // 是否禁用所有交互功能（上传、删除、悬停效果），默认false
-	noHover?: boolean // 是否禁用悬停效果和点击预览，默认false
+	loading?: boolean // 外部控制的loading状态，undefined时使用内部状态
+	noEditable?: boolean // 是否不可编辑，既不允许上传和删除，默认false
+	noHover?: boolean // 是否禁用悬停效果，默认false
+	noPreview?: boolean // 注意 noHover 只是禁用 hover，但是不是禁用预览
+	noInteraction?: boolean // 效果等于 noHover + noEditable
 	onUpload?: (file: File, url?: string) => void // 文件上传完成回调，返回文件和URL（如有）
 	onDelete?: () => void // 删除完成回调
 	onChange?: (url: string | undefined) => void // URL变化回调，上传和删除时都会调用
 	onCustomUpload?: (file: File) => Promise<string | undefined> // 自定义异步上传函数，返回URL
 	onCustomDelete?: () => Promise<void> // 自定义异步删除函数
 	onCustomUploadError?: (error: Error, file: File) => void // 自定义上传错误回调
+	onLoadingChange?: (loading: boolean) => void // loading状态变化回调
 	className?: string // 样式类名
 	style?: CSSProperties // 内联样式
 	children?: React.ReactNode // 插槽内容，优先级高于默认图片渲染

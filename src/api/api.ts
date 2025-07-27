@@ -50,28 +50,34 @@ api.instance.interceptors.response.use(
 		return response
 	},
 	(error) => {
-		const config = error.config
+		// 如果error，且自动处理，那么resolve null
 
-		if (config?.noErrorToast) {
-			return Promise.resolve({ data: null })
+		const response = error.response
+		const config = error.config || {}
+		const { noErrorToast, silent } = config
+		// 错误优先级 业务错误 -> 响应码错误 -> 请求失败
+		const errMsg = response?.data?.msg || response?.data?.message || response?.statusText || response?.status || error.message || '请求失败'
+
+		// 默认的内部自动error toast
+		if (!noErrorToast || silent) {
+			if (!silent) {
+				notify.error('请求错误', {
+					description: errMsg,
+				})
+			}
+			return Promise.resolve(null)
 		}
 
-		// 默认显示错误提示
-		const message = error.response?.data?.message || error.message || '请求失败'
-		notify.error('请求错误', {
-			description: message,
-			duration: 4000,
-		})
-
-		return Promise.reject(error)
+		return Promise.reject(errMsg)
 	}
 )
 
 // 目前似乎只能这么拓展
 declare module 'axios' {
 	export interface AxiosRequestConfig {
-		noAuth?: boolean
-		noErrorToast?: boolean
+		noAuth?: boolean // 是否跳过认证header
+		noErrorToast?: boolean // 是否不需要内部自动处理错误提示，并且返回 null
+		silent?: boolean // 彻底静音，此时错误静默返回 null
 	}
 }
 

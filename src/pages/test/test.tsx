@@ -13,76 +13,68 @@ import {
 	SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { isDev } from '@/utils/env'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { TestAIAgent } from './components/test-ai-agent'
-import { TestChatMsg } from './components/test-chat-msg'
-import { TestCustom } from './components/test-custom'
-import { TestDummy } from './components/test-dummy'
-import { TestGrid } from './components/test-grid'
-import { TestImgPrevSmart } from './components/test-img-prev-smart'
-import { TestImgPreview } from './components/test-img-preview'
-import { TestMarkdown } from './components/test-markdown'
-import { TestMarkdownMermaid } from './components/test-markdown-mermaid'
-import { TestMarkdownStreaming } from './components/test-markdown-streaming'
-import { TestMultiSelector } from './components/test-multi-selector'
-import { TestNotify } from './components/test-notify'
-import { TestOSS } from './components/test-oss'
-import { TestShadcn } from './components/test-shadcn'
-import { TestShimmer } from './components/test-shimmer'
-import { TestShimmerOp } from './components/test-shimmer-op'
-import { TestStreamText } from './components/test-stream-text'
-import { TestTwBreakpoint } from './components/test-tw-breakpoint'
-import { TestUserAvatar } from './components/test-user-avatar'
-import { TestVideoPreview } from './components/test-video-preview'
-import { TestErrorHandling } from './components/test-error-handling'
+import { useMount, useUpdate } from 'ahooks'
+import { testMgr } from './test-mgr'
 
 let Test = () => <div>Test</div>
 
 if (isDev) {
 	Test = () => {
 		const [searchParams, setSearchParams] = useSearchParams()
+		const [selectedComponent, setSelectedComponent] = useState<React.ComponentType | null>(null)
+		const [loading, setLoading] = useState(false)
+		const [keys, setKeys] = useState<string[]>([])
+		const update = useUpdate()
 
-		const config = {
-			custom: <TestCustom />,
-			shadcn: <TestShadcn />,
-			notify: <TestNotify />,
-			errorHandling: <TestErrorHandling />,
-			multiSelector: <TestMultiSelector />,
-			dummy: <TestDummy />,
-			image: <TestImgPreview />,
-			imageSmartSizing: <TestImgPrevSmart />,
-			userAvatar: <TestUserAvatar />,
-			video: <TestVideoPreview />,
-			oss: <TestOSS />,
-			aiAgent: <TestAIAgent />,
-			chatMsg: <TestChatMsg />,
-			markdown: <TestMarkdown />,
-			mermaid: <TestMarkdownMermaid />,
-			markdownStreaming: <TestMarkdownStreaming />,
-			shimmer: <TestShimmer />,
-			shimmerOp: <TestShimmerOp />,
-			streamText: <TestStreamText />,
-			twBreakpoint: <TestTwBreakpoint />,
-			grid: <TestGrid />,
-		} as const
-
-		const keys = Object.keys(config) as Array<keyof typeof config>
-		const currTest = searchParams.get('test')
+		useMount(() => {
+			testMgr.init()
+			setKeys(testMgr.getKeys())
+			update()
+		})
+		const currTest = searchParams.get('t')
 
 		// 确定当前选中的测试用例
-		const selectedKey = currTest && keys.includes(currTest as keyof typeof config) ? (currTest as keyof typeof config) : keys[0]
+		const selectedKey = currTest && keys.includes(currTest) ? currTest : keys[0]
+
+		// 加载组件
+		const loadComponent = async (key: string) => {
+			if (!key) return
+			setLoading(true)
+			try {
+				const Component = await testMgr.load(key)
+				setSelectedComponent(() => Component)
+			} catch (error) {
+				console.error('Failed to load component:', error)
+				setSelectedComponent(null)
+			} finally {
+				setLoading(false)
+			}
+		}
 
 		// 初始化时同步 URL 参数
 		useEffect(() => {
-			if (!currTest || !keys.includes(currTest as keyof typeof config)) {
-				setSearchParams({ test: keys[0] })
+			if (!currTest || !keys.includes(currTest)) {
+				if (keys[0]) {
+					setSearchParams({ t: keys[0] })
+				}
+			} else {
+				loadComponent(currTest)
 			}
-		}, [currTest, keys, setSearchParams])
+		}, [currTest, keys.join(','), setSearchParams])
 
 		// 切换测试用例
-		const handleTestChange = (key: keyof typeof config) => {
-			setSearchParams({ test: key })
+		const handleTestChange = (key: string) => {
+			setSearchParams({ t: key })
+			loadComponent(key)
+		}
+
+		const renderComponent = () => {
+			if (loading) return <div className="p-4">Loading...</div>
+			if (!selectedComponent) return <div className="p-4">Component not found</div>
+			const Component = selectedComponent
+			return <Component />
 		}
 
 		return (
@@ -114,7 +106,7 @@ if (isDev) {
 						<SidebarTrigger />
 						<h1 className="text-lg font-semibold">{selectedKey} 测试</h1>
 					</header>
-					<div>{config[selectedKey]}</div>
+					<div>{renderComponent()}</div>
 				</SidebarInset>
 			</SidebarProvider>
 		)

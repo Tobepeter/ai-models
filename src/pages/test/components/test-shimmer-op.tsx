@@ -3,7 +3,7 @@ import { ShimmerOp } from '@/components/common/shimmer-op'
 /**
  * 测试基于 opacity 的 shimmer 效果组件
  */
-export const TestShimmerOp = () => {
+const TestShimmerOp = () => {
 	return (
 		<div className="p-6 max-w-2xl mx-auto">
 			<div className="space-y-6">
@@ -47,3 +47,5 @@ export const TestShimmerOp = () => {
 		</div>
 	)
 }
+
+export default TestShimmerOp;

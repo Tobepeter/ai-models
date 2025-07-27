@@ -38,6 +38,16 @@ type UserCreateRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type UserCreateResponse struct {
+	User  UserResponse `json:"user"`
+	Token string       `json:"token"`
+}
+
+type UserLoginResponse struct {
+	User  UserResponse `json:"user"`
+	Token string       `json:"token"`
+}
+
 /**
  * 用户登录请求结构体
  */
@@ -90,3 +100,8 @@ func (u *User) ToResponse() UserResponse {
 		UpdatedAt: u.UpdatedAt,
 	}
 }
+
+/**
+ * 用户列表分页响应结构体
+ */
+type UserListResponse = PaginationResponse[UserResponse]

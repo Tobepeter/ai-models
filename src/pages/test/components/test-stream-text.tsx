@@ -7,7 +7,7 @@ import { useState } from 'react'
 /**
  * 测试聊天流式输出效果
  */
-export const TestStreamText = () => {
+const TestStreamText = () => {
 	const [displayText, setDisplayText] = useState('')
 	const [isRunning, setIsRunning] = useState(false)
 	const [currIdx, setCurrIdx] = useState(0)
@@ -116,3 +116,5 @@ function hello(name) {
 		</div>
 	)
 }
+
+export default TestStreamText;

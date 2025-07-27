@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 /**
  * 聊天消息组件测试
  */
-export const TestChatMsg = () => {
+const TestChatMsg = () => {
 	const testMsgs: Msg[] = [
 		// 用户文本消息
 		{
@@ -338,3 +338,5 @@ classDiagram
 		</div>
 	)
 }
+
+export default TestChatMsg;

@@ -1,12 +1,12 @@
-import { generateApi } from 'swagger-typescript-api'
-import { join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
-import { projectRoot } from './utils/env'
-import chokidar from 'chokidar'
-import { globby } from 'globby'
 import { spawn } from 'child_process'
+import chokidar from 'chokidar'
 import { Command } from 'commander'
+import { existsSync, mkdirSync } from 'fs'
 import { debounce } from 'lodash-es'
+import { join } from 'path'
+import { generateApi } from 'swagger-typescript-api'
+import { projectRoot } from './utils/env'
+import { genApiTool } from './utils/gen-api-tool'
 
 const program = new Command()
 
@@ -108,16 +108,22 @@ async function genApiTypes() {
 		const { files } = await generateApi({
 			fileName: cfg.outFile,
 			output: cfg.outDir,
+			// 可选：使用自定义模板（需要进一步完善）
+			// templates: join(projectRoot, 'templates'),
 			...src,
 			...apiGenOpts,
 		})
 		console.log('✅ TypeScript API 类型生成完成:')
 		files.forEach((f) => console.log('  -', f.fileName || 'generated'))
+
+		// NOTE: 现在可以使用 genApiTool.fixResponseTypes() 来修复类型
+		// await genApiTool.fixResponseTypes(join(cfg.outDir, cfg.outFile))
 	} catch (e) {
 		console.error('❌ API 类型生成失败:', e)
 		throw e
 	}
 }
+
 
 // 主函数
 async function main() {

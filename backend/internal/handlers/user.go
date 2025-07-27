@@ -27,9 +27,10 @@ func NewUserHandler(userService *services.UserService, authService *auth.AuthSer
 
 // @Summary 用户注册
 // @Description 新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证
+// @ID register
 // @Tags Auth
 // @Param request body models.UserCreateRequest true "注册请求"
-// @Success 200 {object} response.Response{data=object{user=models.UserResponse,token=string}}
+// @Success 200 {object} response.Response{data=models.UserCreateResponse}
 // @Router /users/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req models.UserCreateRequest
@@ -46,9 +47,9 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	data := gin.H{
-		"user":  user.ToResponse(),
-		"token": token,
+	data := models.UserCreateResponse{
+		User:  user.ToResponse(),
+		Token: token,
 	}
 
 	response.Success(c, data)
@@ -56,9 +57,10 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 // @Summary 用户登录
 // @Description 用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息
+// @ID login
 // @Tags Auth
 // @Param request body models.UserLoginRequest true "登录请求"
-// @Success 200 {object} response.Response{data=object{user=models.UserResponse,token=string}}
+// @Success 200 {object} response.Response{data=models.UserLoginResponse}
 // @Router /users/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 	var req models.UserLoginRequest
@@ -75,9 +77,9 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	data := gin.H{
-		"user":  user.ToResponse(),
-		"token": token,
+	data := models.UserLoginResponse{
+		User:  user.ToResponse(),
+		Token: token,
 	}
 
 	response.Success(c, data)
@@ -85,6 +87,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 // @Summary 获取用户信息
 // @Description 获取当前登录用户的个人资料信息，包括基本信息、角色等
+// @ID getProfile
 // @Tags User
 // @Success 200 {object} response.Response{data=models.UserResponse}
 // @Router /users/profile [get]
@@ -107,6 +110,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 // @Summary 更新用户信息
 // @Description 更新当前登录用户的个人资料，如用户名、邮箱、头像等信息
+// @ID updateProfile
 // @Tags User
 // @Param request body models.UserUpdateRequest true "更新请求"
 // @Success 200 {object} response.Response{data=models.UserResponse}
@@ -137,10 +141,11 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 
 // @Summary 获取用户列表
 // @Description 管理员分页获取系统中所有用户的列表，支持分页查询
+// @ID getUsers
 // @Tags Admin
 // @Param page query int true "页码"
 // @Param limit query int true "每页数量"
-// @Success 200 {object} response.Response{data=map[string]any}
+// @Success 200 {object} response.Response{data=models.UserListResponse}
 // @Router /admin/users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -158,6 +163,7 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 
 // @Summary 删除用户
 // @Description 管理员删除指定用户账户，此操作将永久删除用户数据，请谨慎使用
+// @ID deleteUser
 // @Tags Admin
 // @Param id path string true "用户ID"
 // @Success 200 {object} response.Response{data=map[string]any}
@@ -176,11 +182,12 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "User deleted successfully"})
+	response.SuccessMsg(c, "User deleted successfully")
 }
 
 // @Summary 根据ID获取用户信息
 // @Description 管理员根据用户ID获取指定用户的详细信息，用于用户管理
+// @ID getUserByID
 // @Tags Admin
 // @Param id path string true "用户ID"
 // @Success 200 {object} response.Response{data=models.UserResponse}
@@ -206,6 +213,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 // @Summary 激活用户
 // @Description 管理员激活指定用户账户，激活后用户可以正常登录和使用系统
+// @ID activateUser
 // @Tags Admin
 // @Param id path string true "用户ID"
 // @Success 200 {object} response.Response{data=map[string]any}
@@ -224,7 +232,7 @@ func (h *UserHandler) ActivateUser(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "User activated successfully"})
+	response.SuccessMsg(c, "User activated successfully")
 }
 
 // @Summary 停用用户
@@ -247,7 +255,7 @@ func (h *UserHandler) DeactivateUser(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "User deactivated successfully"})
+	response.SuccessMsg(c, "User deactivated successfully")
 }
 
 // @Summary 修改密码
@@ -282,7 +290,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "密码修改成功"})
+	response.SuccessMsg(c, "密码修改成功")
 }
 
 // @Summary 用户退出登录
@@ -307,5 +315,5 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	// 将token添加到黑名单
 	h.authService.Logout(token)
 
-	response.Success(c, gin.H{"message": "退出登录成功"})
+	response.SuccessMsg(c, "退出登录成功")
 }

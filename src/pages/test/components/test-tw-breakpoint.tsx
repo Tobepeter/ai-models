@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const TestTwBreakpoint = () => {
+const TestTwBreakpoint = () => {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
 	useEffect(() => {
@@ -147,3 +147,5 @@ export const TestTwBreakpoint = () => {
 		</div>
 	)
 }
+
+export default TestTwBreakpoint;

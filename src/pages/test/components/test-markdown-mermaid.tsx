@@ -3,7 +3,7 @@ import { Markdown } from '@/components/common/markdown'
 /**
  * Markdown Mermaid 图表测试
  */
-export const TestMarkdownMermaid = () => {
+const TestMarkdownMermaid = () => {
 	const mermaidCases = [
 		{
 			title: '流程图 (Flowchart)',
@@ -202,3 +202,5 @@ flowchart LR
 		</div>
 	)
 }
+
+export default TestMarkdownMermaid;

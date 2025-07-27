@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const TestGrid = () => {
+const TestGrid = () => {
 	const [selectedExample, setSelectedExample] = useState('basic')
 
 	const examples = {
@@ -243,3 +243,5 @@ export const TestGrid = () => {
 		</div>
 	)
 }
+
+export default TestGrid;

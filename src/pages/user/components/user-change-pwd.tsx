@@ -1,9 +1,9 @@
+import { userApi } from '@/api/user/user-api'
 import { FormItem } from '@/components/common/form/form-item'
 import { FormLabel } from '@/components/common/form/form-label'
 import { FormPwd } from '@/components/common/form/form-pwd'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { authApi } from '@/api/auth/auth-api'
 import { useMemoizedFn } from 'ahooks'
 import { useState } from 'react'
 
@@ -69,7 +69,10 @@ export const UserChangePwd = (props: UserChangePwdProps) => {
 		setIsSubmitting(true)
 
 		try {
-			await authApi.changePassword(formData)
+			await userApi.updatePassword({
+				old_password: formData.oldPassword,
+				new_password: formData.newPassword,
+			})
 
 			// 重置表单
 			setFormData({

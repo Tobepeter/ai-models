@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 /**
  * 测试占位数据展示组件
  */
-export const TestDummy = () => {
+const TestDummy = () => {
 	const [playingVideo, setPlayingVideo] = useState<string | null>(null)
 	const [playingAudio, setPlayingAudio] = useState<string | null>(null)
 
@@ -179,3 +179,5 @@ export const TestDummy = () => {
 		</div>
 	)
 }
+
+export default TestDummy;

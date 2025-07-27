@@ -10,7 +10,7 @@ import { User, Heart, Star } from 'lucide-react'
 /**
  * UserAvatar 组件测试
  */
-export const TestUserAvatar = () => {
+const TestUserAvatar = () => {
 	const [avatarUrl, setAvatarUrl] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face')
 	const [customSize, setCustomSize] = useState(60)
 
@@ -73,6 +73,37 @@ export const TestUserAvatar = () => {
 				</CardContent>
 			</Card>
 
+			{/* 特殊状态 */}
+			<Card>
+				<CardHeader>
+					<CardTitle>特殊状态</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="flex items-center gap-6 flex-wrap">
+						<div className="text-center space-y-2">
+							<UserAvatar src={avatarUrl} size={60} fallbackText="张" />
+							<p className="text-xs text-muted-foreground">有图片忽略fallbackText</p>
+						</div>
+						<div className="text-center space-y-2">
+							<UserAvatar size={60} fallbackText="李四" />
+							<p className="text-xs text-muted-foreground">仅文字fallback</p>
+						</div>
+						<div className="text-center space-y-2">
+							<UserAvatar size={60} fallbackText="AB" />
+							<p className="text-xs text-muted-foreground">英文fallback</p>
+						</div>
+						<div className="text-center space-y-2">
+							<UserAvatar size={60} />
+							<p className="text-xs text-muted-foreground">静态图标fallback</p>
+						</div>
+						<div className="text-center space-y-2">
+							<UserAvatar src={avatarUrl} size={60} loading />
+							<p className="text-xs text-muted-foreground">加载中</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
 			{/* 点击行为测试 */}
 			<Card>
 				<CardHeader>
@@ -87,6 +118,10 @@ export const TestUserAvatar = () => {
 						<div className="text-center space-y-2">
 							<UserAvatar src={avatarUrl} size={60} noPreview />
 							<p className="text-xs text-muted-foreground">不可点击</p>
+						</div>
+						<div className="text-center space-y-2">
+							<UserAvatar size={60} fallbackText="预览" />
+							<p className="text-xs text-muted-foreground">文字可预览</p>
 						</div>
 					</div>
 				</CardContent>
@@ -124,3 +159,5 @@ export const TestUserAvatar = () => {
 		</div>
 	)
 }
+
+export default TestUserAvatar;

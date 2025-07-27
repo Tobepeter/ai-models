@@ -665,7 +665,7 @@ const CurrentButtonSelector = () => {
 	)
 }
 
-export const TestMultiSelector = () => {
+const TestMultiSelector = () => {
 	return (
 		<div className="space-y-8 p-6">
 			{/* 当前方式对比 */}
@@ -797,3 +797,5 @@ export const TestMultiSelector = () => {
 		</div>
 	)
 }
+
+export default TestMultiSelector;

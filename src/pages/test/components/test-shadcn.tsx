@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Heart, Star, Users, Settings, Mail } from 'lucide-react'
 
-export const TestShadcn = () => {
+const TestShadcn = () => {
 	return (
 		<div className="space-y-8">
 			{/* 按钮展示 */}
@@ -264,3 +264,5 @@ export const TestShadcn = () => {
 		</div>
 	)
 }
+
+export default TestShadcn;

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 /**
  * 测试视频预览组件
  */
-export const TestVideoPreview = () => {
+const TestVideoPreview = () => {
 	const [uploadedUrl, setUploadedUrl] = useState<string>('')
 	const [controllableUrl, setControllableUrl] = useState<string>(dummy.videos.bunny)
 
@@ -293,3 +293,5 @@ export const TestVideoPreview = () => {
 		</div>
 	)
 }
+
+export default TestVideoPreview;

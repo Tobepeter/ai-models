@@ -6,7 +6,7 @@ import { ImagePreview } from '@/components/common/image-preview'
 /**
  * 测试图片预览智能尺寸适配
  */
-export const TestImgPrevSmart = () => {
+const TestImgPrevSmart = () => {
 	const [selectedImage, setSelectedImage] = useState('')
 
 	// 测试用的不同尺寸图片
@@ -72,7 +72,7 @@ export const TestImgPrevSmart = () => {
 							<div key={idx} className="space-y-2">
 								<p className="text-sm font-medium">{img.name}</p>
 								<p className="text-xs text-gray-500">{img.description}</p>
-								<ImagePreview url={img.url} notEditable size={120} className="border" />
+								<ImagePreview url={img.url} noEditable size={120} className="border" />
 								<Button variant="outline" size="sm" onClick={() => setSelectedImage(img.url)} className="w-full">
 									设为当前测试图片
 								</Button>
@@ -90,7 +90,7 @@ export const TestImgPrevSmart = () => {
 								<br />• 是否保持原始宽高比
 							</p>
 							<div className="flex justify-center">
-								<ImagePreview url={selectedImage} notEditable size={200} className="border-2 border-blue-500" />
+								<ImagePreview url={selectedImage} noEditable size={200} className="border-2 border-blue-500" />
 							</div>
 							<div className="mt-4 text-center">
 								<Button variant="outline" onClick={() => setSelectedImage('')}>
@@ -104,3 +104,5 @@ export const TestImgPrevSmart = () => {
 		</div>
 	)
 }
+
+export default TestImgPrevSmart;

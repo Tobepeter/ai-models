@@ -13,7 +13,7 @@ const meta: Meta<typeof ImagePreview> = {
 			control: 'text',
 			description: '图片URL',
 		},
-		notEditable: {
+		noEditable: {
 			control: 'boolean',
 			description: '是否可编辑',
 		},
@@ -47,7 +47,7 @@ export const Default: Story = {
 export const Editable: Story = {
 	args: {
 		url: SAMPLE_IMAGE,
-		notEditable: true,
+		noEditable: true,
 	},
 }
 
@@ -94,9 +94,9 @@ export const MultipleImages: Story = {
 	render: () => (
 		<div className="flex gap-4 flex-wrap">
 			<ImagePreview url={SAMPLE_IMAGE} />
-			<ImagePreview url={SAMPLE_IMAGE} notEditable />
+			<ImagePreview url={SAMPLE_IMAGE} noEditable />
 			<ImagePreview />
-			<ImagePreview notEditable />
+			<ImagePreview noEditable />
 		</div>
 	),
 }

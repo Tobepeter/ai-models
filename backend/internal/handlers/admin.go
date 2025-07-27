@@ -6,6 +6,8 @@ import (
 	"ai-models-backend/pkg/response"
 	"net/http"
 
+	"ai-models-backend/internal/models"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -43,10 +45,10 @@ func (h *AdminHandler) GetSystemStatus(c *gin.Context) {
 		return
 	}
 
-	data := gin.H{
-		"total_users": totalUsers,
-		"admin_users": adminUsers,
-		"system_info": gin.H{
+	data := models.AdminStatsResponse{
+		TotalUsers: totalUsers,
+		AdminUsers: adminUsers,
+		SystemInfo: map[string]interface{}{
 			"version": "1.0.0",
 			"status":  "running",
 		},
@@ -81,5 +83,5 @@ func (h *AdminHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"message": "密码重置成功"})
+	response.SuccessMsg(c, "密码重置成功")
 }
