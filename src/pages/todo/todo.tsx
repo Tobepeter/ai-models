@@ -5,10 +5,12 @@ import { useState } from 'react'
 import { useTodoStore } from './todo-store'
 import { notify } from '@/components/common/notify'
 import { TodoItem } from './components/todo-item'
+import { DragList } from '@/components/common/drag-list'
 import type { TodoItem as TodoItemType } from './todo-types'
+import type { DragListItem } from '@/components/common/drag-list'
 
 export const Todo = () => {
-	const { todos, addTodo, updateTodo, deleteTodo } = useTodoStore()
+	const { todos, addTodo, updateTodo, deleteTodo, setTodos } = useTodoStore()
 	const [newTodoTitle, setNewTodoTitle] = useState('')
 
 	const handleAddTodo = () => {
@@ -51,14 +53,23 @@ export const Todo = () => {
 					const { todos: currentTodos, setData } = useTodoStore.getState()
 					const newTodos = [todo, ...currentTodos]
 					setData({ todos: newTodos })
-					notify.info('任务已恢复')
 				},
 			},
 		})
 	}
 
-	// 按创建时间倒序排列，新的在顶部
-	const sortedTodos = [...todos].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+	// 自定义渲染函数，用于 DragList 组件
+	const renderTodoItem = (item: DragListItem) => {
+		// 找到对应的 todo 对象
+		const todo = todos.find((t) => t.id.toString() === item.id) as TodoItemType
+		if (!todo) return null
+
+		return (
+			<div className="w-full">
+				<TodoItem todo={todo} onEdit={handleEdit} onDelete={handleDelete} />
+			</div>
+		)
+	}
 
 	return (
 		<div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -71,10 +82,11 @@ export const Todo = () => {
 						value={newTodoTitle}
 						onChange={(e) => setNewTodoTitle(e.target.value)}
 						onKeyDown={handleKeyDown}
-						className="text-lg h-12 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+						className="text-lg h-12 focus:ring-2 focus:ring-blue-500"
+						maxLength={50}
 					/>
 					<div>
-						<Button onClick={handleAddTodo} disabled={!newTodoTitle.trim()} className="h-12 px-6 transition-all duration-200">
+						<Button onClick={handleAddTodo} disabled={!newTodoTitle.trim()} className="h-12 px-6">
 							<Plus className="h-5 w-5" />
 						</Button>
 					</div>
@@ -83,7 +95,7 @@ export const Todo = () => {
 
 			{/* 任务列表 */}
 			<div className="space-y-3">
-				{sortedTodos.length === 0 ? (
+				{todos.length === 0 ? (
 					<div className="text-center py-12 text-muted-foreground">
 						<div>
 							<p>暂无任务</p>
@@ -91,7 +103,17 @@ export const Todo = () => {
 						</div>
 					</div>
 				) : (
-					sortedTodos.map((todo: TodoItemType) => <TodoItem key={todo.id} todo={todo} onEdit={handleEdit} onDelete={handleDelete} />)
+					<DragList
+						items={todos.map((todo) => ({ id: todo.id.toString(), title: todo.title }))}
+						onItemsChange={(items) => {
+							// 将排序后的items映射回todos数组
+							const updatedTodos = items.map((item) => {
+								return todos.find((t) => t.id.toString() === item.id)!
+							})
+							setTodos(updatedTodos)
+						}}
+						renderItem={renderTodoItem}
+					/>
 				)}
 			</div>
 		</div>

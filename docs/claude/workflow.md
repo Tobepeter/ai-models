@@ -8,9 +8,8 @@
 
 ## Typescript 开发流程
 
-- 代码修改后可以通过 `npm run type-check` 检查类型错误
-- 使用 `npm run lint:fix` 保持代码质量
-- 如无特殊说明，请不要主动启动项目
+- 大幅度重构，代码修改通过 `npm run type-check` 检查类型错误，以及 `lint`（不用太过频繁）
+- 如无特殊说明，请不要主动启动项目，如 `npm run dev`
 
 ## 语言
 

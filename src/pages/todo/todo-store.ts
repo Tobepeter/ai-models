@@ -46,6 +46,7 @@ type TodoState = typeof todoState
 interface TodoActions {
 	// 基础操作
 	setData: (data: Partial<TodoState>) => void
+	setTodos: (todos: TodoItem[]) => void
 
 	// TODO 操作
 	addTodo: (todo: TodoCreateRequest) => void
@@ -61,6 +62,7 @@ const stateCreator = () => {
 	return combine(todoState, (set, get) => ({
 		// 基础操作
 		setData: (data: Partial<TodoState>) => set(data),
+		setTodos: (todos: TodoItem[]) => set({ todos }),
 
 		// TODO 操作
 		addTodo: (todo: TodoCreateRequest) => {
