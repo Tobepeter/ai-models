@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
  * OSS上传进度组件
  * 显示文件上传的进度条
  */
-const TestOssUploadProgress = ({ uploading, progress }: TestOssUploadProgressProps) => {
+export const TestOssUploadProgress = ({ uploading, progress }: TestOssUploadProgressProps) => {
 	if (!uploading) return null
 
 	return (
@@ -30,4 +30,4 @@ export type TestOssUploadProgressProps = {
 	progress: number
 }
 
-export default TestOssUploadProgress;
+

@@ -6,13 +6,7 @@ import { OssAccessType, OssUploadResult } from '@/utils/oss/oss-types'
 import { useMount } from 'ahooks'
 import { type Credentials } from 'ali-oss'
 import { useRef, useState } from 'react'
-import { TestOssConfigInfo } from './test-oss-config-info'
-import { TestOssFileUpload } from './test-oss-file-upload'
-import { TestOssHeader } from './test-oss-header'
-import { TestOssPermissions } from './test-oss-permissions'
-import { TestOssResult } from './test-oss-result'
-import { TestOssUploadProgress } from './test-oss-upload-progress'
-import { TestOssUrlPreview } from './test-oss-url-preview'
+import { TestOssConfigInfo, TestOssFileUpload, TestOssHeader, TestOssPermissions, TestOssResult, TestOssUploadProgress, TestOssUrlPreview } from './oss'
 
 /**
  * OSS功能测试页面
@@ -180,34 +174,13 @@ const TestOSS = () => {
 		<div className="p-6 space-y-6">
 			<TestOssHeader />
 
-			<TestOssConfigInfo 
-				status={status}
-				sts={sts}
-				loading={loading}
-				onCheckStatus={checkStatus}
-				onGetSts={getSts}
-			/>
+			<TestOssConfigInfo status={status} sts={sts} loading={loading} onCheckStatus={checkStatus} onGetSts={getSts} />
 
-			<TestOssUploadProgress 
-				uploading={uploading}
-				progress={progress}
-			/>
+			<TestOssUploadProgress uploading={uploading} progress={progress} />
 
-			<TestOssFileUpload
-				uploading={uploading}
-				result={result}
-				fileRef={fileRef}
-				onUpload={handleUpload}
-				onSelectFile={selectFile}
-				onDeleteResult={deleteResult}
-			/>
+			<TestOssFileUpload uploading={uploading} result={result} fileRef={fileRef} onUpload={handleUpload} onSelectFile={selectFile} onDeleteResult={deleteResult} />
 
-			<TestOssUrlPreview
-				path={path}
-				preview={preview}
-				onPathChange={setPath}
-				onGetSignedUrl={getSignedUrl}
-			/>
+			<TestOssUrlPreview path={path} preview={preview} onPathChange={setPath} onGetSignedUrl={getSignedUrl} />
 
 			<TestOssPermissions
 				readPermission={readPerm}
@@ -230,4 +203,4 @@ const TestOSS = () => {
 	)
 }
 
-export default TestOss;
+export default TestOSS

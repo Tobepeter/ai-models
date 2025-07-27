@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
  * OSS URL预览组件
  * 输入OSS路径并获取签名URL进行预览
  */
-const TestOssUrlPreview = ({ path, preview, onPathChange, onGetSignedUrl }: TestOssUrlPreviewProps) => {
+export const TestOssUrlPreview = ({ path, preview, onPathChange, onGetSignedUrl }: TestOssUrlPreviewProps) => {
 	return (
 		<Card>
 			<CardHeader>
@@ -77,4 +77,4 @@ export type TestOssUrlPreviewProps = {
 	onGetSignedUrl?: () => void
 }
 
-export default TestOssUrlPreview;
+

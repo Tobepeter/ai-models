@@ -92,7 +92,7 @@ export const Register = () => {
 				})
 
 				// 静默刷新用户信息（不等待结果）
-				authApi.refreshUserInfo()
+				// authApi.refreshUserInfo()
 
 				// 直接跳转
 				navigate(redirectTo, { replace: true })

@@ -12,7 +12,7 @@ import { ossAccessKeyId } from '@/utils/env'
  * OSS权限配置组件
  * 配置读写权限、后端签名模式和AK密钥
  */
-const TestOssPermissions = ({
+export const TestOssPermissions = ({
 	readPermission,
 	writePermission,
 	backendSignMode,
@@ -171,4 +171,4 @@ export type TestOssPermissionsProps = {
 	onSaveAkConfig?: () => void
 }
 
-export default TestOssPermissions;
+

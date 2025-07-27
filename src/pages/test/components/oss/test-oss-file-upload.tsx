@@ -7,7 +7,7 @@ import { RefObject } from 'react'
  * OSS文件上传组件
  * 处理文件选择、上传和结果展示
  */
-const TestOssFileUpload = ({ uploading, result, fileRef, onUpload, onSelectFile, onDeleteResult }: TestOssFileUploadProps) => {
+export const TestOssFileUpload = ({ uploading, result, fileRef, onUpload, onSelectFile, onDeleteResult }: TestOssFileUploadProps) => {
 	return (
 		<Card>
 			<CardHeader>
@@ -90,4 +90,4 @@ export type TestOssFileUploadProps = {
 	onDeleteResult?: () => void
 }
 
-export default TestOssFileUpload;
+

@@ -25,7 +25,7 @@ const cfg = {
 	local: join(bePath, 'docs/swagger.json'),
 	remote: 'http://localhost:8080/swagger/doc.json', // gin-swagger 标准地址
 	outDir: join(projectRoot, 'src/api/types'),
-	outFile: 'generated.ts',
+	outFile: 'generated.ts', // 新的输出文件名
 }
 
 const apiGenOpts = {
@@ -45,7 +45,7 @@ const apiGenOpts = {
 			return result
 		},
 	},
-	cleanOutput: true, // 清除输出目录
+	cleanOutput: false, // 不清除输出目录，避免删除其他文件
 	extractRequestParams: true, // 提取请求参数
 	extractRequestBody: true, // 提取请求体
 	extractResponseBody: true, // 提取响应体
@@ -87,6 +87,10 @@ async function genSwagger() {
 	})
 }
 
+
+
+
+
 // 生成 api types 文件
 async function genApiTypes() {
 	console.log('🔧 生成 TypeScript API 类型...')
@@ -108,22 +112,22 @@ async function genApiTypes() {
 		const { files } = await generateApi({
 			fileName: cfg.outFile,
 			output: cfg.outDir,
-			// 可选：使用自定义模板（需要进一步完善）
-			// templates: join(projectRoot, 'templates'),
 			...src,
 			...apiGenOpts,
 		})
 		console.log('✅ TypeScript API 类型生成完成:')
 		files.forEach((f) => console.log('  -', f.fileName || 'generated'))
 
-		// NOTE: 现在可以使用 genApiTool.fixResponseTypes() 来修复类型
-		// await genApiTool.fixResponseTypes(join(cfg.outDir, cfg.outFile))
+		// 使用 AST 增强生成的代码
+		const generatedFilePath = join(cfg.outDir, cfg.outFile)
+		if (existsSync(generatedFilePath)) {
+			await genApiTool.enhanceGeneratedTypes(generatedFilePath)
+		}
 	} catch (e) {
 		console.error('❌ API 类型生成失败:', e)
 		throw e
 	}
 }
-
 
 // 主函数
 async function main() {
@@ -143,7 +147,6 @@ async function main() {
 
 // 监听并运行
 async function watchAndRun() {
-	// NOTE: 不要用 glob 语法，chokidar v4 移除了 glob 语法
 	const watcher = chokidar.watch(bePath, {
 		ignoreInitial: true,
 		cwd: projectRoot,
@@ -176,7 +179,6 @@ async function watchAndRun() {
 	}
 
 	const debouncedFn = debounce(trigger, DEBOUNCE_DELAY, {
-		// 优先调度
 		leading: true,
 		trailing: false,
 	})
@@ -186,7 +188,6 @@ async function watchAndRun() {
 			return
 		}
 
-		// 忽略 docs/ 目录下的文件，不然死循环了
 		if (filePath.includes('docs/')) {
 			return
 		}
@@ -199,7 +200,6 @@ async function watchAndRun() {
 
 	watcher.on('ready', () => {
 		console.log('初始扫描完成，开始监听变更...')
-		// 打印被监听的文件列表
 		const watchedPaths = watcher.getWatched()
 		console.log('监听的文件/目录:', Object.keys(watchedPaths).length)
 		console.log('注意：只会响应 .go 文件的变更')
@@ -209,14 +209,12 @@ async function watchAndRun() {
 		console.error('❌ 文件监听错误:', error)
 	})
 
-	// 优雅退出处理
 	process.on('SIGINT', () => {
 		console.log('\n🛑 正在停止监听...')
 		watcher.close()
 		process.exit(0)
 	})
 
-	// 启动时先跑一次
 	console.log('🚀 启动时生成一次...')
 	await main()
 	console.log('👀 已启动监听，按 Ctrl+C 退出')
@@ -224,7 +222,7 @@ async function watchAndRun() {
 
 // 入口函数
 async function run() {
-	console.log('🚀 AI Models API 生成器')
+	console.log('🚀 AI Models API 生成器 v2 (with AST enhancements)')
 	console.log('模式:', useLocal ? '本地' : '远程')
 
 	if (opts.watch) {

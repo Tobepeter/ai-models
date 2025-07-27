@@ -307,15 +307,13 @@ export interface UserUpdateRequest {
   username?: string;
 }
 
-export interface Response {
+export interface Response<T = any> {
   code?: number;
-  data?: any;
+  data?: T;
   message?: string;
 }
 
-export type StatusListData = Response & {
-  data?: Record<string, any>;
-};
+export type StatusListData = Response<Record<string, any>>;
 
 export interface GetUsersParams {
   /** 页码 */
@@ -324,47 +322,31 @@ export interface GetUsersParams {
   limit: number;
 }
 
-export type GetUsersData = Response & {
-  data?: UserListResponse;
-};
+export type GetUsersData = Response<UserListResponse>;
 
-export type GetUserByIdData = Response & {
-  data?: UserResponse;
-};
+export type GetUserByIdData = Response<UserResponse>;
 
-export type DeleteUserData = Response & {
-  data?: Record<string, any>;
-};
+export type DeleteUserData = Response<Record<string, any>>;
 
-export type ActivateUserData = Response & {
-  data?: Record<string, any>;
-};
+export type ActivateUserData = Response<Record<string, any>>;
 
-export type UsersDeactivateCreateData = Response & {
-  data?: Record<string, any>;
-};
+export type UsersDeactivateCreateData = Response<Record<string, any>>;
 
 /** 新密码 */
 export interface UsersResetPasswordCreatePayload {
   new_password?: string;
 }
 
-export type UsersResetPasswordCreateData = Response & {
-  data?: Record<string, any>;
-};
+export type UsersResetPasswordCreateData = Response<Record<string, any>>;
 
-export type ChatCreateData = Response & {
-  data?: ChatResponse;
-};
+export type ChatCreateData = Response<ChatResponse>;
 
 export interface ChatHistoryListParams {
   /** 会话ID */
   session_id: string;
 }
 
-export type ChatHistoryListData = Response & {
-  data?: ChatMessage[];
-};
+export type ChatHistoryListData = Response<ChatMessage[]>;
 
 export interface ChatHistoryDeleteParams {
   /** 会话ID */
@@ -373,13 +355,9 @@ export interface ChatHistoryDeleteParams {
 
 export type ChatHistoryDeleteData = Response;
 
-export type GenerateCreateData = Response & {
-  data?: GenerateResponse;
-};
+export type GenerateCreateData = Response<GenerateResponse>;
 
-export type ModelsListData = Response & {
-  data?: AIModel[];
-};
+export type ModelsListData = Response<AIModel[]>;
 
 export interface V1ChatCompletionsCreateParams {
   /** 平台 */
@@ -399,9 +377,7 @@ export interface V1ImagesGenerationsCreateParams {
   platform?: string;
 }
 
-export type V1ImagesGenerationsCreateData = Response & {
-  data?: string[];
-};
+export type V1ImagesGenerationsCreateData = Response<string[]>;
 
 export interface GetListParams {
   /** 页码 */
@@ -412,29 +388,17 @@ export interface GetListParams {
   category?: string;
 }
 
-export type GetListData = Response & {
-  data?: Record<string, any>;
-};
+export type GetListData = Response<Record<string, any>>;
 
-export type CreateData = Response & {
-  data?: CrudResponse;
-};
+export type CreateData = Response<CrudResponse>;
 
-export type GetByIdData = Response & {
-  data?: CrudResponse;
-};
+export type GetByIdData = Response<CrudResponse>;
 
-export type UpdateData = Response & {
-  data?: CrudResponse;
-};
+export type UpdateData = Response<CrudResponse>;
 
-export type DeleteData = Response & {
-  data?: Record<string, any>;
-};
+export type DeleteData = Response<Record<string, any>>;
 
-export type DeleteResult = Response & {
-  data?: Record<string, any>;
-};
+export type DeleteResult = Response<Record<string, any>>;
 
 export interface GetFileListParams {
   /** 前缀 */
@@ -443,25 +407,15 @@ export interface GetFileListParams {
   maxKeys?: number;
 }
 
-export type GetFileListData = Response & {
-  data?: FileListResponse;
-};
+export type GetFileListData = Response<FileListResponse>;
 
-export type HashifyNameData = Response & {
-  data?: HashifyNameResponse;
-};
+export type HashifyNameData = Response<HashifyNameResponse>;
 
-export type SignToFetchData = Response & {
-  data?: SignResponse;
-};
+export type SignToFetchData = Response<SignResponse>;
 
-export type SignToUploadData = Response & {
-  data?: SignResponse;
-};
+export type SignToUploadData = Response<SignResponse>;
 
-export type GetStsCredentialsData = Response & {
-  data?: STSResponse;
-};
+export type GetStsCredentialsData = Response<STSResponse>;
 
 export interface UploadFilePayload {
   /**
@@ -477,13 +431,9 @@ export interface UploadFilePayload {
   noPreview?: string;
 }
 
-export type UploadFileData = Response & {
-  data?: FileUploadResponse;
-};
+export type UploadFileData = Response<FileUploadResponse>;
 
-export type GetFileUrlData = Response & {
-  data?: GetURLResponse;
-};
+export type GetFileUrlData = Response<GetURLResponse>;
 
 export interface GetTestParams {
   /** 错误类型 */
@@ -504,32 +454,20 @@ export interface GetTestParams {
   message?: string;
 }
 
-export type GetTestData = Response & {
-  data?: Record<string, any>;
-};
+export type GetTestData = Response<Record<string, any>>;
 
 /** 测试请求体 */
 export type PostTestPayload = Record<string, any>;
 
-export type PostTestData = Response & {
-  data?: Record<string, any>;
-};
+export type PostTestData = Response<Record<string, any>>;
 
-export type ErrBusinessDetailData = Response & {
-  data?: Record<string, any>;
-};
+export type ErrBusinessDetailData = Response<Record<string, any>>;
 
-export type ErrCodeDetailData = Response & {
-  data?: Record<string, any>;
-};
+export type ErrCodeDetailData = Response<Record<string, any>>;
 
-export type ErrNetworkDetailData = Response & {
-  data?: Record<string, any>;
-};
+export type ErrNetworkDetailData = Response<Record<string, any>>;
 
-export type ErrParamDetailData = Response & {
-  data?: Record<string, any>;
-};
+export type ErrParamDetailData = Response<Record<string, any>>;
 
 export interface GetTodoListParams {
   /** 页码 */
@@ -540,65 +478,35 @@ export interface GetTodoListParams {
   completed?: boolean;
 }
 
-export type GetTodoListData = Response & {
-  data?: Record<string, any>;
-};
+export type GetTodoListData = Response<Record<string, any>>;
 
-export type CreateTodoData = Response & {
-  data?: TodoResponse;
-};
+export type CreateTodoData = Response<TodoResponse>;
 
-export type UpdateTodoPositionsData = Response & {
-  data?: Record<string, any>;
-};
+export type UpdateTodoPositionsData = Response<Record<string, any>>;
 
-export type RebalanceTodoPositionsData = Response & {
-  data?: Record<string, any>;
-};
+export type RebalanceTodoPositionsData = Response<Record<string, any>>;
 
-export type GetTodoStatsData = Response & {
-  data?: Record<string, any>;
-};
+export type GetTodoStatsData = Response<Record<string, any>>;
 
-export type GetTodoByIdData = Response & {
-  data?: TodoResponse;
-};
+export type GetTodoByIdData = Response<TodoResponse>;
 
-export type UpdateTodoData = Response & {
-  data?: TodoResponse;
-};
+export type UpdateTodoData = Response<TodoResponse>;
 
-export type DeleteTodoData = Response & {
-  data?: Record<string, any>;
-};
+export type DeleteTodoData = Response<Record<string, any>>;
 
-export type ToggleTodoCompleteData = Response & {
-  data?: TodoResponse;
-};
+export type ToggleTodoCompleteData = Response<TodoResponse>;
 
-export type ChangePasswordCreateData = Response & {
-  data?: Record<string, any>;
-};
+export type ChangePasswordCreateData = Response<Record<string, any>>;
 
-export type LoginData = Response & {
-  data?: UserLoginResponse;
-};
+export type LoginData = Response<UserLoginResponse>;
 
-export type LogoutCreateData = Response & {
-  data?: Record<string, any>;
-};
+export type LogoutCreateData = Response<Record<string, any>>;
 
-export type GetProfileData = Response & {
-  data?: UserResponse;
-};
+export type GetProfileData = Response<UserResponse>;
 
-export type UpdateProfileData = Response & {
-  data?: UserResponse;
-};
+export type UpdateProfileData = Response<UserResponse>;
 
-export type RegisterData = Response & {
-  data?: UserCreateResponse;
-};
+export type RegisterData = Response<UserCreateResponse>;
 
 import type {
   AxiosInstance,

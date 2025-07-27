@@ -1,48 +1,110 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { join } from 'path'
+import { Project, InterfaceDeclaration, SyntaxKind } from 'ts-morph'
+import { projectRoot } from './env'
 
 /**
  * API 生成工具类
  * 处理 swagger 生成的类型修复和后处理
  */
 class GenApiTool {
-	/** 修复生成的 Response 类型，目前swagger不支持go泛型，会报错，只能自己代码替换了 */
-	async fixResponseTypes(generatedFilePath: string) {
-		if (!existsSync(generatedFilePath)) {
-			console.warn('⚠️  生成的文件不存在，跳过类型修复')
-			return
-		}
+	/**
+	 * 使用 ts-morph 增强生成的 TypeScript 代码
+	 */
+	async enhanceGeneratedTypes(filePath: string) {
+		console.log('🔧 使用 AST 增强 TypeScript 类型...')
 
-		console.log('🔧 修复 Response 类型中的 any 问题...')
-
-		let content = readFileSync(generatedFilePath, 'utf-8')
-
-		// 1. 将 Response 接口改为泛型
-		content = content.replace(
-			/export interface Response \{[\s\S]*?\}/,
-			`export interface Response<T = any> {
-  code?: number;
-  data?: T;
-  message?: string;
-}`
-		)
-
-		// 2. 处理所有的 Response & { ... } 模式
-		// 使用更精确的正则表达式来匹配完整的类型定义
-		content = content.replace(/export type (\w+) = Response & \{([\s\S]*?)\};/g, (match, typeName, fieldsContent) => {
-			// 提取 data 字段的类型
-			const dataMatch = fieldsContent.match(/data\?\s*:\s*([\s\S]*?)(\s*[;}])/s)
-			if (dataMatch && dataMatch[1]) {
-				let dataType = dataMatch[1].trim()
-				// 移除末尾的分号或其他符号
-				dataType = dataType.replace(/[;,\s]*$/, '')
-				return `export type ${typeName} = Response<${dataType}>;`
-			}
-			// 如果没有找到 data 字段，返回原格式
-			return match
+		const project = new Project({
+			tsConfigFilePath: join(projectRoot, 'tsconfig.json'),
 		})
 
-		writeFileSync(generatedFilePath, content, 'utf-8')
-		console.log('✅ Response 类型修复完成')
+		const sourceFile = project.addSourceFileAtPath(filePath)
+
+		// 1. 找到 Response 接口，为 data 属性添加泛型 T
+		this.enhanceResponseInterface(sourceFile)
+
+		// 2. 找到继承 Response 且有 {data: dataType} 的接口，改为 Response<dataType>
+		this.enhanceResponseExtensions(sourceFile)
+
+		await sourceFile.save()
+		console.log('✅ AST 增强完成')
+	}
+
+	/**
+	 * 找到名为 "Response" 的接口，为 data 属性添加泛型 T
+	 * 
+	 * eg. Response -> Response<T>
+	 */
+	private enhanceResponseInterface(sourceFile: any) {
+		const interfaces = sourceFile.getInterfaces()
+
+		interfaces.forEach((interfaceDecl: InterfaceDeclaration) => {
+			const name = interfaceDecl.getName()
+
+			// 只处理名为 "Response" 的接口
+			if (name === 'Response') {
+				// 添加泛型参数 T
+				if (interfaceDecl.getTypeParameters().length === 0) {
+					interfaceDecl.addTypeParameter('T = any')
+				}
+
+				// 查找 data 属性并设置为泛型 T
+				const dataProperty = interfaceDecl.getProperty('data')
+				if (dataProperty) {
+					dataProperty.setType('T')
+				}
+			}
+		})
+	}
+
+	/**
+	 * 找到继承 Response 且有 {data: dataType} 的接口，改为 Response<dataType>
+	 * 
+	 * eg. type MyType = Resposne & {data: OtherType} -> Response<OtherType>
+	 */
+	private enhanceResponseExtensions(sourceFile: any) {
+		// 处理 type aliases 如: export type PostTestData = Response & { data: SomeType }
+		const typeAliases = sourceFile.getTypeAliases()
+
+		typeAliases.forEach((typeAlias: any) => {
+			const typeNode = typeAlias.getTypeNode()
+			if (typeNode) {
+				// 检查是否是交叉类型 (intersection type)
+				if (typeNode.getKind() === SyntaxKind.IntersectionType) {
+					const intersectionTypes = typeNode.getTypeNodes()
+
+					let hasResponse = false
+					let dataType = null
+
+					// 遍历交叉类型的各个部分
+					intersectionTypes.forEach((typeRef: any) => {
+						// 检查是否包含 Response
+						if (typeRef.getText() === 'Response') {
+							hasResponse = true
+						}
+
+						// 检查是否是对象类型且包含 data 字段
+						if (typeRef.getKind() === SyntaxKind.TypeLiteral) {
+							const members = typeRef.getMembers()
+							members.forEach((member: any) => {
+								if (member.getName && member.getName() === 'data') {
+									// 获取 data 字段的类型
+									const typeAnnotation = member.getTypeNode()
+									if (typeAnnotation) {
+										dataType = typeAnnotation.getText()
+									}
+								}
+							})
+						}
+					})
+
+					// 如果同时包含 Response 和 data 字段，进行转换
+					if (hasResponse && dataType) {
+						typeAlias.setType(`Response<${dataType}>`)
+						// console.log(`✅ AST转换 ${typeAlias.getName()}: Response & {data: ${dataType}} → Response<${dataType}>`)
+					}
+				}
+			}
+		})
 	}
 }
 
