@@ -3,11 +3,13 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { authApi } from './api/auth/auth-api'
 import { NotifyHub } from './components/common/notify'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
+import { useUserStore } from './store/user-store'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
 
 function App() {
 	const navigate = useNavigate()
+	const userStore = useUserStore()
 	useGitHubPagesRouter()
 
 	useMount(() => {
@@ -20,6 +22,9 @@ function App() {
 		}
 		console.log(`%c[App] ${msg}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
 
+		// 恢复用户存储数据
+		userStore.restore()
+		
 		// 静默登录状态
 		authApi.checkLogin()
 

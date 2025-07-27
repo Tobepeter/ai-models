@@ -3,10 +3,10 @@ import { JwtPayloadApp, jwt } from '@/utils/jwt'
 import { storageKeys } from '@/utils/storage'
 import { Nullable } from '@/utils/types'
 import { create } from 'zustand'
-import { combine, persist } from 'zustand/middleware'
+import { combine } from 'zustand/middleware'
 import type { UserResponse } from '@/api/types/generated'
 
-// 初始状态
+// Initial user state
 const userState = {
 	info: {
 		id: 0,
@@ -24,41 +24,92 @@ const userState = {
 
 type UserState = typeof userState
 
-const stateCreator = () => {
-	return combine(userState, (set) => ({
-		setData: (data: Partial<UserState>) => set(data),
-		setToken: (token: string) => {
-			if (!token) {
-				set({ tokenPayload: null, token })
-				return
-			}
+// Persist data to localStorage
+const persistData = (state: UserState) => {
+	try {
+		const dataToPersist = {
+			info: state.info,
+			token: state.token,
+		}
+		localStorage.setItem(storageKeys.user, JSON.stringify(dataToPersist))
+	} catch (error) {
+		console.warn('[UserStore] Failed to persist data:', error)
+	}
+}
 
-			const payload = jwt.parse(token)
-			if (payload && jwt.isValid(payload)) {
-				set({ tokenPayload: payload, token })
+// Create the store state
+const stateCreator = () => {
+	return combine(userState, (set, get) => ({
+		// Set partial user state data
+		setData: (data: Partial<UserState>) => {
+			const newState = { ...get(), ...data }
+			
+			// If token is being set, also update tokenPayload
+			if (data.token !== undefined) {
+				if (!data.token) {
+					newState.tokenPayload = null
+				} else {
+					const payload = jwt.parse(data.token)
+					if (payload && jwt.isValid(payload)) {
+						newState.tokenPayload = payload
+					}
+				}
 			}
+			
+			set(newState)
+			// Trigger persistence
+			persistData(newState)
 		},
-		clear: () => set(userState),
-		/** 跳转到登录页，支持重定向参数 */
+		// Clear user data
+		clear: () => {
+			set(userState)
+			// Also clear persisted data
+			localStorage.removeItem(storageKeys.user)
+		},
+		// Navigate to login page with optional redirect
 		goLogin: (redirectTo?: string) => {
-			// 获取当前路径作为默认重定向地址
+			// Get current path as default redirect address
 			const currentPath = redirectTo || window.location.pathname
 			const loginUrl = currentPath === '/login' ? '/login' : `/login?redirect=${encodeURIComponent(currentPath)}`
 
-			// 清空历史
+			// Clear history
 			router.navigate(loginUrl, { replace: true })
+		},
+		// Restore persisted data and parse token payload
+		restore: () => {
+			try {
+				const persistedData = localStorage.getItem(storageKeys.user)
+				if (persistedData) {
+					const parsed = JSON.parse(persistedData)
+					const restored = {
+						...userState,
+						...parsed,
+					}
+					
+					// Parse token payload if token exists
+					if (restored.token) {
+						const payload = jwt.parse(restored.token)
+						if (payload && jwt.isValid(payload)) {
+							restored.tokenPayload = payload
+						}
+					}
+					
+					set(restored)
+					return
+				}
+			} catch (error) {
+				console.warn('[UserStore] Failed to restore persisted data:', error)
+			}
+			// Fallback to default state
+			set(userState)
+		},
+		// Manually trigger persistence
+		persist: () => {
+			persistData(get())
 		},
 	}))
 }
 
-export const useUserStore = create(
-	persist(stateCreator(), {
-		name: storageKeys.user,
-		partialize: (state) => ({
-			info: state.info,
-			token: state.token,
-		}),
-	})
-)
+export const useUserStore = create(stateCreator())
 
 export type UserStore = ReturnType<ReturnType<typeof stateCreator>>

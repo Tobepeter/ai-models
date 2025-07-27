@@ -11,9 +11,7 @@ class AuthApi {
 		if (!res) return null
 		const authData = res.data
 		const store = useUserStore.getState()
-		const { token, user } = authData
-		if (token) store.setToken(token)
-		if (user) store.setData({ info: user })
+		store.setData({ info: authData.user, token: authData.token })
 		return authData
 	}
 
@@ -23,9 +21,7 @@ class AuthApi {
 		if (!res) return null
 		const authData = res.data
 		const store = useUserStore.getState()
-		const { token, user } = authData
-		if (token) store.setToken(token)
-		if (user) store.setData({ info: user })
+		store.setData({ info: authData.user, token: authData.token })
 		return authData
 	}
 

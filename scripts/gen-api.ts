@@ -12,11 +12,13 @@ const program = new Command()
 
 program.option('-w, --watch', '监听 backend/**/*.go 文件变更，自动生成 swagger 并更新 api types')
 program.option('-r, --remote', '使用远程 swagger 地址而非本地文件')
+program.option('-s, --skip-swag', '跳过 swagger 生成步骤，直接使用现有的 swagger.json')
 program.parse()
 
 const opts = program.opts()
 const useLocal = !opts.remote // 默认使用本地，除非指定 --remote
 const bePath = join(projectRoot, 'backend')
+const skipSwag = opts.skipSwag
 
 // 配置常量
 const DEBOUNCE_DELAY = 500 // 防抖延迟 (ms)
@@ -128,8 +130,12 @@ async function genApiTypes() {
 // 主函数
 async function main() {
 	try {
-		if (useLocal) {
-			await genSwagger()
+		if (useLocal && !skipSwag) {
+			try {
+				await genSwagger()
+			} catch (swaggerError) {
+				console.warn('⚠️  Swagger 生成失败，将尝试使用现有的 swagger.json 文件:', swaggerError.message)
+			}
 		}
 		await genApiTypes()
 	} catch (error) {
@@ -220,6 +226,9 @@ async function watchAndRun() {
 async function run() {
 	console.log('🚀 AI Models API 生成器 v2 (with AST enhancements)')
 	console.log('模式:', useLocal ? '本地' : '远程')
+	if (skipSwag) {
+		console.log('ⓘ 跳过 Swagger 生成步骤')
+	}
 
 	if (opts.watch) {
 		console.log('📂 监听模式启动...')

@@ -5,6 +5,8 @@ const appKey = 'appdata'
 /**
  * 本地存储管理器
  * 统一管理应用数据的本地存储，使用整体写入和读取策略
+ * 
+ * @deprecated 不好用，太聚合用起来每次都要写一大堆数据
  */
 class Storage {
 	private cache: StorageAppData | null = null
@@ -77,8 +79,7 @@ export interface StorageAppData {
 export const storageKeys = {
 	sts: 'oss-sts-cache',
 	app: 'app-storage',
-	user: 'user-storage',
-	authToken: 'auth-token',
+	user: 'user',
 	chat: 'chat',
 	todo: 'todo',
 }
