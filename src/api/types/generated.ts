@@ -291,6 +291,7 @@ export interface UserResponse {
   avatar_oss_key?: string;
   created_at?: string;
   email?: string;
+  extra?: string;
   id?: number;
   is_active?: boolean;
   role?: string;
@@ -302,6 +303,7 @@ export interface UserUpdateRequest {
   avatar?: string;
   avatar_oss_key?: string;
   email?: string;
+  extra?: string;
   /**
    * @minLength 3
    * @maxLength 50

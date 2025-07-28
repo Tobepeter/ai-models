@@ -1,6 +1,6 @@
+import type { TodoCreateRequest, TodoResponse, TodoUpdateRequest } from '@/api/types/generated'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { TodoResponse, TodoCreateRequest, TodoUpdateRequest } from '@/api/types/generated'
 import { todoUtil } from './todo-util'
 
 // 初始状态为空数组
@@ -16,11 +16,14 @@ interface TodoActions {
 	setTodos: (todos: TodoResponse[]) => void
 
 	// TODO 操作
-	addTodo: (todo: TodoCreateRequest) => void
-	updateTodo: (id: number, updates: TodoUpdateRequest) => void
-	deleteTodo: (id: number) => void
-	toggleTodo: (id: number) => void
-	reorderTodo: (id: number, newPosition: number) => void
+	addTodo: (todo: TodoCreateRequest) => Promise<void>
+	updateTodo: (id: number, updates: TodoUpdateRequest) => Promise<void>
+	deleteTodo: (id: number) => Promise<void>
+	toggleTodo: (id: number) => Promise<void>
+	reorderTodo: (id: number, newPosition: number) => Promise<void>
+
+	// 初始化加载
+	loadTodos: () => Promise<void>
 
 	// 重置状态
 	reset: () => void
@@ -42,75 +45,125 @@ const stateCreator = () => {
 			todoUtil.savePersist(sortedTodos)
 		},
 
+		// 初始化加载
+		loadTodos: async () => {
+			const todos = await todoUtil.load()
+			const sortedTodos = [...todos].sort((a, b) => (a.position || 0) - (b.position || 0))
+			set({ todos: sortedTodos })
+			// 同时更新本地存储
+			todoUtil.savePersist(sortedTodos)
+		},
+
 		// TODO 操作
-		addTodo: (todo: TodoCreateRequest) => {
-			const now = new Date().toISOString()
+		addTodo: async (todo: TodoCreateRequest) => {
 			const currentTodos = get().todos;
 			
 			// 计算新todo的position
 			let newPosition = 100;
 			if (currentTodos.length > 0) {
-				// 添加到顶部，位置为第一个元素位置减去100
 				const firstPosition = currentTodos[0].position || 100;
-				newPosition = Math.max(firstPosition - 100, 0); // 确保不小于0
+				newPosition = Math.max(firstPosition - 100, 0);
 			}
 			
-			const newTodo: TodoResponse = {
-				...todo,
-				id: Date.now(), // 简单的ID生成
-				created_at: now,
-				updated_at: now,
-				description: todo.description ?? '',
-				priority: todo.priority ?? 1,
-				due_date: todo.due_date ?? null,
-				completed: false,
-				position: newPosition,
-			}
-
-			// 新增的todo添加到数组并保持排序
-			const todos = [newTodo, ...currentTodos];
-			set({ todos })
-			// 保存到持久化存储
-			todoUtil.savePersist(todos)
-		},
-
-		updateTodo: (id: number, updates: TodoUpdateRequest) => {
-			const todos = get().todos.map((todo) => 
-				todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo
-			).sort((a, b) => (a.position || 0) - (b.position || 0));
+			const todoWithPosition = { ...todo, position: newPosition };
 			
-			set({ todos })
-			// 保存到持久化存储
-			todoUtil.savePersist(todos)
+			// 尝试通过API创建
+			const createdTodo = await todoUtil.createTodo(todoWithPosition);
+			
+			if (createdTodo) {
+				// API创建成功，使用服务器返回的数据
+				const todos = [createdTodo, ...currentTodos].sort((a, b) => (a.position || 0) - (b.position || 0));
+				set({ todos })
+				todoUtil.savePersist(todos)
+			} else {
+				// API创建失败或未登录，使用本地逻辑
+				const now = new Date().toISOString()
+				const newTodo: TodoResponse = {
+					...todoWithPosition,
+					id: Date.now(),
+					created_at: now,
+					updated_at: now,
+					description: todo.description ?? '',
+					priority: todo.priority ?? 1,
+					due_date: todo.due_date ?? null,
+					completed: false,
+				}
+				
+				const todos = [newTodo, ...currentTodos];
+				set({ todos })
+				todoUtil.savePersist(todos)
+			}
 		},
 
-		deleteTodo: (id: number) => {
+		updateTodo: async (id: number, updates: TodoUpdateRequest) => {
+			// 尝试通过API更新
+			const updatedTodo = await todoUtil.updateTodo(id, updates);
+			
+			if (updatedTodo) {
+				// API更新成功，使用服务器返回的数据
+				const todos = get().todos.map((todo) => 
+					todo.id === id ? updatedTodo : todo
+				).sort((a, b) => (a.position || 0) - (b.position || 0));
+				
+				set({ todos })
+				todoUtil.savePersist(todos)
+			} else {
+				// API更新失败或未登录，使用本地逻辑
+				const todos = get().todos.map((todo) => 
+					todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo
+				).sort((a, b) => (a.position || 0) - (b.position || 0));
+				
+				set({ todos })
+				todoUtil.savePersist(todos)
+			}
+		},
+
+		deleteTodo: async (id: number) => {
+			// 尝试通过API删除
+			const success = await todoUtil.deleteTodo(id);
+			
+			// 无论API是否成功，都从本地状态中删除
 			const todos = get().todos.filter((todo) => todo.id !== id)
 				.sort((a, b) => (a.position || 0) - (b.position || 0));
 				
 			set({ todos })
-			// 保存到持久化存储
 			todoUtil.savePersist(todos)
 		},
 
-		toggleTodo: (id: number) => {
-			const todos = get().todos.map((todo) => 
-				todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo
-			).sort((a, b) => (a.position || 0) - (b.position || 0));
+		toggleTodo: async (id: number) => {
+			// 尝试通过API切换
+			const toggledTodo = await todoUtil.toggleTodo(id);
 			
-			set({ todos })
-			// 保存到持久化存储
-			todoUtil.savePersist(todos)
+			if (toggledTodo) {
+				// API切换成功，使用服务器返回的数据
+				const todos = get().todos.map((todo) => 
+					todo.id === id ? toggledTodo : todo
+				).sort((a, b) => (a.position || 0) - (b.position || 0));
+				
+				set({ todos })
+				todoUtil.savePersist(todos)
+			} else {
+				// API切换失败或未登录，使用本地逻辑
+				const todos = get().todos.map((todo) => 
+					todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo
+				).sort((a, b) => (a.position || 0) - (b.position || 0));
+				
+				set({ todos })
+				todoUtil.savePersist(todos)
+			}
 		},
 
-		reorderTodo: (id: number, newPosition: number) => {
+		reorderTodo: async (id: number, newPosition: number) => {
+			// 先更新本地状态
 			const todos = get().todos.map((todo) => 
 				todo.id === id ? { ...todo, position: newPosition, updated_at: new Date().toISOString() } : todo
 			).sort((a, b) => (a.position || 0) - (b.position || 0));
 			
 			set({ todos })
-			// 保存到持久化存储
 			todoUtil.savePersist(todos)
+			
+			// 尝试通过API更新位置
+			await todoUtil.updateTodo(id, { position: newPosition });
 		},
 
 		// 重置状态
@@ -123,4 +176,5 @@ const stateCreator = () => {
 }
 
 export const useTodoStore = create(stateCreator())
-export type { TodoState, TodoActions }
+export type { TodoActions, TodoState }
+

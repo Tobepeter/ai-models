@@ -242,7 +242,10 @@ func (s *OSSService) DeleteFile(objectKey string) error {
 
 // GetFileURL 获取文件访问URL
 func (s *OSSService) GetFileURL(objectKey string) (string, error) {
-	return s.SignToFetch(objectKey)
+	// return s.SignToFetch(objectKey)
+
+	// NOTE: current is public reading
+	return s.GetPublicUrl(objectKey), nil
 }
 
 // GetPublicUrl 获取公共读文件的URL

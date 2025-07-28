@@ -29,7 +29,7 @@ class ChatHubHelper {
 				id: `silicon-text-${idx}`,
 				platform: 'silicon',
 				model: model,
-				name: model.split('/').pop() || model, // 取最后一部分作为显示名称
+				name: model,
 				enabled: false,
 			})
 		})
@@ -40,7 +40,7 @@ class ChatHubHelper {
 				id: `openrouter-text-${idx}`,
 				platform: 'openrouter',
 				model: model,
-				name: model.split('/').pop() || model, // 取最后一部分作为显示名称
+				name: model,
 				enabled: false,
 			})
 		})

@@ -1,5 +1,7 @@
 import { isDev } from './env'
 import { useChatStore } from '@/pages/chat/chat-store'
+import { useAppStore } from '@/store/app-store'
+import { useUserStore } from '@/store/user-store'
 
 let debug = {
 	init: () => {},
@@ -12,6 +14,14 @@ if (isDev) {
 		}
 
 		initGlobal() {
+			this.defineGetter('appStore', () => {
+				return useAppStore.getState()
+			})
+
+			this.defineGetter('userStore', () => {
+				return useUserStore.getState()
+			})
+
 			this.defineGetter('chatStore', () => {
 				return useChatStore.getState()
 			})

@@ -9,8 +9,8 @@ import type { TodoResponse } from '@/api/types/generated'
 
 export interface TodoItemProps {
 	todo: TodoResponse
-	onEdit?: (id: number, title: string) => void
-	onDelete?: (id: number) => void
+	onEdit?: (id: number, title: string) => Promise<void>
+	onDelete?: (id: number) => Promise<void>
 }
 
 /** 简单的todo项组件 */
@@ -24,9 +24,9 @@ export const TodoItem = (props: TodoItemProps) => {
 		setIsEditing(true)
 	}
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (editTitle.trim() && onEdit && todo.id) {
-			onEdit(todo.id, editTitle.trim())
+			await onEdit(todo.id, editTitle.trim())
 		}
 		setIsEditing(false)
 	}
@@ -40,9 +40,9 @@ export const TodoItem = (props: TodoItemProps) => {
 		}
 	}
 
-	const handleToggle = () => {
+	const handleToggle = async () => {
 		if (todo.id) {
-			toggleTodo(todo.id)
+			await toggleTodo(todo.id)
 		}
 	}
 

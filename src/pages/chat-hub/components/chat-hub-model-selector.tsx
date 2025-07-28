@@ -1,5 +1,6 @@
 import { ChatHubModel } from '../chat-hub-type'
-import { Button } from '@/components/ui/button'
+import { MultiSelectDialog, MultiSelectItem } from '@/components/ui/multi-select-dialog'
+import { useMemo } from 'react'
 
 /**
  * 模型选择器组件
@@ -7,29 +8,47 @@ import { Button } from '@/components/ui/button'
 export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	const { models, selectedModels, onChange, disabled = false } = props
 
-	const handleToggle = (model: ChatHubModel) => {
-		if (disabled) return
+	/* 将模型按平台分组 */
+	const modelGroups = useMemo(() => {
+		const groups: Record<string, string[]> = {}
+		
+		models.forEach((model) => {
+			if (!groups[model.platform]) {
+				groups[model.platform] = []
+			}
+			groups[model.platform].push(model.name)
+		})
+		
+		return groups
+	}, [models])
 
-		const isSelected = selectedModels.some((m) => m.id === model.id)
-		if (isSelected) {
-			// 取消选择
-			onChange(selectedModels.filter((m) => m.id !== model.id))
-		} else {
-			// 添加选择
-			onChange([...selectedModels, model])
-		}
+	/* 获取选中的模型项目数组 */
+	const selectedModelItems = useMemo(() => {
+		return selectedModels.map((model) => ({
+			group: model.platform,
+			item: model.name
+		}))
+	}, [selectedModels])
+
+	/* 处理选择变化 */
+	const handleSelectionChange = (selectedItems: MultiSelectItem[]) => {
+		const newSelectedModels = models.filter((model) => 
+			selectedItems.some(item => item.group === model.platform && item.item === model.name)
+		)
+		onChange(newSelectedModels)
 	}
 
 	return (
-		<div className="flex flex-wrap gap-2">
-			{models.map((model) => {
-				const isSelected = selectedModels.some((m) => m.id === model.id)
-				return (
-					<Button key={model.id} onClick={() => handleToggle(model)} disabled={disabled} variant={isSelected ? 'default' : 'outline'} size="sm" className="rounded-full">
-						{model.name}
-					</Button>
-				)
-			})}
+		<div>
+			<MultiSelectDialog
+				value={selectedModelItems}
+				onChange={handleSelectionChange}
+				groups={modelGroups}
+				triggerText="选择AI模型"
+				dialogTitle="选择AI模型"
+				disabled={disabled}
+				hoverChange={true}
+			/>
 		</div>
 	)
 }

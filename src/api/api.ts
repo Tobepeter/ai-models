@@ -3,6 +3,9 @@ import { requestConfig } from '@/config/request-config'
 import { useUserStore } from '@/store/user-store'
 import { jwt } from '@/utils/jwt'
 import { Api } from './types/generated'
+import { isDev } from '@/utils/env'
+
+const verbose = isDev && true // current hard code true
 
 const api = new Api({
 	baseURL: requestConfig.serverUrl,
@@ -11,6 +14,10 @@ const api = new Api({
 })
 
 api.instance.interceptors.request.use((config) => {
+	if (verbose) {
+		console.log(`[api] request ${config.method?.toUpperCase()} ${config.url}`)
+	}
+
 	if (config.noAuth) {
 		return config
 	}
@@ -38,6 +45,10 @@ api.instance.interceptors.response.use(
 		const config = response.config
 		const { data } = response
 
+		if (verbose) {
+			console.log(`[api] response succ ${config.method?.toUpperCase()} ${config.url}`, data)
+		}
+
 		// 处理业务响应 (HTTP 200 但 business code !== 0)
 		if (!config.noErrorToast && data && typeof data === 'object') {
 			if (data.code === 0) {
@@ -57,6 +68,10 @@ api.instance.interceptors.response.use(
 		const { noErrorToast, silent } = config
 		// 错误优先级 业务错误 -> 响应码错误 -> 请求失败
 		const errMsg = response?.data?.msg || response?.data?.message || response?.statusText || response?.status || error.message || '请求失败'
+
+		if (verbose) {
+			console.log(`[api] response err ${config.method?.toUpperCase()} ${config.url}`, errMsg)
+		}
 
 		// 默认的内部自动error toast
 		if (!noErrorToast || silent) {

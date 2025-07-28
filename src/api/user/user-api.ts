@@ -9,7 +9,7 @@ class UserApi {
 		const res = await api.users.getProfile({ silent })
 		if (!res) return null
 		const info = res.data
-		useUserStore.setState({ info })
+		useUserStore.getState().setData({ info })
 		return info
 	}
 
@@ -18,7 +18,7 @@ class UserApi {
 		const res = await api.users.updateProfile(data)
 		if (!res) return null
 		const info = res.data
-		useUserStore.setState({ info })
+		useUserStore.getState().setData({ info })
 		return info
 	}
 

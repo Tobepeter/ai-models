@@ -1,4 +1,5 @@
 import { useMount } from 'ahooks'
+import { useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { authApi } from './api/auth/auth-api'
 import { NotifyHub } from './components/common/notify'
@@ -10,6 +11,7 @@ import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
 function App() {
 	const navigate = useNavigate()
 	const userStore = useUserStore()
+	const [isMounted, setIsMounted] = useState(false)
 	useGitHubPagesRouter()
 
 	useMount(() => {
@@ -22,16 +24,20 @@ function App() {
 		}
 		console.log(`%c[App] ${msg}`, 'color: white; background: black; border-radius: 5px; padding: 5px;')
 
-		// 恢复用户存储数据
-		userStore.restore()
-		
-		// 静默登录状态
-		authApi.checkLogin()
+		userStore.restore() // 恢复用户存储数据
+		authApi.checkLogin() // 静默登录状态
 
 		if (isProd) {
 			navigate('/chat')
 		}
+
+		setIsMounted(true)
 	})
+
+	// 确保 storage 已经加载初始化代码执行了
+	if (!isMounted) {
+		return null
+	}
 
 	return (
 		<div className="bg-background text-foreground">

@@ -185,12 +185,22 @@ func TestTodoService_PositionAndStats(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, todo1)
 
+		// 确保测试结束后删除TODO
+		defer func() {
+			_ = todoService.DeleteTodo(user.ID, todo1.ID)
+		}()
+
 		todo2Req := models.TodoCreateRequest{
 			Title: "Second TODO",
 		}
 		todo2, err := todoService.CreateTodo(user.ID, todo2Req)
 		require.NoError(t, err)
 		assert.NotNil(t, todo2)
+
+		// 确保测试结束后删除TODO
+		defer func() {
+			_ = todoService.DeleteTodo(user.ID, todo2.ID)
+		}()
 		assert.True(t, todo2.Position > todo1.Position)
 
 		// 获取统计信息
@@ -248,6 +258,11 @@ func TestTodoService_PositionUpdate(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, todo1)
 
+		// 确保测试结束后删除TODO
+		defer func() {
+			_ = todoService.DeleteTodo(user.ID, todo1.ID)
+		}()
+
 		todo2Req := models.TodoCreateRequest{
 			Title: "Second TODO",
 		}
@@ -255,12 +270,22 @@ func TestTodoService_PositionUpdate(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, todo2)
 
+		// 确保测试结束后删除TODO
+		defer func() {
+			_ = todoService.DeleteTodo(user.ID, todo2.ID)
+		}()
+
 		todo3Req := models.TodoCreateRequest{
 			Title: "Third TODO",
 		}
 		todo3, err := todoService.CreateTodo(user.ID, todo3Req)
 		require.NoError(t, err)
 		assert.NotNil(t, todo3)
+
+		// 确保测试结束后删除TODO
+		defer func() {
+			_ = todoService.DeleteTodo(user.ID, todo3.ID)
+		}()
 
 		// 更新位置 - 将第三个TODO移动到第一个位置
 		positionReq := models.TodoPositionUpdateRequest{

@@ -15,6 +15,7 @@ type User struct {
 	PlainPassword string `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
 	Avatar        string `json:"avatar,omitempty"`                     // 用户头像URL
 	AvatarOssKey  string `json:"avatar_oss_key,omitempty"`             // 用户头像OSS对象键
+	Extra         string `json:"extra,omitempty"`                      // 扩展字段，JSON格式存储额外信息
 	IsActive      bool   `json:"is_active" gorm:"default:true"`        // 用户激活状态
 	Role          string `json:"role" gorm:"default:'user'"`           // 用户角色: admin, user
 }
@@ -64,6 +65,7 @@ type UserUpdateRequest struct {
 	Email        string `json:"email,omitempty" binding:"omitempty,email"`
 	Avatar       string `json:"avatar,omitempty"`
 	AvatarOssKey string `json:"avatar_oss_key,omitempty"`
+	Extra        string `json:"extra,omitempty"`
 }
 
 /**
@@ -83,6 +85,7 @@ type UserResponse struct {
 	Email        string    `json:"email"`
 	Avatar       string    `json:"avatar,omitempty"`
 	AvatarOssKey string    `json:"avatar_oss_key,omitempty"`
+	Extra        string    `json:"extra,omitempty"`
 	Role         string    `json:"role"`
 	IsActive     bool      `json:"is_active"`
 	CreatedAt    time.Time `json:"created_at"`
@@ -97,6 +100,7 @@ func (u *User) ToResponse() UserResponse {
 		Email:        u.Email,
 		Avatar:       u.Avatar,
 		AvatarOssKey: u.AvatarOssKey,
+		Extra:        u.Extra,
 		Role:         u.Role,
 		IsActive:     u.IsActive,
 		CreatedAt:    u.CreatedAt,

@@ -38,11 +38,13 @@ export const UserAvatar = (props: UserAvatarProps) => {
 		</Avatar>
 	)
 
+	const displayFallbackText = !!fallbackText && !src
+
 	// 如果是fallbackText，不能编辑
-	const finialEditable = editable && !fallbackText
+	const finialEditable = editable && displayFallbackText
 
 	// 如果是fallbackText，不能预览
-	const finalNoPreview = !!fallbackText || noPreview
+	const finalNoPreview = displayFallbackText || noPreview
 
 	// 使用noInteraction来控制是否可预览（相当于noPreview）
 	return (

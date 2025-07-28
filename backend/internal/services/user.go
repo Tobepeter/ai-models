@@ -6,6 +6,7 @@ import (
 	"ai-models-backend/internal/models"
 	"errors"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -16,13 +17,15 @@ import (
  */
 type UserService struct {
 	BaseService
-	config *config.Config
+	config     *config.Config
+	ossService *OSSService
 }
 
 func NewUserService(cfg *config.Config) *UserService {
 	return &UserService{
 		BaseService: BaseService{DB: database.DB},
 		config:      cfg,
+		ossService:  NewOSSService(cfg),
 	}
 }
 
@@ -107,6 +110,21 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 		user.Avatar = req.Avatar
 	}
 
+	// 更新头像OSS密钥
+	if req.AvatarOssKey != "" {
+		// 如果更换了新的OSS key，异步删除旧的文件
+		oldOssKey := user.AvatarOssKey
+		if oldOssKey != "" && oldOssKey != req.AvatarOssKey {
+			go s.deleteOSSFileAsync(oldOssKey)
+		}
+		user.AvatarOssKey = req.AvatarOssKey
+	}
+
+	// 更新扩展字段
+	if req.Extra != "" {
+		user.Extra = req.Extra
+	}
+
 	// 保存更新
 	if err := s.DB.Save(&user).Error; err != nil {
 		return nil, err
@@ -141,7 +159,23 @@ func (s *UserService) GetUsers(page, limit int) (*models.PaginationResponse, err
 
 // DeleteUser 删除用户
 func (s *UserService) DeleteUser(id uint) error {
-	return s.HardDelete(&models.User{}, id)
+	// 先获取用户信息，检查是否有OSS key需要删除
+	user, err := s.GetUserByID(id)
+	if err != nil {
+		return err
+	}
+
+	// 删除用户记录
+	if err := s.HardDelete(&models.User{}, id); err != nil {
+		return err
+	}
+
+	// 如果用户有头像OSS key，异步静默删除OSS上的文件
+	if user.AvatarOssKey != "" {
+		go s.deleteOSSFileAsync(user.AvatarOssKey)
+	}
+
+	return nil
 }
 
 // ActivateUser 启用用户
@@ -234,4 +268,22 @@ func (s *UserService) IsAdmin(userID uint) (bool, error) {
 		return false, err
 	}
 	return user.IsAdmin(), nil
+}
+
+// deleteOSSFileAsync 异步静默删除OSS文件
+func (s *UserService) deleteOSSFileAsync(ossKey string) {
+	if s.ossService == nil {
+		logrus.Error("OSS服务未初始化，无法删除文件")
+		return
+	}
+
+	if err := s.ossService.DeleteFile(ossKey); err != nil {
+		// 静默处理错误，只记录日志
+		logrus.WithFields(logrus.Fields{
+			"ossKey": ossKey,
+			"error":  err.Error(),
+		}).Warn("异步删除OSS文件失败")
+	} else {
+		logrus.WithField("ossKey", ossKey).Info("异步删除OSS文件成功")
+	}
 }

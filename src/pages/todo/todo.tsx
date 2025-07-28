@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus } from 'lucide-react'
+import { Plus, CheckSquare } from 'lucide-react'
 import { useState } from 'react'
 import { useMount } from 'ahooks'
 import { useTodoStore } from './todo-store'
+import { useUserStore } from '@/store/user-store'
 import { notify } from '@/components/common/notify'
 import { TodoItem } from './components/todo-item'
 import { DragList } from '@/components/common/drag-list'
@@ -12,18 +13,21 @@ import type { DragListItem } from '@/components/common/drag-list'
 import { todoUtil } from './todo-util'
 
 export const Todo = () => {
-	const { todos, addTodo, updateTodo, deleteTodo, setTodos, toggleTodo, reorderTodo } = useTodoStore()
+	const { todos, addTodo, updateTodo, deleteTodo, loadTodos, toggleTodo, reorderTodo } = useTodoStore()
+	const { token, info: user } = useUserStore()
 	const [newTodoTitle, setNewTodoTitle] = useState('')
 
+	// 判断是否已登录
+	const isLoggedIn = token && user && user.username !== 'anonymous'
+
 	useMount(() => {
-		// 组件挂载时加载持久化数据
-		const persistedTodos = todoUtil.loadPersist()
-		setTodos(persistedTodos)
+		// 组件挂载时加载数据（优先从服务器加载）
+		loadTodos()
 	})
 
-	const handleAddTodo = () => {
+	const handleAddTodo = async () => {
 		if (newTodoTitle.trim()) {
-			addTodo({
+			await addTodo({
 				title: newTodoTitle.trim(),
 				description: '',
 				priority: 1,
@@ -39,16 +43,16 @@ export const Todo = () => {
 		}
 	}
 
-	const handleEdit = (id: number, title: string) => {
-		updateTodo(id, { title })
+	const handleEdit = async (id: number, title: string) => {
+		await updateTodo(id, { title })
 	}
 
-	const handleDelete = (id: number) => {
+	const handleDelete = async (id: number) => {
 		const todo = todos.find((t) => t.id === id)
 		if (!todo) return
 
 		// 先删除
-		deleteTodo(id)
+		await deleteTodo(id)
 
 		// 显示撤销toast
 		notify.success('任务已删除', {
@@ -105,7 +109,9 @@ export const Todo = () => {
 		<div className="max-w-2xl mx-auto p-6 space-y-6">
 			{/* 顶部大输入框 */}
 			<div className="space-y-4">
-				<p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>
+				{!isLoggedIn && (
+					<p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>
+				)}
 				<div className="flex gap-2">
 					<Input
 						placeholder="添加新任务..."
@@ -127,15 +133,18 @@ export const Todo = () => {
 			<div className="space-y-3">
 				{todos.length === 0 ? (
 					<div className="text-center py-12 text-muted-foreground">
-						<div>
-							<p>暂无任务</p>
-							<p className="text-sm mt-1">在上方输入框中添加你的第一个任务吧！</p>
+						<div className="flex flex-col items-center space-y-3">
+							<CheckSquare className="h-16 w-16 text-muted-foreground/40" />
+							<div>
+								<p className="text-lg font-medium">暂无任务</p>
+								<p className="text-sm mt-1">在上方输入框中添加你的第一个任务吧！</p>
+							</div>
 						</div>
 					</div>
 				) : (
 					<DragList
 						items={todos.map((todo) => ({ id: todo.id?.toString() || '', title: todo.title }))}
-						onItemMove={(fromIndex, toIndex) => {
+						onItemMove={async (fromIndex, toIndex) => {
 							// 获取被移动的todo
 							const movedTodo = todos[fromIndex];
 							if (!movedTodo) return;
@@ -144,7 +153,7 @@ export const Todo = () => {
 							const newPosition = calculateInsertPosition(fromIndex, toIndex);
 							
 							// 更新位置
-							reorderTodo(movedTodo.id!, newPosition);
+							await reorderTodo(movedTodo.id!, newPosition);
 						}}
 						renderItem={renderTodoItem}
 					/>
