@@ -24,7 +24,7 @@ func GetGormConfig(cfg *config.Config) *gorm.Config {
 			SlowThreshold:             time.Second, // 慢查询阈值
 			LogLevel:                  logLevel,    // 日志级别
 			IgnoreRecordNotFoundError: true,        // 忽略ErrRecordNotFound错误
-			Colorful:                  true,        // 是否启用颜色
+			Colorful:                  false,       // 是否启用颜色（这里禁用，nodejs日志文件会附带这些信息）
 		},
 	)
 

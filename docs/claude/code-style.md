@@ -43,12 +43,14 @@
 ## nodejs规范
 - 如果fsextra更加优雅，可以代替fs->fse
 - __dirname使用import.meta.url去计算
+- 尽量不要用相对路径，env.ts 可以拿到 `projectRoot`
+- 常量放到顶部，大写开头就行
 
 ## 代码规范
 
 ### 风格
 - 如果是简单if语句，考虑使用三元表达式
-- 注释后置，保持克制，只在特殊逻辑处添加
+- 注释如可以后置到表达式后面，保持克制，只在特殊逻辑处添加
 - 简单逻辑尽量写在一行，如 `if (condition) return`
 - JSDoc 保持简短描述，函数注释如果只有一行，使用 `/* description */` 格式
 - class 必须是三行 jsDoc
