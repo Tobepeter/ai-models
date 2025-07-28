@@ -8,7 +8,7 @@ import { useUserStore } from '@/store/user-store'
 import { notify } from '@/components/common/notify'
 import { TodoItem } from './components/todo-item'
 import { DragList } from '@/components/common/drag-list'
-import type { TodoResponse } from '@/api/types/generated'
+import type { TodoResponse } from '@/api/swagger/generated'
 import type { DragListItem } from '@/components/common/drag-list'
 import { todoUtil } from './todo-util'
 

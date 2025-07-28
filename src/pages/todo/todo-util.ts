@@ -1,7 +1,7 @@
 import { storageKeys } from '@/utils/storage'
 import { useUserStore } from '@/store/user-store'
 import { api } from '@/api/api'
-import type { TodoResponse, TodoCreateRequest, TodoUpdateRequest, GetTodoListParams } from '@/api/types/generated'
+import type { TodoResponse, TodoCreateRequest, TodoUpdateRequest, GetTodoListParams } from '@/api/swagger/generated'
 
 // 模拟数据
 const mockTodos: TodoResponse[] = [

@@ -22,18 +22,15 @@ package main
 
 import (
 	"ai-models-backend/internal/config"
+	"ai-models-backend/internal/container"
 	"ai-models-backend/internal/database"
 	"ai-models-backend/internal/handlers"
 	"ai-models-backend/internal/middleware"
-	"ai-models-backend/internal/services"
-	"ai-models-backend/internal/services/ai"
-	"ai-models-backend/internal/services/auth"
 	"ai-models-backend/pkg/response"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -45,11 +42,6 @@ func main() {
 	// 设置 logrus 为 JSON 格式
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	// 加载环境变量
-	if err := godotenv.Load(); err != nil {
-		logrus.Warn("未找到 .env 文件，使用系统环境变量")
-	}
-
 	cfg := config.New()
 
 	// 初始化数据库
@@ -58,29 +50,15 @@ func main() {
 	}
 	defer database.Close()
 
-	userService := services.NewUserService(cfg)
-	authService := auth.NewAuthService(cfg)
+	// 创建依赖注入容器
+	c := container.New(cfg)
 
-	// 初始化默认管理员用户
-	if err := authService.CreateDefaultAdmin(); err != nil {
-		logrus.Warn("创建默认管理员用户失败:", err)
+	// 初始化应用
+	if err := c.Initialize(); err != nil {
+		logrus.Warn("应用初始化失败:", err)
 	}
 
-	aiService := ai.NewAIService(cfg)
-	ossService := services.NewOSSService(cfg)
-	crudService := services.NewCrudService()
-	todoService := services.NewTodoService()
-
-	userHandler := handlers.NewUserHandler(userService, authService)
-	adminHandler := handlers.NewAdminHandler(userService, authService)
-	aiHandler := handlers.NewAIHandler(aiService)
-	ossHandler := handlers.NewOSSHandler(ossService)
-	healthHandler := handlers.NewHealthHandler()
-	crudHandler := handlers.NewCrudHandler(crudService)
-	todoHandler := handlers.NewTodoHandler(todoService)
-	testHandler := handlers.NewTestHandler()
-
-	router := setupRouter(cfg, authService, userService, userHandler, adminHandler, aiHandler, ossHandler, healthHandler, crudHandler, todoHandler, testHandler)
+	router := setupRouter(c)
 
 	logrus.Infof("服务器启动，端口: %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
@@ -88,8 +66,8 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authService *auth.AuthService, userService *services.UserService, userHandler *handlers.UserHandler, adminHandler *handlers.AdminHandler, aiHandler *handlers.AIHandler, ossHandler *handlers.OSSHandler, healthHandler *handlers.HealthHandler, crudHandler *handlers.CrudHandler, todoHandler *handlers.TodoHandler, testHandler *handlers.TestHandler) *gin.Engine {
-	if cfg.IsProd {
+func setupRouter(c *container.Container) *gin.Engine {
+	if c.Config.IsProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -103,16 +81,16 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 
 	r.Use(middleware.Logger())
 	r.Use(middleware.Recovery())
-	r.Use(middleware.CORS(cfg.IsDev))
+	r.Use(middleware.CORS(c.Config.IsDev))
 
 	r.Use(middleware.RateLimitLow()) // 全局 Low 限流
 
-	r.GET("/health", healthHandler.Health)
-	r.GET("/ready", healthHandler.Ready)
-	r.GET("/live", healthHandler.Live)
+	r.GET("/health", c.HealthHandler.Health)
+	r.GET("/ready", c.HealthHandler.Ready)
+	r.GET("/live", c.HealthHandler.Live)
 
 	// Swagger文档路由 (仅在开发环境)
-	if !cfg.IsProd {
+	if !c.Config.IsProd {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
@@ -121,78 +99,78 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 		users := api.Group("/users")
 		{
 			// 公开接口
-			users.POST("/register", userHandler.Register)
-			users.POST("/login", userHandler.Login)
+			users.POST("/register", c.UserHandler.Register)
+			users.POST("/login", c.UserHandler.Login)
 
 			// 用户自己的接口
-			users.POST("/logout", middleware.AuthRequired(authService), userHandler.Logout)
-			users.GET("/profile", middleware.AuthRequired(authService), userHandler.GetProfile)
-			users.PUT("/profile", middleware.AuthRequired(authService), userHandler.UpdateProfile)
-			users.POST("/change-password", middleware.AuthRequired(authService), userHandler.ChangePassword)
+			users.POST("/logout", middleware.AuthRequired(c.AuthService), c.UserHandler.Logout)
+			users.GET("/profile", middleware.AuthRequired(c.AuthService), c.UserHandler.GetProfile)
+			users.PUT("/profile", middleware.AuthRequired(c.AuthService), c.UserHandler.UpdateProfile)
+			users.POST("/change-password", middleware.AuthRequired(c.AuthService), c.UserHandler.ChangePassword)
 		}
 
 		// 很多 openai 都是带有 v1 前缀的，模拟一下
 		ai := api.Group("/ai/v1")
 		ai.Use(middleware.RateLimitMid())
 		{
-			ai.POST("/chat/completions", aiHandler.OpenAIChatCompletion)
-			ai.POST("/images/generations", aiHandler.GenerateImages)
+			ai.POST("/chat/completions", c.AIHandler.OpenAIChatCompletion)
+			ai.POST("/images/generations", c.AIHandler.GenerateImages)
 		}
 
 		oss := api.Group("/oss")
 		{
 			// 客户端签名模式 - 获取签名和凭证
-			oss.POST("/sts", ossHandler.GetSTSCredentials)
-			oss.POST("/sign-to-upload", ossHandler.SignToUpload)
-			oss.POST("/sign-to-fetch", ossHandler.SignToFetch)
-			oss.POST("/hashify-name", ossHandler.HashifyName)
-			oss.GET("/files", ossHandler.GetFileList)
+			oss.POST("/sts", c.OSSHandler.GetSTSCredentials)
+			oss.POST("/sign-to-upload", c.OSSHandler.SignToUpload)
+			oss.POST("/sign-to-fetch", c.OSSHandler.SignToFetch)
+			oss.POST("/hashify-name", c.OSSHandler.HashifyName)
+			oss.GET("/files", c.OSSHandler.GetFileList)
 
 			// 代理模式 - 后端全权代理操作
-			oss.POST("/upload", handlers.FileSizeMiddleware(), ossHandler.UploadFile)
-			oss.POST("/delete", ossHandler.DeleteFile)
-			oss.POST("/get-url", ossHandler.GetFileURL)
+			oss.POST("/upload", handlers.FileSizeMiddleware(), c.OSSHandler.UploadFile)
+			oss.POST("/delete", c.OSSHandler.DeleteFile)
+			oss.POST("/get-url", c.OSSHandler.GetFileURL)
 		}
 
 		crud := api.Group("/crud")
 		{
-			crud.POST("", crudHandler.Create)       // 创建记录
-			crud.GET("/:id", crudHandler.GetByID)   // 根据ID获取记录
-			crud.GET("", crudHandler.GetList)       // 获取列表（支持分页）
-			crud.PUT("/:id", crudHandler.Update)    // 更新记录
-			crud.DELETE("/:id", crudHandler.Delete) // 删除记录
+			crud.POST("", c.CrudHandler.Create)       // 创建记录
+			crud.GET("/:id", c.CrudHandler.GetByID)   // 根据ID获取记录
+			crud.GET("", c.CrudHandler.GetList)       // 获取列表（支持分页）
+			crud.PUT("/:id", c.CrudHandler.Update)    // 更新记录
+			crud.DELETE("/:id", c.CrudHandler.Delete) // 删除记录
 		}
 
 		todos := api.Group("/todos")
-		todos.Use(middleware.AuthRequired(authService)) // 需要认证
+		todos.Use(middleware.AuthRequired(c.AuthService)) // 需要认证
 		{
-			todos.POST("", todoHandler.CreateTodo)                   // 创建TODO
-			todos.GET("/stats", todoHandler.GetStats)                // 获取TODO统计信息
-			todos.PUT("/positions", todoHandler.UpdatePositions)     // 批量更新位置（拖拽排序）
-			todos.POST("/rebalance", todoHandler.RebalancePositions) // 重新平衡位置
-			todos.GET("/:id", todoHandler.GetTodoByID)               // 根据ID获取TODO
-			todos.GET("", todoHandler.GetTodoList)                   // 获取TODO列表（按位置排序）
-			todos.PUT("/:id", todoHandler.UpdateTodo)                // 更新TODO
-			todos.PATCH("/:id/toggle", todoHandler.ToggleTodoComplete) // 切换TODO完成状态
-			todos.DELETE("/:id", todoHandler.DeleteTodo)             // 删除TODO
+			todos.POST("", c.TodoHandler.CreateTodo)                     // 创建TODO
+			todos.GET("/stats", c.TodoHandler.GetStats)                  // 获取TODO统计信息
+			todos.PUT("/positions", c.TodoHandler.UpdatePositions)       // 批量更新位置（拖拽排序）
+			todos.POST("/rebalance", c.TodoHandler.RebalancePositions)   // 重新平衡位置
+			todos.GET("/:id", c.TodoHandler.GetTodoByID)                 // 根据ID获取TODO
+			todos.GET("", c.TodoHandler.GetTodoList)                     // 获取TODO列表（按位置排序）
+			todos.PUT("/:id", c.TodoHandler.UpdateTodo)                  // 更新TODO
+			todos.PATCH("/:id/toggle", c.TodoHandler.ToggleTodoComplete) // 切换TODO完成状态
+			todos.DELETE("/:id", c.TodoHandler.DeleteTodo)               // 删除TODO
 		}
 
 		// 管理员接口
 		admin := api.Group("/admin")
-		admin.Use(middleware.AdminRequired(authService, userService))
+		admin.Use(middleware.AdminRequired(c.AuthService, c.UserService))
 		{
 			// 系统管理
-			admin.GET("/status", adminHandler.GetSystemStatus) // 获取系统状态
+			admin.GET("/status", c.AdminHandler.GetSystemStatus) // 获取系统状态
 
 			// 用户管理
 			adminUsers := admin.Group("/users")
 			{
-				adminUsers.GET("", userHandler.GetUsers)                               // 获取用户列表
-				adminUsers.GET("/:id", userHandler.GetUserByID)                        // 根据ID获取用户
-				adminUsers.DELETE("/:id", userHandler.DeleteUser)                      // 删除用户
-				adminUsers.POST("/:id/activate", userHandler.ActivateUser)             // 激活用户
-				adminUsers.POST("/:id/deactivate", userHandler.DeactivateUser)         // 停用用户
-				adminUsers.POST("/:id/reset-password", adminHandler.ResetUserPassword) // 重置用户密码
+				adminUsers.GET("", c.UserHandler.GetUsers)                               // 获取用户列表
+				adminUsers.GET("/:id", c.UserHandler.GetUserByID)                        // 根据ID获取用户
+				adminUsers.DELETE("/:id", c.UserHandler.DeleteUser)                      // 删除用户
+				adminUsers.POST("/:id/activate", c.UserHandler.ActivateUser)             // 激活用户
+				adminUsers.POST("/:id/deactivate", c.UserHandler.DeactivateUser)         // 停用用户
+				adminUsers.POST("/:id/reset-password", c.AdminHandler.ResetUserPassword) // 重置用户密码
 			}
 		}
 
@@ -202,12 +180,12 @@ func setupRouter(cfg *config.Config, authService *auth.AuthService, userService 
 			// 错误测试分组 - 所有测试接口都放在这里
 			err := test.Group("/err")
 			{
-				err.GET("", testHandler.TestErrors)                       // 测试各种错误码
-				err.POST("", testHandler.TestPostErrors)                  // 测试POST请求错误
-				err.GET("/param/:id", testHandler.TestParamErrors)        // 测试路径参数错误
-				err.GET("/code/:code", testHandler.TestSpecificError)     // 测试特定错误码
-				err.GET("/network/:type", testHandler.TestNetworkError)   // 测试网络错误
-				err.GET("/business/:type", testHandler.TestBusinessError) // 测试业务错误
+				err.GET("", c.TestHandler.TestErrors)                       // 测试各种错误码
+				err.POST("", c.TestHandler.TestPostErrors)                  // 测试POST请求错误
+				err.GET("/param/:id", c.TestHandler.TestParamErrors)        // 测试路径参数错误
+				err.GET("/code/:code", c.TestHandler.TestSpecificError)     // 测试特定错误码
+				err.GET("/network/:type", c.TestHandler.TestNetworkError)   // 测试网络错误
+				err.GET("/business/:type", c.TestHandler.TestBusinessError) // 测试业务错误
 			}
 		}
 	}

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Edit, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTodoStore } from '@/pages/todo/todo-store'
-import type { TodoResponse } from '@/api/types/generated'
+import type { TodoResponse } from '@/api/swagger/generated'
 
 export interface TodoItemProps {
 	todo: TodoResponse

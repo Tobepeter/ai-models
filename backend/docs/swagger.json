@@ -1,0 +1,2760 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "AI Models Backend API documentation",
+        "title": "AI Models API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/admin/status": {
+            "get": {
+                "description": "获取系统运行状态信息，包括用户统计数据和系统基本信息，用于管理员监控",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "获取系统状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "description": "管理员分页获取系统中所有用户的列表，支持分页查询",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "获取用户列表",
+                "operationId": "getUsers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.PaginationResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}": {
+            "get": {
+                "description": "管理员根据用户ID获取指定用户的详细信息，用于用户管理",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "根据ID获取用户信息",
+                "operationId": "getUserByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "管理员删除指定用户账户，此操作将永久删除用户数据，请谨慎使用",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "删除用户",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/activate": {
+            "post": {
+                "description": "管理员激活指定用户账户，激活后用户可以正常登录和使用系统",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "激活用户",
+                "operationId": "activateUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/deactivate": {
+            "post": {
+                "description": "管理员停用指定用户账户，停用后用户无法登录和使用系统功能",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "停用用户",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/reset-password": {
+            "post": {
+                "description": "管理员重置指定用户的密码，通常用于用户忘记密码或管理员主动重置的场景",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "重置用户密码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "新密码",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "new_password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/chat": {
+            "post": {
+                "description": "与AI模型进行对话聊天，支持流式和非流式响应，可以指定使用的AI模型",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "AI聊天",
+                "parameters": [
+                    {
+                        "description": "聊天请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.ChatResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/chat/history": {
+            "get": {
+                "description": "获取用户的历史聊天记录，支持分页和过滤",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "获取聊天历史",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "会话ID",
+                        "name": "session_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/ai-models-backend_internal_models.ChatMessage"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "清除用户的历史聊天记录，支持按会话ID清除",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "清除聊天历史",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "会话ID",
+                        "name": "session_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/generate": {
+            "post": {
+                "description": "基于提示词生成文本内容，支持自定义参数和不同的AI模型",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "文本生成",
+                "parameters": [
+                    {
+                        "description": "生成请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.GenerateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.GenerateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/models": {
+            "get": {
+                "description": "获取可用的AI模型列表，支持不同的AI平台和模型类型",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "获取模型列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/ai-models-backend_internal_models.AIModel"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/v1/chat/completions": {
+            "post": {
+                "description": "OpenAI兼容聊天接口，支持流式和非流式响应，可以指定使用的AI模型",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "OpenAI兼容聊天接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "平台",
+                        "name": "platform",
+                        "in": "query"
+                    },
+                    {
+                        "description": "OpenAI聊天请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/v1/images/generations": {
+            "post": {
+                "description": "基于提示词生成图片，支持自定义参数和不同的AI模型",
+                "tags": [
+                    "AI"
+                ],
+                "summary": "图片生成",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "平台",
+                        "name": "platform",
+                        "in": "query"
+                    },
+                    {
+                        "description": "图片生成请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "model": {
+                                    "type": "string"
+                                },
+                                "prompt": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/crud": {
+            "get": {
+                "description": "分页获取数据记录列表，支持按分类筛选，返回分页信息和记录数据",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "获取记录列表",
+                "operationId": "getList",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "分类",
+                        "name": "category",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的数据记录，支持分类，数据是字符串，前端自行管理决定是否要json parse",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "创建记录",
+                "operationId": "create",
+                "parameters": [
+                    {
+                        "description": "创建请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/crud/{id}": {
+            "get": {
+                "description": "根据唯一标识符获取指定的数据记录详细信息",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "根据ID获取记录",
+                "operationId": "getByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "记录ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "根据ID更新现有数据记录的内容，支持更新数据和分类信息",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "更新记录",
+                "operationId": "update",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "记录ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "根据ID永久删除指定的数据记录，操作不可逆，请谨慎使用",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "删除记录",
+                "operationId": "delete",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "记录ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/delete": {
+            "delete": {
+                "description": "删除OSS文件",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "删除",
+                "operationId": "delete",
+                "parameters": [
+                    {
+                        "description": "删除请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.DeleteFileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/files": {
+            "get": {
+                "description": "获取OSS文件列表",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "获取文件列表",
+                "operationId": "getFileList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "前缀",
+                        "name": "prefix",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "最大数量",
+                        "name": "maxKeys",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FileListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/hashify": {
+            "post": {
+                "description": "生成哈希文件名，防止重名",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "生成哈希文件名",
+                "operationId": "hashifyName",
+                "parameters": [
+                    {
+                        "description": "文件名请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.HashifyNameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.HashifyNameResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/sign-to-fetch": {
+            "post": {
+                "description": "生成获取签名，用于下载文件",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "生成获取签名",
+                "operationId": "signToFetch",
+                "parameters": [
+                    {
+                        "description": "签名请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.SignRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.SignResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/sign-to-upload": {
+            "post": {
+                "description": "生成上传签名，用于上传文件",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "生成上传签名",
+                "operationId": "signToUpload",
+                "parameters": [
+                    {
+                        "description": "签名请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.SignRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.SignResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/sts": {
+            "get": {
+                "description": "获取STS临时凭证，用于上传文件，或者浏览",
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "STS临时凭证",
+                "operationId": "getStsCredentials",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.STSResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/upload": {
+            "post": {
+                "description": "直接上传文件到OSS",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "直接上传文件",
+                "operationId": "uploadFile",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "文件名",
+                        "name": "fileName",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "前缀",
+                        "name": "prefix",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "不预览",
+                        "name": "noPreview",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FileUploadResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/oss/url": {
+            "post": {
+                "tags": [
+                    "OSS"
+                ],
+                "summary": "获取文件URL",
+                "operationId": "getFileURL",
+                "parameters": [
+                    {
+                        "description": "URL请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.GetURLRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.GetURLResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/test/err": {
+            "get": {
+                "description": "用于测试前端对各种HTTP状态码和错误响应的处理，支持通过参数指定错误类型",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试各种错误码",
+                "parameters": [
+                    {
+                        "enum": [
+                            "400",
+                            "401",
+                            "403",
+                            "404",
+                            "405",
+                            "409",
+                            "413",
+                            "429",
+                            "500",
+                            "503",
+                            "validation",
+                            "success"
+                        ],
+                        "type": "string",
+                        "description": "错误类型",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "自定义错误消息",
+                        "name": "message",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "测试POST请求的各种错误情况，包括JSON解析错误、参数验证等",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试POST请求错误处理",
+                "parameters": [
+                    {
+                        "description": "测试请求体",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/test/err/business/{type}": {
+            "get": {
+                "description": "模拟各种业务逻辑错误",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试业务错误",
+                "parameters": [
+                    {
+                        "enum": [
+                            "validation",
+                            "auth",
+                            "permission",
+                            "quota",
+                            "maintenance"
+                        ],
+                        "type": "string",
+                        "description": "业务错误类型",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/test/err/code/{code}": {
+            "get": {
+                "description": "根据路径参数返回对应的错误码，用于测试前端错误处理",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试特定错误码",
+                "parameters": [
+                    {
+                        "enum": [
+                            "400",
+                            "401",
+                            "403",
+                            "404",
+                            "405",
+                            "409",
+                            "413",
+                            "429",
+                            "500",
+                            "503"
+                        ],
+                        "type": "string",
+                        "description": "错误码",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/test/err/network/{type}": {
+            "get": {
+                "description": "模拟各种网络错误情况，如超时、连接失败等",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试网络错误模拟",
+                "parameters": [
+                    {
+                        "enum": [
+                            "timeout",
+                            "connection",
+                            "dns",
+                            "ssl"
+                        ],
+                        "type": "string",
+                        "description": "网络错误类型",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/test/err/param/{id}": {
+            "get": {
+                "description": "测试带路径参数的请求错误处理",
+                "tags": [
+                    "Test"
+                ],
+                "summary": "测试路径参数错误",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "测试ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos": {
+            "get": {
+                "description": "分页获取TODO列表，按position升序排列，支持按完成状态筛选",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "获取TODO列表",
+                "operationId": "getTodoList",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "完成状态",
+                        "name": "completed",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的TODO项，支持设置标题、描述、优先级、位置和截止日期。不指定position时自动分配到最后",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "创建TODO",
+                "operationId": "createTodo",
+                "parameters": [
+                    {
+                        "description": "创建请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/positions": {
+            "put": {
+                "description": "批量更新TODO项的位置，支持拖拽排序功能",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "批量更新TODO位置",
+                "operationId": "updateTodoPositions",
+                "parameters": [
+                    {
+                        "description": "位置更新请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoPositionUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/rebalance": {
+            "post": {
+                "description": "重新平衡所有TODO项的位置值，当位置值变得过小时使用",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "重新平衡TODO位置",
+                "operationId": "rebalanceTodoPositions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/stats": {
+            "get": {
+                "description": "获取TODO的统计信息，包括总数、完成数、待完成数",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "获取TODO统计信息",
+                "operationId": "getTodoStats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/{id}": {
+            "get": {
+                "description": "根据唯一标识符获取指定的TODO项详细信息",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "根据ID获取TODO",
+                "operationId": "getTodoByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TODO ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "根据ID更新现有TODO项的内容，支持更新标题、描述、完成状态、优先级、位置等",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "更新TODO",
+                "operationId": "updateTodo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TODO ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "更新请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "根据ID永久删除指定的TODO项，操作不可逆",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "删除TODO",
+                "operationId": "deleteTodo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TODO ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/{id}/toggle": {
+            "patch": {
+                "description": "快速切换TODO项的完成状态（完成/未完成）",
+                "tags": [
+                    "TODO"
+                ],
+                "summary": "切换TODO完成状态",
+                "operationId": "toggleTodoComplete",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TODO ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/change-password": {
+            "post": {
+                "description": "用户修改自己的登录密码，需要提供旧密码进行验证",
+                "tags": [
+                    "User"
+                ],
+                "summary": "修改密码",
+                "parameters": [
+                    {
+                        "description": "修改密码请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.ChangePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "用户登录",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "登录请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.UserLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserLoginResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/logout": {
+            "post": {
+                "description": "用户主动退出登录，清除服务端的登录状态和token",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "用户退出登录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/profile": {
+            "get": {
+                "description": "获取当前登录用户的个人资料信息，包括基本信息、角色等",
+                "tags": [
+                    "User"
+                ],
+                "summary": "获取用户信息",
+                "operationId": "getProfile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新当前登录用户的个人资料，如用户名、邮箱、头像等信息",
+                "tags": [
+                    "User"
+                ],
+                "summary": "更新用户信息",
+                "operationId": "updateProfile",
+                "parameters": [
+                    {
+                        "description": "更新请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register": {
+            "post": {
+                "description": "新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "用户注册",
+                "operationId": "register",
+                "parameters": [
+                    {
+                        "description": "注册请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserCreateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ai-models-backend_internal_models.AIModel": {
+            "type": "object",
+            "properties": {
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "max_tokens": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.ChangePasswordRequest": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "old_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "old_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.ChatMessage": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.ChatRequest": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "stream": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.ChatResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "usage": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.Usage"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.CrudCreateRequest": {
+            "type": "object",
+            "required": [
+                "data"
+            ],
+            "properties": {
+                "category": {
+                    "description": "业务分类，默认为general",
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.CrudResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.CrudUpdateRequest": {
+            "type": "object",
+            "required": [
+                "data"
+            ],
+            "properties": {
+                "category": {
+                    "description": "业务分类",
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.DeleteFileRequest": {
+            "type": "object",
+            "required": [
+                "objectKey"
+            ],
+            "properties": {
+                "objectKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.FileInfo": {
+            "type": "object",
+            "properties": {
+                "lastModified": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "objectKey": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.FileListResponse": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ai-models-backend_internal_models.FileInfo"
+                    }
+                },
+                "isTruncated": {
+                    "type": "boolean"
+                },
+                "nextMarker": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.FileUploadResponse": {
+            "type": "object",
+            "properties": {
+                "hashifyName": {
+                    "description": "哈希化文件名",
+                    "type": "string"
+                },
+                "objectKey": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "uploadTime": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.GenerateRequest": {
+            "type": "object",
+            "required": [
+                "prompt"
+            ],
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "prompt": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.GenerateResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "usage": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.Usage"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.GetURLRequest": {
+            "type": "object",
+            "required": [
+                "objectKey"
+            ],
+            "properties": {
+                "objectKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.GetURLResponse": {
+            "type": "object",
+            "properties": {
+                "objectKey": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.HashifyNameRequest": {
+            "type": "object",
+            "required": [
+                "fileName"
+            ],
+            "properties": {
+                "fileName": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.HashifyNameResponse": {
+            "type": "object",
+            "properties": {
+                "hashifyName": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.OpenAIChatCompletionRequest": {
+            "type": "object",
+            "required": [
+                "messages",
+                "model"
+            ],
+            "properties": {
+                "max_tokens": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIMessage"
+                    }
+                },
+                "model": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "stream": {
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "top_p": {
+                    "type": "number"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.OpenAIChatCompletionResponse": {
+            "type": "object",
+            "properties": {
+                "choices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChoice"
+                    }
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "object": {
+                    "type": "string"
+                },
+                "usage": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIUsage"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.OpenAIChoice": {
+            "type": "object",
+            "properties": {
+                "finish_reason": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "message": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIMessage"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.OpenAIMessage": {
+            "type": "object",
+            "required": [
+                "content",
+                "role"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.OpenAIUsage": {
+            "type": "object",
+            "properties": {
+                "completion_tokens": {
+                    "type": "integer"
+                },
+                "prompt_tokens": {
+                    "type": "integer"
+                },
+                "total_tokens": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.Pagination": {
+            "type": "object",
+            "properties": {
+                "current": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.PaginationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {}
+                },
+                "pagination": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.Pagination"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.STSCredentials": {
+            "type": "object",
+            "properties": {
+                "AccessKeyId": {
+                    "description": "NOTE：注意官方的字段是大写开头的",
+                    "type": "string"
+                },
+                "AccessKeySecret": {
+                    "type": "string"
+                },
+                "Expiration": {
+                    "type": "string"
+                },
+                "SecurityToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.STSResponse": {
+            "type": "object",
+            "properties": {
+                "credentials": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.STSCredentials"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.SignRequest": {
+            "type": "object",
+            "properties": {
+                "fileName": {
+                    "description": "文件名",
+                    "type": "string"
+                },
+                "fileType": {
+                    "description": "文件类型，用于路径计算",
+                    "type": "string"
+                },
+                "objectKey": {
+                    "description": "完整的objectKey，如果提供则直接使用",
+                    "type": "string"
+                },
+                "prefix": {
+                    "description": "路径前缀",
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.SignResponse": {
+            "type": "object",
+            "properties": {
+                "objectKey": {
+                    "type": "string"
+                },
+                "signedUrl": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.TodoCreateRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "description": "可选",
+                    "type": "string"
+                },
+                "due_date": {
+                    "description": "可选",
+                    "type": "string"
+                },
+                "position": {
+                    "description": "可选，不传则自动分配",
+                    "type": "number"
+                },
+                "priority": {
+                    "description": "可选",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "必填",
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.TodoPositionItem": {
+            "type": "object",
+            "required": [
+                "id",
+                "position"
+            ],
+            "properties": {
+                "id": {
+                    "description": "必填",
+                    "type": "integer"
+                },
+                "position": {
+                    "description": "必填",
+                    "type": "number"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.TodoPositionUpdateRequest": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "description": "必填，dive验证数组元素",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ai-models-backend_internal_models.TodoPositionItem"
+                    }
+                }
+            }
+        },
+        "ai-models-backend_internal_models.TodoResponse": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "position": {
+                    "type": "number"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.TodoUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "description": "可选，使用指针区分false和未设置",
+                    "type": "boolean"
+                },
+                "description": {
+                    "description": "可选，不传不更新",
+                    "type": "string"
+                },
+                "due_date": {
+                    "description": "可选，不传不更新",
+                    "type": "string"
+                },
+                "position": {
+                    "description": "可选，支持更新排序位置",
+                    "type": "number"
+                },
+                "priority": {
+                    "description": "可选，不传不更新",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "可选，不传不更新",
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.Usage": {
+            "type": "object",
+            "properties": {
+                "completion_tokens": {
+                    "type": "integer"
+                },
+                "prompt_tokens": {
+                    "type": "integer"
+                },
+                "total_tokens": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserCreateRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserCreateResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserLoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserLoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "avatar_oss_key": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "extra": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.UserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "avatar_oss_key": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "extra": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "ai-models-backend_pkg_response.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

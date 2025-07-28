@@ -4,7 +4,7 @@ import { storageKeys } from '@/utils/storage'
 import { Nullable } from '@/utils/types'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { UserResponse } from '@/api/types/generated'
+import type { UserResponse } from '@/api/swagger/generated'
 
 // Initial user state
 const userState = {

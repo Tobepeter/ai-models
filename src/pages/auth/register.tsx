@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/common/theme-toggle'
 import { useUserStore } from '@/store/user-store'
 import { authApi } from '@/api/auth/auth-api'
 import { notify } from '@/components/common/notify'
-import type { UserCreateRequest } from '@/api/types/generated'
+import type { UserCreateRequest } from '@/api/swagger/generated'
 
 type FormErrors = Record<string, string | undefined>
 type RegisterForm = UserCreateRequest & { confirmPassword: string }

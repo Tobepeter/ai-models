@@ -1,6 +1,6 @@
 import { useUserStore } from '@/store/user-store'
 import { api } from '../api'
-import type { UserUpdateRequest, UserResponse, ChangePasswordRequest } from '../types/generated'
+import type { UserUpdateRequest, UserResponse, ChangePasswordRequest } from '../swagger/generated'
 
 /** 用户相关API */
 class UserApi {

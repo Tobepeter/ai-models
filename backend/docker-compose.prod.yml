@@ -4,8 +4,12 @@ services:
     container_name: ai-models-backend
     ports:
       - '8080:8080'
-    env_file:
-      - .env # 从文件加载环境变量
+    # env_file:
+    #   - .env
+    ## NOTE: 注意是挂载而不是 env_file，env_file是自动注入的，容器内无此文件
+    #  代码会强制校验需要 .env（这个必须存在，方便不存在时候排查问题）
+    volumes:
+      - ./.env:/app/.env # 挂载.env文件到容器内部
     environment:
       - GO_ENV=production
     restart: unless-stopped
@@ -24,13 +28,8 @@ services:
   db:
     image: postgres:15
     container_name: ai-models-db
-    environment:
-      - POSTGRES_DB=ai_models
-      - POSTGRES_USER=app
-      - POSTGRES_PASSWORD=apppassword
-      - POSTGRES_ROOT_PASSWORD=rootpassword
-      - TZ=Asia/Shanghai
-      - PGTZ=Asia/Shanghai
+    env_file:
+      - .env
     ports:
       - '5432:5432'
     volumes:

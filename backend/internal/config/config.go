@@ -44,8 +44,8 @@ type Config struct {
 
 func New() *Config {
 
-	// must have .env file
 	if _, err := os.Stat(".env"); os.IsNotExist(err) {
+		// 业务逻辑必须保证，不然跑起来没意义
 		logrus.Fatal(".env file not found")
 	}
 

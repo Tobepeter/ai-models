@@ -1,4 +1,4 @@
-import type { TodoCreateRequest, TodoResponse, TodoUpdateRequest } from '@/api/types/generated'
+import type { TodoCreateRequest, TodoResponse, TodoUpdateRequest } from '@/api/swagger/generated'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 import { todoUtil } from './todo-util'

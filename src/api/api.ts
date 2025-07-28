@@ -2,7 +2,7 @@ import { notify } from '@/components/common/notify'
 import { requestConfig } from '@/config/request-config'
 import { useUserStore } from '@/store/user-store'
 import { jwt } from '@/utils/jwt'
-import { Api } from './types/generated'
+import { Api } from './swagger/generated'
 import { isDev } from '@/utils/env'
 
 const verbose = isDev && true // current hard code true

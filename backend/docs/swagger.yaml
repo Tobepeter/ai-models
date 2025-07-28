@@ -1,0 +1,1708 @@
+basePath: /
+definitions:
+  ai-models-backend_internal_models.AIModel:
+    properties:
+      capabilities:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      max_tokens:
+        type: integer
+      name:
+        type: string
+      provider:
+        type: string
+      type:
+        type: string
+    type: object
+  ai-models-backend_internal_models.ChangePasswordRequest:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  ai-models-backend_internal_models.ChatMessage:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      model:
+        type: string
+      role:
+        type: string
+    type: object
+  ai-models-backend_internal_models.ChatRequest:
+    properties:
+      message:
+        type: string
+      model:
+        type: string
+      stream:
+        type: boolean
+    required:
+    - message
+    type: object
+  ai-models-backend_internal_models.ChatResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      model:
+        type: string
+      usage:
+        $ref: '#/definitions/ai-models-backend_internal_models.Usage'
+    type: object
+  ai-models-backend_internal_models.CrudCreateRequest:
+    properties:
+      category:
+        description: 业务分类，默认为general
+        type: string
+      data:
+        type: string
+    required:
+    - data
+    type: object
+  ai-models-backend_internal_models.CrudResponse:
+    properties:
+      category:
+        type: string
+      created_at:
+        type: string
+      data:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  ai-models-backend_internal_models.CrudUpdateRequest:
+    properties:
+      category:
+        description: 业务分类
+        type: string
+      data:
+        type: string
+    required:
+    - data
+    type: object
+  ai-models-backend_internal_models.DeleteFileRequest:
+    properties:
+      objectKey:
+        type: string
+    required:
+    - objectKey
+    type: object
+  ai-models-backend_internal_models.FileInfo:
+    properties:
+      lastModified:
+        type: string
+      name:
+        type: string
+      objectKey:
+        type: string
+      size:
+        type: integer
+      url:
+        type: string
+    type: object
+  ai-models-backend_internal_models.FileListResponse:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/ai-models-backend_internal_models.FileInfo'
+        type: array
+      isTruncated:
+        type: boolean
+      nextMarker:
+        type: string
+    type: object
+  ai-models-backend_internal_models.FileUploadResponse:
+    properties:
+      hashifyName:
+        description: 哈希化文件名
+        type: string
+      objectKey:
+        type: string
+      size:
+        type: integer
+      type:
+        type: string
+      uploadTime:
+        type: string
+      url:
+        type: string
+    type: object
+  ai-models-backend_internal_models.GenerateRequest:
+    properties:
+      model:
+        type: string
+      parameters:
+        additionalProperties: {}
+        type: object
+      prompt:
+        type: string
+    required:
+    - prompt
+    type: object
+  ai-models-backend_internal_models.GenerateResponse:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      model:
+        type: string
+      usage:
+        $ref: '#/definitions/ai-models-backend_internal_models.Usage'
+    type: object
+  ai-models-backend_internal_models.GetURLRequest:
+    properties:
+      objectKey:
+        type: string
+    required:
+    - objectKey
+    type: object
+  ai-models-backend_internal_models.GetURLResponse:
+    properties:
+      objectKey:
+        type: string
+      url:
+        type: string
+    type: object
+  ai-models-backend_internal_models.HashifyNameRequest:
+    properties:
+      fileName:
+        type: string
+    required:
+    - fileName
+    type: object
+  ai-models-backend_internal_models.HashifyNameResponse:
+    properties:
+      hashifyName:
+        type: string
+    type: object
+  ai-models-backend_internal_models.OpenAIChatCompletionRequest:
+    properties:
+      max_tokens:
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIMessage'
+        type: array
+      model:
+        type: string
+      platform:
+        type: string
+      stream:
+        type: boolean
+      temperature:
+        type: number
+      top_p:
+        type: number
+    required:
+    - messages
+    - model
+    type: object
+  ai-models-backend_internal_models.OpenAIChatCompletionResponse:
+    properties:
+      choices:
+        items:
+          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChoice'
+        type: array
+      created:
+        type: integer
+      id:
+        type: string
+      model:
+        type: string
+      object:
+        type: string
+      usage:
+        $ref: '#/definitions/ai-models-backend_internal_models.OpenAIUsage'
+    type: object
+  ai-models-backend_internal_models.OpenAIChoice:
+    properties:
+      finish_reason:
+        type: string
+      index:
+        type: integer
+      message:
+        $ref: '#/definitions/ai-models-backend_internal_models.OpenAIMessage'
+    type: object
+  ai-models-backend_internal_models.OpenAIMessage:
+    properties:
+      content:
+        type: string
+      role:
+        type: string
+    required:
+    - content
+    - role
+    type: object
+  ai-models-backend_internal_models.OpenAIUsage:
+    properties:
+      completion_tokens:
+        type: integer
+      prompt_tokens:
+        type: integer
+      total_tokens:
+        type: integer
+    type: object
+  ai-models-backend_internal_models.Pagination:
+    properties:
+      current:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
+  ai-models-backend_internal_models.PaginationResponse:
+    properties:
+      data:
+        items: {}
+        type: array
+      pagination:
+        $ref: '#/definitions/ai-models-backend_internal_models.Pagination'
+    type: object
+  ai-models-backend_internal_models.STSCredentials:
+    properties:
+      AccessKeyId:
+        description: NOTE：注意官方的字段是大写开头的
+        type: string
+      AccessKeySecret:
+        type: string
+      Expiration:
+        type: string
+      SecurityToken:
+        type: string
+    type: object
+  ai-models-backend_internal_models.STSResponse:
+    properties:
+      credentials:
+        $ref: '#/definitions/ai-models-backend_internal_models.STSCredentials'
+    type: object
+  ai-models-backend_internal_models.SignRequest:
+    properties:
+      fileName:
+        description: 文件名
+        type: string
+      fileType:
+        description: 文件类型，用于路径计算
+        type: string
+      objectKey:
+        description: 完整的objectKey，如果提供则直接使用
+        type: string
+      prefix:
+        description: 路径前缀
+        type: string
+    type: object
+  ai-models-backend_internal_models.SignResponse:
+    properties:
+      objectKey:
+        type: string
+      signedUrl:
+        type: string
+    type: object
+  ai-models-backend_internal_models.TodoCreateRequest:
+    properties:
+      description:
+        description: 可选
+        type: string
+      due_date:
+        description: 可选
+        type: string
+      position:
+        description: 可选，不传则自动分配
+        type: number
+      priority:
+        description: 可选
+        type: integer
+      title:
+        description: 必填
+        type: string
+    required:
+    - title
+    type: object
+  ai-models-backend_internal_models.TodoPositionItem:
+    properties:
+      id:
+        description: 必填
+        type: integer
+      position:
+        description: 必填
+        type: number
+    required:
+    - id
+    - position
+    type: object
+  ai-models-backend_internal_models.TodoPositionUpdateRequest:
+    properties:
+      items:
+        description: 必填，dive验证数组元素
+        items:
+          $ref: '#/definitions/ai-models-backend_internal_models.TodoPositionItem'
+        type: array
+    required:
+    - items
+    type: object
+  ai-models-backend_internal_models.TodoResponse:
+    properties:
+      completed:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      position:
+        type: number
+      priority:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  ai-models-backend_internal_models.TodoUpdateRequest:
+    properties:
+      completed:
+        description: 可选，使用指针区分false和未设置
+        type: boolean
+      description:
+        description: 可选，不传不更新
+        type: string
+      due_date:
+        description: 可选，不传不更新
+        type: string
+      position:
+        description: 可选，支持更新排序位置
+        type: number
+      priority:
+        description: 可选，不传不更新
+        type: integer
+      title:
+        description: 可选，不传不更新
+        type: string
+    type: object
+  ai-models-backend_internal_models.Usage:
+    properties:
+      completion_tokens:
+        type: integer
+      prompt_tokens:
+        type: integer
+      total_tokens:
+        type: integer
+    type: object
+  ai-models-backend_internal_models.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  ai-models-backend_internal_models.UserCreateResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+    type: object
+  ai-models-backend_internal_models.UserLoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  ai-models-backend_internal_models.UserLoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+    type: object
+  ai-models-backend_internal_models.UserResponse:
+    properties:
+      avatar:
+        type: string
+      avatar_oss_key:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      extra:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  ai-models-backend_internal_models.UserUpdateRequest:
+    properties:
+      avatar:
+        type: string
+      avatar_oss_key:
+        type: string
+      email:
+        type: string
+      extra:
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    type: object
+  ai-models-backend_pkg_response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: AI Models Backend API documentation
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: AI Models API
+  version: "1.0"
+paths:
+  /admin/status:
+    get:
+      description: 获取系统运行状态信息，包括用户统计数据和系统基本信息，用于管理员监控
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 获取系统状态
+      tags:
+      - Admin
+  /admin/users:
+    get:
+      description: 管理员分页获取系统中所有用户的列表，支持分页查询
+      operationId: getUsers
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.PaginationResponse'
+              type: object
+      summary: 获取用户列表
+      tags:
+      - Admin
+  /admin/users/{id}:
+    delete:
+      description: 管理员删除指定用户账户，此操作将永久删除用户数据，请谨慎使用
+      operationId: deleteUser
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 删除用户
+      tags:
+      - Admin
+    get:
+      description: 管理员根据用户ID获取指定用户的详细信息，用于用户管理
+      operationId: getUserByID
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+              type: object
+      summary: 根据ID获取用户信息
+      tags:
+      - Admin
+  /admin/users/{id}/activate:
+    post:
+      description: 管理员激活指定用户账户，激活后用户可以正常登录和使用系统
+      operationId: activateUser
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 激活用户
+      tags:
+      - Admin
+  /admin/users/{id}/deactivate:
+    post:
+      description: 管理员停用指定用户账户，停用后用户无法登录和使用系统功能
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 停用用户
+      tags:
+      - Admin
+  /admin/users/{id}/reset-password:
+    post:
+      description: 管理员重置指定用户的密码，通常用于用户忘记密码或管理员主动重置的场景
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 新密码
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            new_password:
+              type: string
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 重置用户密码
+      tags:
+      - Admin
+  /ai/chat:
+    post:
+      description: 与AI模型进行对话聊天，支持流式和非流式响应，可以指定使用的AI模型
+      parameters:
+      - description: 聊天请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.ChatRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.ChatResponse'
+              type: object
+      summary: AI聊天
+      tags:
+      - AI
+  /ai/chat/history:
+    delete:
+      description: 清除用户的历史聊天记录，支持按会话ID清除
+      parameters:
+      - description: 会话ID
+        in: query
+        name: session_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+      summary: 清除聊天历史
+      tags:
+      - AI
+    get:
+      description: 获取用户的历史聊天记录，支持分页和过滤
+      parameters:
+      - description: 会话ID
+        in: query
+        name: session_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/ai-models-backend_internal_models.ChatMessage'
+                  type: array
+              type: object
+      summary: 获取聊天历史
+      tags:
+      - AI
+  /ai/generate:
+    post:
+      description: 基于提示词生成文本内容，支持自定义参数和不同的AI模型
+      parameters:
+      - description: 生成请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.GenerateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.GenerateResponse'
+              type: object
+      summary: 文本生成
+      tags:
+      - AI
+  /ai/models:
+    get:
+      description: 获取可用的AI模型列表，支持不同的AI平台和模型类型
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/ai-models-backend_internal_models.AIModel'
+                  type: array
+              type: object
+      summary: 获取模型列表
+      tags:
+      - AI
+  /ai/v1/chat/completions:
+    post:
+      description: OpenAI兼容聊天接口，支持流式和非流式响应，可以指定使用的AI模型
+      parameters:
+      - description: 平台
+        in: query
+        name: platform
+        type: string
+      - description: OpenAI聊天请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionResponse'
+      summary: OpenAI兼容聊天接口
+      tags:
+      - AI
+  /ai/v1/images/generations:
+    post:
+      description: 基于提示词生成图片，支持自定义参数和不同的AI模型
+      parameters:
+      - description: 平台
+        in: query
+        name: platform
+        type: string
+      - description: 图片生成请求
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            model:
+              type: string
+            prompt:
+              type: string
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: 图片生成
+      tags:
+      - AI
+  /crud:
+    get:
+      description: 分页获取数据记录列表，支持按分类筛选，返回分页信息和记录数据
+      operationId: getList
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      - description: 分类
+        in: query
+        name: category
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 获取记录列表
+      tags:
+      - CRUD
+    post:
+      description: 创建新的数据记录，支持分类，数据是字符串，前端自行管理决定是否要json parse
+      operationId: create
+      parameters:
+      - description: 创建请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.CrudCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+              type: object
+      summary: 创建记录
+      tags:
+      - CRUD
+  /crud/{id}:
+    delete:
+      description: 根据ID永久删除指定的数据记录，操作不可逆，请谨慎使用
+      operationId: delete
+      parameters:
+      - description: 记录ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 删除记录
+      tags:
+      - CRUD
+    get:
+      description: 根据唯一标识符获取指定的数据记录详细信息
+      operationId: getByID
+      parameters:
+      - description: 记录ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+              type: object
+      summary: 根据ID获取记录
+      tags:
+      - CRUD
+    put:
+      description: 根据ID更新现有数据记录的内容，支持更新数据和分类信息
+      operationId: update
+      parameters:
+      - description: 记录ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.CrudUpdateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+              type: object
+      summary: 更新记录
+      tags:
+      - CRUD
+  /oss/delete:
+    delete:
+      description: 删除OSS文件
+      operationId: delete
+      parameters:
+      - description: 删除请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.DeleteFileRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 删除
+      tags:
+      - OSS
+  /oss/files:
+    get:
+      description: 获取OSS文件列表
+      operationId: getFileList
+      parameters:
+      - description: 前缀
+        in: query
+        name: prefix
+        type: string
+      - description: 最大数量
+        in: query
+        name: maxKeys
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FileListResponse'
+              type: object
+      summary: 获取文件列表
+      tags:
+      - OSS
+  /oss/hashify:
+    post:
+      description: 生成哈希文件名，防止重名
+      operationId: hashifyName
+      parameters:
+      - description: 文件名请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.HashifyNameRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.HashifyNameResponse'
+              type: object
+      summary: 生成哈希文件名
+      tags:
+      - OSS
+  /oss/sign-to-fetch:
+    post:
+      description: 生成获取签名，用于下载文件
+      operationId: signToFetch
+      parameters:
+      - description: 签名请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SignRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.SignResponse'
+              type: object
+      summary: 生成获取签名
+      tags:
+      - OSS
+  /oss/sign-to-upload:
+    post:
+      description: 生成上传签名，用于上传文件
+      operationId: signToUpload
+      parameters:
+      - description: 签名请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SignRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.SignResponse'
+              type: object
+      summary: 生成上传签名
+      tags:
+      - OSS
+  /oss/sts:
+    get:
+      description: 获取STS临时凭证，用于上传文件，或者浏览
+      operationId: getStsCredentials
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.STSResponse'
+              type: object
+      summary: STS临时凭证
+      tags:
+      - OSS
+  /oss/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 直接上传文件到OSS
+      operationId: uploadFile
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 文件名
+        in: formData
+        name: fileName
+        type: string
+      - description: 前缀
+        in: formData
+        name: prefix
+        type: string
+      - description: 不预览
+        in: formData
+        name: noPreview
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FileUploadResponse'
+              type: object
+      summary: 直接上传文件
+      tags:
+      - OSS
+  /oss/url:
+    post:
+      operationId: getFileURL
+      parameters:
+      - description: URL请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.GetURLRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.GetURLResponse'
+              type: object
+      summary: 获取文件URL
+      tags:
+      - OSS
+  /test/err:
+    get:
+      description: 用于测试前端对各种HTTP状态码和错误响应的处理，支持通过参数指定错误类型
+      parameters:
+      - description: 错误类型
+        enum:
+        - "400"
+        - "401"
+        - "403"
+        - "404"
+        - "405"
+        - "409"
+        - "413"
+        - "429"
+        - "500"
+        - "503"
+        - validation
+        - success
+        in: query
+        name: type
+        type: string
+      - description: 自定义错误消息
+        in: query
+        name: message
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试各种错误码
+      tags:
+      - Test
+    post:
+      description: 测试POST请求的各种错误情况，包括JSON解析错误、参数验证等
+      parameters:
+      - description: 测试请求体
+        in: body
+        name: request
+        schema:
+          additionalProperties: true
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试POST请求错误处理
+      tags:
+      - Test
+  /test/err/business/{type}:
+    get:
+      description: 模拟各种业务逻辑错误
+      parameters:
+      - description: 业务错误类型
+        enum:
+        - validation
+        - auth
+        - permission
+        - quota
+        - maintenance
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试业务错误
+      tags:
+      - Test
+  /test/err/code/{code}:
+    get:
+      description: 根据路径参数返回对应的错误码，用于测试前端错误处理
+      parameters:
+      - description: 错误码
+        enum:
+        - "400"
+        - "401"
+        - "403"
+        - "404"
+        - "405"
+        - "409"
+        - "413"
+        - "429"
+        - "500"
+        - "503"
+        in: path
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试特定错误码
+      tags:
+      - Test
+  /test/err/network/{type}:
+    get:
+      description: 模拟各种网络错误情况，如超时、连接失败等
+      parameters:
+      - description: 网络错误类型
+        enum:
+        - timeout
+        - connection
+        - dns
+        - ssl
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试网络错误模拟
+      tags:
+      - Test
+  /test/err/param/{id}:
+    get:
+      description: 测试带路径参数的请求错误处理
+      parameters:
+      - description: 测试ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 测试路径参数错误
+      tags:
+      - Test
+  /todos:
+    get:
+      description: 分页获取TODO列表，按position升序排列，支持按完成状态筛选
+      operationId: getTodoList
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: limit
+        type: integer
+      - description: 完成状态
+        in: query
+        name: completed
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 获取TODO列表
+      tags:
+      - TODO
+    post:
+      description: 创建新的TODO项，支持设置标题、描述、优先级、位置和截止日期。不指定position时自动分配到最后
+      operationId: createTodo
+      parameters:
+      - description: 创建请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.TodoCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+              type: object
+      summary: 创建TODO
+      tags:
+      - TODO
+  /todos/{id}:
+    delete:
+      description: 根据ID永久删除指定的TODO项，操作不可逆
+      operationId: deleteTodo
+      parameters:
+      - description: TODO ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 删除TODO
+      tags:
+      - TODO
+    get:
+      description: 根据唯一标识符获取指定的TODO项详细信息
+      operationId: getTodoByID
+      parameters:
+      - description: TODO ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+              type: object
+      summary: 根据ID获取TODO
+      tags:
+      - TODO
+    put:
+      description: 根据ID更新现有TODO项的内容，支持更新标题、描述、完成状态、优先级、位置等
+      operationId: updateTodo
+      parameters:
+      - description: TODO ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.TodoUpdateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+              type: object
+      summary: 更新TODO
+      tags:
+      - TODO
+  /todos/{id}/toggle:
+    patch:
+      description: 快速切换TODO项的完成状态（完成/未完成）
+      operationId: toggleTodoComplete
+      parameters:
+      - description: TODO ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+              type: object
+      summary: 切换TODO完成状态
+      tags:
+      - TODO
+  /todos/positions:
+    put:
+      description: 批量更新TODO项的位置，支持拖拽排序功能
+      operationId: updateTodoPositions
+      parameters:
+      - description: 位置更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.TodoPositionUpdateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 批量更新TODO位置
+      tags:
+      - TODO
+  /todos/rebalance:
+    post:
+      description: 重新平衡所有TODO项的位置值，当位置值变得过小时使用
+      operationId: rebalanceTodoPositions
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 重新平衡TODO位置
+      tags:
+      - TODO
+  /todos/stats:
+    get:
+      description: 获取TODO的统计信息，包括总数、完成数、待完成数
+      operationId: getTodoStats
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 获取TODO统计信息
+      tags:
+      - TODO
+  /users/change-password:
+    post:
+      description: 用户修改自己的登录密码，需要提供旧密码进行验证
+      parameters:
+      - description: 修改密码请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.ChangePasswordRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 修改密码
+      tags:
+      - User
+  /users/login:
+    post:
+      description: 用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息
+      operationId: login
+      parameters:
+      - description: 登录请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.UserLoginRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.UserLoginResponse'
+              type: object
+      summary: 用户登录
+      tags:
+      - Auth
+  /users/logout:
+    post:
+      description: 用户主动退出登录，清除服务端的登录状态和token
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+      summary: 用户退出登录
+      tags:
+      - Auth
+  /users/profile:
+    get:
+      description: 获取当前登录用户的个人资料信息，包括基本信息、角色等
+      operationId: getProfile
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+      summary: 获取用户信息
+      tags:
+      - User
+    put:
+      description: 更新当前登录用户的个人资料，如用户名、邮箱、头像等信息
+      operationId: updateProfile
+      parameters:
+      - description: 更新请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.UserUpdateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+              type: object
+      summary: 更新用户信息
+      tags:
+      - User
+  /users/register:
+    post:
+      description: 新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证
+      operationId: register
+      parameters:
+      - description: 注册请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.UserCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.UserCreateResponse'
+              type: object
+      summary: 用户注册
+      tags:
+      - Auth
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

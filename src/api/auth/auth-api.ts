@@ -1,7 +1,7 @@
 import { useUserStore } from '@/store/user-store'
 import { jwt } from '@/utils/jwt'
 import { api } from '../api'
-import type { LoginData, RegisterData, UserCreateRequest, UserLoginRequest } from '../types/generated'
+import type { LoginData, RegisterData, UserCreateRequest, UserLoginRequest } from '../swagger/generated'
 import { userApi } from '../user/user-api'
 
 class AuthApi {

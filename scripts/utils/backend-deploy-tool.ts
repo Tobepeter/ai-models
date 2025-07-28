@@ -37,10 +37,14 @@ class BackendDeployTool {
 		try {
 			await this.dockerLogin()
 
-			const buildCmd = `docker buildx build --platform=linux/amd64 --push -t ${imageTag} .`
+			// 拉取镜像可用性测试cmd
+			// ping -c 3 docker.mirrors.ustc.edu.cn
+			// ping -c 3 registry.cn-hangzhou.aliyuncs.com
+			// ping -c 3 registry-1.docker.io
+			// ping -c 3 hub-mirror.c.163.com
+			const buildCmd = `docker buildx build --progress=plain --platform=linux/amd64 --push -t ${imageTag} ${backendPath}`
 
 			execSync(buildCmd, {
-				cwd: backendPath,
 				encoding: 'utf8',
 				stdio: 'inherit',
 			})

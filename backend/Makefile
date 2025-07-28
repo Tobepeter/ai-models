@@ -64,6 +64,7 @@ bootstrap:
 	go install github.com/swaggo/swag/cmd/swag@v1.8.12
 
 # 生成 Swagger 文档
+# http://localhost:8080/swagger/index.html#/
 swagger:
 	swag init -g cmd/main.go -o docs/ --parseDependency --parseInternal
 	@echo "Swagger 文档已生成到 docs/ 目录"

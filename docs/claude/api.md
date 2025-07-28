@@ -22,7 +22,7 @@
 ### 生成的API类型
 - 所有API接口的TypeScript类型都会自动生成
 - 请求和响应的数据结构保持类型安全
-- 位于`src/api/types/generated.ts`
+- 位于`src/api/swagger/generated.ts`
 
 ## 后端
 

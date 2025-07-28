@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { GitCompare, MessageSquare, User, Database, LucideIcon } from 'lucide-react'
+import { GitCompare, MessageSquare, User, Database, LucideIcon, ListTodo } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface NavCard {
@@ -29,6 +29,11 @@ const navCards: NavCard[] = [
 		path: '/user',
 		icon: User,
 	},
+	{
+		title: 'todo list',
+		path: '/todo',
+		icon: ListTodo,
+	}
 ]
 
 export const Home = () => {

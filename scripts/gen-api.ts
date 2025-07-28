@@ -26,7 +26,7 @@ const DEBOUNCE_DELAY = 500 // 防抖延迟 (ms)
 const cfg = {
 	local: join(bePath, 'docs/swagger.json'),
 	remote: 'http://localhost:8080/swagger/doc.json', // gin-swagger 标准地址
-	outDir: join(projectRoot, 'src/api/types'),
+	outDir: join(projectRoot, 'src/api/swagger'),
 	outFile: 'generated.ts', // 新的输出文件名
 }
 
