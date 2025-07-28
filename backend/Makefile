@@ -58,13 +58,14 @@ clean:
 	go clean
 	rm -f $(BINARY_NAME)
 
+# NOTE：swag不能用latest，v1.16.5 有一个 segmentation fault 的 bug
 bootstrap:
 	go install github.com/air-verse/air@latest
-	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/swaggo/swag/cmd/swag@v1.8.12
 
 # 生成 Swagger 文档
 swagger:
-	cd cmd && swag init -g main.go -o ../docs/
+	swag init -g cmd/main.go -o docs/ --parseDependency --parseInternal
 	@echo "Swagger 文档已生成到 docs/ 目录"
 
 # 测试覆盖率
