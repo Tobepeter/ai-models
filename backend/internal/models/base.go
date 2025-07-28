@@ -29,8 +29,8 @@ type Pagination struct {
 	Total    int64 `json:"total"`
 }
 
-// PaginationResponse 分页响应模型
-type PaginationResponse[T any] struct {
-	Data       []T        `json:"data"`
+// PaginationResponse 分页响应模型 (non-generic version for Swagger compatibility)
+type PaginationResponse struct {
+	Data       []any      `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }

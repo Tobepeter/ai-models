@@ -1,18 +1,23 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { UserAvatar } from '@/components/common/user-avatar'
+import { FileUpload } from '@/components/common/file-upload'
 import { UserChangePwd } from '@/pages/user/components/user-change-pwd'
 import { useUserStore } from '@/store/user-store'
 import { authApi } from '@/api/auth/auth-api'
-import { Edit, LogOut, Settings, Key, LogIn } from 'lucide-react'
+import { Edit, LogOut, Settings, Key, LogIn, Upload } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { ossClient } from '@/utils/oss/oss-client'
+import { OssUploadResult } from '@/utils/oss/oss-types'
 
 export const User = () => {
-	const { info: user, token, goLogin } = useUserStore()
+	const { info: user, token, goLogin, setData } = useUserStore()
 	const navigate = useNavigate()
 	const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false)
+	const [avatarLoading, setAvatarLoading] = useState(false)
+	const currentObjectKeyRef = useRef<string>(user?.avatar_oss_key || '')
 
 	const handleLogout = async () => {
 		try {
@@ -21,6 +26,40 @@ export const User = () => {
 			console.error('Logout failed:', error)
 		}
 		navigate('/login')
+	}
+
+	// Handle avatar upload
+	const handleAvatarUpload = async (file: File, result?: OssUploadResult) => {
+		if (!result) return
+
+		setAvatarLoading(true)
+		try {
+			// If there's an old avatar, silently delete it
+			if (currentObjectKeyRef.current) {
+				ossClient.deleteFile(currentObjectKeyRef.current).catch((error) => {
+					console.warn('[User] Failed to delete old avatar:', error)
+				})
+			}
+
+			// Update the user's avatar in the store
+			setData({
+				info: {
+					...user,
+					avatar: result.url || '',
+					avatar_oss_key: result.objectKey,
+				},
+			})
+
+			// Save the new objectKey
+			currentObjectKeyRef.current = result.objectKey
+
+			// TODO: Update the user's avatar in the backend
+			// This would typically involve an API call to update the user's avatar URL and object key
+		} catch (error) {
+			console.error('Avatar update failed:', error)
+		} finally {
+			setAvatarLoading(false)
+		}
 	}
 
 	// 判断是否已登录（有token且用户名不是anonymous）
@@ -43,10 +82,27 @@ export const User = () => {
 			<Card>
 				<CardHeader>
 					<div className="flex items-center space-x-4">
-						<Avatar className="h-16 w-16">
-							<AvatarImage src={displayUser.avatar} alt={displayUser.username} />
-							<AvatarFallback className="text-xl">{displayUser.username.charAt(0).toUpperCase()}</AvatarFallback>
-						</Avatar>
+						<div className="flex flex-col items-center">
+							<UserAvatar 
+								src={displayUser.avatar} 
+								alt={displayUser.username} 
+								size={64}
+								fallbackText={displayUser.username.charAt(0).toUpperCase()}
+								loading={avatarLoading}
+							/>
+							{isLoggedIn && (
+								<FileUpload 
+									ossEnable 
+									onUpload={handleAvatarUpload}
+									onLoadingChange={setAvatarLoading}
+								>
+									<Button variant="ghost" size="sm" className="mt-2 h-8 px-2">
+										<Upload className="h-4 w-4 mr-1" />
+										更换头像
+									</Button>
+								</FileUpload>
+							)}
+						</div>
 						<div className="flex-1">
 							<CardTitle className="text-xl">{displayUser.username}</CardTitle>
 							<CardDescription>{displayUser.email}</CardDescription>

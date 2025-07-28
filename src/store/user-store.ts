@@ -13,6 +13,7 @@ const userState = {
 		username: 'anonymous',
 		email: 'anonymous@example.com',
 		avatar: '',
+		avatar_oss_key: '',
 		role: 'user',
 		is_active: false,
 		created_at: '',

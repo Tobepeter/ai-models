@@ -87,22 +87,21 @@ func (h *UserHandler) Login(c *gin.Context) {
 	response.Success(c, data)
 }
 
+// GetProfile 获取当前用户信息
 // @Summary 获取用户信息
 // @Description 获取当前登录用户的个人资料信息，包括基本信息、角色等
 // @ID getProfile
 // @Tags User
 // @Success 200 {object} response.Response{data=models.UserResponse}
+// @Failure 401 {object} response.Response
+// @Failure 500 {object} response.Response
 // @Router /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
-
+	userID := c.MustGet("userID").(uint)
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		logrus.Error("Failed to get user:", err)
-		response.Error(c, http.StatusInternalServerError, "Failed to get user profile")
+		response.Error(c, http.StatusInternalServerError, "Failed to get user")
 		return
 	}
 
@@ -145,7 +144,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 // @Tags Admin
 // @Param page query int true "页码"
 // @Param limit query int true "每页数量"
-// @Success 200 {object} response.Response{data=models.UserListResponse}
+// @Success 200 {object} response.Response{data=models.PaginationResponse}
 // @Router /admin/users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))

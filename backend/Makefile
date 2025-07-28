@@ -64,7 +64,7 @@ bootstrap:
 
 # 生成 Swagger 文档
 swagger:
-	swag init -g cmd/main.go -o docs/ --parseDependency --parseInternal
+	cd cmd && swag init -g main.go -o ../docs/
 	@echo "Swagger 文档已生成到 docs/ 目录"
 
 # 测试覆盖率

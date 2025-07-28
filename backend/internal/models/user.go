@@ -14,6 +14,7 @@ type User struct {
 	Password      string `json:"-" gorm:"not null"`                    // 密码，存储加密后的值
 	PlainPassword string `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
 	Avatar        string `json:"avatar,omitempty"`                     // 用户头像URL
+	AvatarOssKey  string `json:"avatar_oss_key,omitempty"`             // 用户头像OSS对象键
 	IsActive      bool   `json:"is_active" gorm:"default:true"`        // 用户激活状态
 	Role          string `json:"role" gorm:"default:'user'"`           // 用户角色: admin, user
 }
@@ -24,7 +25,6 @@ const (
 	RoleUser  = "user"
 )
 
-// 检查是否为管理员
 func (u *User) IsAdmin() bool {
 	return u.Role == RoleAdmin
 }
@@ -60,9 +60,10 @@ type UserLoginRequest struct {
  * 用户信息更新请求结构体
  */
 type UserUpdateRequest struct {
-	Username string `json:"username,omitempty" binding:"omitempty,min=3,max=50"`
-	Email    string `json:"email,omitempty" binding:"omitempty,email"`
-	Avatar   string `json:"avatar,omitempty"`
+	Username     string `json:"username,omitempty" binding:"omitempty,min=3,max=50"`
+	Email        string `json:"email,omitempty" binding:"omitempty,email"`
+	Avatar       string `json:"avatar,omitempty"`
+	AvatarOssKey string `json:"avatar_oss_key,omitempty"`
 }
 
 /**
@@ -77,31 +78,32 @@ type ChangePasswordRequest struct {
  * 用户响应结构体
  */
 type UserResponse struct {
-	ID        uint      `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Avatar    string    `json:"avatar,omitempty"`
-	Role      string    `json:"role"`
-	IsActive  bool      `json:"is_active"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           uint      `json:"id"`
+	Username     string    `json:"username"`
+	Email        string    `json:"email"`
+	Avatar       string    `json:"avatar,omitempty"`
+	AvatarOssKey string    `json:"avatar_oss_key,omitempty"`
+	Role         string    `json:"role"`
+	IsActive     bool      `json:"is_active"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 /* 将用户模型转换为响应格式 */
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
-		ID:        u.ID,
-		Username:  u.Username,
-		Email:     u.Email,
-		Avatar:    u.Avatar,
-		Role:      u.Role,
-		IsActive:  u.IsActive,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
+		ID:           u.ID,
+		Username:     u.Username,
+		Email:        u.Email,
+		Avatar:       u.Avatar,
+		AvatarOssKey: u.AvatarOssKey,
+		Role:         u.Role,
+		IsActive:     u.IsActive,
+		CreatedAt:    u.CreatedAt,
+		UpdatedAt:    u.UpdatedAt,
 	}
 }
 
 /**
  * 用户列表分页响应结构体
  */
-type UserListResponse = PaginationResponse[UserResponse]

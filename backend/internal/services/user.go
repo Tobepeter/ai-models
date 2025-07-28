@@ -115,30 +115,25 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 	return &user, nil
 }
 
-// GetUsers 获取用户列表
-func (s *UserService) GetUsers(page, limit int) (*models.UserListResponse, error) {
+// GetUsers 获取用户列表（分页）
+func (s *UserService) GetUsers(page, limit int) (*models.PaginationResponse, error) {
 	var users []models.User
-
-	// 使用基础服务的分页方法
 	total, err := s.Paginate(&models.User{}, &users, page, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换为响应格式
-	var userResponses []models.UserResponse
-	for _, user := range users {
-		userResponses = append(userResponses, user.ToResponse())
-	}
-
-	// 创建分页响应
-	response := &models.UserListResponse{
-		Data: userResponses,
+	response := &models.PaginationResponse{
+		Data: make([]any, len(users)),
 		Pagination: models.Pagination{
 			Current:  page,
 			PageSize: limit,
 			Total:    total,
 		},
+	}
+
+	for i, user := range users {
+		response.Data[i] = user.ToResponse()
 	}
 
 	return response, nil
