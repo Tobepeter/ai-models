@@ -95,7 +95,7 @@ function extractExports(code: string): string[] {
 /**
  * 生成window注入代码，包含冲突检查
  */
-function generateInjectionCode(exports: string[], filePath: string): string {
+function generateInjectionCode(exports: string[], filePath: string) {
   const fileName = filePath.split('/').pop() || 'unknown'
   
   const injections = exports.map(varName => `

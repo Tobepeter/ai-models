@@ -9,19 +9,19 @@ import tseslint from 'typescript-eslint'
 import noSimpleReturnTypes from './eslint-rules/no-simple-return-types.js'
 import tsxPropsPattern from './eslint-rules/tsx-props-pattern.js'
 import propsChildrenPattern from './eslint-rules/props-children-pattern.js'
-import noBlockComments from './eslint-rules/no-block-comments.js'
+import reactDestructureImports from './eslint-rules/react-destructure-imports.js'
 
 const customRules = {
 	'no-simple-return-types': noSimpleReturnTypes,
 	'tsx-props-pattern': tsxPropsPattern,
 	'props-children-pattern': propsChildrenPattern,
-	'no-block-comments': noBlockComments,
+	'react-destructure-imports': reactDestructureImports,
 }
 
 export default tseslint.config(
 	[
 		{
-			ignores: ['dist/**/*', 'temp/**/*', 'backend/**/*', 'src/components/ui/**', 'src/stories/**'],
+			ignores: ['dist/**/*', 'temp/**/*', 'backend/**/*', 'src/components/ui/**', 'src/hooks/use-mobile.ts', 'src/stories/**'],
 		},
 		{
 			files: ['**/*.{ts,tsx}'],
@@ -46,12 +46,7 @@ export default tseslint.config(
 				'custom/no-simple-return-types': 'error',
 				'custom/tsx-props-pattern': 'error',
 				'custom/props-children-pattern': 'error',
-				'custom/no-block-comments': [
-					'warn',
-					{
-						allowJSDoc: true,
-					},
-				],
+				'custom/react-destructure-imports': 'warn', // TODO: 貌似不生效
 			},
 		},
 	],

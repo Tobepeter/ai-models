@@ -4,7 +4,8 @@ import { Card, CardContent } from '@/components/ui/card'
  * OSS上传进度组件
  * 显示文件上传的进度条
  */
-export const TestOssUploadProgress = ({ uploading, progress }: TestOssUploadProgressProps) => {
+export const TestOssUploadProgress = (props: TestOssUploadProgressProps) => {
+	const { uploading, progress } = props
 	if (!uploading) return null
 
 	return (

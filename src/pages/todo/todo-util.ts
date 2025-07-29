@@ -42,7 +42,7 @@ const mockTodos: TodoResponse[] = [
 
 class TodoUtil {
 	/* 检查用户是否已登录 */
-	private isLoggedIn(): boolean {
+	private isLoggedIn() {
 		const { token, info } = useUserStore.getState()
 		return !!(token && info && info.username !== 'anonymous')
 	}
@@ -65,7 +65,7 @@ class TodoUtil {
 	}
 
 	/* 保存待办事项数据到localStorage */
-	savePersist(todos: TodoResponse[]): void {
+	savePersist(todos: TodoResponse[]) {
 		try {
 			localStorage.setItem(storageKeys.todo, JSON.stringify(todos))
 		} catch (error) {

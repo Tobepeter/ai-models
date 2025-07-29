@@ -10,8 +10,9 @@ export interface AppEmojiMartProps {
 	trigger?: React.ReactNode
 }
 
-/* Apple风格emoji选择器 */
-export const AppEmojiMart = ({ onEmojiSelect, onClear, trigger }: AppEmojiMartProps) => {
+// Apple风格emoji选择器
+export const AppEmojiMart = (props: AppEmojiMartProps) => {
+	const { onEmojiSelect, onClear, trigger } = props
 	const [isOpen, setIsOpen] = useState(false)
 
 	const handleEmojiSelect = (emoji: any) => {

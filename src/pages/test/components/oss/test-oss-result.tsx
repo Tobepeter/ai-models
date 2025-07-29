@@ -5,7 +5,8 @@ import { OssUploadResult } from '@/utils/oss/oss-types'
  * OSS测试结果组件
  * 以JSON格式显示最后的上传结果
  */
-export const TestOssResult = ({ result }: TestOssResultProps) => {
+export const TestOssResult = (props: TestOssResultProps) => {
+	const { result } = props
 	if (!result) return null
 
 	return (

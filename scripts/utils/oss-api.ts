@@ -78,7 +78,7 @@ class OssAPI {
 		}
 	}
 
-	getPublicUrl(objectKey: string): string {
+	getPublicUrl(objectKey: string) {
 		return `https://${ossBucket}.${ossRegion}.aliyuncs.com/${objectKey}`
 	}
 
@@ -87,7 +87,7 @@ class OssAPI {
 	 *
 	 * 返回类似: avatar_1642579200000_abc123.jpg
 	 */
-	hashifyName(fileName: string): string {
+	hashifyName(fileName: string) {
 		const name = fileName.split('/').pop() || 'unknown'
 		const timestamp = Date.now()
 		const randomStr = Math.random().toString(36).substring(2, 8)

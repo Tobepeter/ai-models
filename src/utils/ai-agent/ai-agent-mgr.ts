@@ -54,7 +54,7 @@ export class AIAgentManager {
 		return false
 	}
 
-	getModel(): string {
+	getModel() {
 		return this.agent?.currModel || ''
 	}
 
@@ -109,7 +109,7 @@ export class AIAgentManager {
 		return this.agent.getVideoTaskStatus(requestId)
 	}
 
-	checkValid(): boolean {
+	checkValid() {
 		const info = this.getInValidinfo()
 		if (info) {
 			console.error(info)
@@ -118,7 +118,7 @@ export class AIAgentManager {
 		return true
 	}
 
-	getInValidinfo(): string {
+	getInValidinfo() {
 		if (!this.agent) {
 			return 'agent is not initialized'
 		}

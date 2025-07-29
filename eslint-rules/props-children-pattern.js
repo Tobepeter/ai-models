@@ -7,13 +7,7 @@
  * 规范：
  * 1. 检查以 Props 结尾的 interface/type 定义
  * 2. 如果包含 children 属性，提示使用 PropsWithChildren
- * 3. 鼓励使用 React 官方的类型定义
- * 
- * 示例：
- * ❌ interface MyComponentProps { title: string; children: ReactNode }
- * ❌ type MyComponentProps = { title: string; children: React.ReactNode }
- * ✅ interface MyComponentProps extends PropsWithChildren { title: string }
- * ✅ type MyComponentProps = PropsWithChildren<{ title: string }>
+*  3. 使用使用放到组件props上，如 export const MyComponent = (props: PropsWithChildren<T>) => { ... }
  */
 export default {
   meta: {

@@ -34,7 +34,7 @@ export const UserChangePwd = (props: UserChangePwdProps) => {
 		}
 	})
 
-	const validateForm = useMemoizedFn((): boolean => {
+	const validateForm = useMemoizedFn(() => {
 		const newErrors: FormErrors = {}
 
 		if (!formData.oldPassword) {

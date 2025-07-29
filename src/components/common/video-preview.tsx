@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, PropsWithChildren } from 'react'
 import { Play, Plus, Trash2, Video as VideoIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -112,7 +112,7 @@ export const VideoPreview = (props: VideoPreviewProps) => {
 	)
 }
 
-export type VideoPreviewProps = {
+export type VideoPreviewProps = PropsWithChildren<{
 	url?: string // 外部控制的视频URL，优先级高于内部状态
 	defaultUrl?: string // 默认视频URL，仅在组件初始化时生效
 	cover?: string // 自定义封面图片URL
@@ -126,4 +126,4 @@ export type VideoPreviewProps = {
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）
-}
+}>

@@ -9,7 +9,8 @@ interface UserSettingsProps {
 	onChangePassword?: () => void
 }
 
-export const UserSettings = ({ onChangePassword }: UserSettingsProps) => {
+export const UserSettings = (props: UserSettingsProps) => {
+	const { onChangePassword } = props
 	const { info: user, token } = useUserStore()
 	const navigate = useNavigate()
 

@@ -1,28 +1,28 @@
-/**
- * ESLint 自定义规则：禁止简单返回值类型注解
- * 
- * 目标：移除函数中不必要的简单返回值类型注解，让 TypeScript 自动推断类型
- * 
- * 检测的简单类型：
- * - void：无返回值函数
- * - string：字符串返回值
- * - number：数字返回值  
- * - boolean：布尔返回值
- * - Promise<void>：异步无返回值函数
- * 
- * 原理：这些简单类型可以被 TypeScript 自动推断，显式标注是冗余的
- * 
- * 示例：
- * ❌ function getName(): string { return 'hello' }
- * ❌ const isValid = (): boolean => true
- * ❌ async function save(): Promise<void> { await api.save() }
- * ❌ const onClick = (): void => { console.log('click') }
- * 
- * ✅ function getName() { return 'hello' }           // 自动推断为 string
- * ✅ const isValid = () => true                      // 自动推断为 boolean  
- * ✅ async function save() { await api.save() }      // 自动推断为 Promise<void>
- * ✅ const onClick = () => { console.log('click') }  // 自动推断为 void
- */
+//
+// ESLint 自定义规则：禁止简单返回值类型注解
+//
+// 目标：移除函数中不必要的简单返回值类型注解，让 TypeScript 自动推断类型
+//
+// 检测的简单类型：
+// - void：无返回值函数
+// - string：字符串返回值
+// - number：数字返回值
+// - boolean：布尔返回值
+// - Promise<void>：异步无返回值函数
+//
+// 原理：这些简单类型可以被 TypeScript 自动推断，显式标注是冗余的
+//
+// 示例：
+// ❌ function getName(): string { return 'hello' }
+// ❌ const isValid = (): boolean => true
+// ❌ async function save(): Promise<void> { await api.save() }
+// ❌ const onClick = (): void => { console.log('click') }
+//
+// ✅ function getName() { return 'hello' }           // 自动推断为 string
+// ✅ const isValid = () => true                      // 自动推断为 boolean
+// ✅ async function save() { await api.save() }      // 自动推断为 Promise<void>
+// ✅ const onClick = () => { console.log('click') }  // 自动推断为 void
+//
 export default {
   meta: {
     type: 'suggestion',  // 规则类型：建议性规则
@@ -35,10 +35,10 @@ export default {
   },
   
   create(context) {
-    /**
-     * 检查函数的返回值类型注解是否为简单类型
-     * @param {Object} node - AST 函数节点
-     */
+    //
+// 检查函数的返回值类型注解是否为简单类型
+// @param {Object} node - AST 函数节点
+//
     function checkReturnType(node) {
       // 如果函数没有返回值类型注解，跳过检查
       if (!node.returnType) return

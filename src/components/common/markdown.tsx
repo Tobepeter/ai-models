@@ -10,7 +10,8 @@ import { v4 as uuidv4 } from 'uuid'
 /**
  * Mermaid 图表组件
  */
-const MermaidChart = ({ chart }: { chart: string }) => {
+const MermaidChart = (props: { chart: string }) => {
+	const { chart } = props
 	const ref = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {

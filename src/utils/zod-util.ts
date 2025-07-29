@@ -35,7 +35,7 @@ const customErrorMap: z.core.$ZodErrorMap = (issue) => {
 }
 
 // 类型转换为中文
-function getTypeInChinese(type: z.core.$ZodTypeDef['type']): string {
+function getTypeInChinese(type: z.core.$ZodTypeDef['type']) {
 	const typeMap: Record<z.core.$ZodTypeDef['type'], string> = {
 		string: '文本',
 		number: '数字',

@@ -12,21 +12,22 @@ import { ossAccessKeyId } from '@/utils/env'
  * OSS权限配置组件
  * 配置读写权限、后端签名模式和AK密钥
  */
-export const TestOssPermissions = ({
-	readPermission,
-	writePermission,
-	backendSignMode,
-	akDialogOpen,
-	currAccessKeyId,
-	currAccessKeySecret,
-	onReadPermissionChange,
-	onWritePermissionChange,
-	onBackendSignModeChange,
-	onAkDialogOpenChange,
-	onAccessKeyIdChange,
-	onAccessKeySecretChange,
-	onSaveAkConfig,
-}: TestOssPermissionsProps) => {
+export const TestOssPermissions = (props: TestOssPermissionsProps) => {
+	const {
+		readPermission,
+		writePermission,
+		backendSignMode,
+		akDialogOpen,
+		currAccessKeyId,
+		currAccessKeySecret,
+		onReadPermissionChange,
+		onWritePermissionChange,
+		onBackendSignModeChange,
+		onAkDialogOpenChange,
+		onAccessKeyIdChange,
+		onAccessKeySecretChange,
+		onSaveAkConfig,
+	} = props
 	return (
 		<Card>
 			<CardHeader>

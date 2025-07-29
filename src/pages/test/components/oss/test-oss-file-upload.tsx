@@ -7,7 +7,8 @@ import { RefObject } from 'react'
  * OSS文件上传组件
  * 处理文件选择、上传和结果展示
  */
-export const TestOssFileUpload = ({ uploading, result, fileRef, onUpload, onSelectFile, onDeleteResult }: TestOssFileUploadProps) => {
+export const TestOssFileUpload = (props: TestOssFileUploadProps) => {
+	const { uploading, result, fileRef, onUpload, onSelectFile, onDeleteResult } = props
 	return (
 		<Card>
 			<CardHeader>

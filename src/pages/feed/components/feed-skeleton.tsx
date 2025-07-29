@@ -6,9 +6,12 @@ interface FeedSkeletonProps {
 }
 
 /* 骨架屏基础组件 - 带动画效果 */
-const SkeletonBox = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-	<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...props} />
-)
+const SkeletonBox = (props: React.HTMLAttributes<HTMLDivElement>) => {
+	const { className, ...restProps } = props
+	return (
+		<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...restProps} />
+	)
+}
 
 /* 单个信息流项目骨架屏 */
 const FeedItemSkeleton = () => (
@@ -55,26 +58,35 @@ const FeedItemSkeleton = () => (
 )
 
 /* 信息流骨架屏组件 */
-export const FeedSkeleton = ({ className, count = 3 }: FeedSkeletonProps) => (
-	<div className={cn('space-y-0', className)}>
-		{Array.from({ length: count }, (_, index) => (
-			<FeedItemSkeleton key={index} />
-		))}
-	</div>
-)
+export const FeedSkeleton = (props: FeedSkeletonProps) => {
+	const { className, count = 3 } = props
+	return (
+		<div className={cn('space-y-0', className)}>
+			{Array.from({ length: count }, (_, index) => (
+				<FeedItemSkeleton key={index} />
+			))}
+		</div>
+	)
+}
 
 /* 加载更多骨架屏 */
-export const LoadMoreSkeleton = ({ className }: { className?: string }) => (
-	<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
-		<SkeletonBox className="w-4 h-4 rounded-full" />
-		<SkeletonBox className="h-4 w-20" />
-	</div>
-)
+export const LoadMoreSkeleton = (props: { className?: string }) => {
+	const { className } = props
+	return (
+		<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
+			<SkeletonBox className="w-4 h-4 rounded-full" />
+			<SkeletonBox className="h-4 w-20" />
+		</div>
+	)
+}
 
 /* 刷新骨架屏 */
-export const RefreshSkeleton = ({ className }: { className?: string }) => (
-	<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
-		<SkeletonBox className="w-5 h-5 rounded-full" />
-		<SkeletonBox className="h-4 w-16" />
-	</div>
-)
+export const RefreshSkeleton = (props: { className?: string }) => {
+	const { className } = props
+	return (
+		<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
+			<SkeletonBox className="w-5 h-5 rounded-full" />
+			<SkeletonBox className="h-4 w-16" />
+		</div>
+	)
+}

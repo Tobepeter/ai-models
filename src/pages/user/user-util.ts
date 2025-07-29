@@ -21,7 +21,7 @@ export const parseUserExtra = (extra?: string): UserExtra => {
 }
 
 /* 序列化用户扩展字段 */
-export const stringifyUserExtra = (extra: UserExtra): string => {
+export const stringifyUserExtra = (extra: UserExtra) => {
 	return JSON.stringify(extra)
 }
 

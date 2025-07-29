@@ -1,4 +1,4 @@
-import { useState, useRef, CSSProperties, useEffect } from 'react'
+import { useState, useRef, CSSProperties, useEffect, PropsWithChildren } from 'react'
 import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -264,7 +264,7 @@ export const ImagePreview = (props: ImagePreviewProps) => {
 	)
 }
 
-export type ImagePreviewProps = {
+export type ImagePreviewProps = PropsWithChildren<{
 	url?: string // 外部控制的图片URL，优先级高于内部状态
 	defaultUrl?: string // 默认图片URL，仅在组件初始化时生效
 	loading?: boolean // 外部控制的loading状态，undefined时使用内部状态
@@ -287,4 +287,4 @@ export type ImagePreviewProps = {
 	size?: number // 统一尺寸（像素）
 	aspectRatio?: string // 宽高比，如 '16/9', '4/3', '1/1' 等
 	base64Mode?: boolean // 是否使用base64模式
-}
+}>

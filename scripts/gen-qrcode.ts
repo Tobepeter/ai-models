@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename)
 const outputDir = path.join(__dirname, '../temp/qrcode/')
 
 /** 获取本机内网IP地址 */
-function getLocalIP(): string {
+function getLocalIP() {
 	const interfaces = os.networkInterfaces()
 
 	for (const name of Object.keys(interfaces)) {
