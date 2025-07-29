@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { UserAvatar } from '@/components/common/user-avatar'
-import { Send } from 'lucide-react'
+import { Send, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface CommentInputProps {
@@ -14,7 +14,6 @@ interface CommentInputProps {
 	className?: string
 }
 
-/* 评论输入组件 - 支持普通评论和回复评论 */
 export const CommentInput = (props: CommentInputProps) => {
 	const { postId, replyTo, placeholder, onSubmit, onCancel, className } = props
 	const [content, setContent] = useState('')
@@ -39,37 +38,57 @@ export const CommentInput = (props: CommentInputProps) => {
 		}
 	}
 
-	const displayPlaceholder = placeholder || '输入你的回复...'
+	const displayPlaceholder = placeholder || (replyTo ? `回复 ${replyTo}...` : '写下你的想法...')
 
 	return (
-		<div className={cn('flex space-x-3 p-4 border-b border-border', className)}>
-			<UserAvatar src="https://i.pravatar.cc/150?img=1" alt="当前用户头像" size={32} className="flex-shrink-0 mt-1" fallbackText="我" />
+		<div className={cn('p-4', className)}>
+			{replyTo && (
+				<div className="flex items-center justify-between mb-3 p-2 bg-muted/50 rounded-lg">
+					<span className="text-sm text-muted-foreground">
+						回复 <span className="font-medium text-foreground">@{replyTo}</span>
+					</span>
+					{onCancel && (
+						<Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onCancel}>
+							<X className="h-3 w-3" />
+						</Button>
+					)}
+				</div>
+			)}
 
-			<div className="flex-1 space-y-2">
-				<Textarea
-					value={content}
-					onChange={(e) => setContent(e.target.value)}
-					onKeyDown={handleKeyDown}
-					placeholder={displayPlaceholder}
-					className="min-h-[80px] resize-none border-0 shadow-none focus-visible:ring-0 p-0"
-					maxLength={500}
+			<div className="flex space-x-3">
+				<UserAvatar 
+					src="https://i.pravatar.cc/150?img=1" 
+					alt="当前用户头像" 
+					size={36} 
+					className="flex-shrink-0" 
+					fallbackText="我" 
 				/>
 
-				<div className="flex items-center justify-between">
-					<div className="text-xs text-muted-foreground">
-						{content.length}/500 {content.length > 0 && '• Cmd+Enter 发送'}
-					</div>
+				<div className="flex-1 space-y-3">
+					<Textarea
+						value={content}
+						onChange={(e) => setContent(e.target.value)}
+						onKeyDown={handleKeyDown}
+						placeholder={displayPlaceholder}
+						className="min-h-[100px] resize-none"
+					/>
 
-					<div className="flex items-center space-x-2">
-						{onCancel && (
+					<div className="flex justify-end space-x-2">
+						{onCancel && !replyTo && (
 							<Button variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting}>
 								取消
 							</Button>
 						)}
-
-						<Button size="sm" onClick={handleSubmit} disabled={!content.trim() || isSubmitting} className="min-w-[60px]">
+						<Button 
+							size="sm" 
+							onClick={handleSubmit} 
+							disabled={!content.trim() || isSubmitting}
+						>
 							{isSubmitting ? (
-								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+								<>
+									<div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+									发送中
+								</>
 							) : (
 								<>
 									<Send className="h-3 w-3 mr-1" />

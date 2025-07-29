@@ -10,19 +10,27 @@ interface FeedItemProps {
 	post: FeedPost
 	onLike: (postId: string) => void
 	onToggleExpand: (postId: string) => void
-	onToggleComments: (postId: string) => void
 	onAddComment: (postId: string, content: string, replyTo?: string) => void
+	onLikeComment?: (commentId: string) => void
+	onReply?: (postId: string, username: string) => void
 	className?: string
 }
 
 /* 信息流单项组件 - 布局：头像信息 + 文字内容 + 图片 + 交互按钮 + 评论输入区(动态展开) + 评论列表 */
 export const FeedItem = (props: FeedItemProps) => {
-	const { post, onLike, onToggleExpand, onToggleComments, onAddComment, className } = props
+	const { post, onLike, onToggleExpand, onAddComment, onLikeComment, onReply, className } = props
 
 	const handleToggleExpand = () => onToggleExpand(post.id)
-	const handleToggleComments = () => onToggleComments(post.id)
 	const handleAddComment = (content: string, replyTo?: string) => {
 		onAddComment(post.id, content, replyTo)
+	}
+
+	const handleLikeComment = (commentId: string) => {
+		onLikeComment?.(commentId)
+	}
+
+	const handleReply = (username: string) => {
+		onReply?.(post.id, username)
 	}
 
 	const handleViewMore = () => {
@@ -46,18 +54,17 @@ export const FeedItem = (props: FeedItemProps) => {
 				likeCount={post.likeCount}
 				commentCount={post.commentCount}
 				isLiked={post.isLiked}
-				showComments={post.showComments}
 				onLike={onLike}
-				onComment={handleToggleComments}
+				onAddComment={handleAddComment}
 			/>
-
-			{/* 评论区域 - 包含动态展开的输入框和评论列表 */}
+			
+			{/* 评论列表 */}
 			<CommentSection
 				postId={post.id}
 				comments={post.comments}
-				showCommentInput={post.showComments}
-				onAddComment={handleAddComment}
 				onViewMore={handleViewMore}
+				onLikeComment={handleLikeComment}
+				onReply={handleReply}
 			/>
 		</article>
 	)

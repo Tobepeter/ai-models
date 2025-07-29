@@ -20,7 +20,6 @@ class FeedUtil {
 		const emojis: string[] = []
 		const emojiMartData = data as any
 
-		// 遍历所有分类
 		const categories = emojiMartData.categories || []
 		const emojiMapping = emojiMartData.emojis || {}
 
@@ -34,13 +33,12 @@ class FeedUtil {
 			}
 		}
 
-		// console.log(emojis)
 
 		return emojis.length > 0 ? emojis : ['😀', '😃', '😄'] // 回退到默认表情
 	}
 
 	/* 格式化时间为中文相对时间 */
-	formatTime(timestamp: string): string {
+	formatTime(timestamp: string) {
 		const now = dayjs()
 		const time = dayjs(timestamp)
 		const diffInMinutes = now.diff(time, 'minute')
@@ -50,13 +48,13 @@ class FeedUtil {
 		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前` // 24小时内
 		if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}天前` // 7天内
 		return time.format('MM-DD') // 超过7天显示日期
-	}
+	} // console.log(emojis) // 遍历所有分类
 
-	truncateContent(content: string, maxLength: number = this.MAX_CONTENT_LENGTH): string {
+	truncateContent(content: string, maxLength: number = this.MAX_CONTENT_LENGTH) {
 		return truncate(content, { length: maxLength, omission: '...' })
 	}
 
-	needsTruncate(content: string): boolean {
+	needsTruncate(content: string) {
 		return content.length > this.MAX_CONTENT_LENGTH
 	}
 
@@ -65,7 +63,7 @@ class FeedUtil {
 		return content.match(hashtagRegex) || []
 	}
 
-	generateCursor(timestamp: number, postId: string): string {
+	generateCursor(timestamp: number, postId: string) {
 		return `${timestamp}_${postId}` // 格式: timestamp_postId
 	}
 
@@ -81,15 +79,15 @@ class FeedUtil {
 		}
 	}
 
-	randomStatus(): string {
+	randomStatus() {
 		return this.STATUS_EMOJIS[Math.floor(Math.random() * this.STATUS_EMOJIS.length)]
 	}
 
-	generateUserId(): string {
+	generateUserId() {
 		return `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 	}
 
-	generatePostId(): string {
+	generatePostId() {
 		return `post_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 	}
 
@@ -103,7 +101,7 @@ class FeedUtil {
 	}
 
 	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M, >999M显示999M+ */
-	formatCount(count: number): string {
+	formatCount(count: number) {
 		if (count < 1000) return count.toString()
 
 		if (count < 1000000) {
@@ -119,7 +117,7 @@ class FeedUtil {
 		return '999M+'
 	}
 
-	isValidImageUrl(url: string): boolean {
+	isValidImageUrl(url: string) {
 		try {
 			const urlObj = new URL(url)
 			const pathname = urlObj.pathname.toLowerCase()

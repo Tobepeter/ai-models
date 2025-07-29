@@ -30,7 +30,6 @@ export interface FeedPost {
 	commentCount: number
 	isLiked: boolean
 	isExpanded: boolean // 长内容展开状态
-	showComments: boolean // 是否展开评论区
 	comments: Comment[] // 评论列表
 }
 
@@ -91,11 +90,6 @@ const stateCreator = () => {
 			set({ posts: updatedPosts })
 		},
 
-		toggleComments: (postId: string) => {
-			const { posts } = get()
-			const updatedPosts = posts.map((post) => (post.id === postId ? { ...post, showComments: !post.showComments } : post))
-			set({ posts: updatedPosts })
-		},
 
 		addComment: (postId: string, comment: Comment) => {
 			const { posts } = get()
@@ -124,7 +118,6 @@ export const useFeedStore = create(
 		partialize: (state) => ({
 			posts: state.posts.slice(0, 50).map(post => ({
 				...post,
-				showComments: false, // 不持久化评论输入框展开状态
 				isExpanded: false, // 不持久化内容展开状态
 			})),
 			cursor: state.cursor,

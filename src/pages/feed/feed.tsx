@@ -33,9 +33,14 @@ export const Feed = () => {
 
 	const handleLike = (postId: string) => feedMgr.toggleLike(postId)
 	const handleToggleExpand = (postId: string) => feedMgr.toggleExpand(postId)
-	const handleToggleComments = (postId: string) => feedMgr.toggleComments(postId)
 	const handleAddComment = (postId: string, content: string, replyTo?: string) => {
 		feedMgr.addComment(postId, content, replyTo)
+	}
+	const handleLikeComment = (commentId: string) => {
+		console.log('点赞评论:', commentId) // TODO: 实现评论点赞功能
+	}
+	const handleReply = (postId: string, username: string) => {
+		console.log('回复用户:', postId, username) // TODO: 实现回复功能状态管理
 	}
 
 	const handleRetry = () => {
@@ -78,7 +83,7 @@ export const Feed = () => {
 				{posts.length > 0 && (
 					<div className="divide-y divide-border">
 						{posts.map((post) => (
-							<FeedItem key={post.id} post={post} onLike={handleLike} onToggleExpand={handleToggleExpand} onToggleComments={handleToggleComments} onAddComment={handleAddComment} />
+							<FeedItem key={post.id} post={post} onLike={handleLike} onToggleExpand={handleToggleExpand} onAddComment={handleAddComment} onLikeComment={handleLikeComment} onReply={handleReply} />
 						))}
 					</div>
 				)}

@@ -6,11 +6,22 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
+import noSimpleReturnTypes from './eslint-rules/no-simple-return-types.js'
+import tsxPropsPattern from './eslint-rules/tsx-props-pattern.js'
+import propsChildrenPattern from './eslint-rules/props-children-pattern.js'
+import noBlockComments from './eslint-rules/no-block-comments.js'
+
+const customRules = {
+	'no-simple-return-types': noSimpleReturnTypes,
+	'tsx-props-pattern': tsxPropsPattern,
+	'props-children-pattern': propsChildrenPattern,
+	'no-block-comments': noBlockComments,
+}
 
 export default tseslint.config(
 	[
 		{
-			ignores: ['dist/**/*', 'temp/**/*', 'backend/**/*'],
+			ignores: ['dist/**/*', 'temp/**/*', 'backend/**/*', 'src/components/ui/**', 'src/stories/**'],
 		},
 		{
 			files: ['**/*.{ts,tsx}'],
@@ -18,6 +29,9 @@ export default tseslint.config(
 			languageOptions: {
 				ecmaVersion: 2020,
 				globals: globals.browser,
+			},
+			plugins: {
+				custom: { rules: customRules },
 			},
 			rules: {
 				'@typescript-eslint/no-unused-vars': 'off',
@@ -27,6 +41,17 @@ export default tseslint.config(
 				'react-hooks/exhaustive-deps': 'off',
 				'@typescript-eslint/no-empty-object-type': 'off',
 				'@typescript-eslint/ban-ts-comment': 'off', // 允许 @ts-ignore 注释，非强制 @ts-expect-error
+
+				// == custom ==
+				'custom/no-simple-return-types': 'error',
+				'custom/tsx-props-pattern': 'error',
+				'custom/props-children-pattern': 'error',
+				'custom/no-block-comments': [
+					'warn',
+					{
+						allowJSDoc: true,
+					},
+				],
 			},
 		},
 	],

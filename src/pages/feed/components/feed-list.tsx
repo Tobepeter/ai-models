@@ -12,8 +12,9 @@ interface FeedListProps {
 	hasMore: boolean
 	onLike: (postId: string) => void
 	onToggleExpand: (postId: string) => void
-	onToggleComments: (postId: string) => void
 	onAddComment: (postId: string, content: string, replyTo?: string) => void
+	onLikeComment?: (commentId: string) => void
+	onReply?: (postId: string, username: string) => void
 	onLoadMore: () => void
 	className?: string
 }
@@ -28,7 +29,7 @@ const OVERSCAN_COUNT = 5
  * 虚拟滚动信息流列表组件
  */
 export const FeedList = (props: FeedListProps) => {
-	const { posts, loading, hasMore, onLike, onToggleExpand, onToggleComments, onAddComment, onLoadMore, className } = props
+	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onLikeComment, onReply, onLoadMore, className } = props
 
 	const listRef = useRef<List>(null)
 	const [listHeight, setListHeight] = useState(600)
@@ -70,7 +71,7 @@ export const FeedList = (props: FeedListProps) => {
 
 		return (
 			<div style={style}>
-				<FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onToggleComments={onToggleComments} onAddComment={onAddComment} />
+				<FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} onLikeComment={onLikeComment} onReply={onReply} />
 			</div>
 		)
 	}

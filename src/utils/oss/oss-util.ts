@@ -13,7 +13,7 @@ class OssUtil {
 	 * 返回类似: avatar_1642579200000_abc123.jpg
 	 * 后端也有类似的代码，如果使用的是后端上传
 	 */
-	hashifyName(fileName: string): string {
+	hashifyName(fileName: string) {
 		const name = fileName.split('/').pop() || 'unknown'
 		const timestamp = Date.now()
 		const randomStr = Math.random().toString(36).substring(2, 8)

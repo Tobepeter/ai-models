@@ -155,7 +155,6 @@ class FeedMock {
 				commentCount: Math.floor(Math.random() * 100),
 				isLiked: Math.random() > 0.7,
 				isExpanded: false,
-				showComments: false, // 控制评论输入框的展开状态
 				comments: this.generateMockComments(postId, Math.floor(Math.random() * 15 + 5)), // 5-20条评论
 			}
 
@@ -209,19 +208,18 @@ class FeedMock {
 		}
 	}
 
-	private randomName(): string {
+	private randomName() {
 		return CHINESE_NAMES[Math.floor(Math.random() * CHINESE_NAMES.length)]
 	}
 
-	private randomAvatar(): string {
+	private randomAvatar() {
 		const avatars = [dummy.images.avatar, dummy.images.avatarFemale, dummy.images.avatarMale, 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70 + 1)]
 		return avatars[Math.floor(Math.random() * avatars.length)]
 	}
 
-	private randomContent(): string {
+	private randomContent() {
 		const template = CONTENT_TEMPLATES[Math.floor(Math.random() * CONTENT_TEMPLATES.length)]
 
-		// 30%概率生成长内容
 		if (Math.random() > 0.7) {
 			const additionalContent = CONTENT_TEMPLATES.filter((t) => t !== template)
 				.slice(0, Math.floor(Math.random() * 3 + 1))
@@ -232,18 +230,18 @@ class FeedMock {
 		return template
 	}
 
-	private randomImage(): string {
+	private randomImage() {
 		const images = [dummy.images.landscape, dummy.images.portrait, dummy.images.square, dummy.getImage('landscape'), dummy.getImage('portrait'), dummy.getImage('square')]
 		return images[Math.floor(Math.random() * images.length)]
 	}
 
-	private randomCommentContent(): string {
+	private randomCommentContent() {
 		return COMMENT_TEMPLATES[Math.floor(Math.random() * COMMENT_TEMPLATES.length)]
 	}
 
-	private randomReplyContent(): string {
+	private randomReplyContent() {
 		return REPLY_TEMPLATES[Math.floor(Math.random() * REPLY_TEMPLATES.length)]
 	}
 }
 
-export const feedMock = new FeedMock()
+export const feedMock = new FeedMock() // 30%概率生成长内容
