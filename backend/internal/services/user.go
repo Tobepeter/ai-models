@@ -51,6 +51,7 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 		Username: req.Username,
 		Email:    req.Email,
 		Password: string(hashedPassword),
+		Role:     models.RoleUser, // 默认角色为普通用户
 		IsActive: true,
 	}
 

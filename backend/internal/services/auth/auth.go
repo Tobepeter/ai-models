@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"ai-models-backend/internal/config"
 	"ai-models-backend/internal/models"
+	"ai-models-backend/internal/services"
 	"errors"
 
 	"github.com/sirupsen/logrus"
@@ -43,37 +43,10 @@ func (s *AuthService) Login(username, password string) (*models.User, string, er
 
 // Register 用户注册
 func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, string, error) {
-	// 检查用户名是否已存在
-	if s.ExistsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
-		return nil, "", errors.New("用户名已存在")
-	}
-
-	// 检查邮箱是否已存在
-	if s.ExistsByCondition(&models.User{}, map[string]any{"email": req.Email}) {
-		return nil, "", errors.New("邮箱已存在")
-	}
-
-	// 加密密码
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	// 调用用户服务创建用户
+	userService := services.NewUserService(s.config)
+	user, err := userService.CreateUser(req)
 	if err != nil {
-		return nil, "", err
-	}
-
-	user := &models.User{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: string(hashedPassword),
-		Role:     models.RoleUser, // 默认角色为普通用户
-		IsActive: true,
-	}
-
-	// 根据配置决定是否存储明文密码
-	if config.UserStorePlainPassword {
-		user.PlainPassword = req.Password
-	}
-
-	// 保存到数据库
-	if err := s.DB.Create(user).Error; err != nil {
 		return nil, "", err
 	}
 
@@ -142,4 +115,3 @@ func (s *AuthService) CreateDefaultAdmin() error {
 	logrus.Infof("默认管理员用户已创建: %s", username)
 	return nil
 }
-

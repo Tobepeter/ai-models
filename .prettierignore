@@ -1,1 +1,5 @@
+# NOTE: preattier will ignore .gitignore specified and node_modules/
+
 /docs
+/src/components/ui/
+/backend/
