@@ -36,17 +36,19 @@ export const FeedActions = (props: FeedActionsProps) => {
 
 	return (
 		<div className={cn('flex items-center space-x-4 pt-2', className)}>
-			{/* 点赞按钮和动画 */}
+			{/* 点赞 */}
 			<Button
 				variant="ghost"
 				size="sm"
 				className={cn('h-8 px-2 min-w-[60px] justify-start transition-colors', isLiked ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-red-500')}
 				onClick={handleLike}
 			>
+				{/* 点赞爱心 */}
 				<motion.div whileTap={{ scale: 1.2 }} transition={{ duration: 0.1 }} className="mr-1">
 					<Heart className={cn('h-4 w-4 transition-colors', isLiked && 'fill-current')} />
 				</motion.div>
 
+				{/* 点赞数量 */}
 				<AnimatePresence mode="wait">
 					<motion.span
 						key={likeCount}

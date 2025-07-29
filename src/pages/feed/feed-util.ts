@@ -2,6 +2,7 @@ import { truncate, debounce } from 'lodash-es'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
+import data from '@emoji-mart/data'
 
 dayjs.extend(relativeTime) // 配置中文相对时间
 dayjs.locale('zh-cn')
@@ -12,89 +13,31 @@ dayjs.locale('zh-cn')
  */
 class FeedUtil {
 	readonly MAX_CONTENT_LENGTH = 200 // 内容最大长度
-	readonly STATUS_EMOJIS = [
-		// 用户状态表情
-		'😀',
-		'😃',
-		'😄',
-		'😁',
-		'😆',
-		'😅',
-		'😂',
-		'🤣',
-		'😊',
-		'😇',
-		'🙂',
-		'🙃',
-		'😉',
-		'😌',
-		'😍',
-		'🥰',
-		'😘',
-		'😗',
-		'😙',
-		'😚',
-		'😋',
-		'😛',
-		'😝',
-		'😜',
-		'🤪',
-		'🤨',
-		'🧐',
-		'🤓',
-		'😎',
-		'🤩',
-		'🥳',
-		'😏',
-		'😒',
-		'😞',
-		'😔',
-		'😟',
-		'😕',
-		'🙁',
-		'☹️',
-		'😣',
-		'😖',
-		'😫',
-		'😩',
-		'🥺',
-		'😢',
-		'😭',
-		'😤',
-		'😠',
-		'😡',
-		'🤬',
-		'🤯',
-		'😳',
-		'🥵',
-		'🥶',
-		'😱',
-		'😨',
-		'😰',
-		'😥',
-		'😓',
-		'🤗',
-		'🤔',
-		'🤭',
-		'🤫',
-		'🤥',
-		'😶',
-		'😐',
-		'😑',
-		'😬',
-		'🙄',
-		'😯',
-		'😦',
-		'😧',
-		'😮',
-		'😲',
-		'🥱',
-		'😴',
-		'🤤',
-		'😪',
-		'😵',
-		'🤐',
-	]
+	readonly STATUS_EMOJIS = this.getAllEmojis()
+
+	/* 从emoji-mart数据中获取所有表情 */
+	getAllEmojis(): string[] {
+		const emojis: string[] = []
+		const emojiMartData = data as any
+
+		// 遍历所有分类
+		const categories = emojiMartData.categories || []
+		const emojiMapping = emojiMartData.emojis || {}
+
+		for (const category of categories) {
+			const categoryEmojis = category.emojis || []
+			for (const emojiId of categoryEmojis) {
+				const emoji = emojiMapping[emojiId]
+				if (emoji?.skins?.[0]?.native) {
+					emojis.push(emoji.skins[0].native)
+				}
+			}
+		}
+
+		// console.log(emojis)
+
+		return emojis.length > 0 ? emojis : ['😀', '😃', '😄'] // 回退到默认表情
+	}
 
 	/* 格式化时间为中文相对时间 */
 	formatTime(timestamp: string): string {
@@ -159,7 +102,7 @@ class FeedUtil {
 		return debounce(func, wait) // 使用lodash防抖
 	}
 
-	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M */
+	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M, >999M显示999M+ */
 	formatCount(count: number): string {
 		if (count < 1000) return count.toString()
 
@@ -168,13 +111,12 @@ class FeedUtil {
 			return k % 1 === 0 ? `${k}k` : `${k.toFixed(1)}k`
 		}
 
-		if (count < 1000000000) {
+		if (count < 999000000) {
 			const m = count / 1000000
 			return m % 1 === 0 ? `${m}M` : `${m.toFixed(1)}M`
 		}
 
-		const b = count / 1000000000
-		return b % 1 === 0 ? `${b}B` : `${b.toFixed(1)}B`
+		return '999M+'
 	}
 
 	isValidImageUrl(url: string): boolean {

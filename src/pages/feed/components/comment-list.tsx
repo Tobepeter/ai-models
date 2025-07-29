@@ -3,7 +3,7 @@ import { type Comment } from '../feed-store'
 import { cn } from '@/lib/utils'
 
 interface CommentListProps {
-	comments: Comment[]
+	comments?: Comment[]
 	onReply: (username: string) => void
 	onLikeComment?: (commentId: string) => void
 	className?: string
@@ -16,13 +16,13 @@ interface CommentListProps {
 export const CommentList = (props: CommentListProps) => {
 	const { comments, onReply, onLikeComment, className } = props
 
-	if (comments.length === 0) {
-		return <div className={cn('py-8 text-center text-muted-foreground text-sm', className)}>暂无评论，来说点什么吧~</div>
+	if (!comments || comments.length === 0) {
+		return <div className={cn('py-4 text-center text-muted-foreground text-sm', className)}>暂无评论</div>
 	}
 
 	return (
-		<div className={cn('divide-y divide-border', className)}>
-			{comments.map((comment) => (
+		<div className={cn('py-3 space-y-1', className)}>
+			{comments?.map((comment) => (
 				<CommentItem key={comment.id} comment={comment} onReply={onReply} onLike={onLikeComment} />
 			))}
 		</div>

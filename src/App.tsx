@@ -16,9 +16,6 @@ function App() {
 	useGitHubPagesRouter()
 
 	useMount(async () => {
-		// 初始化 zod 中文错误消息
-		await zodUtil.init()
-
 		let msg = ''
 		if (isDev) {
 			debug.init()
@@ -30,6 +27,7 @@ function App() {
 
 		userStore.restore() // 恢复用户存储数据
 		authApi.checkLogin() // 静默登录状态
+		zodUtil.init()
 
 		if (isProd) {
 			navigate('/chat')

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useInViewport } from 'ahooks'
+import { useInViewport, useMount } from 'ahooks'
 import { useFeedStore } from './feed-store'
 import { feedMgr } from './feed-mgr'
 import { FeedItem } from './components/feed-item'
@@ -17,9 +17,9 @@ export const Feed = () => {
 	const [loadMoreInViewport] = useInViewport(loadMoreRef) // 是否进入视口
 
 	// 初始化数据加载
-	useEffect(() => {
-		if (posts.length === 0 && !loading && !error) feedMgr.loadInitial()
-	}, [posts.length, loading, error])
+	useMount(() => {
+		feedMgr.loadInitial()
+	})
 
 	// 滚动到底部时自动加载更多
 	useEffect(() => {

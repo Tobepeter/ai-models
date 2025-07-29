@@ -15,7 +15,7 @@ interface FeedItemProps {
 	className?: string
 }
 
-/* 信息流单项组件 - 三栏布局：头像信息 + 文字内容 + 单张图片 */
+/* 信息流单项组件 - 布局：头像信息 + 文字内容 + 图片 + 交互按钮 + 评论输入区(动态展开) + 评论列表 */
 export const FeedItem = (props: FeedItemProps) => {
 	const { post, onLike, onToggleExpand, onToggleComments, onAddComment, className } = props
 
@@ -25,8 +25,12 @@ export const FeedItem = (props: FeedItemProps) => {
 		onAddComment(post.id, content, replyTo)
 	}
 
+	const handleViewMore = () => {
+		console.log('进入post详情页:', post.id) // TODO: 实现详情页跳转
+	}
+
 	return (
-		<article className={cn('p-4 bg-card hover:bg-accent/5 transition-colors', className)}>
+		<article className={cn('p-4 bg-card', className)}>
 			{/* 用户信息栏 */}
 			<FeedHeader userId={post.userId} username={post.username} avatar={post.avatar} status={post.status} createdAt={post.createdAt} className="mb-3" />
 
@@ -47,8 +51,14 @@ export const FeedItem = (props: FeedItemProps) => {
 				onComment={handleToggleComments}
 			/>
 
-			{/* 评论区域 */}
-			<CommentSection postId={post.id} comments={post.comments} isOpen={post.showComments} onAddComment={handleAddComment} />
+			{/* 评论区域 - 包含动态展开的输入框和评论列表 */}
+			<CommentSection
+				postId={post.id}
+				comments={post.comments}
+				showCommentInput={post.showComments}
+				onAddComment={handleAddComment}
+				onViewMore={handleViewMore}
+			/>
 		</article>
 	)
 }

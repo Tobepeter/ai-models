@@ -5,6 +5,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Search, X } from 'lucide-react'
 import { useState } from 'react'
 
+// npm 推荐，emojilib，emoji-mart
+
 // emoji分组数据
 const emojGroupList = [
 	'😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗😚😙',

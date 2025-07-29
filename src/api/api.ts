@@ -80,7 +80,8 @@ api.instance.interceptors.response.use(
 					description: errMsg,
 				})
 			}
-			return Promise.resolve(null)
+			// swagger的client默认会解包
+			return Promise.resolve({ data: null })
 		}
 
 		return Promise.reject(errMsg)

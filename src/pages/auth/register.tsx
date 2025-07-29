@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form'
 import { useFieldCheck } from './hooks/use-field-check'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { zodUtil } from '@/utils/zod-util'
 
 export const Register = () => {
 	const navigate = useNavigate()
@@ -77,6 +78,15 @@ export const Register = () => {
 		}))
 	}
 
+	// 随机填充表单数据
+	const handleRandomFill = () => {
+		form.setValue('username', zodUtil.genUserName())
+		form.setValue('email', zodUtil.genEmail())
+		const password = zodUtil.genPassword()
+		form.setValue('password', password)
+		form.setValue('confirmPassword', password)
+	}
+
 	const handleSubmit = async (data: RegisterFormData) => {
 		// 检查是否有字段检查正在进行
 		if (checkSubmitConflict()) {
@@ -114,7 +124,7 @@ export const Register = () => {
 			<Card className="w-full max-w-md shadow-lg border-0 bg-card/95 backdrop-blur relative">
 				{/* 随机按钮 */}
 				<div className="absolute top-4 left-4 z-10">
-					<Button variant="ghost" size="sm" className="text-primary/70 hover:text-primary hover:bg-primary/10">
+					<Button variant="ghost" size="sm" className="text-primary/70 hover:text-primary hover:bg-primary/10" onClick={handleRandomFill}>
 						<Dices className="h-4 w-4 mr-1" />
 						随机
 					</Button>

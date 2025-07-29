@@ -39,20 +39,13 @@ export const CommentInput = (props: CommentInputProps) => {
 		}
 	}
 
-	const displayPlaceholder = replyTo ? `回复 @${replyTo}...` : placeholder || '写评论...'
+	const displayPlaceholder = placeholder || '输入你的回复...'
 
 	return (
 		<div className={cn('flex space-x-3 p-4 border-b border-border', className)}>
 			<UserAvatar src="https://i.pravatar.cc/150?img=1" alt="当前用户头像" size={32} className="flex-shrink-0 mt-1" fallbackText="我" />
 
 			<div className="flex-1 space-y-2">
-				{/* 回复提示条 */}
-				{replyTo && (
-					<div className="text-sm text-muted-foreground">
-						回复 <span className="text-primary">@{replyTo}</span>
-					</div>
-				)}
-
 				<Textarea
 					value={content}
 					onChange={(e) => setContent(e.target.value)}
@@ -68,7 +61,7 @@ export const CommentInput = (props: CommentInputProps) => {
 					</div>
 
 					<div className="flex items-center space-x-2">
-						{replyTo && onCancel && (
+						{onCancel && (
 							<Button variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting}>
 								取消
 							</Button>

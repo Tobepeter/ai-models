@@ -101,9 +101,10 @@ const stateCreator = () => {
 			const { posts } = get()
 			const updatedPosts = posts.map((post) => {
 				if (post.id === postId) {
+					const existingComments = Array.isArray(post.comments) ? post.comments : []
 					return {
 						...post,
-						comments: [comment, ...post.comments], // 新评论在前
+						comments: [comment, ...existingComments], // 新评论在前
 						commentCount: post.commentCount + 1,
 					}
 				}
@@ -121,7 +122,11 @@ export const useFeedStore = create(
 	persist(stateCreator(), {
 		name: storageKeys.feed || 'feed-storage',
 		partialize: (state) => ({
-			posts: state.posts.slice(0, 50), // 只持久化前50条数据，避免存储过大
+			posts: state.posts.slice(0, 50).map(post => ({
+				...post,
+				showComments: false, // 不持久化评论输入框展开状态
+				isExpanded: false, // 不持久化内容展开状态
+			})),
 			cursor: state.cursor,
 		}),
 	})

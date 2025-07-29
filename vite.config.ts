@@ -5,10 +5,11 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import { defineConfig } from 'vite'
 import { pathUtil } from './scripts/utils/path-util'
+import { autoWindowInjectPlugin } from './scripts/vite/auto-window-inject-plugin'
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-	plugins: [react(), tailwindcss()],
+	plugins: [react(), tailwindcss(), autoWindowInjectPlugin()],
 	base: pathUtil.getBaseUrl(),
 	server: {
 		host: '0.0.0.0', // 允许局域网访问
