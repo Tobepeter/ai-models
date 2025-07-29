@@ -13,7 +13,7 @@ import {
 	SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { isDev } from '@/utils/env'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useMount, useUpdate } from 'ahooks'
 import { testMgr } from './test-mgr'
@@ -23,7 +23,7 @@ let Test = () => <div>Test</div>
 if (isDev) {
 	Test = () => {
 		const [searchParams, setSearchParams] = useSearchParams()
-		const [selectedComponent, setSelectedComponent] = useState<React.ComponentType | null>(null)
+		const [selectedComponent, setSelectedComponent] = useState<ComponentType | null>(null)
 		const [loading, setLoading] = useState(false)
 		const [keys, setKeys] = useState<string[]>([])
 		const update = useUpdate()

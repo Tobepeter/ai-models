@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { HTMLAttributes } from 'react'
 
 interface FeedSkeletonProps {
 	className?: string
@@ -6,7 +7,7 @@ interface FeedSkeletonProps {
 }
 
 /* 骨架屏基础组件 - 带动画效果 */
-const SkeletonBox = (props: React.HTMLAttributes<HTMLDivElement>) => {
+const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
 	const { className, ...restProps } = props
 	return (
 		<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...restProps} />

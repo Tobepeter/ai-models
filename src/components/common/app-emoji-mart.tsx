@@ -2,12 +2,12 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 
 export interface AppEmojiMartProps {
 	onEmojiSelect: (emoji: string) => void
 	onClear?: () => void
-	trigger?: React.ReactNode
+	trigger?: ReactNode
 }
 
 // Apple风格emoji选择器

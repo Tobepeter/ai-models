@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 
 // npm 推荐，emojilib，emoji-mart
 
@@ -83,7 +83,7 @@ const filterEmojis = (searchTerm: string): string[] => {
 export interface EmojiPickerProps {
 	onEmojiSelect: (emoji: string) => void
 	onClear?: () => void
-	trigger?: React.ReactNode
+	trigger?: ReactNode
 }
 
 export const EmojiPicker = (props: EmojiPickerProps) => {

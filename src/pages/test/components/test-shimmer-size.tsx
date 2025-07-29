@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
+import { useState, CSSProperties } from 'react'
 
 const TestShimmerSize = () => {
 	const [showAnimation, setShowAnimation] = useState(true)
@@ -11,7 +11,7 @@ const TestShimmerSize = () => {
 	//  比如提供size 110%，实际上position的位移距离是按照多出来的10%作为梯度计算的（很慢），如果提供100%，是完全移动不了的
 
 	// 100% 背景尺寸的 shimmer
-	const shimmer100Style: React.CSSProperties = {
+	const shimmer100Style: CSSProperties = {
 		width: '300px',
 		height: '20px',
 		borderRadius: '4px',
@@ -21,7 +21,7 @@ const TestShimmerSize = () => {
 	}
 
 	// 200% 背景尺寸的 shimmer
-	const shimmer200Style: React.CSSProperties = {
+	const shimmer200Style: CSSProperties = {
 		width: '300px',
 		height: '20px',
 		borderRadius: '4px',
@@ -31,7 +31,7 @@ const TestShimmerSize = () => {
 	}
 
 	// 400% 背景尺寸的 shimmer（更宽）
-	const shimmer400Style: React.CSSProperties = {
+	const shimmer400Style: CSSProperties = {
 		width: '300px',
 		height: '20px',
 		borderRadius: '4px',

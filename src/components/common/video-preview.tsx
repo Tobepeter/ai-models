@@ -1,4 +1,4 @@
-import React, { useState, useRef, PropsWithChildren } from 'react'
+import React, { useState, useRef, PropsWithChildren, CSSProperties, ReactNode } from 'react'
 import { Play, Plus, Trash2, Video as VideoIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -121,8 +121,8 @@ export type VideoPreviewProps = PropsWithChildren<{
 	onDelete?: () => void // 删除回调
 	onChange?: (url: string | undefined) => void // URL变化回调，上传和删除时都会调用
 	className?: string // 样式类名
-	style?: React.CSSProperties // 内联样式
-	children?: React.ReactNode // 插槽内容
+	style?: CSSProperties // 内联样式
+	children?: ReactNode // 插槽内容
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）

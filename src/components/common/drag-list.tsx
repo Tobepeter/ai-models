@@ -27,7 +27,7 @@ export interface DragListProps<T extends DragListItem> {
 // 内部item传递的参数
 interface SortableItemProps<T extends DragListItem> {
 	item: T
-	renderItem?: (item: T) => React.ReactNode
+	renderItem?: (item: T) => ReactNode
 	isDragging?: boolean
 	className?: string
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, CSSProperties } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import { useInViewport } from 'ahooks'
 import { FeedItem } from './feed-item'
@@ -58,7 +58,7 @@ export const FeedList = (props: FeedListProps) => {
 	}, [loadMoreInViewport, hasMore, loading, onLoadMore])
 
 	// 渲染单个列表项
-	const renderItem = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+	const renderItem = ({ index, style }: { index: number; style: CSSProperties }) => {
 		const post = posts[index]
 
 		if (!post) {

@@ -1,4 +1,4 @@
-import { useState, useRef, CSSProperties, useEffect, PropsWithChildren } from 'react'
+import { useState, useRef, CSSProperties, useEffect, PropsWithChildren, ReactNode } from 'react'
 import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -281,7 +281,7 @@ export type ImagePreviewProps = PropsWithChildren<{
 	onLoadingChange?: (loading: boolean) => void // loading状态变化回调
 	className?: string // 样式类名
 	style?: CSSProperties // 内联样式
-	children?: React.ReactNode // 插槽内容，优先级高于默认图片渲染
+	children?: ReactNode // 插槽内容，优先级高于默认图片渲染
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）

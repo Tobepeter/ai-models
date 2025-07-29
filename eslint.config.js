@@ -46,7 +46,7 @@ export default tseslint.config(
 				'custom/no-simple-return-types': 'error',
 				'custom/tsx-props-pattern': 'error',
 				'custom/props-children-pattern': 'error',
-				'custom/react-destructure-imports': 'warn', // TODO: 貌似不生效
+				'custom/react-destructure-imports': 'error',
 			},
 		},
 	],
