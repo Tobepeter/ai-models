@@ -85,33 +85,31 @@ export const Todo = () => {
 
 	// 计算插入位置
 	const calculateInsertPosition = (fromIndex: number, toIndex: number) => {
-		const todosArray = [...todos];
-		
+		const todosArray = [...todos]
+
 		// 如果移动到顶部
 		if (toIndex === 0) {
-			const firstPosition = todosArray[0]?.position || 100;
-			return Math.max(firstPosition - 100, 0);
+			const firstPosition = todosArray[0]?.position || 100
+			return Math.max(firstPosition - 100, 0)
 		}
-		
+
 		// 如果移动到底部
 		if (toIndex >= todosArray.length) {
-			const lastPosition = todosArray[todosArray.length - 1]?.position || 100;
-			return lastPosition + 100;
+			const lastPosition = todosArray[todosArray.length - 1]?.position || 100
+			return lastPosition + 100
 		}
-		
+
 		// 如果移动到中间
-		const prevPosition = todosArray[toIndex - 1]?.position || 0;
-		const nextPosition = todosArray[toIndex]?.position || 100;
-		return (prevPosition + nextPosition) / 2;
-	};
+		const prevPosition = todosArray[toIndex - 1]?.position || 0
+		const nextPosition = todosArray[toIndex]?.position || 100
+		return (prevPosition + nextPosition) / 2
+	}
 
 	return (
 		<div className="max-w-2xl mx-auto p-6 space-y-6">
 			{/* 顶部大输入框 */}
 			<div className="space-y-4">
-				{!isLoggedIn && (
-					<p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>
-				)}
+				{!isLoggedIn && <p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>}
 				<div className="flex gap-2">
 					<Input
 						placeholder="添加新任务..."
@@ -146,14 +144,14 @@ export const Todo = () => {
 						items={todos.map((todo) => ({ id: todo.id?.toString() || '', title: todo.title }))}
 						onItemMove={async (fromIndex, toIndex) => {
 							// 获取被移动的todo
-							const movedTodo = todos[fromIndex];
-							if (!movedTodo) return;
-							
+							const movedTodo = todos[fromIndex]
+							if (!movedTodo) return
+
 							// 计算新位置
-							const newPosition = calculateInsertPosition(fromIndex, toIndex);
-							
+							const newPosition = calculateInsertPosition(fromIndex, toIndex)
+
 							// 更新位置
-							await reorderTodo(movedTodo.id!, newPosition);
+							await reorderTodo(movedTodo.id!, newPosition)
 						}}
 						renderItem={renderTodoItem}
 					/>

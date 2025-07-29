@@ -5,7 +5,7 @@ const appKey = 'appdata'
 /**
  * 本地存储管理器
  * 统一管理应用数据的本地存储，使用整体写入和读取策略
- * 
+ *
  * @deprecated 不好用，太聚合用起来每次都要写一大堆数据
  */
 class Storage {
@@ -82,4 +82,5 @@ export const storageKeys = {
 	user: 'user',
 	chat: 'chat',
 	todo: 'todo',
+	feed: 'feed-storage',
 }

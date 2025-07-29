@@ -56,35 +56,22 @@ export const TodoItem = (props: TodoItemProps) => {
 			{/* 标题 */}
 			<div className="flex-1">
 				{isEditing ? (
-				<Input 
-					value={editTitle} 
-					onChange={(e) => setEditTitle(e.target.value)} 
-					onBlur={handleSave} 
-					onKeyDown={handleKeyDown} 
-					className="h-8 text-sm" 
-					autoFocus 
-					maxLength={50}
-				/>
-			) : (
-				<div className="flex items-center gap-2">
-					<span className={cn('text-sm', todo.completed && 'line-through text-muted-foreground')}>{todo.title}</span>
-					<div>
-						<Button variant="ghost" size="sm" onClick={handleEdit} className="h-6 w-6 p-0">
-							<Edit className="h-3 w-3" />
-						</Button>
+					<Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} onBlur={handleSave} onKeyDown={handleKeyDown} className="h-8 text-sm" autoFocus maxLength={50} />
+				) : (
+					<div className="flex items-center gap-2">
+						<span className={cn('text-sm', todo.completed && 'line-through text-muted-foreground')}>{todo.title}</span>
+						<div>
+							<Button variant="ghost" size="sm" onClick={handleEdit} className="h-6 w-6 p-0">
+								<Edit className="h-3 w-3" />
+							</Button>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 			</div>
 
 			{/* 删除按钮 */}
 			<div>
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => onDelete?.(todo.id!)}
-					className="h-8 w-8 p-0"
-				>
+				<Button variant="ghost" size="sm" onClick={() => onDelete?.(todo.id!)} className="h-8 w-8 p-0">
 					<Trash2 className="h-4 w-4" />
 				</Button>
 			</div>

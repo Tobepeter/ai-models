@@ -33,7 +33,7 @@ const navCards: NavCard[] = [
 		title: 'todo list',
 		path: '/todo',
 		icon: ListTodo,
-	}
+	},
 ]
 
 export const Home = () => {

@@ -7,6 +7,7 @@ import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import { useUserStore } from './store/user-store'
 import debug from './utils/debug'
 import { buildTimeLocal, isDev, isMock, isProd } from './utils/env'
+import { zodUtil } from './utils/zod-util'
 
 function App() {
 	const navigate = useNavigate()
@@ -14,7 +15,10 @@ function App() {
 	const [isMounted, setIsMounted] = useState(false)
 	useGitHubPagesRouter()
 
-	useMount(() => {
+	useMount(async () => {
+		// 初始化 zod 中文错误消息
+		await zodUtil.init()
+
 		let msg = ''
 		if (isDev) {
 			debug.init()

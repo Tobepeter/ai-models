@@ -15,7 +15,7 @@ export const Cover = () => {
 
 	return (
 		<div className="absolute inset-0">
-			<img src={resolvedTheme === 'dark' ? darkImg : lightImg} alt="cover" className={imgCls} />
+			<img src={resolvedTheme === 'dark' ? darkImg : lightImg} alt="cover" className={imgCls} draggable={false} />
 		</div>
 	)
 }

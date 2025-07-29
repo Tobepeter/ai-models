@@ -291,6 +291,26 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	response.SuccessMsg(c, "密码修改成功")
 }
 
+// @Summary 检查用户字段是否存在
+// @Description 检查用户对应的字段是否存在（通常是email和username）
+// @Tags Auth
+// @Param field query string true "字段名"
+// @Param value query string true "字段值"
+// @Success 200 {object} response.Response{data=bool}
+// @Router /users/check-field [get]
+func (h *UserHandler) CheckUserField(c *gin.Context) {
+	field := c.Query("field")
+	value := c.Query("value")
+
+	if field == "" || value == "" {
+		response.Error(c, http.StatusBadRequest, "参数不能为空")
+		return
+	}
+
+	exists := h.userService.CheckUserFieldExist(field, value)
+	response.Success(c, exists)
+}
+
 // @Summary 用户退出登录
 // @Description 用户主动退出登录，清除服务端的登录状态和token
 // @Tags Auth

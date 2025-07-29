@@ -81,9 +81,7 @@ export const UserCard = () => {
 				<div className="flex items-start space-x-4">
 					{/* 头像区域 */}
 					<div className="flex flex-col items-center">
-						<MyAvatar 
-							size={64}
-						/>
+						<MyAvatar size={64} />
 						{isLoggedIn && (
 							<FileUpload onUpload={handleAvatarUpload}>
 								<Button variant="ghost" size="sm" className="mt-1 h-7 px-2 text-xs" disabled={avatarLoading}>
@@ -99,14 +97,7 @@ export const UserCard = () => {
 						{/* 用户名编辑 */}
 						<div className="mb-1">
 							{isLoggedIn ? (
-								<QuickEdit
-									value={displayUser.username}
-									maxLength={10}
-									allowEmpty={false}
-									onSubmitChange={handleUsernameSubmit}
-									textClassName="text-lg font-semibold"
-									containerClassName="w-fit"
-								/>
+								<QuickEdit value={displayUser.username} maxLength={10} allowEmpty={false} onSubmitChange={handleUsernameSubmit} textClassName="text-lg font-semibold" containerClassName="w-fit" />
 							) : (
 								<CardTitle className="text-lg truncate">{displayUser.username}</CardTitle>
 							)}
@@ -157,9 +148,7 @@ export const UserCard = () => {
 							</div>
 						)}
 
-						{!isLoggedIn && (
-							<p className="text-sm text-muted-foreground">请登录以查看详细信息</p>
-						)}
+						{!isLoggedIn && <p className="text-sm text-muted-foreground">请登录以查看详细信息</p>}
 					</div>
 
 					{/* 登录按钮 */}

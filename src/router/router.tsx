@@ -6,6 +6,7 @@ import { ChatHub } from '@/pages/chat-hub/chat-hub'
 import { Chat } from '@/pages/chat/chat'
 import { Crud } from '@/pages/crud/crud'
 import { Doc } from '@/pages/docs/doc'
+import { Feed } from '@/pages/feed/feed'
 import { Home } from '@/pages/home/home'
 import { Test } from '@/pages/test/test'
 import { User } from '@/pages/user/user'
@@ -41,6 +42,11 @@ export const routes: CustomRouteObject[] = [
 		path: 'chat-hub',
 		element: <ChatHub />,
 		handle: { title: 'AI对比助手' },
+	},
+	{
+		path: 'feed',
+		element: <Feed />,
+		handle: { title: '信息流' },
 	},
 	{
 		path: 'crud',

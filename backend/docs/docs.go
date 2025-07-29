@@ -1804,6 +1804,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/check-field": {
+            "get": {
+                "description": "检查用户对应的字段是否存在（通常是email和username）",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "检查用户字段是否存在",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "字段名",
+                        "name": "field",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "字段值",
+                        "name": "value",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "description": "用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息",

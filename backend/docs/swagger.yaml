@@ -1583,6 +1583,33 @@ paths:
       summary: 修改密码
       tags:
       - User
+  /users/check-field:
+    get:
+      description: 检查用户对应的字段是否存在（通常是email和username）
+      parameters:
+      - description: 字段名
+        in: query
+        name: field
+        required: true
+        type: string
+      - description: 字段值
+        in: query
+        name: value
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+      summary: 检查用户字段是否存在
+      tags:
+      - Auth
   /users/login:
     post:
       description: 用户使用用户名和密码登录系统，验证成功后返回JWT token和用户信息

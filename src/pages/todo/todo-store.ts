@@ -39,7 +39,7 @@ const stateCreator = () => {
 		},
 		setTodos: (todos: TodoResponse[]) => {
 			// 确保todos按position排序
-			const sortedTodos = [...todos].sort((a, b) => (a.position || 0) - (b.position || 0));
+			const sortedTodos = [...todos].sort((a, b) => (a.position || 0) - (b.position || 0))
 			set({ todos: sortedTodos })
 			// 保存到持久化存储
 			todoUtil.savePersist(sortedTodos)
@@ -56,23 +56,23 @@ const stateCreator = () => {
 
 		// TODO 操作
 		addTodo: async (todo: TodoCreateRequest) => {
-			const currentTodos = get().todos;
-			
+			const currentTodos = get().todos
+
 			// 计算新todo的position
-			let newPosition = 100;
+			let newPosition = 100
 			if (currentTodos.length > 0) {
-				const firstPosition = currentTodos[0].position || 100;
-				newPosition = Math.max(firstPosition - 100, 0);
+				const firstPosition = currentTodos[0].position || 100
+				newPosition = Math.max(firstPosition - 100, 0)
 			}
-			
-			const todoWithPosition = { ...todo, position: newPosition };
-			
+
+			const todoWithPosition = { ...todo, position: newPosition }
+
 			// 尝试通过API创建
-			const createdTodo = await todoUtil.createTodo(todoWithPosition);
-			
+			const createdTodo = await todoUtil.createTodo(todoWithPosition)
+
 			if (createdTodo) {
 				// API创建成功，使用服务器返回的数据
-				const todos = [createdTodo, ...currentTodos].sort((a, b) => (a.position || 0) - (b.position || 0));
+				const todos = [createdTodo, ...currentTodos].sort((a, b) => (a.position || 0) - (b.position || 0))
 				set({ todos })
 				todoUtil.savePersist(todos)
 			} else {
@@ -88,8 +88,8 @@ const stateCreator = () => {
 					due_date: todo.due_date ?? null,
 					completed: false,
 				}
-				
-				const todos = [newTodo, ...currentTodos];
+
+				const todos = [newTodo, ...currentTodos]
 				set({ todos })
 				todoUtil.savePersist(todos)
 			}
@@ -97,22 +97,22 @@ const stateCreator = () => {
 
 		updateTodo: async (id: number, updates: TodoUpdateRequest) => {
 			// 尝试通过API更新
-			const updatedTodo = await todoUtil.updateTodo(id, updates);
-			
+			const updatedTodo = await todoUtil.updateTodo(id, updates)
+
 			if (updatedTodo) {
 				// API更新成功，使用服务器返回的数据
-				const todos = get().todos.map((todo) => 
-					todo.id === id ? updatedTodo : todo
-				).sort((a, b) => (a.position || 0) - (b.position || 0));
-				
+				const todos = get()
+					.todos.map((todo) => (todo.id === id ? updatedTodo : todo))
+					.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 				set({ todos })
 				todoUtil.savePersist(todos)
 			} else {
 				// API更新失败或未登录，使用本地逻辑
-				const todos = get().todos.map((todo) => 
-					todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo
-				).sort((a, b) => (a.position || 0) - (b.position || 0));
-				
+				const todos = get()
+					.todos.map((todo) => (todo.id === id ? { ...todo, ...updates, updated_at: new Date().toISOString() } : todo))
+					.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 				set({ todos })
 				todoUtil.savePersist(todos)
 			}
@@ -120,34 +120,35 @@ const stateCreator = () => {
 
 		deleteTodo: async (id: number) => {
 			// 尝试通过API删除
-			const success = await todoUtil.deleteTodo(id);
-			
+			const success = await todoUtil.deleteTodo(id)
+
 			// 无论API是否成功，都从本地状态中删除
-			const todos = get().todos.filter((todo) => todo.id !== id)
-				.sort((a, b) => (a.position || 0) - (b.position || 0));
-				
+			const todos = get()
+				.todos.filter((todo) => todo.id !== id)
+				.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 			set({ todos })
 			todoUtil.savePersist(todos)
 		},
 
 		toggleTodo: async (id: number) => {
 			// 尝试通过API切换
-			const toggledTodo = await todoUtil.toggleTodo(id);
-			
+			const toggledTodo = await todoUtil.toggleTodo(id)
+
 			if (toggledTodo) {
 				// API切换成功，使用服务器返回的数据
-				const todos = get().todos.map((todo) => 
-					todo.id === id ? toggledTodo : todo
-				).sort((a, b) => (a.position || 0) - (b.position || 0));
-				
+				const todos = get()
+					.todos.map((todo) => (todo.id === id ? toggledTodo : todo))
+					.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 				set({ todos })
 				todoUtil.savePersist(todos)
 			} else {
 				// API切换失败或未登录，使用本地逻辑
-				const todos = get().todos.map((todo) => 
-					todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo
-				).sort((a, b) => (a.position || 0) - (b.position || 0));
-				
+				const todos = get()
+					.todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed, updated_at: new Date().toISOString() } : todo))
+					.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 				set({ todos })
 				todoUtil.savePersist(todos)
 			}
@@ -155,15 +156,15 @@ const stateCreator = () => {
 
 		reorderTodo: async (id: number, newPosition: number) => {
 			// 先更新本地状态
-			const todos = get().todos.map((todo) => 
-				todo.id === id ? { ...todo, position: newPosition, updated_at: new Date().toISOString() } : todo
-			).sort((a, b) => (a.position || 0) - (b.position || 0));
-			
+			const todos = get()
+				.todos.map((todo) => (todo.id === id ? { ...todo, position: newPosition, updated_at: new Date().toISOString() } : todo))
+				.sort((a, b) => (a.position || 0) - (b.position || 0))
+
 			set({ todos })
 			todoUtil.savePersist(todos)
-			
+
 			// 尝试通过API更新位置
-			await todoUtil.updateTodo(id, { position: newPosition });
+			await todoUtil.updateTodo(id, { position: newPosition })
 		},
 
 		// 重置状态
@@ -177,4 +178,3 @@ const stateCreator = () => {
 
 export const useTodoStore = create(stateCreator())
 export type { TodoActions, TodoState }
-

@@ -44,7 +44,7 @@ const stateCreator = () => {
 		// Set partial user state data
 		setData: (data: Partial<UserState>) => {
 			const newState = { ...get(), ...data }
-			
+
 			// If token is being set, also update tokenPayload
 			if (data.token !== undefined) {
 				if (!data.token) {
@@ -56,7 +56,7 @@ const stateCreator = () => {
 					}
 				}
 			}
-			
+
 			set(newState)
 			// Trigger persistence
 			persistData(newState)
@@ -86,7 +86,7 @@ const stateCreator = () => {
 						...userState,
 						...parsed,
 					}
-					
+
 					// Parse token payload if token exists
 					if (restored.token) {
 						const payload = jwt.parse(restored.token)
@@ -94,7 +94,7 @@ const stateCreator = () => {
 							restored.tokenPayload = payload
 						}
 					}
-					
+
 					set(restored)
 					return
 				}

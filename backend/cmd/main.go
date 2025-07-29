@@ -101,6 +101,7 @@ func setupRouter(c *container.Container) *gin.Engine {
 			// 公开接口
 			users.POST("/register", c.UserHandler.Register)
 			users.POST("/login", c.UserHandler.Login)
+			users.GET("/check-field", c.UserHandler.CheckUserField) // 检查字段是否存在
 
 			// 用户自己的接口
 			users.POST("/logout", middleware.AuthRequired(c.AuthService), c.UserHandler.Logout)

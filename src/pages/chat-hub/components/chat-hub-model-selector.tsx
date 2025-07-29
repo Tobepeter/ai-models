@@ -11,14 +11,14 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	/* 将模型按平台分组 */
 	const modelGroups = useMemo(() => {
 		const groups: Record<string, string[]> = {}
-		
+
 		models.forEach((model) => {
 			if (!groups[model.platform]) {
 				groups[model.platform] = []
 			}
 			groups[model.platform].push(model.name)
 		})
-		
+
 		return groups
 	}, [models])
 
@@ -26,29 +26,19 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	const selectedModelItems = useMemo(() => {
 		return selectedModels.map((model) => ({
 			group: model.platform,
-			item: model.name
+			item: model.name,
 		}))
 	}, [selectedModels])
 
 	/* 处理选择变化 */
 	const handleSelectionChange = (selectedItems: MultiSelectItem[]) => {
-		const newSelectedModels = models.filter((model) => 
-			selectedItems.some(item => item.group === model.platform && item.item === model.name)
-		)
+		const newSelectedModels = models.filter((model) => selectedItems.some((item) => item.group === model.platform && item.item === model.name))
 		onChange(newSelectedModels)
 	}
 
 	return (
 		<div>
-			<MultiSelectDialog
-				value={selectedModelItems}
-				onChange={handleSelectionChange}
-				groups={modelGroups}
-				triggerText="选择AI模型"
-				dialogTitle="选择AI模型"
-				disabled={disabled}
-				hoverChange={true}
-			/>
+			<MultiSelectDialog value={selectedModelItems} onChange={handleSelectionChange} groups={modelGroups} triggerText="选择AI模型" dialogTitle="选择AI模型" disabled={disabled} hoverChange={true} />
 		</div>
 	)
 }

@@ -29,15 +29,20 @@ func NewUserService(cfg *config.Config) *UserService {
 	}
 }
 
+// CheckUserFieldExist 检查用户字段是否存在
+func (s *UserService) CheckUserFieldExist(field, value string) bool {
+	return s.ExistsByCondition(&models.User{}, map[string]any{field: value})
+}
+
 // CreateUser 创建用户
 func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, error) {
 	// 检查用户名是否已存在
-	if s.ExistsByCondition(&models.User{}, map[string]any{"username": req.Username}) {
+	if s.CheckUserFieldExist("username", req.Username) {
 		return nil, errors.New("用户名已存在")
 	}
 
 	// 检查邮箱是否已存在
-	if s.ExistsByCondition(&models.User{}, map[string]any{"email": req.Email}) {
+	if s.CheckUserFieldExist("email", req.Email) {
 		return nil, errors.New("邮箱已存在")
 	}
 

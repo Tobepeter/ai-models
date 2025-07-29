@@ -37,10 +37,7 @@ export const AppHeader = () => {
 				{/* 右侧操作区 */}
 				<div className="flex items-center gap-3">
 					<ThemeToggle />
-					<MyAvatar 
-						size={32}
-						onClick={() => navigate('/user')}
-					/>
+					<MyAvatar size={32} onClick={() => navigate('/user')} />
 				</div>
 			</div>
 		</header>
