@@ -3,15 +3,8 @@ import { useInViewport } from 'ahooks'
 import { ImagePreview } from '@/components/common/image-preview'
 import { cn } from '@/lib/utils'
 
-interface FeedImageProps {
-	src: string
-	alt?: string
-	className?: string
-}
-
 /**
- * 信息流图片组件
- * 支持懒加载和点击预览
+ * 信息流图片组件 - 支持懒加载和点击预览
  */
 export const FeedImage = (props: FeedImageProps) => {
 	const { src, alt = '图片', className } = props
@@ -44,4 +37,10 @@ export const FeedImage = (props: FeedImageProps) => {
 			)}
 		</div>
 	)
+}
+
+export interface FeedImageProps {
+	src: string
+	alt?: string
+	className?: string
 }

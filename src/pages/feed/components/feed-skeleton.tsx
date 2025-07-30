@@ -1,12 +1,9 @@
 import { cn } from '@/lib/utils'
 import { HTMLAttributes } from 'react'
 
-interface FeedSkeletonProps {
-	className?: string
-	count?: number
-}
-
-/* 骨架屏基础组件 - 带动画效果 */
+/**
+ * 骨架屏基础组件 - 带动画效果
+ */
 const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
 	const { className, ...restProps } = props
 	return (
@@ -14,7 +11,9 @@ const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
 	)
 }
 
-/* 单个信息流项目骨架屏 */
+/**
+ * 单个信息流项目骨架屏
+ */
 const FeedItemSkeleton = () => (
 	<div className="p-4 border-b border-gray-100">
 		{/* 头部信息栏 */}
@@ -58,7 +57,9 @@ const FeedItemSkeleton = () => (
 	</div>
 )
 
-/* 信息流骨架屏组件 */
+/**
+ * 信息流骨架屏组件
+ */
 export const FeedSkeleton = (props: FeedSkeletonProps) => {
 	const { className, count = 3 } = props
 	return (
@@ -70,7 +71,9 @@ export const FeedSkeleton = (props: FeedSkeletonProps) => {
 	)
 }
 
-/* 加载更多骨架屏 */
+/**
+ * 加载更多骨架屏
+ */
 export const LoadMoreSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
@@ -81,7 +84,9 @@ export const LoadMoreSkeleton = (props: { className?: string }) => {
 	)
 }
 
-/* 刷新骨架屏 */
+/**
+ * 刷新骨架屏
+ */
 export const RefreshSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
@@ -90,4 +95,9 @@ export const RefreshSkeleton = (props: { className?: string }) => {
 			<SkeletonBox className="h-4 w-16" />
 		</div>
 	)
+}
+
+export interface FeedSkeletonProps {
+	className?: string
+	count?: number
 }

@@ -19,7 +19,7 @@ export const ChatText = (props: ChatTextProps) => {
 	)
 }
 
-export type ChatTextProps = {
+export interface ChatTextProps {
 	content: string
 	className?: string
 	style?: CSSProperties

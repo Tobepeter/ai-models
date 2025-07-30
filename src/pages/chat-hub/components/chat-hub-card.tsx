@@ -77,6 +77,6 @@ export const ChatHubCard = (props: ChatHubCardProps) => {
 	)
 }
 
-export type ChatHubCardProps = {
+export interface ChatHubCardProps {
 	card: ChatHubCardType
 }

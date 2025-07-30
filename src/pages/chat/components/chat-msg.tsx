@@ -81,6 +81,6 @@ export const ChatMsg = (props: ChatMsgProps) => {
 	)
 }
 
-export type ChatMsgProps = {
+export interface ChatMsgProps {
 	msg: Msg
 }

@@ -1,4 +1,4 @@
-import { truncate, debounce } from 'lodash-es'
+import { truncate } from 'lodash-es'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
@@ -96,9 +96,6 @@ class FeedUtil {
 		return new Promise((resolve) => setTimeout(resolve, delay))
 	}
 
-	createDebounced<T extends (...args: any[]) => any>(func: T, wait: number = 300) {
-		return debounce(func, wait) // 使用lodash防抖
-	}
 
 	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M, >999M显示999M+ */
 	formatCount(count: number) {

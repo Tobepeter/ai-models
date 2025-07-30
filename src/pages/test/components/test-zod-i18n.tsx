@@ -19,7 +19,7 @@ interface TestCase {
 	testValues: { value: string; desc: string }[]
 }
 
-type LocaleOption = {
+interface LocaleOption {
 	label: string
 	value: string
 	config: () => void

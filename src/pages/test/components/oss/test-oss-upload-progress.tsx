@@ -23,7 +23,7 @@ export const TestOssUploadProgress = (props: TestOssUploadProgressProps) => {
 	)
 }
 
-export type TestOssUploadProgressProps = {
+export interface TestOssUploadProgressProps {
 	uploading: boolean
 	progress: number
 }

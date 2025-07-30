@@ -124,7 +124,7 @@ export const Markdown = (props: MarkdownProps) => {
 	)
 }
 
-export type MarkdownProps = {
+export interface MarkdownProps {
 	content: string
 	className?: string
 	style?: CSSProperties

@@ -13,14 +13,14 @@ export interface Msg {
 	mediaData?: MediaData
 }
 
-export type MediaData = {
+export interface MediaData {
 	url?: string
 	filename?: string
 	size?: string
 	duration?: string
 }
 
-export type ChatPersist = {
+export interface ChatPersist {
 	platform: AIPlatform
 	model: string
 	stream?: boolean

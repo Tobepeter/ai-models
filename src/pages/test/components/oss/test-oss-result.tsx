@@ -21,6 +21,6 @@ export const TestOssResult = (props: TestOssResultProps) => {
 	)
 }
 
-export type TestOssResultProps = {
+export interface TestOssResultProps {
 	result: OssUploadResult | null
 }

@@ -6,19 +6,6 @@ import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
 import { type FeedPost } from '../feed-store'
 import { cn } from '@/lib/utils'
 
-interface FeedListProps {
-	posts: FeedPost[]
-	loading: boolean
-	hasMore: boolean
-	onLike: (postId: string) => void
-	onToggleExpand: (postId: string) => void
-	onAddComment: (postId: string, content: string, replyTo?: string) => void
-	onLikeComment?: (commentId: string) => void
-	onReply?: (postId: string, username: string) => void
-	onLoadMore: () => void
-	className?: string
-}
-
 /** 预估的单个项目高度 */
 const ESTIMATED_ITEM_HEIGHT = 200
 
@@ -117,4 +104,17 @@ export const FeedList = (props: FeedListProps) => {
 			</div>
 		</div>
 	)
+}
+
+export interface FeedListProps {
+	posts: FeedPost[]
+	loading: boolean
+	hasMore: boolean
+	onLike: (postId: string) => void
+	onToggleExpand: (postId: string) => void
+	onAddComment: (postId: string, content: string, replyTo?: string) => void
+	onLikeComment?: (commentId: string) => void
+	onReply?: (postId: string, username: string) => void
+	onLoadMore: () => void
+	className?: string
 }

@@ -44,7 +44,7 @@ export const DocSidebar = (props: DocSidebarProps) => {
 	)
 }
 
-export type DocSidebarProps = {
+export interface DocSidebarProps {
 	selectedItem: DocFile | null
 	onDocSelect: (path: string) => void
 }

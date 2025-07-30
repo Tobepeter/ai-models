@@ -50,7 +50,7 @@ export const Shimmer = (props: PropsWithChildren<ShimmerProps>) => {
 	)
 }
 
-export type ShimmerProps = {
+export interface ShimmerProps {
 	className?: string
 	style?: CSSProperties
 	duration?: number // 毫秒

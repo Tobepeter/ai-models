@@ -53,7 +53,7 @@ export const TestOssConfigInfo = (props: TestOssConfigInfoProps) => {
 	)
 }
 
-export type TestOssConfigInfoProps = {
+export interface TestOssConfigInfoProps {
 	status: string
 	sts: Credentials | null
 	loading: boolean

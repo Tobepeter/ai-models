@@ -23,6 +23,6 @@ export const Screen = (props: PropsWithChildren<ScreenProps>) => {
 	return <ScreenContainer height={height}>{children}</ScreenContainer>
 }
 
-export type ScreenProps = {
+export interface ScreenProps {
 	dynamicHeight?: boolean
 }

@@ -3,13 +3,6 @@ import { type Comment } from '../feed-store'
 import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
 
-interface CommentItemProps {
-	comment: Comment
-	onReply: (username: string) => void
-	onLike?: (commentId: string) => void
-	className?: string
-}
-
 /**
  * 单条评论组件 - 紧凑布局，显示用户名
  */
@@ -37,4 +30,11 @@ export const CommentItem = (props: CommentItemProps) => {
 			</div>
 		</div>
 	)
+}
+
+export interface CommentItemProps {
+	comment: Comment
+	onReply: (username: string) => void
+	onLike?: (commentId: string) => void
+	className?: string
 }

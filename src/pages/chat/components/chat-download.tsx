@@ -26,7 +26,7 @@ export const ChatDownload = (props: ChatDownloadProps) => {
 	)
 }
 
-export type ChatDownloadProps = {
+export interface ChatDownloadProps {
 	url: string
 	filename: string
 	size: string

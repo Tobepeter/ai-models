@@ -24,6 +24,6 @@ export const ChatMedia = (props: ChatMediaProps) => {
 	}
 }
 
-export type ChatMediaProps = {
+export interface ChatMediaProps {
 	msg: Msg
 }

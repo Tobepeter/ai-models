@@ -3,14 +3,9 @@ import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
-interface FeedContentProps {
-	content: string
-	isExpanded: boolean
-	onToggleExpand: () => void
-	className?: string
-}
-
-/* 信息流内容组件 - 支持长内容折叠和展开 */
+/**
+ * 信息流内容组件 - 支持长内容折叠和展开
+ */
 export const FeedContent = (props: FeedContentProps) => {
 	const { content, isExpanded, onToggleExpand, className } = props
 
@@ -54,4 +49,11 @@ export const FeedContent = (props: FeedContentProps) => {
 			)}
 		</div>
 	)
+}
+
+export interface FeedContentProps {
+	content: string
+	isExpanded: boolean
+	onToggleExpand: () => void
+	className?: string
 }

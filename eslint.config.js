@@ -10,12 +10,14 @@ import noSimpleReturnTypes from './eslint-rules/no-simple-return-types.js'
 import tsxPropsPattern from './eslint-rules/tsx-props-pattern.js'
 import propsChildrenPattern from './eslint-rules/props-children-pattern.js'
 import reactDestructureImports from './eslint-rules/react-destructure-imports.js'
+import requireComponentJsdoc from './eslint-rules/require-component-jsdoc.js'
 
 const customRules = {
 	'no-simple-return-types': noSimpleReturnTypes,
 	'tsx-props-pattern': tsxPropsPattern,
 	'props-children-pattern': propsChildrenPattern,
 	'react-destructure-imports': reactDestructureImports,
+	'require-component-jsdoc': requireComponentJsdoc,
 }
 
 export default tseslint.config(
@@ -41,12 +43,14 @@ export default tseslint.config(
 				'react-hooks/exhaustive-deps': 'off',
 				'@typescript-eslint/no-empty-object-type': 'off',
 				'@typescript-eslint/ban-ts-comment': 'off', // 允许 @ts-ignore 注释，非强制 @ts-expect-error
+				'@typescript-eslint/consistent-type-definitions': 'error', // 强制使用 interface 而不是 type
 
 				// == custom ==
 				'custom/no-simple-return-types': 'error',
 				'custom/tsx-props-pattern': 'error',
 				'custom/props-children-pattern': 'error',
 				'custom/react-destructure-imports': 'error',
+				'custom/require-component-jsdoc': 'error',
 			},
 		},
 	],

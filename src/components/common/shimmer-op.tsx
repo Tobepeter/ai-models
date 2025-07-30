@@ -39,7 +39,7 @@ export const ShimmerOp = (props: ShimmerOpProps) => {
 	)
 }
 
-export type ShimmerOpProps = {
+export interface ShimmerOpProps {
 	text: string
 	range?: number // 影响周围n个字
 	duration?: number // 毫秒，索引递增间隔时间

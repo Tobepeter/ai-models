@@ -16,7 +16,7 @@
 ### Prop 设计
 - 降低组件使用复杂度，props 能可选就可选
 - 回调函数 `onXXX` 尽量设为可选的
-- Prop不要定义children，而是在参数内用 `PropsWithChildren` 包装
+- Prop不要定义children，而是在组件的参数内用 `PropsWithChildren` 包装
 
 ### 业务组件 Props
 - 业务组件优先消费 store 数据，避免 props 传递
@@ -30,6 +30,10 @@
 
 ### 受控组件
 - 使用 `defaultValue`, `value`, `onChange` 模式，支持内部状态管理
+
+### 组件注释
+- 组件必须有jsDoc，不用太详细，就一个标题也行，除非复杂可以加点描述
+- jsx片区不要大面积无注释，某个特定区块标注一下
 
 ## shadcn/ui 使用规范
 - 不要修改 shadcn 原始代码（`src/components/ui/`, `src/lib/utils.ts`, `src/hooks/use-mobile.ts`）

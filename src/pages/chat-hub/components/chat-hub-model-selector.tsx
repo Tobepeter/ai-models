@@ -43,7 +43,7 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	)
 }
 
-export type ChatHubModelSelectorProps = {
+export interface ChatHubModelSelectorProps {
 	models: ChatHubModel[]
 	selectedModels: ChatHubModel[]
 	onChange: (models: ChatHubModel[]) => void

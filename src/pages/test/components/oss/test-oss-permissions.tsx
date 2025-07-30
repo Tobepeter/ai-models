@@ -139,7 +139,7 @@ export const TestOssPermissions = (props: TestOssPermissionsProps) => {
 	)
 }
 
-export type TestOssPermissionsProps = {
+export interface TestOssPermissionsProps {
 	readPermission: OssAccessType
 	writePermission: OssAccessType
 	backendSignMode: boolean

@@ -3,25 +3,53 @@ import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
 import { delayC } from '../../utils/common'
 import { CancelablePromise } from '../../utils/cancelable-promise'
+import { Nullable } from '../../utils/types'
 import { faker } from '@faker-js/faker'
+import { debounce } from 'lodash-es'
 
 /**
  * 信息流管理器 - 处理数据加载和状态管理
  * 支持无限滚动、下拉刷新、点赞和评论等功能
  */
 class FeedManager {
-	currTimer: CancelablePromise | null = null
+	// 拆分为独立的计时器，避免不同业务操作相互干扰
+	private loadTimer: Nullable<CancelablePromise> = null      // 数据加载计时器（初始化、加载更多、刷新）
+	private likeTimer: Nullable<CancelablePromise> = null      // 点赞操作计时器
+	private commentTimer: Nullable<CancelablePromise> = null   // 评论操作计时器
 
 	private getStore() {
 		return useFeedStore.getState()
 	}
 
-
-	clearTimer() {
-		if (this.currTimer) {
-			this.currTimer.cancel()
-			this.currTimer = null
+	/* 清除数据加载计时器 */
+	private clearLoadTimer() {
+		if (this.loadTimer) {
+			this.loadTimer.cancel()
+			this.loadTimer = null
 		}
+	}
+
+	/* 清除点赞计时器 */
+	private clearLikeTimer() {
+		if (this.likeTimer) {
+			this.likeTimer.cancel()
+			this.likeTimer = null
+		}
+	}
+
+	/* 清除评论计时器 */
+	private clearCommentTimer() {
+		if (this.commentTimer) {
+			this.commentTimer.cancel()
+			this.commentTimer = null
+		}
+	}
+
+	/* 清除所有计时器 - 用于组件卸载等场景 */
+	clearAllTimers() {
+		this.clearLoadTimer()
+		this.clearLikeTimer()
+		this.clearCommentTimer()
 	}
 
 	/* 初始化加载信息流数据 */
@@ -32,9 +60,9 @@ class FeedManager {
 			store.setLoading(true)
 			store.clearError()
 
-			this.clearTimer()
-			this.currTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
-			await this.currTimer
+			this.clearLoadTimer()
+			this.loadTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
+			await this.loadTimer
 
 			const posts = feedMock.generateMockPosts(20)
 
@@ -49,7 +77,7 @@ class FeedManager {
 			store.setLoading(false)
 			return []
 		} finally {
-			this.currTimer = null
+			this.loadTimer = null
 		}
 	}
 
@@ -64,9 +92,9 @@ class FeedManager {
 			store.setLoading(true)
 			store.clearError()
 
-			this.clearTimer()
-			this.currTimer = delayC(faker.number.int({ min: 500, max: 1000 }))
-			await this.currTimer
+			this.clearLoadTimer()
+			this.loadTimer = delayC(faker.number.int({ min: 500, max: 1000 }))
+			await this.loadTimer
 
 			let beforeTimestamp = Date.now()
 			if (cursor) {
@@ -98,7 +126,7 @@ class FeedManager {
 			store.setLoading(false)
 			return []
 		} finally {
-			this.currTimer = null
+			this.loadTimer = null
 		}
 	} // 设置分页游标为最后一条数据的时间戳
 
@@ -110,9 +138,9 @@ class FeedManager {
 			store.setRefreshing(true)
 			store.clearError()
 
-			this.clearTimer()
-			this.currTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
-			await this.currTimer
+			this.clearLoadTimer()
+			this.loadTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
+			await this.loadTimer
 
 			const posts = feedMock.generateMockPosts(10) // 生成新的数据
 
@@ -127,27 +155,27 @@ class FeedManager {
 			store.setRefreshing(false)
 			return []
 		} finally {
-			this.currTimer = null
+			this.loadTimer = null
 		}
 	}
 
-	/* 切换点赞状态 - 使用乐观更新 */
-	async toggleLike(postId: string) {
+	/* 切换点赞状态 */
+	toggleLike = debounce(async (postId: string) => {
 		const store = this.getStore()
 
 		try {
-			store.toggleLike(postId) // 先更新UI，再发请求
-			this.clearTimer()
-			this.currTimer = delayC(faker.number.int({ min: 200, max: 500 }))
-			await this.currTimer
+			store.toggleLike(postId) // 乐观更新
+			this.clearLikeTimer()
+			this.likeTimer = delayC(faker.number.int({ min: 200, max: 500 }))
+			await this.likeTimer
 			console.log(`[FeedManager] 切换点赞状态: ${postId}`)
 		} catch (error) {
 			console.error('[FeedManager] 切换点赞失败:', error)
 			store.toggleLike(postId) // 失败时回滚
 		} finally {
-			this.currTimer = null
+			this.likeTimer = null
 		}
-	} // 重置所有状态
+	}, 150, { leading: true, trailing: false })
 
 	toggleExpand(postId: string) {
 		this.getStore().toggleExpand(postId) // 切换内容展开状态
@@ -158,9 +186,9 @@ class FeedManager {
 		const store = this.getStore()
 
 		try {
-			this.clearTimer()
-			this.currTimer = delayC(faker.number.int({ min: 300, max: 800 }))
-			await this.currTimer
+			this.clearCommentTimer()
+			this.commentTimer = delayC(faker.number.int({ min: 300, max: 800 }))
+			await this.commentTimer
 
 			const comment = feedMock.generateComment(postId, content, replyTo)
 
@@ -169,7 +197,7 @@ class FeedManager {
 		} catch (error) {
 			console.error('[FeedManager] 添加评论失败:', error)
 		} finally {
-			this.currTimer = null
+			this.commentTimer = null
 		}
 	}
 }

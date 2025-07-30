@@ -4,16 +4,9 @@ import { MoreHorizontal } from 'lucide-react'
 import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
 
-interface FeedHeaderProps {
-	userId: string
-	username: string
-	avatar: string
-	status?: string
-	createdAt: string
-	className?: string
-}
-
-/* 信息流头部组件 - 显示用户头像、用户名、状态和时间 */
+/**
+ * 信息流头部组件 - 显示用户头像、用户名、状态和时间
+ */
 export const FeedHeader = (props: FeedHeaderProps) => {
 	const { userId, username, avatar, status, createdAt, className } = props
 
@@ -51,4 +44,13 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 			</Button>
 		</div>
 	)
+}
+
+export interface FeedHeaderProps {
+	userId: string
+	username: string
+	avatar: string
+	status?: string
+	createdAt: string
+	className?: string
 }

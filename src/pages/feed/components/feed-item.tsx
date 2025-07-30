@@ -2,21 +2,13 @@ import { FeedHeader } from './feed-header'
 import { FeedContent } from './feed-content'
 import { FeedImage } from './feed-image'
 import { FeedActions } from './feed-actions'
-import { CommentSection } from './comment-section'
+import { CommentSection } from './feed-comment-list'
 import { type FeedPost } from '../feed-store'
 import { cn } from '@/lib/utils'
 
-interface FeedItemProps {
-	post: FeedPost
-	onLike: (postId: string) => void
-	onToggleExpand: (postId: string) => void
-	onAddComment: (postId: string, content: string, replyTo?: string) => void
-	onLikeComment?: (commentId: string) => void
-	onReply?: (postId: string, username: string) => void
-	className?: string
-}
-
-/* 信息流单项组件 - 布局：头像信息 + 文字内容 + 图片 + 交互按钮 + 评论输入区(动态展开) + 评论列表 */
+/**
+ * 信息流单项组件 - 布局：头像信息 + 文字内容 + 图片 + 交互按钮 + 评论输入区(动态展开) + 评论列表
+ */
 export const FeedItem = (props: FeedItemProps) => {
 	const { post, onLike, onToggleExpand, onAddComment, onLikeComment, onReply, className } = props
 
@@ -68,4 +60,14 @@ export const FeedItem = (props: FeedItemProps) => {
 			/>
 		</article>
 	)
+}
+
+export interface FeedItemProps {
+	post: FeedPost
+	onLike: (postId: string) => void
+	onToggleExpand: (postId: string) => void
+	onAddComment: (postId: string, content: string, replyTo?: string) => void
+	onLikeComment?: (commentId: string) => void
+	onReply?: (postId: string, username: string) => void
+	className?: string
 }

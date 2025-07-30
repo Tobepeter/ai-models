@@ -54,7 +54,7 @@ export const UserAvatar = (props: UserAvatarProps) => {
 	)
 }
 
-export type UserAvatarProps = {
+export interface UserAvatarProps {
 	src?: string // 头像图片URL
 	alt?: string // 图片alt文本
 	size?: number // 头像尺寸（像素）

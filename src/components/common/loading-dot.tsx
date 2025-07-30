@@ -25,7 +25,7 @@ export const LoadingDot = (props: LoadingDotProps) => {
 	)
 }
 
-export type LoadingDotProps = {
+export interface LoadingDotProps {
 	count?: number
 	duration?: number // 毫秒
 	className?: string

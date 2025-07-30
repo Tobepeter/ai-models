@@ -76,7 +76,7 @@ export const TestOssFileUpload = (props: TestOssFileUploadProps) => {
 	)
 }
 
-export type TestOssFileUploadProps = {
+export interface TestOssFileUploadProps {
 	uploading: boolean
 	result: OssUploadResult | null
 	fileRef: RefObject<HTMLInputElement>

@@ -5,7 +5,7 @@ export enum EventType {
 	ChatStop = 'chat-stop',
 }
 
-export type EventMap = {
+export interface EventMap {
 	[EventType.ChatStop]: [string] // 停止的上一条消息，方便继续生成
 }
 

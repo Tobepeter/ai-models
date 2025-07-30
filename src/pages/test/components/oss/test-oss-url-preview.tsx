@@ -69,7 +69,7 @@ export const TestOssUrlPreview = (props: TestOssUrlPreviewProps) => {
 	)
 }
 
-export type TestOssUrlPreviewProps = {
+export interface TestOssUrlPreviewProps {
 	path: string
 	preview: string
 	onPathChange?: (path: string) => void

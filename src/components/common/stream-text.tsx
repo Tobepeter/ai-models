@@ -35,7 +35,7 @@ export const StreamText = (props: StreamTextProps) => {
 	)
 }
 
-export type StreamTextProps = {
+export interface StreamTextProps {
 	content: string
 	className?: string
 	duration?: number // 毫秒

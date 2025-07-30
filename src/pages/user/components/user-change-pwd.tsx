@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useMemoizedFn } from 'ahooks'
 import { useState } from 'react'
 
-type ChangePasswordForm = {
+interface ChangePasswordForm {
 	oldPassword: string
 	newPassword: string
 	confirmPassword: string

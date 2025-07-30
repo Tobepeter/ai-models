@@ -1,4 +1,4 @@
-import React, { useState, useRef, PropsWithChildren, CSSProperties, ReactNode } from 'react'
+import React, { useState, useRef, PropsWithChildren, CSSProperties } from 'react'
 import { Play, Plus, Trash2, Video as VideoIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -9,7 +9,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 /**
  * 视频预览组件
  */
-export const VideoPreview = (props: VideoPreviewProps) => {
+export const VideoPreview = (props: PropsWithChildren<VideoPreviewProps>) => {
 	const { url, defaultUrl, cover, notEditable = false, onUpload, onDelete, onChange, className, style, children, width, height, size } = props
 	const editable = !notEditable
 	const [internalUrl, setInternalUrl] = useState(defaultUrl || '')
@@ -112,7 +112,7 @@ export const VideoPreview = (props: VideoPreviewProps) => {
 	)
 }
 
-export type VideoPreviewProps = PropsWithChildren<{
+export interface VideoPreviewProps {
 	url?: string // 外部控制的视频URL，优先级高于内部状态
 	defaultUrl?: string // 默认视频URL，仅在组件初始化时生效
 	cover?: string // 自定义封面图片URL
@@ -122,8 +122,7 @@ export type VideoPreviewProps = PropsWithChildren<{
 	onChange?: (url: string | undefined) => void // URL变化回调，上传和删除时都会调用
 	className?: string // 样式类名
 	style?: CSSProperties // 内联样式
-	children?: ReactNode // 插槽内容
 	width?: number // 宽度（像素）
 	height?: number // 高度（像素）
 	size?: number // 统一尺寸（像素）
-}>
+}
