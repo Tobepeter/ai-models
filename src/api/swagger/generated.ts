@@ -48,6 +48,29 @@ export interface ChatResponse {
   usage?: Usage;
 }
 
+export interface CreateFeedCommentRequest {
+  /**
+   * 评论内容，最多500字符
+   * @maxLength 500
+   */
+  content: string;
+  /**
+   * 回复的用户名
+   * @maxLength 100
+   */
+  reply_to?: string;
+}
+
+export interface CreateFeedPostRequest {
+  /**
+   * 最多2000字符
+   * @maxLength 2000
+   */
+  content?: string;
+  /** 图片URL */
+  image_url?: string;
+}
+
 export interface CrudCreateRequest {
   /** 业务分类，默认为general */
   category?: string;
@@ -70,6 +93,58 @@ export interface CrudUpdateRequest {
 
 export interface DeleteFileRequest {
   objectKey: string;
+}
+
+export interface FeedComment {
+  /** 冗余头像 */
+  avatar?: string;
+  content?: string;
+  created_at?: string;
+  id?: string;
+  like_count?: number;
+  post_id?: string;
+  /** 回复的用户名 */
+  reply_to?: string;
+  updated_at?: string;
+  user_id?: string;
+  /** 用户信息版本号 */
+  user_profile_version?: number;
+  /** 冗余字段 */
+  username?: string;
+}
+
+export interface FeedCommentResponse {
+  comments?: FeedComment[];
+  has_more?: boolean;
+  next_cursor?: string;
+  total?: number;
+}
+
+export interface FeedPost {
+  /** 冗余头像 */
+  avatar?: string;
+  comment_count?: number;
+  /** 文字内容（可选） */
+  content?: string;
+  created_at?: string;
+  id?: string;
+  /** 图片URL（可选） */
+  image_url?: string;
+  like_count?: number;
+  /** 用户状态emoji */
+  status?: string;
+  updated_at?: string;
+  user_id?: string;
+  /** 用户信息版本号 */
+  user_profile_version?: number;
+  /** 冗余字段 */
+  username?: string;
+}
+
+export interface FeedPostResponse {
+  has_more?: boolean;
+  next_cursor?: string;
+  posts?: FeedPost[];
 }
 
 export interface FileInfo {
@@ -294,7 +369,9 @@ export interface UserResponse {
   extra?: string;
   id?: number;
   is_active?: boolean;
+  profile_version?: number;
   role?: string;
+  status?: string;
   updated_at?: string;
   username?: string;
 }
@@ -304,6 +381,7 @@ export interface UserUpdateRequest {
   avatar_oss_key?: string;
   email?: string;
   extra?: string;
+  status?: string;
   /**
    * @minLength 3
    * @maxLength 50
@@ -382,6 +460,51 @@ export interface V1ImagesGenerationsCreateParams {
 }
 
 export type V1ImagesGenerationsCreateData = Response<string[]>;
+
+export type FeedCommentsLikeCreateData = Response;
+
+export interface FeedPostsListParams {
+  /**
+   * 排序类型
+   * @default "time"
+   */
+  sort?: "time" | "like" | "comment";
+  /** cursor分页的after_id */
+  after_id?: string;
+  /**
+   * 每页数量
+   * @min 1
+   * @max 50
+   * @default 20
+   */
+  limit?: number;
+}
+
+export type FeedPostsListData = FeedPostResponse;
+
+export type FeedPostsCreateData = FeedPost;
+
+export type FeedPostsDetailData = FeedPost;
+
+export interface FeedPostsCommentsListParams {
+  /** cursor分页的after_id */
+  after_id?: string;
+  /**
+   * 每页数量
+   * @min 1
+   * @max 50
+   * @default 20
+   */
+  limit?: number;
+  /** 帖子ID */
+  postId: string;
+}
+
+export type FeedPostsCommentsListData = FeedCommentResponse;
+
+export type FeedPostsCommentsCreateData = FeedComment;
+
+export type FeedPostsLikeCreateData = Response;
 
 export interface GetListParams {
   /** 页码 */
@@ -952,6 +1075,140 @@ export class Api<
         query: query,
         body: request,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  api = {
+    /**
+     * @description 点赞或取消点赞评论，需要登录
+     *
+     * @tags Feed
+     * @name FeedCommentsLikeCreate
+     * @summary 切换评论点赞状态
+     * @request POST:/api/feed/comments/{comment_id}/like
+     */
+    feedCommentsLikeCreate: (commentId: string, params: RequestParams = {}) =>
+      this.request<FeedCommentsLikeCreateData, Response>({
+        path: `/api/feed/comments/${commentId}/like`,
+        method: "POST",
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 支持多种排序方式和cursor分页
+     *
+     * @tags Feed
+     * @name FeedPostsList
+     * @summary 获取信息流帖子列表
+     * @request GET:/api/feed/posts
+     */
+    feedPostsList: (query: FeedPostsListParams, params: RequestParams = {}) =>
+      this.request<FeedPostsListData, Response>({
+        path: `/api/feed/posts`,
+        method: "GET",
+        query: query,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 创建新的信息流帖子，需要登录
+     *
+     * @tags Feed
+     * @name FeedPostsCreate
+     * @summary 创建信息流帖子
+     * @request POST:/api/feed/posts
+     */
+    feedPostsCreate: (
+      request: CreateFeedPostRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<FeedPostsCreateData, Response>({
+        path: `/api/feed/posts`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 获取指定帖子的详细信息
+     *
+     * @tags Feed
+     * @name FeedPostsDetail
+     * @summary 获取帖子详情
+     * @request GET:/api/feed/posts/{post_id}
+     */
+    feedPostsDetail: (postId: string, params: RequestParams = {}) =>
+      this.request<FeedPostsDetailData, Response>({
+        path: `/api/feed/posts/${postId}`,
+        method: "GET",
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 获取指定帖子的评论列表，支持cursor分页
+     *
+     * @tags Feed
+     * @name FeedPostsCommentsList
+     * @summary 获取帖子评论列表
+     * @request GET:/api/feed/posts/{post_id}/comments
+     */
+    feedPostsCommentsList: (
+      { postId, ...query }: FeedPostsCommentsListParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<FeedPostsCommentsListData, Response>({
+        path: `/api/feed/posts/${postId}/comments`,
+        method: "GET",
+        query: query,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 为指定帖子创建评论，需要登录
+     *
+     * @tags Feed
+     * @name FeedPostsCommentsCreate
+     * @summary 创建帖子评论
+     * @request POST:/api/feed/posts/{post_id}/comments
+     */
+    feedPostsCommentsCreate: (
+      postId: string,
+      request: CreateFeedCommentRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<FeedPostsCommentsCreateData, Response>({
+        path: `/api/feed/posts/${postId}/comments`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description 点赞或取消点赞帖子，需要登录
+     *
+     * @tags Feed
+     * @name FeedPostsLikeCreate
+     * @summary 切换帖子点赞状态
+     * @request POST:/api/feed/posts/{post_id}/like
+     */
+    feedPostsLikeCreate: (postId: string, params: RequestParams = {}) =>
+      this.request<FeedPostsLikeCreateData, Response>({
+        path: `/api/feed/posts/${postId}/like`,
+        method: "POST",
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

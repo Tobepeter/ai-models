@@ -5,6 +5,7 @@ import (
 	"ai-models-backend/internal/database"
 	"ai-models-backend/internal/models"
 	"errors"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -126,9 +127,19 @@ func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models
 		user.AvatarOssKey = req.AvatarOssKey
 	}
 
+	// 更新状态
+	if req.Status != "" {
+		user.Status = req.Status
+	}
+
 	// 更新扩展字段
 	if req.Extra != "" {
 		user.Extra = req.Extra
+	}
+
+	// 如果有关键信息更新，增加版本号
+	if req.Username != "" || req.Avatar != "" || req.AvatarOssKey != "" || req.Status != "" {
+		user.ProfileVersion++
 	}
 
 	// 保存更新
@@ -274,6 +285,13 @@ func (s *UserService) IsAdmin(userID uint) (bool, error) {
 		return false, err
 	}
 	return user.IsAdmin(), nil
+}
+
+// GetRecentlyUpdatedUsers 获取最近更新的用户列表
+func (s *UserService) GetRecentlyUpdatedUsers(since time.Time) ([]models.User, error) {
+	var users []models.User
+	err := s.DB.Where("updated_at > ?", since).Find(&users).Error
+	return users, err
 }
 
 // deleteOSSFileAsync 异步静默删除OSS文件

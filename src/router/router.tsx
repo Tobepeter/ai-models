@@ -7,6 +7,7 @@ import { Chat } from '@/pages/chat/chat'
 import { Crud } from '@/pages/crud/crud'
 import { Doc } from '@/pages/docs/doc'
 import { Feed } from '@/pages/feed/feed'
+import { FeedDetail } from '@/pages/feed/feed-detail'
 import { Home } from '@/pages/home/home'
 import { Test } from '@/pages/test/test'
 import { User } from '@/pages/user/user'
@@ -47,6 +48,11 @@ export const routes: CustomRouteObject[] = [
 		path: 'feed',
 		element: <Feed />,
 		handle: { title: '信息流' },
+	},
+	{
+		path: 'feed/:postId',
+		element: <FeedDetail />,
+		handle: { title: '帖子详情' },
 	},
 	{
 		path: 'crud',

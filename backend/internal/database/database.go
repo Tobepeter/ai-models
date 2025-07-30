@@ -68,6 +68,8 @@ func autoMigrate() error {
 		&models.ConversationHistory{},
 		&models.Crud{},
 		&models.Todo{},
+		&models.FeedPost{},
+		&models.FeedComment{},
 	)
 
 	if err != nil {
@@ -106,4 +108,9 @@ func HealthCheck() error {
 	}
 
 	return nil
+}
+
+// GetDB 获取数据库实例
+func GetDB() *gorm.DB {
+	return DB
 }

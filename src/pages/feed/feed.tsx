@@ -4,6 +4,7 @@ import { useFeedStore } from './feed-store'
 import { feedMgr } from './feed-mgr'
 import { FeedItem } from './components/feed-item'
 import { FeedSkeleton, LoadMoreSkeleton } from './components/feed-skeleton'
+import { FeedDetailDialog } from './components/feed-detail-dialog'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -107,6 +108,9 @@ export const Feed = () => {
 					</div>
 				)}
 			</div>
+
+			{/* 详情弹窗 */}
+			<FeedDetailDialog />
 		</div>
 	)
 }

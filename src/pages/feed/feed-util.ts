@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
 import data from '@emoji-mart/data'
+import { type Comment } from './feed-store'
 
 dayjs.extend(relativeTime) // 配置中文相对时间
 dayjs.locale('zh-cn')
@@ -121,6 +122,22 @@ class FeedUtil {
 			return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(pathname) // 支持常见图片格式
 		} catch {
 			return false
+		}
+	}
+
+	/** 创建新评论 */
+	createComment(postId: string, content: string, replyTo?: string): Comment {
+		return {
+			id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+			postId,
+			userId: 'current-user', // TODO: 从用户状态获取
+			username: '当前用户', // TODO: 从用户状态获取
+			avatar: '/placeholder-avatar.jpg', // TODO: 从用户状态获取
+			content,
+			replyTo,
+			createdAt: new Date().toISOString(),
+			likeCount: 0,
+			isLiked: false,
 		}
 	}
 }

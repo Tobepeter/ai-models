@@ -8,16 +8,18 @@ import (
  * 用户数据模型
  */
 type User struct {
-	BaseModel            // 继承基础字段
-	Username      string `json:"username" gorm:"uniqueIndex;not null"` // 用户名，系统内唯一标识
-	Email         string `json:"email" gorm:"uniqueIndex;not null"`    // 邮箱地址，用于登录和通知
-	Password      string `json:"-" gorm:"not null"`                    // 密码，存储加密后的值
-	PlainPassword string `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
-	Avatar        string `json:"avatar,omitempty"`                     // 用户头像URL
-	AvatarOssKey  string `json:"avatar_oss_key,omitempty"`             // 用户头像OSS对象键
-	Extra         string `json:"extra,omitempty"`                      // 扩展字段，JSON格式存储额外信息
-	IsActive      bool   `json:"is_active" gorm:"default:true"`        // 用户激活状态
-	Role          string `json:"role" gorm:"default:'user'"`           // 用户角色: admin, user
+	BaseModel               // 继承基础字段
+	Username        string  `json:"username" gorm:"uniqueIndex;not null"` // 用户名，系统内唯一标识
+	Email           string  `json:"email" gorm:"uniqueIndex;not null"`    // 邮箱地址，用于登录和通知
+	Password        string  `json:"-" gorm:"not null"`                    // 密码，存储加密后的值
+	PlainPassword   string  `json:"-" gorm:"column:plain_password"`       // 明文密码，可选存储
+	Avatar          string  `json:"avatar,omitempty"`                     // 用户头像URL
+	AvatarOssKey    string  `json:"avatar_oss_key,omitempty"`             // 用户头像OSS对象键
+	Status          string  `json:"status,omitempty"`                     // 用户状态emoji
+	Extra           string  `json:"extra,omitempty"`                      // 扩展字段，JSON格式存储额外信息
+	IsActive        bool    `json:"is_active" gorm:"default:true"`        // 用户激活状态
+	Role            string  `json:"role" gorm:"default:'user'"`           // 用户角色: admin, user
+	ProfileVersion  int64   `json:"profile_version" gorm:"default:1"`     // 用户信息版本号
 }
 
 // 用户角色常量
@@ -65,6 +67,7 @@ type UserUpdateRequest struct {
 	Email        string `json:"email,omitempty" binding:"omitempty,email"`
 	Avatar       string `json:"avatar,omitempty"`
 	AvatarOssKey string `json:"avatar_oss_key,omitempty"`
+	Status       string `json:"status,omitempty"`
 	Extra        string `json:"extra,omitempty"`
 }
 
@@ -80,31 +83,35 @@ type ChangePasswordRequest struct {
  * 用户响应结构体
  */
 type UserResponse struct {
-	ID           uint      `json:"id"`
-	Username     string    `json:"username"`
-	Email        string    `json:"email"`
-	Avatar       string    `json:"avatar,omitempty"`
-	AvatarOssKey string    `json:"avatar_oss_key,omitempty"`
-	Extra        string    `json:"extra,omitempty"`
-	Role         string    `json:"role"`
-	IsActive     bool      `json:"is_active"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID             uint      `json:"id"`
+	Username       string    `json:"username"`
+	Email          string    `json:"email"`
+	Avatar         string    `json:"avatar,omitempty"`
+	AvatarOssKey   string    `json:"avatar_oss_key,omitempty"`
+	Status         string    `json:"status,omitempty"`
+	Extra          string    `json:"extra,omitempty"`
+	Role           string    `json:"role"`
+	IsActive       bool      `json:"is_active"`
+	ProfileVersion int64     `json:"profile_version"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 /* 将用户模型转换为响应格式 */
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
-		ID:           u.ID,
-		Username:     u.Username,
-		Email:        u.Email,
-		Avatar:       u.Avatar,
-		AvatarOssKey: u.AvatarOssKey,
-		Extra:        u.Extra,
-		Role:         u.Role,
-		IsActive:     u.IsActive,
-		CreatedAt:    u.CreatedAt,
-		UpdatedAt:    u.UpdatedAt,
+		ID:             u.ID,
+		Username:       u.Username,
+		Email:          u.Email,
+		Avatar:         u.Avatar,
+		AvatarOssKey:   u.AvatarOssKey,
+		Status:         u.Status,
+		Extra:          u.Extra,
+		Role:           u.Role,
+		IsActive:       u.IsActive,
+		ProfileVersion: u.ProfileVersion,
+		CreatedAt:      u.CreatedAt,
+		UpdatedAt:      u.UpdatedAt,
 	}
 }
 

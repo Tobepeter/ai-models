@@ -24,16 +24,16 @@ export const AppHeader = () => {
 					{/* 返回按钮 */}
 					<button
 						onClick={() => navigate(-1)}
-						className="flex items-center text-foreground hover:text-primary transition-colors"
+						className="flex items-center text-foreground hover:text-primary transition-colors cursor-pointer"
 					>
 						<ArrowLeft className="h-5 w-5" />
 					</button>
-					
+
 					{/* 首页按钮 */}
 					<button
 						onClick={() => navigate('/home')}
 						disabled={isHome}
-						className="flex items-center text-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						className="flex items-center text-foreground hover:text-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						<Home className="h-5 w-5" />
 					</button>

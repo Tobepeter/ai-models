@@ -2,6 +2,7 @@ package container
 
 import (
 	"ai-models-backend/internal/config"
+	"ai-models-backend/internal/database"
 	"ai-models-backend/internal/handlers"
 	"ai-models-backend/internal/services"
 	"ai-models-backend/internal/services/ai"
@@ -17,12 +18,14 @@ type Container struct {
 	Config *config.Config
 
 	// 服务层
-	AuthService *auth.AuthService
-	UserService *services.UserService
-	AIService   *ai.AIService
-	OSSService  *services.OSSService
-	CrudService *services.CrudService
-	TodoService *services.TodoService
+	AuthService     *auth.AuthService
+	UserService     *services.UserService
+	AIService       *ai.AIService
+	OSSService      *services.OSSService
+	CrudService     *services.CrudService
+	TodoService     *services.TodoService
+	FeedService     *services.FeedService
+	FeedSyncManager *services.FeedSyncManager
 
 	// 处理器层
 	UserHandler   *handlers.UserHandler
@@ -33,6 +36,7 @@ type Container struct {
 	CrudHandler   *handlers.CrudHandler
 	TodoHandler   *handlers.TodoHandler
 	TestHandler   *handlers.TestHandler
+	FeedHandler   *handlers.FeedHandler
 }
 
 /* 创建新的容器实例并初始化所有依赖 */
@@ -44,6 +48,8 @@ func New(cfg *config.Config) *Container {
 	ossService := services.NewOSSService(cfg)
 	crudService := services.NewCrudService()
 	todoService := services.NewTodoService()
+	feedService := services.NewFeedService(database.GetDB(), userService)
+	feedSyncManager := services.NewFeedSyncManager(feedService, userService)
 
 	// 初始化处理器层
 	userHandler := handlers.NewUserHandler(userService, authService)
@@ -54,23 +60,27 @@ func New(cfg *config.Config) *Container {
 	crudHandler := handlers.NewCrudHandler(crudService)
 	todoHandler := handlers.NewTodoHandler(todoService)
 	testHandler := handlers.NewTestHandler()
+	feedHandler := handlers.NewFeedHandler(feedService)
 
 	return &Container{
-		Config:        cfg,
-		AuthService:   authService,
-		UserService:   userService,
-		AIService:     aiService,
-		OSSService:    ossService,
-		CrudService:   crudService,
-		TodoService:   todoService,
-		UserHandler:   userHandler,
-		AdminHandler:  adminHandler,
-		AIHandler:     aiHandler,
-		OSSHandler:    ossHandler,
-		HealthHandler: healthHandler,
-		CrudHandler:   crudHandler,
-		TodoHandler:   todoHandler,
-		TestHandler:   testHandler,
+		Config:          cfg,
+		AuthService:     authService,
+		UserService:     userService,
+		AIService:       aiService,
+		OSSService:      ossService,
+		CrudService:     crudService,
+		TodoService:     todoService,
+		FeedService:     feedService,
+		FeedSyncManager: feedSyncManager,
+		UserHandler:     userHandler,
+		AdminHandler:    adminHandler,
+		AIHandler:       aiHandler,
+		OSSHandler:      ossHandler,
+		HealthHandler:   healthHandler,
+		CrudHandler:     crudHandler,
+		TodoHandler:     todoHandler,
+		TestHandler:     testHandler,
+		FeedHandler:     feedHandler,
 	}
 }
 
@@ -80,5 +90,17 @@ func (c *Container) Initialize() error {
 	if err := c.AuthService.CreateDefaultAdmin(); err != nil {
 		return err
 	}
+	
+	// 启动Feed同步任务
+	if err := c.FeedSyncManager.StartSyncTasks(); err != nil {
+		return err
+	}
+	
 	return nil
+}
+
+/* 关闭应用时的清理操作 */
+func (c *Container) Shutdown() {
+	// 停止Feed同步任务
+	c.FeedSyncManager.StopSyncTasks()
 }

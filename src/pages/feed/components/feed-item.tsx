@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import { FeedHeader } from './feed-header'
 import { FeedContent } from './feed-content'
 import { FeedImage } from './feed-image'
 import { FeedActions } from './feed-actions'
 import { CommentSection } from './feed-comment-list'
-import { type FeedPost } from '../feed-store'
+import { type FeedPost, useFeedStore } from '../feed-store'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
 /**
@@ -11,6 +13,9 @@ import { cn } from '@/lib/utils'
  */
 export const FeedItem = (props: FeedItemProps) => {
 	const { post, onLike, onToggleExpand, onAddComment, onLikeComment, onReply, className } = props
+	const { openDetailDialog } = useFeedStore()
+	const navigate = useNavigate()
+	const isMobile = useIsMobile()
 
 	const handleToggleExpand = () => onToggleExpand(post.id)
 	const handleAddComment = (content: string, replyTo?: string) => {
@@ -26,38 +31,68 @@ export const FeedItem = (props: FeedItemProps) => {
 	}
 
 	const handleViewMore = () => {
-		console.log('进入post详情页:', post.id) // TODO: 实现详情页跳转
+		if (isMobile) {
+			// 移动端直接跳转详情页
+			navigate(`/feed/${post.id}`)
+		} else {
+			// PC端打开弹窗
+			openDetailDialog(post.id)
+		}
+	}
+
+	// 点击内容区域打开详情
+	const handleContentClick = () => {
+		if (isMobile) {
+			// 移动端直接跳转详情页
+			navigate(`/feed/${post.id}`)
+		} else {
+			// PC端打开弹窗
+			openDetailDialog(post.id)
+		}
 	}
 
 	return (
-		<article className={cn('p-4 bg-card', className)}>
-			{/* 用户信息栏 */}
-			<FeedHeader userId={post.userId} username={post.username} avatar={post.avatar} status={post.status} createdAt={post.createdAt} className="mb-3" />
+		<article className={cn('bg-card', className)}>
+			{/* 整个帖子区域都可点击 */}
+			<div
+				className="cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 rounded-lg border border-transparent hover:border-border/50"
+				onClick={handleContentClick}
+			>
+				{/* 内容区域 */}
+				<div className="p-4">
+					{/* 用户信息栏 */}
+					<FeedHeader userId={post.userId} username={post.username} avatar={post.avatar} status={post.status} createdAt={post.createdAt} className="mb-3" />
 
-			{/* 文字内容栏 */}
-			{post.content && <FeedContent content={post.content} isExpanded={post.isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
+					{/* 文字内容栏 */}
+					{post.content && <FeedContent content={post.content} isExpanded={post.isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
 
-			{/* 图片内容栏 */}
-			{post.image && <FeedImage src={post.image} alt={`${post.username}的图片`} className="mb-3" />}
+					{/* 图片内容栏 */}
+					{post.image && <FeedImage src={post.image} alt={`${post.username}的图片`} className="mb-3" />}
+				</div>
 
-			{/* 交互按钮栏 */}
-			<FeedActions
-				postId={post.id}
-				likeCount={post.likeCount}
-				commentCount={post.commentCount}
-				isLiked={post.isLiked}
-				onLike={onLike}
-				onAddComment={handleAddComment}
-			/>
-			
-			{/* 评论列表 */}
-			<CommentSection
-				postId={post.id}
-				comments={post.comments}
-				onViewMore={handleViewMore}
-				onLikeComment={handleLikeComment}
-				onReply={handleReply}
-			/>
+				{/* 交互按钮栏 - 也包含在点击区域内 */}
+				<div className="px-4 pb-4">
+					<FeedActions
+						postId={post.id}
+						likeCount={post.likeCount}
+						commentCount={post.commentCount}
+						isLiked={post.isLiked}
+						onLike={onLike}
+						onAddComment={handleAddComment}
+					/>
+				</div>
+			</div>
+
+			{/* 评论列表 - 独立区域，不触发弹窗 */}
+			<div className="px-4">
+				<CommentSection
+					postId={post.id}
+					comments={post.comments}
+					onViewMore={handleViewMore}
+					onLikeComment={handleLikeComment}
+					onReply={handleReply}
+				/>
+			</div>
 		</article>
 	)
 }

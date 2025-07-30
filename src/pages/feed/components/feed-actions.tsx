@@ -27,7 +27,10 @@ export const FeedActions = (props: FeedActionsProps) => {
 	})
 
 	return (
-		<div className={cn('flex items-center space-x-4 pt-2', className)}>
+		<div
+			className={cn('flex items-center space-x-4 pt-2', className)}
+			onClick={(e) => e.stopPropagation()} // 阻止冒泡到父级点击事件
+		>
 			{/* 点赞 */}
 			<Button
 				variant="ghost"

@@ -175,6 +175,25 @@ func setupRouter(c *container.Container) *gin.Engine {
 			}
 		}
 
+		// Feed 信息流接口
+		feed := api.Group("/feed")
+		{
+			// 公开接口
+			feed.GET("/posts", c.FeedHandler.GetFeedPosts)                          // 获取信息流帖子列表
+			feed.GET("/posts/:post_id", c.FeedHandler.GetFeedPostDetail)            // 获取帖子详情
+			feed.GET("/posts/:post_id/comments", c.FeedHandler.GetFeedComments)     // 获取帖子评论列表
+
+			// 需要认证的接口
+			feedAuth := feed.Group("")
+			feedAuth.Use(middleware.AuthRequired(c.AuthService))
+			{
+				feedAuth.POST("/posts", c.FeedHandler.CreateFeedPost)                     // 创建信息流帖子
+				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.ToggleLikePost)       // 切换帖子点赞状态
+				feedAuth.POST("/posts/:post_id/comments", c.FeedHandler.CreateFeedComment) // 创建帖子评论
+				feedAuth.POST("/comments/:comment_id/like", c.FeedHandler.ToggleLikeComment) // 切换评论点赞状态
+			}
+		}
+
 		// 测试接口 - 用于测试各种错误码和响应
 		test := api.Group("/test")
 		{
