@@ -4,9 +4,9 @@ import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
 /**
- * 信息流内容组件 - 支持长内容折叠和展开
+ * 信息流文本组件 - 支持长内容折叠和展开
  */
-export const FeedContent = (props: FeedContentProps) => {
+export const FeedText = (props: FeedTextProps) => {
 	const { content, isExpanded, onToggleExpand, className } = props
 
 	if (!content) return null
@@ -15,7 +15,7 @@ export const FeedContent = (props: FeedContentProps) => {
 	const displayContent = needsTruncate && !isExpanded ? feedUtil.truncateContent(content) : content
 
 	return (
-		<div className={cn('space-y-2', className)} data-slot="feed-content">
+		<div className={cn('space-y-2', className)} data-slot="feed-text">
 			{/* 文本内容区域 */}
 			<div className="text-sm text-foreground leading-relaxed">
 				<AnimatePresence mode="wait">
@@ -51,7 +51,7 @@ export const FeedContent = (props: FeedContentProps) => {
 	)
 }
 
-export interface FeedContentProps {
+export interface FeedTextProps {
 	content: string
 	isExpanded: boolean
 	onToggleExpand: () => void

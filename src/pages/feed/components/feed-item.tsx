@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { FeedHeader } from './feed-header'
-import { FeedContent } from './feed-content'
+import { FeedText } from './feed-text'
 import { FeedImage } from './feed-image'
 import { FeedActions } from './feed-actions'
 import { CommentSection } from './feed-comment-list'
@@ -54,19 +54,17 @@ export const FeedItem = (props: FeedItemProps) => {
 	return (
 		<article className={cn('bg-card', className)} data-slot="feed-item">
 			{/* 整个帖子区域都可点击 */}
-			<div className="relative rounded-lg border border-transparent">
-				{/* 背景点击层 - 只有点击到背景区域才触发详情页 */}
-				<div
-					className="absolute inset-0 -z-10 cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50 rounded-lg"
-					onClick={handleContentClick}
-				/>
+			<div 
+				className="relative rounded-lg border border-transparent cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50"
+				onClick={handleContentClick}
+			>
 				{/* 内容区域 */}
 				<div className="p-4">
 					{/* 用户信息栏 */}
 					<FeedHeader userId={post.userId} username={post.username} avatar={post.avatar} status={post.status} createdAt={post.createdAt} className="mb-3" />
 
 					{/* 文字内容栏 */}
-					{post.content && <FeedContent content={post.content} isExpanded={post.isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
+					{post.content && <FeedText content={post.content} isExpanded={post.isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
 
 					{/* 图片内容栏 */}
 					{post.image && <FeedImage src={post.image} alt={`${post.username}的图片`} className="mb-3" />}

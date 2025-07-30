@@ -1,4 +1,4 @@
-import { CommentItem } from './comment-item'
+import { FeedCommentItem } from './feed-comment-item'
 import { type Comment } from '../feed-store'
 import { cn } from '@/lib/utils'
 
@@ -57,7 +57,7 @@ export const CommentList = (props: CommentListProps) => {
 	return (
 		<div className={cn('py-3 space-y-1', className)} data-slot="comment-list">
 			{comments?.map((comment) => (
-				<CommentItem key={comment.id} comment={comment} onReply={onReply} onLike={onLikeComment} />
+				<FeedCommentItem key={comment.id} comment={comment} onReply={onReply} onLike={onLikeComment} />
 			))}
 		</div>
 	)

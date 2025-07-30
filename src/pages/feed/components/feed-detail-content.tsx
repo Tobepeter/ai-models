@@ -1,13 +1,13 @@
-import { type CSSProperties } from 'react'
+import { type CSSProperties, useMemo } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { FeedHeader } from './feed-header'
-import { FeedContent } from './feed-content'
+import { FeedText } from './feed-text'
 import { FeedImage } from './feed-image'
 import { FeedActions } from './feed-actions'
-import { CommentItem } from './comment-item'
-import { useFeedDetail } from '../hooks/use-feed-detail'
+import { FeedCommentItem } from './feed-comment-item'
+import { useFeedStore } from '../feed-store'
 import { type FeedPost, type Comment } from '../feed-store'
 import { feedConfig } from '../feed-config'
 import { cn } from '@/lib/utils'
@@ -19,42 +19,110 @@ import { ExternalLink, RefreshCw } from 'lucide-react'
  */
 export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const { post, showNavigateButton = false, onNavigateToPage, onAddComment, onLikeComment, onReply, className } = props
+	
+	const { 
+		commentsByPostId, 
+		toggleLike,
+		toggleExpand,
+	} = useFeedStore()
 
-	// 使用自定义Hook处理详情逻辑
-	const {
-		comments,
-		hasMoreComments,
-		handleLike,
-		handleToggleExpand,
-		handleLoadMore,
-		handleRetry,
-		loading,
-		error
-	} = useFeedDetail(post)
+	// 获取评论数据
+	const commentPage = post ? commentsByPostId[post.id] : null
+	const comments = useMemo(() => {
+		if (!post || !commentPage) {
+			return post?.comments || []
+		}
+		return commentPage.comments.map(id => commentPage.commentsById[id]).filter(Boolean)
+	}, [post, commentPage])
 
-	// 处理添加评论
-	const handleAddComment = (content: string, replyTo?: string) => onAddComment?.(post.id, content, replyTo)
+	const hasMoreComments = Boolean(commentPage?.nextCursor || (commentPage?.total || 0) > comments.length)
+	const loading = commentPage?.loading || false
+	const error = commentPage?.error
 
-	// 处理评论点赞
+	// 处理函数
+	const handleLike = (postId: string) => toggleLike(postId)
+	const handleToggleExpand = (postId: string) => toggleExpand(postId)
+	const handleAddComment = (content: string, replyTo?: string) => onAddComment?.(post!.id, content, replyTo)
 	const handleLikeComment = (commentId: string) => onLikeComment?.(commentId)
+	const handleReply = (username: string) => onReply?.(post!.id, username)
+	const handleNavigateToPage = () => onNavigateToPage?.(post!.id)
+	
+	// 加载更多评论
+	const handleLoadMore = async () => {
+		if (!commentPage || loading) return
+		// TODO: 调用 manager 加载更多评论
+		console.log('加载更多评论:', post!.id, commentPage.nextCursor)
+	}
+	
+	// 重试加载
+	const handleRetry = () => handleLoadMore()
 
-	// 处理回复
-	const handleReply = (username: string) => onReply?.(post.id, username)
+	// 渲染不同状态
+	const renderEmptyPost = () => (
+		<div className={cn('flex flex-col h-full items-center justify-center', className)} data-slot="feed-detail-content-empty">
+			<div className="text-center space-y-2">
+				<p className="text-muted-foreground">帖子不存在</p>
+				<p className="text-sm text-muted-foreground">该帖子可能已被删除或不存在</p>
+			</div>
+		</div>
+	)
 
-	// 跳转到详情页
-	const handleNavigateToPage = () => onNavigateToPage?.(post.id)
+	const renderError = () => (
+		<div className={cn('flex flex-col h-full items-center justify-center', className)}>
+			<div className="text-center">
+				<p className="text-destructive mb-4">加载评论失败</p>
+				<Button onClick={handleRetry} size="sm">重试</Button>
+			</div>
+		</div>
+	)
 
-	// 错误状态
-	if (error && comments.length === 0) {
+	const renderCommentList = () => {
+		if (loading && comments.length === 0) {
+			// 首次加载骨架屏
+			return (
+				<div className="p-6 space-y-4">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<div key={i} className="flex space-x-3">
+							<Skeleton circle width={32} height={32} />
+							<div className="flex-1">
+								<Skeleton width="30%" height={16} className="mb-2" />
+								<Skeleton count={2} height={14} />
+							</div>
+						</div>
+					))}
+				</div>
+			)
+		}
+
+		if (comments.length > 0) {
+			return (
+				<VirtualCommentList
+					comments={comments}
+					onReply={handleReply}
+					onLikeComment={handleLikeComment}
+					hasMore={hasMoreComments}
+					loading={loading}
+					error={error}
+					onLoadMore={handleLoadMore}
+					onRetry={handleRetry}
+				/>
+			)
+		}
+
+		// 无评论状态
 		return (
-			<div className={cn('flex flex-col h-full items-center justify-center', className)}>
+			<div className="flex-1 flex items-center justify-center text-muted-foreground">
 				<div className="text-center">
-					<p className="text-destructive mb-4">加载评论失败</p>
-					<Button onClick={handleRetry} size="sm">重试</Button>
+					<p className="text-sm">暂无评论</p>
+					<p className="text-xs mt-1">来发表第一条评论吧</p>
 				</div>
 			</div>
 		)
 	}
+
+	// 主要状态判断
+	if (!post) return renderEmptyPost()
+	if (error && comments.length === 0) return renderError()
 
 	return (
 		<div className={cn('flex flex-col h-full', className)} data-slot="feed-detail-content">
@@ -72,11 +140,11 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 
 				{/* 文字内容 */}
 				{post.content && (
-					<FeedContent 
-						content={post.content} 
-						isExpanded={post.isExpanded} 
-						onToggleExpand={() => handleToggleExpand(post.id)} 
-						className="mb-4" 
+					<FeedText
+						content={post.content}
+						isExpanded={post.isExpanded}
+						onToggleExpand={() => handleToggleExpand(post.id)}
+						className="mb-4"
 					/>
 				)}
 
@@ -117,41 +185,8 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 
 			{/* 评论区域 */}
 			<div className="flex-1 flex flex-col min-h-0">
-				{/* 评论列表 */}
 				<div className="flex-1 min-h-0">
-					{loading && comments.length === 0 ? (
-						// 首次加载骨架屏
-						<div className="p-6 space-y-4">
-							{Array.from({ length: 5 }).map((_, i) => (
-								<div key={i} className="flex space-x-3">
-									<Skeleton circle width={32} height={32} />
-									<div className="flex-1">
-										<Skeleton width="30%" height={16} className="mb-2" />
-										<Skeleton count={2} height={14} />
-									</div>
-								</div>
-							))}
-						</div>
-					) : comments.length > 0 ? (
-						<VirtualCommentList
-							comments={comments}
-							onReply={handleReply}
-							onLikeComment={handleLikeComment}
-							hasMore={hasMoreComments}
-							loading={loading}
-							error={error}
-							onLoadMore={handleLoadMore}
-							onRetry={handleRetry}
-						/>
-					) : (
-						// 无评论状态
-						<div className="flex-1 flex items-center justify-center text-muted-foreground">
-							<div className="text-center">
-								<p className="text-sm">暂无评论</p>
-								<p className="text-xs mt-1">来发表第一条评论吧</p>
-							</div>
-						</div>
-					)}
+					{renderCommentList()}
 				</div>
 			</div>
 		</div>
@@ -203,7 +238,7 @@ const VirtualCommentList = (props: VirtualCommentListProps) => {
 
 		return (
 			<div style={style} className="px-6 py-2" data-slot="comment-item-renderer">
-				<CommentItem 
+				<FeedCommentItem 
 					comment={comment} 
 					onReply={onReply} 
 					onLike={onLikeComment} 
@@ -242,7 +277,7 @@ const VirtualCommentList = (props: VirtualCommentListProps) => {
 }
 
 export interface FeedDetailContentProps {
-	post: FeedPost
+	post: FeedPost | null // 支持 null，用于显示帖子不存在状态
 	showNavigateButton?: boolean // 是否显示跳转按钮
 	onNavigateToPage?: (postId: string) => void
 	onAddComment?: (postId: string, content: string, replyTo?: string) => void

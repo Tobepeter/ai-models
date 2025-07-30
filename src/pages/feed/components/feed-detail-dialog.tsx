@@ -12,10 +12,10 @@ import { useIsMobile } from '@/hooks/use-mobile'
 export const FeedDetailDialog = () => {
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
-	
-	const { 
-		detailDialog, 
-		posts, 
+
+	const {
+		detailDialog,
+		posts,
 		postsById,
 		closeDetailDialog,
 		addComment,
@@ -23,9 +23,7 @@ export const FeedDetailDialog = () => {
 	} = useFeedStore()
 
 	// 获取当前显示的帖子
-	const currentPost = detailDialog.postId 
-		? (postsById[detailDialog.postId] || posts.find(p => p.id === detailDialog.postId))
-		: null
+	const currentPost = detailDialog.postId ? postsById[detailDialog.postId] || posts.find((p) => p.id === detailDialog.postId) : null
 
 	// 处理弹窗关闭
 	const handleClose = () => {
@@ -76,18 +74,11 @@ export const FeedDetailDialog = () => {
 		}
 	}, [detailDialog.isOpen])
 
-	if (!currentPost) {
-		return null
-	}
-
 	return (
-		<Dialog open={detailDialog.isOpen} onOpenChange={handleClose} data-slot="feed-detail-dialog">
+		<Dialog open={detailDialog.isOpen} onOpenChange={(open) => !open && handleClose()} data-slot="feed-detail-dialog">
 			<DialogContent
 				className={`
-					${isMobile
-						? 'w-full h-full max-w-none max-h-none m-0 rounded-none'
-						: 'w-[85vw] h-[85vh]'
-					}
+					${isMobile ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' : 'w-[85vw] h-[85vh]'}
 					p-0 overflow-hidden
 				`}
 				style={isMobile ? {} : { maxWidth: 'unset' }}
@@ -95,7 +86,7 @@ export const FeedDetailDialog = () => {
 				<DialogHeader className="sr-only">
 					<DialogTitle>帖子详情</DialogTitle>
 				</DialogHeader>
-				
+
 				<FeedDetailContent
 					post={currentPost}
 					showNavigateButton={true}

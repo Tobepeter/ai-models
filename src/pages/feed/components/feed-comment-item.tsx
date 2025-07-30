@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 /**
  * 单条评论组件 - 紧凑布局，显示用户名
  */
-export const CommentItem = (props: CommentItemProps) => {
+export const FeedCommentItem = (props: FeedCommentItemProps) => {
 	const { comment, className } = props
 
 	return (
@@ -32,7 +32,7 @@ export const CommentItem = (props: CommentItemProps) => {
 	)
 }
 
-export interface CommentItemProps {
+export interface FeedCommentItemProps {
 	comment: Comment
 	onReply: (username: string) => void
 	onLike?: (commentId: string) => void

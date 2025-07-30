@@ -25,7 +25,9 @@ export const FeedImage = (props: FeedImageProps) => {
 			style={{
 				aspectRatio: '16/9', // 固定宽高比，避免布局跳动
 				maxHeight: '400px', // 限制最大高度
-			}} data-slot="feed-image"
+			}} 
+			data-slot="feed-image"
+			onClick={(e) => e.stopPropagation()} // 阻止事件冒泡到上级的点击事件
 		>
 			{shouldLoad ? (
 				<ImagePreview url={src} noEditable className="w-full h-full" aspectRatio="16/9" />
