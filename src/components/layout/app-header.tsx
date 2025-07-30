@@ -1,6 +1,6 @@
 import { ThemeToggle } from '@/components/common/theme-toggle'
 import { MyAvatar } from '@/pages/user/components/my-avatar'
-import { Home } from 'lucide-react'
+import { ArrowLeft, Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
 
@@ -19,15 +19,25 @@ export const AppHeader = () => {
 	return (
 		<header className="flex-shrink-0 border-b bg-card px-4 py-3">
 			<div className="flex items-center justify-between w-full">
-				{/* 左侧 Home */}
-				<button
-					onClick={() => navigate('/home')}
-					disabled={isHome}
-					className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					<Home className="h-5 w-5" />
-					<span className="font-medium hidden sm:inline">首页</span>
-				</button>
+				{/* 左侧按钮区 */}
+				<div className="flex items-center gap-2">
+					{/* 返回按钮 */}
+					<button
+						onClick={() => navigate(-1)}
+						className="flex items-center text-foreground hover:text-primary transition-colors"
+					>
+						<ArrowLeft className="h-5 w-5" />
+					</button>
+					
+					{/* 首页按钮 */}
+					<button
+						onClick={() => navigate('/home')}
+						disabled={isHome}
+						className="flex items-center text-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<Home className="h-5 w-5" />
+					</button>
+				</div>
 
 				{/* 中间标题 */}
 				<div className="flex-1 text-center px-4">

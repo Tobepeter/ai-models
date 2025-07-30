@@ -37,7 +37,7 @@ export interface FeedPost {
 const feedState = {
 	posts: [] as FeedPost[],
 	loading: false,
-	refreshing: false,
+	refreshing: false, // loading 的子状态，表示是刷新类型的加载
 	hasMore: true,
 	cursor: null as string | null, // 分页游标
 	error: null as string | null,
@@ -49,7 +49,6 @@ const stateCreator = () => {
 	return combine(feedState, (set, get) => ({
 		setData: (data: Partial<FeedState>) => set(data), // 更新部分状态
 		setLoading: (loading: boolean) => set({ loading }),
-		setRefreshing: (refreshing: boolean) => set({ refreshing }),
 		setError: (error: string | null) => set({ error }),
 
 		prependPosts: (newPosts: FeedPost[]) => {

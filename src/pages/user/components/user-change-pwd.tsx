@@ -14,6 +14,7 @@ interface ChangePasswordForm {
 }
 type FormErrors = Record<string, string | undefined>
 
+/** 用户修改密码组件 */
 export const UserChangePwd = (props: UserChangePwdProps) => {
 	const { open, onOpenChange } = props
 

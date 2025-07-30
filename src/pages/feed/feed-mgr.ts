@@ -135,7 +135,7 @@ class FeedManager {
 		const store = this.getStore()
 
 		try {
-			store.setRefreshing(true)
+			store.setData({ refreshing: true, loading: true })
 			store.clearError()
 
 			this.clearLoadTimer()
@@ -147,12 +147,12 @@ class FeedManager {
 			const lastPost = posts[posts.length - 1]
 			const cursor = lastPost ? feedUtil.generateCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
 
-			store.setData({ posts, cursor, hasMore: true, refreshing: false })
+			store.setData({ posts, cursor, hasMore: true, refreshing: false, loading: false })
 			return posts
 		} catch (error) {
 			console.error('[FeedManager] 刷新数据失败:', error)
 			store.setError('刷新失败，请重试')
-			store.setRefreshing(false)
+			store.setData({ refreshing: false, loading: false })
 			return []
 		} finally {
 			this.loadTimer = null

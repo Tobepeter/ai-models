@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { docMgr } from './doc-mgr'
 import type { DocFile } from './doc-types'
 
+/** 文档侧边栏组件 */
 export const DocSidebar = (props: DocSidebarProps) => {
 	const { selectedItem, onDocSelect } = props
 	const [searchQuery, setSearchQuery] = useState('')

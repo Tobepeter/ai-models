@@ -36,6 +36,7 @@ interface DragItemProps<T extends DragListItem> extends SortableItemProps<T> {
 	[key: string]: any // dnd-kit 的 attributes 和 listeners
 }
 
+/** 拖拽项组件 */
 const DragItem = <T extends DragListItem>(props: DragItemProps<T>) => {
 	const { item, renderItem, isDragging = false, className = '', ...domProps } = props
 	const rootClassName = cn('transition-all duration-200 hover:shadow-md', isDragging ? 'shadow-2xl border-2 border-primary/20 cursor-grabbing' : '', className)
@@ -62,7 +63,7 @@ const DragItem = <T extends DragListItem>(props: DragItemProps<T>) => {
 	)
 }
 
-// 内部附带排序上下文的Item包裹组件
+/** 内部附带排序上下文的Item包裹组件 */
 const SortableItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
 	const { item, renderItem, className } = props
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
@@ -75,12 +76,15 @@ const SortableItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
 	)
 }
 
-// Item 拖拽时候虚拟的Overlay组件
+/** Item 拖拽时候虚拟的Overlay组件 */
 const DragOverlayItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
 	return <DragItem {...props} isDragging />
 }
 
-/* 通用拖拽列表组件 - 支持受控/非受控模式、自定义渲染、完全可定制样式 */
+/**
+ * 通用拖拽列表组件
+ * 支持受控/非受控模式、自定义渲染、完全可定制样式
+ */
 export const DragList = <T extends DragListItem>(props: DragListProps<T>) => {
 	const { items, defaultItems, onItemsChange, onItemMove, renderItem, className = '', itemClassName = '', activationDistance = 3 } = props
 	const [internal, setInternal] = useState<T[]>(defaultItems || [])

@@ -14,6 +14,7 @@ interface DraggableButtonProps {
 	className?: string
 }
 
+/** 可拖拽按钮组件 */
 const DraggableButton = (props: DraggableButtonProps) => {
 	const { title, pos, onClick, isDragging, className } = props
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: dragId })

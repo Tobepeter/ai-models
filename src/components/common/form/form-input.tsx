@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
+/** 表单输入组件 */
 export const FormInput = (props: FormInputProps) => {
 	const { id, type, placeholder, value, onChange, disabled, error, autoComplete, className, name } = props
 	return (

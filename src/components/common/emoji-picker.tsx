@@ -86,6 +86,7 @@ export interface EmojiPickerProps {
 	trigger?: ReactNode
 }
 
+/** 自定义emoji选择器组件 */
 export const EmojiPicker = (props: EmojiPickerProps) => {
 	const { onEmojiSelect, onClear, trigger } = props
 	const [search, setSearch] = useState('')

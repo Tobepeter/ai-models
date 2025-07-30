@@ -5,6 +5,7 @@ import { Edit } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
 
+/** 快速编辑组件 */
 export const QuickEdit = (props: QuickEditProps) => {
 	const {
 		value,

@@ -16,6 +16,7 @@ const enableStrict = false
 // NOTE: 位置有遮挡，需要时候再开启
 const enableReactQueryDevtools = false
 
+/** 严格模式包装器 */
 const StrictWrapper = (props: PropsWithChildren) => {
 	return enableStrict ? <StrictMode>{props.children}</StrictMode> : props.children
 }

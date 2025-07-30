@@ -12,6 +12,7 @@ interface MyAvatarProps {
 	className?: string
 }
 
+/** 用户头像组件 */
 export const MyAvatar = (props: MyAvatarProps) => {
 	const { onClick, noPreview = false, size = 64, className } = props
 	const { info: user } = useUserStore()

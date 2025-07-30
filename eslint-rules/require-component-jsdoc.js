@@ -39,7 +39,7 @@ export default {
 					return /^[A-Z]/.test(parent.id.name)
 				}
 
-				// 默认导出形式
+				// 默认导出形式（防止导出时候是匿名的）
 				if (parent.type === 'ExportDefaultDeclaration') {
 					return true
 				}
@@ -66,15 +66,33 @@ export default {
 		 * @returns {boolean} 是否有 JSDoc 注释
 		 */
 		function hasJSDocComment(node) {
-			// 对于箭头函数，需要检查变量声明的注释
 			let targetNode = node
-			if (node.type === 'ArrowFunctionExpression' && node.parent.type === 'VariableDeclarator') {
-				// 找到包含变量声明的语句
-				let parent = node.parent
-				while (parent && parent.type !== 'VariableDeclaration') {
-					parent = parent.parent
+
+			// 对于箭头函数，需要检查不同的导出情况
+			if (node.type === 'ArrowFunctionExpression') {
+				const parent = node.parent
+
+				// export const Component = () => {} 情况
+				if (parent.type === 'VariableDeclarator') {
+					// 找到最外层的语句节点
+					let current = parent
+					while (current.parent && current.parent.type !== 'Program') {
+						current = current.parent
+						// 如果是 ExportNamedDeclaration，使用它作为目标
+						if (current.type === 'ExportNamedDeclaration') {
+							targetNode = current
+							break
+						}
+						// 如果是 VariableDeclaration，使用它
+						if (current.type === 'VariableDeclaration') {
+							targetNode = current
+						}
+					}
 				}
-				if (parent) targetNode = parent
+				// export default () => {} 情况
+				else if (parent.type === 'ExportDefaultDeclaration') {
+					targetNode = parent
+				}
 			}
 
 			// 获取节点前的注释

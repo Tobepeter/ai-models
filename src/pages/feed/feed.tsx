@@ -10,9 +10,7 @@ import { cn } from '@/lib/utils'
 
 /* 信息流主页面 - 支持无限滚动和下拉刷新 */
 export const Feed = () => {
-	const props = useFeedStore()
-	const { posts, loading, refreshing, hasMore, error, clearError } = props
-
+	const { posts, loading, refreshing, hasMore, error, clearError } = useFeedStore()
 	const loadMoreRef = useRef<HTMLDivElement>(null) // 触底检测元素引用
 	const [loadMoreInViewport] = useInViewport(loadMoreRef) // 是否进入视口
 
@@ -23,8 +21,8 @@ export const Feed = () => {
 
 	// 滚动到底部时自动加载更多
 	useEffect(() => {
-		if (loadMoreInViewport && hasMore && !loading && !refreshing) feedMgr.loadMore()
-	}, [loadMoreInViewport, hasMore, loading, refreshing])
+		if (loadMoreInViewport && hasMore && !loading) feedMgr.loadMore()
+	}, [loadMoreInViewport, hasMore, loading])
 
 	const handleRefresh = async () => {
 		clearError()
@@ -58,8 +56,8 @@ export const Feed = () => {
 			<div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border p-4">
 				<div className="flex items-center justify-between">
 					<h1 className="text-lg font-semibold">信息流</h1>
-					<Button variant="ghost" size="sm" onClick={handleRefresh} disabled={refreshing || loading} className="h-8 w-8 p-0">
-						<RefreshCw className={cn('h-4 w-4', (refreshing || loading) && 'animate-spin')} />
+					<Button variant="ghost" size="sm" onClick={handleRefresh} disabled={loading} className="h-8 w-8 p-0">
+						<RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
 					</Button>
 				</div>
 			</div>

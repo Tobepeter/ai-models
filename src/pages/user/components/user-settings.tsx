@@ -9,6 +9,7 @@ interface UserSettingsProps {
 	onChangePassword?: () => void
 }
 
+/** 用户设置组件 */
 export const UserSettings = (props: UserSettingsProps) => {
 	const { onChangePassword } = props
 	const { info: user, token } = useUserStore()

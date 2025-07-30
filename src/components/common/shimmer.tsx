@@ -2,6 +2,7 @@ import { useMount } from 'ahooks'
 import { motion } from 'framer-motion'
 import { CSSProperties, PropsWithChildren, useRef, useEffect, useState } from 'react'
 
+/** 闪烁动画组件 */
 export const Shimmer = (props: PropsWithChildren<ShimmerProps>) => {
 	const { className, style, duration = 1500, shimmerColor } = props
 	const divRef = useRef<HTMLDivElement>(null)
