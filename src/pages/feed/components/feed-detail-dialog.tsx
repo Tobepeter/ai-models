@@ -81,7 +81,7 @@ export const FeedDetailDialog = () => {
 	}
 
 	return (
-		<Dialog open={detailDialog.isOpen} onOpenChange={handleClose}>
+		<Dialog open={detailDialog.isOpen} onOpenChange={handleClose} data-slot="feed-detail-dialog">
 			<DialogContent
 				className={`
 					${isMobile

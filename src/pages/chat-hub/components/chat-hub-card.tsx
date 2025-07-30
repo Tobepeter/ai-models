@@ -36,7 +36,7 @@ export const ChatHubCard = (props: ChatHubCardProps) => {
 	}
 
 	return (
-		<Card className="min-h-[300px] flex flex-col">
+		<Card className="min-h-[300px] flex flex-col" data-slot="chat-hub-card">
 			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
 				<h3 className="font-semibold">{card.modelName}</h3>
 				<Badge variant={config.variant}>{config.label}</Badge>

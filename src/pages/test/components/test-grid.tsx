@@ -187,7 +187,7 @@ const TestGrid = () => {
 	const exampleKeys = Object.keys(examples) as Array<keyof typeof examples>
 
 	return (
-		<div className="p-6 max-w-6xl mx-auto">
+		<div className="p-6 max-w-6xl mx-auto" data-slot="test-grid">
 			<h2 className="text-2xl font-bold mb-6">CSS Grid 布局练习</h2>
 
 			{/* 示例选择器 */}

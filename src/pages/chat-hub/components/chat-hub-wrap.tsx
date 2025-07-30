@@ -23,7 +23,7 @@ export const ChatHubWrap = (props: ChatHubWrapProps) => {
 	}
 
 	return (
-		<div className="flex-1 p-4 overflow-auto">
+		<div className="flex-1 p-4 overflow-auto" data-slot="chat-hub-wrap">
 			<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-auto gap-4">
 				{cards
 					.filter((card) => card && card.id) // 过滤无效卡片

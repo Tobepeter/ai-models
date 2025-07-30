@@ -42,7 +42,7 @@ function App() {
 	}
 
 	return (
-		<div className="bg-background text-foreground">
+		<div className="bg-background text-foreground" data-slot="app">
 			<Outlet />
 			<NotifyHub />
 			{/* {isDev && <GM />} */}

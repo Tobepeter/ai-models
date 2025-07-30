@@ -17,7 +17,7 @@ export const LoadingDot = (props: LoadingDotProps) => {
 	})
 
 	return (
-		<div className={className} style={style}>
+		<div className={className} style={style} data-slot="loading-dot">
 			{Array.from({ length: dotCount }).map((_, i) => (
 				<div key={i}>.</div>
 			))}

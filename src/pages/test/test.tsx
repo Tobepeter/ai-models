@@ -18,7 +18,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useMount, useUpdate } from 'ahooks'
 import { testMgr } from './test-mgr'
 
-let Test = () => <div>Test</div>
+let Test = () => <div data-slot="test">Test</div>
 
 if (isDev) {
 	Test = () => {

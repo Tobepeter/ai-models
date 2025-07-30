@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 export const FormLabel = (props: PropsWithChildren<FormLabelProps>) => {
 	const { htmlFor, children, className, required, tips } = props
 	return (
-		<Label htmlFor={htmlFor} className={cn('text-sm font-medium flex items-center gap-1', className)}>
+		<Label htmlFor={htmlFor} className={cn('text-sm font-medium flex items-center gap-1', className)} data-slot="form-label">
 			{children}
 			{tips && (
 				<Tooltip>

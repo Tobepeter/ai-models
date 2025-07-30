@@ -10,7 +10,7 @@ import { RefObject } from 'react'
 export const TestOssFileUpload = (props: TestOssFileUploadProps) => {
 	const { uploading, result, fileRef, onUpload, onSelectFile, onDeleteResult } = props
 	return (
-		<Card>
+		<Card data-slot="test-oss-file-upload">
 			<CardHeader>
 				<CardTitle>文件上传测试</CardTitle>
 				<CardDescription>选择文件上传到阿里云OSS，获取objectKey进行访问</CardDescription>

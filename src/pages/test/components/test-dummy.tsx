@@ -18,7 +18,7 @@ const TestDummy = () => {
 	}
 
 	return (
-		<div className="w-full max-w-6xl mx-auto p-4 space-y-6">
+		<div className="w-full max-w-6xl mx-auto p-4 space-y-6" data-slot="test-dummy">
 			<div className="text-center space-y-2">
 				<h1 className="text-3xl font-bold">占位数据展示</h1>
 				<p className="text-muted-foreground">快速浏览和使用各种测试数据</p>

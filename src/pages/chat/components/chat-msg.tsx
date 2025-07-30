@@ -32,7 +32,7 @@ export const ChatMsg = (props: ChatMsgProps) => {
 	const chatComp = <Markdown content={msg.content} />
 
 	return (
-		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')}>
+		<div className={cn('flex w-full mb-4', isUser ? 'justify-end' : 'justify-start')} data-slot="chat-msg">
 			<div className={cn('flex max-w-[85%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
 				{!isUser && (
 					<Avatar className="w-8 h-8 mr-2">

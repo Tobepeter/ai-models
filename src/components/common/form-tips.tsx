@@ -11,7 +11,7 @@ export const FormTips = (props: PropsWithChildren<FormTipsProps>) => {
 	const { label, help, htmlFor, className, children } = props
 
 	return (
-		<div className={cn('flex flex-col gap-2', className)}>
+		<div className={cn('flex flex-col gap-2', className)} data-slot="form-tips">
 			<div className="flex items-center gap-2">
 				<Label htmlFor={htmlFor}>{label}</Label>
 				{help && (

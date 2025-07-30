@@ -14,7 +14,7 @@ export const Cover = () => {
 	const imgCls = cn('w-full h-full object-cover', resolvedTheme === 'dark' ? 'blur-sm' : '')
 
 	return (
-		<div className="absolute inset-0">
+		<div className="absolute inset-0" data-slot="cover">
 			<img src={resolvedTheme === 'dark' ? darkImg : lightImg} alt="cover" className={imgCls} draggable={false} />
 		</div>
 	)

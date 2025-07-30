@@ -39,7 +39,7 @@ export const CommentInputPopover = (props: CommentInputPopoverProps) => {
 	}
 
 	return (
-		<Popover open={open} onOpenChange={handleOpenChange}>
+		<Popover open={open} onOpenChange={handleOpenChange} data-slot="comment-input-popover">
 			<PopoverTrigger asChild>
 				<Button variant="ghost" size="sm" className={cn('h-8 px-2', className)}>
 					<MessageCircle className="h-4 w-4 mr-1" />
@@ -89,7 +89,7 @@ export const CommentInput = (props: CommentInputProps) => {
 	const displayPlaceholder = placeholder || (replyTo ? `回复 ${replyTo}...` : '写下你的想法...')
 
 	return (
-		<div className={cn('p-4', className)}>
+		<div className={cn('p-4', className)} data-slot="comment-input">
 			{replyTo && (
 				<div className="flex items-center justify-between mb-3 p-2 bg-muted/50 rounded-lg">
 					<span className="text-sm text-muted-foreground">

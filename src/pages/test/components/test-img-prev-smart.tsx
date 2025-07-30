@@ -54,7 +54,7 @@ const TestImgPrevSmart = () => {
 	]
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6" data-slot="test-img-prev-smart">
 			<Card>
 				<CardHeader>
 					<CardTitle>图片预览智能尺寸适配测试</CardTitle>

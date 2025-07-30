@@ -15,7 +15,7 @@ export const ChatDownload = (props: ChatDownloadProps) => {
 	})
 
 	return (
-		<div className="flex items-center justify-between text-xs text-muted-foreground">
+		<div className="flex items-center justify-between text-xs text-muted-foreground" data-slot="chat-download">
 			<span>
 				{filename} • {size}
 			</span>

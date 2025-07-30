@@ -12,7 +12,7 @@ export const User = () => {
 	const isLoggedIn = token && user && user.username !== 'anonymous'
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto space-y-6">
+		<div className="p-6 max-w-2xl mx-auto space-y-6" data-slot="user">
 			<UserCard />
 			<UserStatistic />
 			<UserSettings onChangePassword={() => setShowChangePasswordDialog(true)} />

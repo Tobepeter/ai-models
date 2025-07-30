@@ -51,7 +51,7 @@ const TestImgPreview = () => {
 	}
 
 	return (
-		<div className="p-6 space-y-6">
+		<div className="p-6 space-y-6" data-slot="test-img-preview">
 			<h1 className="text-2xl font-bold">图片预览组件测试</h1>
 
 			{/* 基础测试 */}

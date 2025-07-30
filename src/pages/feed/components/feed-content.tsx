@@ -15,7 +15,7 @@ export const FeedContent = (props: FeedContentProps) => {
 	const displayContent = needsTruncate && !isExpanded ? feedUtil.truncateContent(content) : content
 
 	return (
-		<div className={cn('space-y-2', className)}>
+		<div className={cn('space-y-2', className)} data-slot="feed-content">
 			{/* 文本内容区域 */}
 			<div className="text-sm text-foreground leading-relaxed">
 				<AnimatePresence mode="wait">

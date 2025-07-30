@@ -9,7 +9,7 @@ export const ChatAudio = (props: ChatAudioProps) => {
 	const { url, filename, size } = props
 
 	return (
-		<Card className="mt-2 max-w-sm">
+		<Card className="mt-2 max-w-sm" data-slot="chat-audio">
 			<CardContent className="p-4">
 				<audio controls className="w-full mb-3">
 					<source src={url} />

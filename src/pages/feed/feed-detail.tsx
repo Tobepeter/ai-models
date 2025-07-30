@@ -103,7 +103,7 @@ export const FeedDetail = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-background">
+		<div className="min-h-screen bg-background" data-slot="feed-detail">
 			{/* 详情内容 */}
 			<div className="container max-w-4xl mx-auto py-6">
 				<div className="bg-card rounded-lg shadow-sm overflow-hidden">

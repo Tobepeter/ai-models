@@ -11,6 +11,7 @@ import tsxPropsPattern from './eslint-rules/tsx-props-pattern.js'
 import propsChildrenPattern from './eslint-rules/props-children-pattern.js'
 import reactDestructureImports from './eslint-rules/react-destructure-imports.js'
 import requireComponentJsdoc from './eslint-rules/require-component-jsdoc.js'
+import requireDataSlot from './eslint-rules/require-data-slot.js'
 
 const customRules = {
 	'no-simple-return-types': noSimpleReturnTypes,
@@ -18,6 +19,7 @@ const customRules = {
 	'props-children-pattern': propsChildrenPattern,
 	'react-destructure-imports': reactDestructureImports,
 	'require-component-jsdoc': requireComponentJsdoc,
+	'require-data-slot': requireDataSlot,
 }
 
 export default tseslint.config(
@@ -51,6 +53,7 @@ export default tseslint.config(
 				'custom/props-children-pattern': 'error',
 				'custom/react-destructure-imports': 'error',
 				'custom/require-component-jsdoc': 'error',
+				'custom/require-data-slot': ['warn', { autoFix: true }], // 使用 warn 级别，便于逐步迁移
 			},
 		},
 	],

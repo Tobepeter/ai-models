@@ -8,7 +8,7 @@ import { docMgr } from './doc-mgr'
 import { DocFile } from './doc-types'
 import { DocSidebar } from './doc-sidebar'
 
-let Doc = () => <div>文档功能仅在开发环境可用</div>
+let Doc = () => <div data-slot="doc">文档功能仅在开发环境可用</div>
 
 if (isDev) {
 	/**

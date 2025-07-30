@@ -37,7 +37,7 @@ export const ChatHubModelSelector = (props: ChatHubModelSelectorProps) => {
 	}
 
 	return (
-		<div>
+		<div data-slot="chat-hub-model-selector">
 			<MultiSelectDialog value={selectedModelItems} onChange={handleSelectionChange} groups={modelGroups} triggerText="选择AI模型" dialogTitle="选择AI模型" disabled={disabled} hoverChange={true} />
 		</div>
 	)

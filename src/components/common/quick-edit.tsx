@@ -99,7 +99,7 @@ export const QuickEdit = (props: QuickEditProps) => {
 	}
 
 	return (
-		<div className={cn('flex items-center', !showEditIcon && 'hover:bg-muted/50 rounded-md p-2 -m-2 transition-colors', containerClassName)}>
+		<div className={cn('flex items-center', !showEditIcon && 'hover:bg-muted/50 rounded-md p-2 -m-2 transition-colors', containerClassName)} data-slot="quick-edit">
 			{showEditIcon && iconPosition === 'left' && (
 				<Button variant="ghost" size="sm" className="h-6 w-6 p-0 mr-2 flex-shrink-0" onClick={handleEditStart}>
 					<Edit className="h-3 w-3" />

@@ -17,16 +17,13 @@ export const AppHeader = () => {
 	const title = currentTitle?.title || 'AI对话'
 
 	return (
-		<header className="flex-shrink-0 border-b bg-card px-4 py-3">
+		<header className="flex-shrink-0 border-b bg-card px-4 py-3" data-slot="app-header">
 			<div className="flex items-center justify-between w-full">
 				{/* 左侧按钮区 */}
 				<div className="flex items-center gap-2">
 					{/* 返回按钮 */}
-					<button
-						onClick={() => navigate(-1)}
-						className="flex items-center text-foreground hover:text-primary transition-colors cursor-pointer"
-					>
-						<ArrowLeft className="h-5 w-5" />
+					<button onClick={() => navigate(-1)} className="flex items-center text-foreground hover:text-primary transition-colors cursor-pointer">
+						<ArrowLeft className="square-5" />
 					</button>
 
 					{/* 首页按钮 */}
@@ -35,7 +32,7 @@ export const AppHeader = () => {
 						disabled={isHome}
 						className="flex items-center text-foreground hover:text-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						<Home className="h-5 w-5" />
+						<Home className="square-5" />
 					</button>
 				</div>
 

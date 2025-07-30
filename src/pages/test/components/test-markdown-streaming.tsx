@@ -90,7 +90,7 @@ function hello() {
 	})
 
 	return (
-		<div className="container mx-auto p-6 space-y-6">
+		<div className="container mx-auto p-6 space-y-6" data-slot="test-markdown-streaming">
 			<Card>
 				<CardHeader>
 					<CardTitle>Markdown 流式测试</CardTitle>

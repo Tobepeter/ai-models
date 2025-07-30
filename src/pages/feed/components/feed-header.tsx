@@ -11,7 +11,7 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 	const { userId, username, avatar, status, createdAt, className } = props
 
 	return (
-		<div className={cn('flex items-start justify-between', className)}>
+		<div className={cn('flex items-start justify-between', className)} data-slot="feed-header">
 			{/* 左侧用户信息 */}
 			<div className="flex items-start space-x-3 flex-1 min-w-0">
 				<UserAvatar src={avatar} alt={`${username}的头像`} size={40} className="flex-shrink-0" fallbackText={username.charAt(0)} />

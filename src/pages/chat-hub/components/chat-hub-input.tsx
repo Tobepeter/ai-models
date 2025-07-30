@@ -39,7 +39,7 @@ export const ChatHubInput = () => {
 	const canSubmit = inputVal.trim() && selectedModels.length > 0 && !isGenerating
 
 	return (
-		<div className="border-t bg-background p-4">
+		<div className="border-t bg-background p-4" data-slot="chat-hub-input">
 			<div className="max-w-4xl mx-auto space-y-4">
 				{/* 模型选择器 */}
 				<div>

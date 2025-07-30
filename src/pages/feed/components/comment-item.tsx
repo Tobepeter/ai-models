@@ -10,7 +10,7 @@ export const CommentItem = (props: CommentItemProps) => {
 	const { comment, className } = props
 
 	return (
-		<div className={cn('flex space-x-3 py-2', className)}>
+		<div className={cn('flex space-x-3 py-2', className)} data-slot="comment-item">
 			{/* 用户头像 */}
 			<UserAvatar
 				src={comment.avatar}

@@ -73,7 +73,7 @@ export const FileUpload = (props: PropsWithChildren<FileUploadProps>) => {
 	}
 
 	return (
-		<div className="relative inline-block">
+		<div className="relative inline-block" data-slot="file-upload">
 			<input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" disabled={uploading} />
 
 			{children ? (

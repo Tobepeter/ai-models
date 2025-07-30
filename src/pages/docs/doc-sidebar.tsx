@@ -13,7 +13,7 @@ export const DocSidebar = (props: DocSidebarProps) => {
 	const sideBarConfigs = docMgr.filterSidebarConfig(searchQuery) || {}
 
 	return (
-		<Sidebar>
+		<Sidebar data-slot="doc-sidebar">
 			<SidebarHeader>
 				<h2 className="text-lg font-semibold">文档浏览</h2>
 				<div className="mt-2">

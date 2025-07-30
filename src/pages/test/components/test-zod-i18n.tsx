@@ -171,7 +171,7 @@ export default function TestZodI18n() {
 	}
 
 	return (
-		<div className="space-y-4 p-4">
+		<div className="space-y-4 p-4" data-slot="test-zod-i18n">
 			<h2 className="text-lg font-semibold">Zod v4 国际化错误消息测试</h2>
 
 			<div className="space-y-2">

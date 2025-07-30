@@ -171,7 +171,7 @@ const TestOSS = () => {
 	}
 
 	return (
-		<div className="p-6 space-y-6">
+		<div className="p-6 space-y-6" data-slot="test-oss">
 			<TestOssHeader />
 
 			<TestOssConfigInfo status={status} sts={sts} loading={loading} onCheckStatus={checkStatus} onGetSts={getSts} />

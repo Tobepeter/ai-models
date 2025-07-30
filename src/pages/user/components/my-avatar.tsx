@@ -30,5 +30,5 @@ export const MyAvatar = (props: MyAvatarProps) => {
 	}
 
 	// 直接使用 UserAvatar 的预览功能
-	return <UserAvatar src={avatarSrc} alt={user?.username} size={size} fallbackText={fallbackText} noPreview={noPreview} className={className} />
+	return <UserAvatar src={avatarSrc} alt={user?.username} size={size} fallbackText={fallbackText} noPreview={noPreview} className={className} data-slot="my-avatar" />
 }

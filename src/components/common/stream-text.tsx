@@ -12,7 +12,7 @@ export const StreamText = (props: StreamTextProps) => {
 	const characters = content.split('')
 
 	return (
-		<span className={cn('whitespace-pre-wrap', className)} style={style}>
+		<span className={cn('whitespace-pre-wrap', className)} style={style} data-slot="stream-text">
 			{characters.map((char, idx) => {
 				// 判断是否是新增的字符（超出上次内容长度的字符）
 				const isNewChar = idx >= prevContent.length

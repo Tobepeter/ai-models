@@ -41,7 +41,7 @@ const TestShimmerSize = () => {
 	}
 
 	return (
-		<div className="p-6 space-y-8">
+		<div className="p-6 space-y-8" data-slot="test-shimmer-size">
 			<style>
 				{`
           @keyframes shimmer100 {

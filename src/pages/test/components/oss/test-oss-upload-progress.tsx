@@ -9,7 +9,7 @@ export const TestOssUploadProgress = (props: TestOssUploadProgressProps) => {
 	if (!uploading) return null
 
 	return (
-		<Card>
+		<Card data-slot="test-oss-upload-progress">
 			<CardContent className="pt-6">
 				<div className="flex items-center gap-2">
 					<div>上传中...</div>

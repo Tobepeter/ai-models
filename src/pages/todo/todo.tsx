@@ -106,7 +106,7 @@ export const Todo = () => {
 	}
 
 	return (
-		<div className="max-w-2xl mx-auto p-6 space-y-6">
+		<div className="max-w-2xl mx-auto p-6 space-y-6" data-slot="todo">
 			{/* 顶部大输入框 */}
 			<div className="space-y-4">
 				{!isLoggedIn && <p className="text-sm text-muted-foreground text-center">你可以登录后数据持久化</p>}

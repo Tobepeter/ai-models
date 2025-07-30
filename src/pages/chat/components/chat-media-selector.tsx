@@ -19,7 +19,7 @@ export const ChatMediaSelector = () => {
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu data-slot="chat-media-selector">
 			<DropdownMenuTrigger asChild>
 				<Button variant="default" size="sm" className="gap-2">
 					<CurrIcon className="h-4 w-4" />

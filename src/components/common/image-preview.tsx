@@ -1,7 +1,7 @@
 import { useState, useRef, CSSProperties, useEffect, PropsWithChildren } from 'react'
 import { Eye, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn, useUnmount } from 'ahooks'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -245,6 +245,7 @@ export const ImagePreview = (props: PropsWithChildren<ImagePreviewProps>) => {
 				<DialogContent showCloseButton={false} className="p-0 border-none" style={getPreviewDimension()}>
 					<VisuallyHidden>
 						<DialogTitle>预览图片</DialogTitle>
+						<DialogDescription>点击或按ESC键关闭图片预览</DialogDescription>
 					</VisuallyHidden>
 					<img
 						src={curUrl}

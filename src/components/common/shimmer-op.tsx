@@ -29,7 +29,7 @@ export const ShimmerOp = (props: ShimmerOpProps) => {
 	}
 
 	return (
-		<div className={cn('flex flex-wrap', className)}>
+		<div className={cn('flex flex-wrap', className)} data-slot="shimmer-op">
 			{text.split('').map((char, index) => (
 				<span key={index} className="transition-opacity" style={{ opacity: getOpacity(index), transitionDuration: `${transitionDur}ms` }}>
 					{char}

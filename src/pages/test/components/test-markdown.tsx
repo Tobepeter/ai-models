@@ -138,7 +138,7 @@ for i in range(10):
 	]
 
 	return (
-		<div className="p-4 max-w-4xl mx-auto">
+		<div className="p-4 max-w-4xl mx-auto" data-slot="test-markdown">
 			<h2 className="text-2xl font-bold mb-6">Markdown 组件测试</h2>
 			<div className="space-y-8">
 				{testCases.map((testCase, idx) => (

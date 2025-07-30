@@ -56,7 +56,7 @@ const TestShimmer = () => {
 	]
 
 	return (
-		<div className="p-6 space-y-8">
+		<div className="p-6 space-y-8" data-slot="test-shimmer">
 			{/* 主标题 */}
 			<div className="text-center space-y-4">
 				<motion.h1

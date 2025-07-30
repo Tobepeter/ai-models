@@ -68,7 +68,7 @@ export const ChatSettings = () => {
 	}
 
 	return (
-		<Dialog open={showSettings} onOpenChange={handleOpenChange}>
+		<Dialog open={showSettings} onOpenChange={handleOpenChange} data-slot="chat-settings">
 			<DialogContent className="sm:max-w-[500px]" aria-describedby="settings">
 				<DialogHeader>
 					<DialogTitle>设置</DialogTitle>

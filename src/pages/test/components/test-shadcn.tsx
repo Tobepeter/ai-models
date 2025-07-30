@@ -13,7 +13,7 @@ import { Heart, Star, Users, Settings, Mail } from 'lucide-react'
 
 const TestShadcn = () => {
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8" data-slot="test-shadcn">
 			{/* 按钮展示 */}
 			<Card>
 				<CardHeader>

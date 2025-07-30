@@ -75,7 +75,7 @@ export const UserCard = () => {
 	}
 
 	return (
-		<Card>
+		<Card data-slot="user-card">
 			<CardHeader className="pb-4">
 				{/* 头部区域：头像 + 基本信息 */}
 				<div className="flex items-start space-x-4">

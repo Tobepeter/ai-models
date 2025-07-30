@@ -21,7 +21,7 @@ const TestTwBreakpoint = () => {
 	const breakpoint = getBreakpoint(windowWidth)
 
 	return (
-		<div className="p-4 space-y-6">
+		<div className="p-4 space-y-6" data-slot="test-tw-breakpoint">
 			{/* 当前宽度显示 */}
 			<div className="fixed top-4 right-4 bg-black/80 text-white px-3 py-2 rounded text-sm font-mono z-50">
 				{windowWidth}px ({breakpoint})

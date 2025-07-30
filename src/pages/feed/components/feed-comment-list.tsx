@@ -23,7 +23,7 @@ export const CommentSection = (props: CommentSectionProps) => {
 	}
 
 	return (
-		<div className={cn('mt-3', className)}>
+		<div className={cn('mt-3', className)} data-slot="comment-section">
 			{/* 评论列表 - 始终可见 */}
 			<div className="relative">
 				<CommentList comments={displayComments} onReply={onReply} onLikeComment={onLikeComment} />
@@ -55,7 +55,7 @@ export const CommentList = (props: CommentListProps) => {
 	}
 
 	return (
-		<div className={cn('py-3 space-y-1', className)}>
+		<div className={cn('py-3 space-y-1', className)} data-slot="comment-list">
 			{comments?.map((comment) => (
 				<CommentItem key={comment.id} comment={comment} onReply={onReply} onLike={onLikeComment} />
 			))}

@@ -33,7 +33,7 @@ export const Shimmer = (props: PropsWithChildren<ShimmerProps>) => {
 	const ease = 'easeInOut'
 
 	return (
-		<div ref={divRef} className={className} style={style}>
+		<div ref={divRef} className={className} style={style} data-slot="shimmer">
 			<motion.span
 				className="text-transparent bg-clip-text"
 				// className="text-transparent"

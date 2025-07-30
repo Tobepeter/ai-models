@@ -111,7 +111,7 @@ const TestReactHookForm = () => {
 	}
 
 	return (
-		<div className="w-full max-w-6xl mx-auto p-4 space-y-6">
+		<div className="w-full max-w-6xl mx-auto p-4 space-y-6" data-slot="test-react-hook-form">
 			<div className="text-center space-y-2">
 				<h1 className="text-3xl font-bold">React Hook Form 学习示例</h1>
 				<p className="text-muted-foreground">学习 React Hook Form 的各种功能和用法</p>

@@ -60,7 +60,7 @@ export const OssImagePreview = (props: OssImagePreviewProps) => {
 			onCustomDelete={onOssDelete ? handleCustomDelete : undefined}
 			onCustomUploadError={handleCustomUploadError}
 			onUpload={handleUpload}
-			onDelete={handleDelete}
+			onDelete={handleDelete} data-slot="oss-image-preview"
 		/>
 	)
 }

@@ -85,7 +85,7 @@ function hello(name) {
 	}
 
 	return (
-		<div className="p-6 max-w-2xl mx-auto">
+		<div className="p-6 max-w-2xl mx-auto" data-slot="test-stream-text">
 			<h2 className="text-xl font-bold mb-4">测试聊天流式输出</h2>
 
 			<div className="mb-4 space-x-2">

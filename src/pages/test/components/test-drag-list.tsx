@@ -70,7 +70,7 @@ const ComplexItemRenderer = (item: ComplexItem) => {
 	const config = priorityConfig[item.priority]
 
 	return (
-		<div className={`w-full ${item.completed ? 'opacity-75' : ''}`}>
+		<div className={`w-full ${item.completed ? 'opacity-75' : ''}`} data-slot="complex-item-renderer">
 			<div className="flex items-center gap-2 mb-2">
 				<h3 className={`font-medium ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.title}</h3>
 				<Badge variant={config.color as any} className="text-xs">
@@ -112,7 +112,7 @@ const TestDragList = () => {
 	}
 
 	return (
-		<div className="p-6 max-w-4xl mx-auto space-y-8">
+		<div className="p-6 max-w-4xl mx-auto space-y-8" data-slot="test-drag-list">
 			<div>
 				<h2 className="text-2xl font-bold mb-2">通用拖拽列表组件测试</h2>
 				<p className="text-muted-foreground">演示 DragList 组件的简单模式和自定义渲染模式</p>

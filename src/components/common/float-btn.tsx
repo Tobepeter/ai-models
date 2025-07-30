@@ -45,7 +45,7 @@ const DraggableButton = (props: DraggableButtonProps) => {
 			)}
 			onClick={onClick}
 			{...attributes}
-			{...listeners}
+			{...listeners} data-slot="draggable-button"
 		>
 			{title}
 		</button>
@@ -121,7 +121,7 @@ export const FloatBtn = (props: FloatBtnProps) => {
 	})
 
 	return (
-		<DndContext sensors={sensors} modifiers={[restrictToWindowEdges]} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+		<DndContext sensors={sensors} modifiers={[restrictToWindowEdges]} onDragEnd={handleDragEnd} onDragStart={handleDragStart} data-slot="float-btn">
 			<DraggableButton title={title} pos={pos} onClick={handleButtonClick} isDragging={isDragging} className={className} />
 		</DndContext>
 	)

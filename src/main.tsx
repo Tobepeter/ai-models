@@ -23,7 +23,7 @@ const StrictWrapper = (props: PropsWithChildren) => {
 
 const Main = () => {
 	return (
-		<ThemeProvider attribute="class">
+		<ThemeProvider attribute="class" data-slot="main">
 			<TooltipProvider>
 				<QueryClientProvider client={queryClient}>
 					<RouterProvider router={router} />

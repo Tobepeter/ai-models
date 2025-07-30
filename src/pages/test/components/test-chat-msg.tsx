@@ -323,7 +323,7 @@ classDiagram
 	]
 
 	return (
-		<div className="p-4 max-w-4xl mx-auto">
+		<div className="p-4 max-w-4xl mx-auto" data-slot="test-chat-msg">
 			<h2 className="text-xl font-semibold mb-4">聊天消息组件测试</h2>
 			<div className="space-y-4">
 				{testMsgs.map((msg) => (

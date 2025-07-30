@@ -52,12 +52,14 @@ export const FeedItem = (props: FeedItemProps) => {
 	}
 
 	return (
-		<article className={cn('bg-card', className)}>
+		<article className={cn('bg-card', className)} data-slot="feed-item">
 			{/* 整个帖子区域都可点击 */}
-			<div
-				className="cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 rounded-lg border border-transparent hover:border-border/50"
-				onClick={handleContentClick}
-			>
+			<div className="relative rounded-lg border border-transparent">
+				{/* 背景点击层 - 只有点击到背景区域才触发详情页 */}
+				<div
+					className="absolute inset-0 -z-10 cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50 rounded-lg"
+					onClick={handleContentClick}
+				/>
 				{/* 内容区域 */}
 				<div className="p-4">
 					{/* 用户信息栏 */}
@@ -70,7 +72,7 @@ export const FeedItem = (props: FeedItemProps) => {
 					{post.image && <FeedImage src={post.image} alt={`${post.username}的图片`} className="mb-3" />}
 				</div>
 
-				{/* 交互按钮栏 - 也包含在点击区域内 */}
+				{/* 交互按钮栏 */}
 				<div className="px-4 pb-4">
 					<FeedActions
 						postId={post.id}

@@ -73,7 +73,7 @@ const TestErrorHandling = () => {
 	]
 
 	return (
-		<Card>
+		<Card data-slot="test-error-handling">
 			<CardHeader>
 				<CardTitle>错误处理测试</CardTitle>
 			</CardHeader>

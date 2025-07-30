@@ -20,7 +20,7 @@ export const Screen = (props: PropsWithChildren<ScreenProps>) => {
 
 	const height = dynamicHeight ? '100dvh' : '100svh'
 
-	return <ScreenContainer height={height}>{children}</ScreenContainer>
+	return <ScreenContainer height={height} data-slot="screen">{children}</ScreenContainer>
 }
 
 export interface ScreenProps {

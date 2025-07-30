@@ -108,7 +108,7 @@ export const UserChangePwd = (props: UserChangePwdProps) => {
 	})
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={open} onOpenChange={onOpenChange} data-slot="user-change-pwd">
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>修改密码</DialogTitle>

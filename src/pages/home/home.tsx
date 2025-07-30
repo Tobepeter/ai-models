@@ -40,7 +40,7 @@ export const Home = () => {
 	const navigate = useNavigate()
 
 	return (
-		<div className="p-6 max-w-4xl mx-auto">
+		<div className="p-6 max-w-4xl mx-auto" data-slot="home">
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 				{navCards.map((card) => {
 					const Icon = card.icon

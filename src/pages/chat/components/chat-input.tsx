@@ -88,7 +88,7 @@ export const ChatInput = () => {
 	const buttonDisabled = !isLoading && !inputVal.trim()
 
 	return (
-		<div className="flex gap-2 p-4 border-t bg-background">
+		<div className="flex gap-2 p-4 border-t bg-background" data-slot="chat-input">
 			<ChatMediaSelector />
 			<div className="flex-1">
 				<Input

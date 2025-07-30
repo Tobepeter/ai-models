@@ -52,7 +52,7 @@ export const Feed = () => {
 	}
 
 	return (
-		<div className="max-w-2xl mx-auto min-h-screen bg-background">
+		<div className="max-w-2xl mx-auto min-h-screen bg-background" data-slot="feed">
 			{/* 固定顶部栏 - 标题和刷新按钮 */}
 			<div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border p-4">
 				<div className="flex items-center justify-between">

@@ -12,7 +12,7 @@ import { ossRegion, ossBucket } from '@/utils/env'
 export const TestOssConfigInfo = (props: TestOssConfigInfoProps) => {
 	const { status, sts, loading, onCheckStatus, onGetSts } = props
 	return (
-		<Card>
+		<Card data-slot="test-oss-config-info">
 			<CardContent className="pt-6">
 				<div className="grid grid-cols-2 gap-6">
 					<Card>

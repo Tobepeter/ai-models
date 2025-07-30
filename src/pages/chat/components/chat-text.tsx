@@ -13,7 +13,7 @@ export const ChatText = (props: ChatTextProps) => {
 	}
 
 	return (
-		<div className={cn('text-sm whitespace-pre-wrap', className)} style={style}>
+		<div className={cn('text-sm whitespace-pre-wrap', className)} style={style} data-slot="chat-text">
 			{content}
 		</div>
 	)

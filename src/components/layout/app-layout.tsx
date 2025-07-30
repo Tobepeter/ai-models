@@ -5,7 +5,7 @@ import { AppHeader } from './app-header'
 
 export const AppLayout = () => {
 	return (
-		<Screen>
+		<Screen data-slot="app-layout">
 			<div className="flex flex-col h-full bg-background">
 				<AppHeader />
 				<main className="flex-1 overflow-auto">

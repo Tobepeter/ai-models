@@ -15,7 +15,7 @@ const TestUserAvatar = () => {
 	const [customSize, setCustomSize] = useState(60)
 
 	return (
-		<div className="p-6 max-w-4xl mx-auto space-y-6">
+		<div className="p-6 max-w-4xl mx-auto space-y-6" data-slot="test-user-avatar">
 			{/* 基础用法测试 */}
 			<Card>
 				<CardHeader>

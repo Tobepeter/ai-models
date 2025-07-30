@@ -27,7 +27,7 @@ export const UserSettings = (props: UserSettingsProps) => {
 	}
 
 	return (
-		<Card>
+		<Card data-slot="user-settings">
 			<CardHeader>
 				<CardTitle>设置</CardTitle>
 				<CardDescription>应用偏好和配置</CardDescription>

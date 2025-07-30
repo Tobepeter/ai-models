@@ -107,7 +107,7 @@ export const EmojiPicker = (props: EmojiPickerProps) => {
 	}
 
 	return (
-		<Popover open={isOpen} onOpenChange={setIsOpen}>
+		<Popover open={isOpen} onOpenChange={setIsOpen} data-slot="emoji-picker">
 			<PopoverTrigger asChild>
 				{trigger || (
 					<Button variant="outline" size="sm">

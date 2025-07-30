@@ -1,3 +1,4 @@
+import { type CSSProperties } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
@@ -56,7 +57,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	}
 
 	return (
-		<div className={cn('flex flex-col h-full', className)}>
+		<div className={cn('flex flex-col h-full', className)} data-slot="feed-detail-content">
 			{/* 帖子内容区域 */}
 			<div className="flex-shrink-0 p-6 border-b">
 				{/* 用户信息 */}
@@ -164,7 +165,8 @@ const VirtualCommentList = (props: VirtualCommentListProps) => {
 	const { comments, onReply, onLikeComment, hasMore, loading, error, onLoadMore, onRetry } = props
 
 	// 评论项渲染器
-	const CommentItemRenderer = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+	const CommentItemRenderer = (props: { index: number; style: CSSProperties }) => {
+		const { index, style } = props
 		const comment = comments[index]
 		
 		// 最后一项显示加载状态
@@ -200,7 +202,7 @@ const VirtualCommentList = (props: VirtualCommentListProps) => {
 		if (!comment) return null
 
 		return (
-			<div style={style} className="px-6 py-2">
+			<div style={style} className="px-6 py-2" data-slot="comment-item-renderer">
 				<CommentItem 
 					comment={comment} 
 					onReply={onReply} 
@@ -232,7 +234,7 @@ const VirtualCommentList = (props: VirtualCommentListProps) => {
 						onLoadMore()
 					}
 				}
-			}}
+			}} data-slot="virtual-comment-list"
 		>
 			{CommentItemRenderer}
 		</List>

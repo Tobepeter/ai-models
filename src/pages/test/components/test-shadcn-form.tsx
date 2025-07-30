@@ -114,7 +114,7 @@ const TestShadcnForm = () => {
 	}
 
 	return (
-		<div className="w-full max-w-6xl mx-auto p-4 space-y-6">
+		<div className="w-full max-w-6xl mx-auto p-4 space-y-6" data-slot="test-shadcn-form">
 			<div className="text-center space-y-2">
 				<h1 className="text-3xl font-bold">shadcn/ui Form 组件展示</h1>
 				<p className="text-muted-foreground">使用 shadcn/ui Form 组件 + react-hook-form + zod 进行表单验证</p>

@@ -25,7 +25,7 @@ export const ChatHub = () => {
 	})
 
 	return (
-		<div className="flex flex-col h-full bg-background">
+		<div className="flex flex-col h-full bg-background" data-slot="chat-hub">
 			{/* 卡片区域 */}
 			<ChatHubWrap cards={cards} />
 

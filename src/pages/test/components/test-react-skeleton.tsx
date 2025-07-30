@@ -3,7 +3,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 const TestReactSkeleton = () => {
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-8" data-slot="test-react-skeleton">
       <h2 className="text-2xl font-bold mb-4">React Loading Skeleton 示例</h2>
       
       {/* 基础骨架屏 */}

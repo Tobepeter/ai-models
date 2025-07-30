@@ -30,7 +30,7 @@ const MermaidChart = (props: { chart: string }) => {
 		}
 	}, [chart])
 
-	return <div ref={ref} className="my-4" />
+	return <div ref={ref} className="my-4" data-slot="mermaid-chart" />
 }
 
 /**
@@ -52,7 +52,7 @@ export const Markdown = (props: MarkdownProps) => {
 	}
 
 	return (
-		<div className={cn('markdown-content text-sm', className)} style={style}>
+		<div className={cn('markdown-content text-sm', className)} style={style} data-slot="markdown">
 			<ReactMarkdown
 				// NOTE: 应该暂时用不上
 				// remarkPlugins={[remarkGfm]}

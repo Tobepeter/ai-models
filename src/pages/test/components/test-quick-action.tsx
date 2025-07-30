@@ -9,7 +9,7 @@ export default function TestQuickAction() {
 	const [emptyValue, setEmptyValue] = useState('')
 
 	return (
-		<div className="p-6 space-y-6 max-w-4xl">
+		<div className="p-6 space-y-6 max-w-4xl" data-slot="test-quick-action">
 			<div className="text-xl font-semibold mb-4">QuickEdit 组件测试</div>
 
 			{/* QuickEdit 基础用法 */}

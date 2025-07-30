@@ -5,7 +5,7 @@ import { ShimmerOp } from '@/components/common/shimmer-op'
  */
 const TestCustom = () => {
 	return (
-		<div className="p-6 max-w-2xl mx-auto">
+		<div className="p-6 max-w-2xl mx-auto" data-slot="test-custom">
 			<div className="space-y-6">
 				<h1 className="text-2xl font-bold">ShimmerOp 测试</h1>
 

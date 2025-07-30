@@ -9,7 +9,7 @@ export const ChatImage = (props: ChatImageProps) => {
 	const { url, filename, size } = props
 
 	return (
-		<div className="mt-2">
+		<div className="mt-2" data-slot="chat-image">
 			<ImagePreview url={url} noEditable={true} className="w-full aspect-square" />
 			<div className="mt-2">
 				<ChatDownload url={url} filename={filename} size={size} />

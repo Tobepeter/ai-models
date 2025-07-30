@@ -30,7 +30,7 @@ export const AppEmojiMart = (props: AppEmojiMartProps) => {
 	}
 
 	return (
-		<Popover open={isOpen} onOpenChange={setIsOpen}>
+		<Popover open={isOpen} onOpenChange={setIsOpen} data-slot="app-emoji-mart">
 			<PopoverTrigger asChild>
 				{trigger || (
 					<Button variant="outline" size="sm">

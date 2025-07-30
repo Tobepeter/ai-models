@@ -53,7 +53,7 @@ export const Login = () => {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative" data-slot="login">
 			<Cover />
 
 			<Card className="w-full max-w-md shadow-lg border-0 bg-card/95 backdrop-blur relative">

@@ -9,7 +9,7 @@ export const ChatVideo = (props: ChatVideoProps) => {
 	const { url, filename, size, duration } = props
 
 	return (
-		<div className="mt-2">
+		<div className="mt-2" data-slot="chat-video">
 			<VideoPreview url={url} notEditable={true} className="rounded-lg shadow-md" />
 			<div className="mt-2">
 				<ChatDownload url={url} filename={filename} size={size} />

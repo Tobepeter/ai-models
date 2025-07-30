@@ -10,7 +10,7 @@ export const TestOssResult = (props: TestOssResultProps) => {
 	if (!result) return null
 
 	return (
-		<Card>
+		<Card data-slot="test-oss-result">
 			<CardHeader>
 				<CardTitle>最后上传结果</CardTitle>
 			</CardHeader>

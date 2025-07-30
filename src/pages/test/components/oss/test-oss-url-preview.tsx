@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 export const TestOssUrlPreview = (props: TestOssUrlPreviewProps) => {
 	const { path, preview, onPathChange, onGetSignedUrl } = props
 	return (
-		<Card>
+		<Card data-slot="test-oss-url-preview">
 			<CardHeader>
 				<CardTitle>OSS签名URL获取</CardTitle>
 				<CardDescription>输入OSS路径，获取STS签名的临时访问链接</CardDescription>

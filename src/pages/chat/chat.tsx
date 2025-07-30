@@ -29,7 +29,7 @@ export const Chat = () => {
 	}, [msgList, isLoading])
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full" data-slot="chat">
 			{/* 消息列表 */}
 			<div className="flex-1 overflow-hidden">
 				<ScrollArea className="h-full">

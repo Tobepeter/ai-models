@@ -82,7 +82,7 @@ export const FeedList = (props: FeedListProps) => {
 	}
 
 	return (
-		<div className={cn('w-full', className)}>
+		<div className={cn('w-full', className)} data-slot="feed-list">
 			{/* 虚拟滚动列表 */}
 			<List
 				ref={listRef}

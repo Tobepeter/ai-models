@@ -62,7 +62,7 @@ const TestNumeralJs = () => {
   ]
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
+    <div className="w-full max-w-6xl mx-auto p-4 space-y-6" data-slot="test-numeral-js">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Numeral.js 格式化展示</h1>
         <p className="text-muted-foreground">数字格式化库的各种用法示例</p>

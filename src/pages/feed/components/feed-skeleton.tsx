@@ -7,7 +7,7 @@ import { HTMLAttributes } from 'react'
 const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
 	const { className, ...restProps } = props
 	return (
-		<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...restProps} />
+		<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...restProps} data-slot="skeleton-box" />
 	)
 }
 
@@ -15,7 +15,7 @@ const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
  * 单个信息流项目骨架屏
  */
 const FeedItemSkeleton = () => (
-	<div className="p-4 border-b border-gray-100">
+	<div className="p-4 border-b border-gray-100" data-slot="feed-item-skeleton">
 		{/* 头部信息栏 */}
 		<div className="flex items-start space-x-3 mb-3">
 			<SkeletonBox className="w-10 h-10 rounded-full flex-shrink-0" />
@@ -63,7 +63,7 @@ const FeedItemSkeleton = () => (
 export const FeedSkeleton = (props: FeedSkeletonProps) => {
 	const { className, count = 3 } = props
 	return (
-		<div className={cn('space-y-0', className)}>
+		<div className={cn('space-y-0', className)} data-slot="feed-skeleton">
 			{Array.from({ length: count }, (_, index) => (
 				<FeedItemSkeleton key={index} />
 			))}
@@ -77,7 +77,7 @@ export const FeedSkeleton = (props: FeedSkeletonProps) => {
 export const LoadMoreSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
+		<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="load-more-skeleton">
 			<SkeletonBox className="w-4 h-4 rounded-full" />
 			<SkeletonBox className="h-4 w-20" />
 		</div>
@@ -90,7 +90,7 @@ export const LoadMoreSkeleton = (props: { className?: string }) => {
 export const RefreshSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<div className={cn('p-4 flex items-center justify-center space-x-2', className)}>
+		<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="refresh-skeleton">
 			<SkeletonBox className="w-5 h-5 rounded-full" />
 			<SkeletonBox className="h-4 w-16" />
 		</div>

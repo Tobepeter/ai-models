@@ -127,7 +127,7 @@ const TestNotify = () => {
 	]
 
 	return (
-		<Card>
+		<Card data-slot="test-notify">
 			<CardHeader>
 				<CardTitle>通知系统测试</CardTitle>
 			</CardHeader>

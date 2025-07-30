@@ -16,7 +16,7 @@ export const GMOutput = (props: GMOutputProps) => {
 	const { logs, onKillProc, onClearLogs } = props
 
 	return (
-		<div className="col-span-3 flex flex-col">
+		<div className="col-span-3 flex flex-col" data-slot="gmoutput">
 			<div className="flex justify-between items-center mb-2">
 				<span className="text-sm font-medium">命令输出</span>
 				<Button size="sm" variant="outline" onClick={onClearLogs}>

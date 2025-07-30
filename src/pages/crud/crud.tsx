@@ -166,7 +166,7 @@ export const Crud = () => {
 	}, [selectedCategory])
 
 	return (
-		<div className="p-6 space-y-6">
+		<div className="p-6 space-y-6" data-slot="crud">
 			<div className="mb-6">
 				<h1 className="text-2xl font-bold mb-2">通用型CRUD体验</h1>
 				<p className="text-muted-foreground">这是一个通用的数据管理界面，支持数据的增删改查操作</p>

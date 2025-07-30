@@ -8,7 +8,7 @@ import (
 
 // BaseModel 基础模型
 type BaseModel struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
+	ID        uint64    `json:"id" gorm:"primaryKey" swaggertype:"string"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

@@ -13,7 +13,7 @@ export const UserStatistic = () => {
 	]
 
 	return (
-		<Card>
+		<Card data-slot="user-statistic">
 			<CardHeader>
 				<CardTitle>使用统计(随便mock的）</CardTitle>
 				<CardDescription>您的AI助手使用情况</CardDescription>

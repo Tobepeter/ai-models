@@ -9,7 +9,7 @@ export const TestChatHub = () => {
 	const selectedModels = models.filter((m) => m.enabled)
 
 	return (
-		<div className="p-4 space-y-4">
+		<div className="p-4 space-y-4" data-slot="test-chat-hub">
 			<h2 className="text-lg font-semibold">ChatHub 测试</h2>
 
 			{/* 全部模型列表 */}

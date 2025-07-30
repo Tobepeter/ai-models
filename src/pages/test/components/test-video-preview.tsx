@@ -31,7 +31,7 @@ const TestVideoPreview = () => {
 	}
 
 	return (
-		<div className="p-6 space-y-6">
+		<div className="p-6 space-y-6" data-slot="test-video-preview">
 			<h1 className="text-2xl font-bold">视频预览组件测试</h1>
 
 			{/* 基础测试 */}

@@ -47,7 +47,7 @@ export const TodoItem = (props: TodoItemProps) => {
 	}
 
 	return (
-		<div className="flex items-center gap-3">
+		<div className="flex items-center gap-3" data-slot="todo-item">
 			{/* 完成按钮 */}
 			<div className="flex items-center h-5">
 				<Checkbox checked={todo.completed} onCheckedChange={handleToggle} />

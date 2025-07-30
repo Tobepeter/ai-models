@@ -38,7 +38,7 @@ export const ThemeToggle = () => {
 	}, [resolvedTheme, systemTheme])
 
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex items-center gap-2" data-slot="theme-toggle">
 			<Switch checked={isDark} onCheckedChange={handleToggle} className="data-[state=checked]:bg-slate-800 data-[state=unchecked]:bg-slate-200" />
 			{isDark ? <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" /> : <Sun className="h-4 w-4 text-yellow-500" />}
 		</div>

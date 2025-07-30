@@ -29,7 +29,7 @@ export const TestOssPermissions = (props: TestOssPermissionsProps) => {
 		onSaveAkConfig,
 	} = props
 	return (
-		<Card>
+		<Card data-slot="test-oss-permissions">
 			<CardHeader>
 				<CardTitle>权限测试</CardTitle>
 				<CardDescription>配置和测试不同的OSS权限模式</CardDescription>

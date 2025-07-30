@@ -41,7 +41,7 @@ const DragItem = <T extends DragListItem>(props: DragItemProps<T>) => {
 	const { item, renderItem, isDragging = false, className = '', ...domProps } = props
 	const rootClassName = cn('transition-all duration-200 hover:shadow-md', isDragging ? 'shadow-2xl border-2 border-primary/20 cursor-grabbing' : '', className)
 	return (
-		<Card className={rootClassName}>
+		<Card className={rootClassName} data-slot="drag-item">
 			<CardContent className="p-3">
 				<div className="flex items-center gap-3">
 					<Button variant="ghost" size="sm" className="p-1 h-auto cursor-grab active:cursor-grabbing opacity-60 hover:opacity-100" {...domProps}>
@@ -70,7 +70,7 @@ const SortableItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
 	const style = { transform: CSS.Transform.toString(transform), transition }
 
 	return (
-		<div ref={setNodeRef} style={style} className={isDragging ? 'opacity-50' : ''}>
+		<div ref={setNodeRef} style={style} className={isDragging ? 'opacity-50' : ''} data-slot="sortable-item">
 			<DragItem item={item} renderItem={renderItem} className={className} {...attributes} {...listeners} />
 		</div>
 	)
@@ -78,7 +78,7 @@ const SortableItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
 
 /** Item 拖拽时候虚拟的Overlay组件 */
 const DragOverlayItem = <T extends DragListItem>(props: SortableItemProps<T>) => {
-	return <DragItem {...props} isDragging />
+	return <DragItem {...props} isDragging data-slot="drag-overlay-item" />
 }
 
 /**
@@ -131,7 +131,7 @@ export const DragList = <T extends DragListItem>(props: DragListProps<T>) => {
 	)
 
 	return (
-		<div className={className}>
+		<div className={className} data-slot="drag-list">
 			<DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleStart} onDragEnd={handleEnd}>
 				<SortableContext items={curr.map((item) => item.id)} strategy={verticalListSortingStrategy}>
 					<div className="space-y-3">

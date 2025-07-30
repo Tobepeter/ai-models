@@ -70,6 +70,7 @@ func autoMigrate() error {
 		&models.Todo{},
 		&models.FeedPost{},
 		&models.FeedComment{},
+		&models.PostLike{},
 	)
 
 	if err != nil {
