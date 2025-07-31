@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { MessageCircle, Send, X } from 'lucide-react'
+import { Send, X } from 'lucide-react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useFeedStore } from '../../feed-store'
-import { feedUtil } from '../../feed-util'
 
 /**
  * 评论输入弹窗组件 - 使用 Popover
@@ -167,21 +166,6 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	)
 }
 
-/**
- * 评论按钮组件 - 包装 CommentInputPopup 显示评论数量
- */
-export const CommentInput = (props: CommentInputProps) => {
-	const { postId, commentCount, onAddComment, replyTo, className } = props
-	return (
-		<CommentInputPopup postId={postId} onAddComment={onAddComment} replyTo={replyTo} className={className}>
-			<Button variant="ghost" size="sm" className="h-8 px-2">
-				<MessageCircle className="h-4 w-4 mr-1" />
-				<span className="text-xs">{feedUtil.formatCount(commentCount)}</span>
-			</Button>
-		</CommentInputPopup>
-	)
-}
-
 interface CommentInputPopupProps {
 	postId: string
 	onAddComment: (content: string, replyTo?: string) => void
@@ -189,12 +173,4 @@ interface CommentInputPopupProps {
 	className?: string
 }
 
-interface CommentInputProps {
-	postId: string
-	commentCount: number
-	onAddComment: (content: string, replyTo?: string) => void
-	replyTo?: string
-	className?: string
-}
-
-export { type CommentInputPopupProps, type CommentInputProps }
+export { type CommentInputPopupProps }

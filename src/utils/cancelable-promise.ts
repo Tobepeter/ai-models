@@ -1,5 +1,3 @@
-import { AnyFn } from './types'
-
 type CancelableExecutor<T> = (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void, onCancel: (cb: AnyFn) => void) => void
 
 export class CancelablePromise<T = any> extends Promise<T> {

@@ -1,6 +1,5 @@
 import { useUnmount } from 'ahooks'
 import { useState } from 'react'
-import { AnyFn } from '@/utils/types'
 
 export const useTimer = () => {
 	const [timeId, setTimeId] = useState(0)

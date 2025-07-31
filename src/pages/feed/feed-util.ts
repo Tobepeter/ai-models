@@ -22,23 +22,28 @@ class FeedUtil {
 		return format(time, 'MM-dd') // 超过7天显示日期
 	}
 
+	// 截断内容到指定长度
 	truncateContent(content: string, maxLength: number = this.MAX_CONTENT_LENGTH) {
 		return truncate(content, { length: maxLength, omission: '...' })
 	}
 
+	// 判断内容是否需要截断
 	needsTruncate(content: string) {
 		return content.length > this.MAX_CONTENT_LENGTH
 	}
 
+	// 提取文本中的话题标签
 	extractHashtags(content: string): string[] {
 		const hashtagRegex = /#[\u4e00-\u9fa5a-zA-Z0-9_]+/g // 支持中文话题标签
 		return content.match(hashtagRegex) || []
 	}
 
+	// 生成分页游标
 	genCursor(timestamp: number, postId: string) {
 		return `${timestamp}_${postId}` // 格式: timestamp_postId
 	}
 
+	// 解析分页游标
 	parseCursor(cursor: string): { timestamp: number; id: string } | null {
 		try {
 			const [timestampStr, id] = cursor.split('_')
@@ -51,14 +56,17 @@ class FeedUtil {
 		}
 	}
 
+	// 生成用户ID
 	generateUserId() {
 		return `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 	}
 
+	// 生成帖子ID
 	generatePostId() {
 		return `post_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 	}
 
+	// 随机延迟函数
 	async delay(min: number = 500, max: number = 1500): Promise<void> {
 		const delay = Math.floor(Math.random() * (max - min + 1)) + min
 		return new Promise((resolve) => setTimeout(resolve, delay))
@@ -81,6 +89,7 @@ class FeedUtil {
 		return '999M+'
 	}
 
+	// 验证图片URL格式
 	isValidImageUrl(url: string) {
 		try {
 			const urlObj = new URL(url)
@@ -91,7 +100,7 @@ class FeedUtil {
 		}
 	}
 
-	/** 创建新评论 */
+	// 创建新评论
 	createComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,

@@ -1,4 +1,3 @@
-import { AnyFn } from '@/utils/types'
 import { FC } from 'react'
 
 /**

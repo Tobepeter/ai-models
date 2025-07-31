@@ -4,7 +4,6 @@ import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
 import { delayC } from '../../utils/common'
 import { CancelablePromise } from '../../utils/cancelable-promise'
-import { Nullable } from '../../utils/types'
 import { faker } from '@faker-js/faker'
 import { debounce } from 'lodash-es'
 

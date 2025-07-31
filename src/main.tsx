@@ -9,6 +9,9 @@ import './index.css'
 import { queryClient } from './api/query-client'
 import { router } from './router/router'
 import { isDev } from './utils/env'
+import { initGlobal } from './global'
+
+initGlobal() // 初始化全局变量
 
 // NOTE: 不是很喜欢这个功能
 const enableStrict = false

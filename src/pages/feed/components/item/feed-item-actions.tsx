@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
-import { Heart, Share } from 'lucide-react'
+import { Heart, Share, MessageCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CommentInput } from '../comment/feed-comment-input-popup'
+import { CommentInputPopup } from '../comment/feed-comment-input-popup'
 import { feedUtil } from '../../feed-util'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
@@ -60,7 +60,12 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInput postId={postId} commentCount={commentCount} onAddComment={onAddComment} replyTo={replyTo} />
+			<CommentInputPopup postId={postId} onAddComment={onAddComment} replyTo={replyTo}>
+				<Button variant="ghost" size="sm" className="h-8 px-2">
+					<MessageCircle className="h-4 w-4 mr-1" />
+					<span className="text-xs">{feedUtil.formatCount(commentCount)}</span>
+				</Button>
+			</CommentInputPopup>
 
 			{/* 分享按钮 */}
 			<Button variant="ghost" size="sm" className="h-8 px-2 min-w-[40px] justify-center text-muted-foreground hover:text-green-500 transition-colors" onClick={handleShare}>
