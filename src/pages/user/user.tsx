@@ -14,7 +14,7 @@ export const User = () => {
 	return (
 		<div className="p-6 max-w-2xl mx-auto space-y-6" data-slot="user">
 			<UserCard />
-			<UserStatistic />
+			{/* <UserStatistic /> */}
 			<UserSettings onChangePassword={() => setShowChangePasswordDialog(true)} />
 			{isLoggedIn && <UserChangePwd open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />}
 		</div>

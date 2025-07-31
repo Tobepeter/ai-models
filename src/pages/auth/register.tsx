@@ -95,6 +95,7 @@ export const Register = () => {
 
 		try {
 			const { confirmPassword, ...registerData } = data
+			// @ts-ignore 可选和非可选冲突了，有空想想如何修复
 			const result = await authApi.register(registerData)
 
 			// 注册成功

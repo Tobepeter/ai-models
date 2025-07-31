@@ -11,6 +11,7 @@ import { feedMgr } from '../feed-mgr'
 import { useFeedStore } from '../feed-store'
 import { OssImagePreview } from '@/components/common/oss-image-preview'
 import { OssUploadResult } from '@/utils/oss/oss-types'
+import { ossClient } from '@/utils/oss/oss-client'
 
 // 表单验证schema - 文字和图片二选一必须有
 const createFeedSchema = z.object({
@@ -83,17 +84,21 @@ export const FeedCreateDialog = () => {
 		return hasContent || hasImage
 	}
 
-	const handleClose = () => {
+	const handleClose = async () => {
 		// 如果正在loading(提交中)，阻止关闭
 		if (loading) {
 			return
 		}
 		
-		// 如果正在提交或已经提交过，不要删除OSS文件
-		// OssImagePreview内部会自动处理文件删除，但我们需要防止提交过程中的误删
+		// 如果有未使用的OSS文件且未提交，需要主动删除
 		if (!hasSubmittedRef.current && currentObjectKeyRef.current) {
-			// 只有在未提交状态下才可能需要清理OSS文件
-			// 实际删除由OssImagePreview组件内部的cleanup逻辑处理
+			try {
+				await ossClient.deleteFile(currentObjectKeyRef.current)
+				console.log(`[FeedCreateDialog] 清理未使用的OSS文件: ${currentObjectKeyRef.current}`)
+			} catch (error) {
+				console.warn(`[FeedCreateDialog] 删除OSS文件失败: ${currentObjectKeyRef.current}`, error)
+				// 静默处理删除失败，不影响关闭流程
+			}
 		}
 		
 		form.reset()
