@@ -31,9 +31,9 @@ type CreateFeedForm = z.infer<typeof createFeedSchema>
 /* 新建Feed弹窗组件 */
 export const FeedCreateDialog = () => {
 	const { loading, createDialog, closeCreateDialog } = useFeedStore()
-	const [imageUrl, setImageUrl] = useState<string>('')
-	const currentObjectKeyRef = useRef<string>('') // 保存当前上传的OSS objectKey
-	const hasSubmittedRef = useRef<boolean>(false) // 标记是否已经提交过
+	const [imageUrl, setImageUrl] = useState('')
+	const currObjectKeyRef = useRef('') // 保存当前上传的OSS objectKey
+	const hasSubmittedRef = useRef(false) // 标记是否已经提交过
 
 	const form = useForm<CreateFeedForm>({
 		resolver: zodResolver(createFeedSchema),
@@ -49,7 +49,7 @@ export const FeedCreateDialog = () => {
 			await feedMgr.createFeed(data.content || '', data.image || '')
 			form.reset()
 			setImageUrl('')
-			currentObjectKeyRef.current = '' // 清空 objectKey 引用
+			currObjectKeyRef.current = '' // 清空 objectKey 引用
 			hasSubmittedRef.current = false // 重置提交状态
 			closeCreateDialog()
 		} catch (error) {
@@ -60,7 +60,7 @@ export const FeedCreateDialog = () => {
 
 	// OSS上传成功回调
 	const handleOssUpload = (result: OssUploadResult, file: File) => {
-		currentObjectKeyRef.current = result.objectKey
+		currObjectKeyRef.current = result.objectKey
 		setImageUrl(result.url)
 		form.setValue('image', result.url)
 		form.trigger('image') // 触发验证
@@ -69,7 +69,7 @@ export const FeedCreateDialog = () => {
 	// OSS删除回调
 	const handleOssDelete = async (objectKey: string) => {
 		// 这里不做实际删除，由OssImagePreview组件内部处理
-		currentObjectKeyRef.current = ''
+		currObjectKeyRef.current = ''
 		setImageUrl('')
 		form.setValue('image', '')
 		form.trigger('image') // 触发验证
@@ -91,19 +91,19 @@ export const FeedCreateDialog = () => {
 		}
 		
 		// 如果有未使用的OSS文件且未提交，需要主动删除
-		if (!hasSubmittedRef.current && currentObjectKeyRef.current) {
+		if (!hasSubmittedRef.current && currObjectKeyRef.current) {
 			try {
-				await ossClient.deleteFile(currentObjectKeyRef.current)
-				console.log(`[FeedCreateDialog] 清理未使用的OSS文件: ${currentObjectKeyRef.current}`)
+				await ossClient.deleteFile(currObjectKeyRef.current)
+				console.log(`[FeedCreateDialog] 清理未使用的OSS文件: ${currObjectKeyRef.current}`)
 			} catch (error) {
-				console.warn(`[FeedCreateDialog] 删除OSS文件失败: ${currentObjectKeyRef.current}`, error)
+				console.warn(`[FeedCreateDialog] 删除OSS文件失败: ${currObjectKeyRef.current}`, error)
 				// 静默处理删除失败，不影响关闭流程
 			}
 		}
 		
 		form.reset()
 		setImageUrl('')
-		currentObjectKeyRef.current = ''
+		currObjectKeyRef.current = ''
 		hasSubmittedRef.current = false // 重置提交状态
 		closeCreateDialog()
 	}

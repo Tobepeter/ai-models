@@ -2,9 +2,7 @@ import MagicString from 'magic-string'
 import type { Plugin } from 'vite'
 
 interface AutoWindowInjectOptions {
-	/** 文件匹配模式，默认匹配 *-util.ts */
 	include?: RegExp
-	/** 是否在生产环境启用，默认仅开发环境 */
 	enableInProduction?: boolean
 }
 
@@ -12,13 +10,12 @@ interface AutoWindowInjectOptions {
  * Vite插件：自动将导出的变量注入到window对象中，方便调试
  *
  * 特性：
- * - 仅处理匹配的文件（默认 *-util.ts）
  * - 防止覆盖已存在的window属性
  * - 保持sourcemap映射
  * - 仅在开发环境启用（可配置）
  */
 export function autoWindowInjectPlugin(options: AutoWindowInjectOptions = {}): Plugin {
-	const { include = /-util\.ts$/, enableInProduction = false } = options
+	const { include = /src\/.*\.(ts|tsx)$/, enableInProduction = false } = options
 
 	return {
 		name: 'auto-window-inject',
@@ -69,7 +66,7 @@ function extractExports(code: string): string[] {
 	const exportConstRegex = /export\s+const\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g
 	const exportBraceRegex = /export\s*\{\s*([^}]+)\s*\}/g
 
-	let match
+	let match: RegExpExecArray | null
 
 	// 提取 export const
 	while ((match = exportConstRegex.exec(code)) !== null) {
@@ -99,13 +96,14 @@ function extractExports(code: string): string[] {
  */
 function generateInjectionCode(exports: string[], filePath: string) {
 	const fileName = filePath.split('/').pop() || 'unknown'
+	const warn = false
 
 	const injections = exports
 		.map(
 			(varName) => `
     if (typeof window !== 'undefined') {
       if (window.hasOwnProperty('${varName}')) {
-        console.warn('[auto-window-inject] 冲突警告: window.${varName} 已存在，跳过注入 (来源: ${fileName})')
+        ${warn ? `console.warn('[auto-window-inject] 冲突警告: window.${varName} 已存在，跳过注入 (来源: ${fileName})')` : ''}
       } else {
         window.${varName} = ${varName}
         // console.log('[auto-window-inject] 注入成功: window.${varName} (来源: ${fileName})')

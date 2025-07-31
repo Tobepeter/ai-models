@@ -10,28 +10,28 @@ import { OssUploadResult } from '@/utils/oss/oss-types'
  */
 export const OssImagePreview = (props: OssImagePreviewProps) => {
 	const { onOssUpload, onOssDelete, ...imagePreviewProps } = props
-	const currentObjectKeyRef = useRef<string>('') // 维护当前的 objectKey
+	const currObjectKeyRef = useRef<string>('') // 维护当前的 objectKey
 
 	const handleCustomUpload = useMemoizedFn(async (file: File): Promise<string | undefined> => {
 		// 如果有旧的 objectKey，静默删除旧文件（不等待）
-		if (currentObjectKeyRef.current) {
-			ossClient.deleteFile(currentObjectKeyRef.current).catch((error) => {
+		if (currObjectKeyRef.current) {
+			ossClient.deleteFile(currObjectKeyRef.current).catch((error) => {
 				console.warn('[OssImagePreview] Failed to delete old file:', error)
 			})
 		}
 
 		// 上传新文件
 		const result = await ossClient.uploadFile(file)
-		currentObjectKeyRef.current = result.objectKey // 保存新的 objectKey
+		currObjectKeyRef.current = result.objectKey // 保存新的 objectKey
 		onOssUpload?.(result, file)
 		return result.url
 	})
 
 	const handleCustomDelete = useMemoizedFn((): Promise<void> => {
-		const objectKey = currentObjectKeyRef.current
+		const objectKey = currObjectKeyRef.current
 
 		// 立即清空 objectKey 引用
-		currentObjectKeyRef.current = ''
+		currObjectKeyRef.current = ''
 
 		// 如果有 objectKey 且有删除回调，执行删除
 		if (objectKey && onOssDelete) {
@@ -66,8 +66,6 @@ export const OssImagePreview = (props: OssImagePreviewProps) => {
 }
 
 export interface OssImagePreviewProps extends Omit<ImagePreviewProps, 'onCustomUpload' | 'onCustomDelete' | 'onCustomUploadError'> {
-	/** OSS 上传成功回调 */
-	onOssUpload?: (result: OssUploadResult, file: File) => void
-	/** OSS 删除回调，传入 objectKey，需要返回Promise */
-	onOssDelete?: (objectKey: string) => Promise<void>
+	onOssUpload?: (result: OssUploadResult, file: File) => void // OSS 上传成功回调
+	onOssDelete?: (objectKey: string) => Promise<void> // OSS 删除回调，传入 objectKey，需要返回Promise
 }

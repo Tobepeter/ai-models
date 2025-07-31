@@ -1,4 +1,4 @@
-import { useMount } from 'ahooks'
+import { useMount, useUnmount } from 'ahooks'
 import { useEffect } from 'react'
 import { useFeedStore } from './feed-store'
 import { feedMgr } from './feed-mgr'
@@ -13,7 +13,7 @@ import { useHeader } from '@/hooks/use-header'
 
 /* 信息流主页面 - 支持无限滚动和下拉刷新 */
 export const Feed = () => {
-	const { posts, loading, hasMore, error, isMaskOpen, clearError, hideMask } = useFeedStore()
+	const { posts, loading, hasMore, error, clearError } = useFeedStore()
 	const { setTitle } = useHeader() // 使用hook，自动处理unmount reset
 
 	// 初始化数据加载和header设置
@@ -22,21 +22,9 @@ export const Feed = () => {
 		setTitle(<FeedNavHeader />)
 	})
 
-	// 监听滚动，滚动时关闭蒙层
-	useEffect(() => {
-		if (!isMaskOpen) return
-
-		const handleScroll = () => {
-			hideMask()
-		}
-
-		// 监听各种滚动容器
-		window.addEventListener('scroll', handleScroll, true) // 捕获阶段监听所有滚动
-
-		return () => {
-			window.removeEventListener('scroll', handleScroll, true)
-		}
-	}, [isMaskOpen, hideMask])
+	useUnmount(() => {
+		useFeedStore.getState().reset()
+	})
 
 	const handleLike = (postId: string) => feedMgr.toggleLike(postId)
 	const handleToggleExpand = (postId: string) => feedMgr.toggleExpand(postId)
@@ -52,12 +40,6 @@ export const Feed = () => {
 		} else {
 			feedMgr.loadMore()
 		}
-	}
-
-	// 处理蒙层点击，关闭所有popup
-	const handleMaskClick = () => {
-		hideMask()
-		// TODO: 这里可以添加关闭所有popup的逻辑
 	}
 
 	return (
@@ -100,9 +82,6 @@ export const Feed = () => {
 
 			{/* 创建弹窗 */}
 			<FeedCreateDialog />
-
-			{/* 全屏蒙层 - 用于评论弹窗，不阻止滚动 */}
-			{isMaskOpen && <div className="fixed inset-0 cursor-default z-40" onClick={handleMaskClick} data-slot="feed-mask" />}
 		</div>
 	)
 }

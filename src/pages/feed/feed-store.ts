@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 import { feedConfig } from './feed-config'
 import type { FeedComment, FeedPost, FeedCommentList } from './feed-types'
+import { reset } from 'numeral'
 
 // 重新导出类型
 export type { FeedComment, FeedPost, FeedCommentList }
@@ -34,8 +35,9 @@ const feedState = {
 		isOpen: false,
 	},
 
-	// 蒙层状态 - 用于评论弹窗
-	isMaskOpen: false,
+	// 评论输入弹窗状态
+	isCommentInputOpen: false,
+	lastCommentCloseTime: -1, // 最后关闭评论弹窗的时间戳，用于防止快速切换
 }
 
 type FeedState = typeof feedState
@@ -180,9 +182,15 @@ const stateCreator = () => {
 			})
 		},
 
-		// 蒙层管理
-		showMask: () => set({ isMaskOpen: true }),
-		hideMask: () => set({ isMaskOpen: false }),
+		// 评论输入弹窗管理
+		setCommentInputOpen: (isOpen: boolean) => {
+			if (!isOpen) {
+				// 关闭时记录时间戳
+				set({ isCommentInputOpen: isOpen, lastCommentCloseTime: Date.now() })
+			} else {
+				set({ isCommentInputOpen: isOpen })
+			}
+		},
 
 		// 评论分页管理
 		setPostComments: (postId: string, comments: FeedComment[], cursor?: string, total?: number) => {
@@ -222,7 +230,7 @@ const stateCreator = () => {
 			})
 		},
 
-		clear: () => set(feedState), // 重置为初始状态
+		reset: () => set(feedState), // 重置为初始状态
 		clearError: () => set({ error: null }),
 	}))
 }
