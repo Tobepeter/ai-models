@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
-import { type FeedComment } from '../feed-types'
+import { type FeedComment } from '../../feed-types'
 import { FeedCommentItem } from './feed-comment-item'
-import { feedConfig } from '../feed-config'
+import { feedConfig } from '../../feed-config'
 
 /**
  * 评论区组件 - 只显示评论列表，不包含输入框

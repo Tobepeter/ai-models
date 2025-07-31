@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { FeedItemHeader } from './feed-item-header'
-import { FeedText } from './feed-text'
+import { FeedText } from '../feed-text'
 import { FeedItemImage } from './feed-item-image'
-import { FeedActions } from './feed-actions'
-import { FeedCommentList } from './feed-comment-list'
-import { useFeedStore } from '../feed-store'
-import { type FeedPost } from '../feed-types'
+import { FeedItemActions } from './feed-item-actions'
+import { FeedCommentList } from '../comment/feed-comment-list'
+import { useFeedStore } from '../../feed-store'
+import { type FeedPost } from '../../feed-types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
@@ -59,7 +59,7 @@ export const FeedItem = (props: FeedItemProps) => {
 
 				{/* 交互按钮栏 */}
 				<div className="px-4 pb-4">
-					<FeedActions postId={id} likeCount={likeCount} commentCount={commentCount} isLiked={isLiked} onLike={onLike} onAddComment={handleAddComment} />
+					<FeedItemActions postId={id} likeCount={likeCount} commentCount={commentCount} isLiked={isLiked} onLike={onLike} onAddComment={handleAddComment} />
 				</div>
 			</div>
 

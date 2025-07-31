@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { FeedItemHeader } from './feed-item-header'
-import { FeedText } from './feed-text'
-import { FeedItemImage } from './feed-item-image'
-import { FeedActions } from './feed-actions'
+import { FeedItemHeader } from '../item/feed-item-header'
+import { FeedText } from '../feed-text'
+import { FeedItemImage } from '../item/feed-item-image'
+import { FeedItemActions } from '../item/feed-item-actions'
 import { FeedDetailCommentList } from './feed-detail-comment-list'
-import { useFeedStore } from '../feed-store'
-import { type FeedPost } from '../feed-store'
+import { useFeedStore } from '../../feed-store'
+import { type FeedPost } from '../../feed-store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { FileX } from 'lucide-react'
@@ -103,7 +103,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 				{post.image && <FeedItemImage src={post.image} className="mb-4 mx-auto" />}
 
 				{/* 交互按钮 */}
-				<FeedActions postId={post.id} likeCount={post.likeCount} commentCount={post.commentCount} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />
+				<FeedItemActions postId={post.id} likeCount={post.likeCount} commentCount={post.commentCount} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />
 			</div>
 
 			{/* 评论区域 - 自适应剩余空间 */}

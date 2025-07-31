@@ -2,7 +2,7 @@ import { UserAvatar } from '@/components/common/user-avatar'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Flag, Trash2, MoreHorizontal, ExternalLink } from 'lucide-react'
-import { feedUtil } from '../feed-util'
+import { feedUtil } from '../../feed-util'
 import { cn } from '@/lib/utils'
 import { notify } from '@/components/common/notify'
 

@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Heart, Share } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CommentInput } from './feed-comment-input-popup'
-import { feedUtil } from '../feed-util'
+import { CommentInput } from '../comment/feed-comment-input-popup'
+import { feedUtil } from '../../feed-util'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
 import { useMemo } from 'react'
@@ -10,7 +10,7 @@ import { useMemo } from 'react'
 /**
  * 信息流交互按钮组件 - 包含点赞、评论、分享功能
  */
-export const FeedActions = (props: FeedActionsProps) => {
+export const FeedItemActions = (props: FeedItemActionsProps) => {
 	const { postId, likeCount, commentCount, isLiked, onLike, onAddComment, replyTo, className } = props
 
 	// 缓存格式化后的数字，避免重复计算
@@ -70,7 +70,7 @@ export const FeedActions = (props: FeedActionsProps) => {
 	)
 }
 
-export interface FeedActionsProps {
+export interface FeedItemActionsProps {
 	postId: string
 	likeCount: number
 	commentCount: number

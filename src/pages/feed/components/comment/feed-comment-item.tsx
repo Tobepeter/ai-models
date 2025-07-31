@@ -1,6 +1,6 @@
 import { UserAvatar } from '@/components/common/user-avatar'
-import { type FeedComment } from '../feed-types'
-import { feedUtil } from '../feed-util'
+import { type FeedComment } from '../../feed-types'
+import { feedUtil } from '../../feed-util'
 import { cn } from '@/lib/utils'
 import { CommentInputPopup } from './feed-comment-input-popup'
 import { useState } from 'react'

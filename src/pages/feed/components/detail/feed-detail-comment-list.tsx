@@ -4,8 +4,8 @@ import { MessageCircle, RefreshCw } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-import { type FeedComment } from '../feed-store'
-import { FeedCommentItem } from './feed-comment-item'
+import { type FeedComment } from '../../feed-store'
+import { FeedCommentItem } from '../comment/feed-comment-item'
 
 /**
  * Feed详情评论列表 - 虚拟滚动实现

@@ -5,8 +5,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { MessageCircle, Send, X } from 'lucide-react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { useFeedStore } from '../feed-store'
-import { feedUtil } from '../feed-util'
+import { useFeedStore } from '../../feed-store'
+import { feedUtil } from '../../feed-util'
 
 /**
  * 评论输入弹窗组件 - 使用 Popover

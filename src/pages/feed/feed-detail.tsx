@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { FeedDetailContent } from './components/feed-detail-content'
+import { FeedDetailContent } from './components/detail/feed-detail-content'
 import { useFeedStore } from './feed-store'
 import { feedUtil } from './feed-util'
 import { feedMgr } from './feed-mgr'

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { FeedItem } from './feed-item'
+import { FeedItem } from './item/feed-item'
 import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
 import { type FeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
