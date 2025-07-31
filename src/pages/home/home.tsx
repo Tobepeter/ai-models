@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { GitCompare, MessageSquare, User, Database, LucideIcon, ListTodo } from 'lucide-react'
+import { GitCompare, MessageSquare, User, Database, LucideIcon, ListTodo, Rss, Newspaper, BookOpen, Globe, Zap, Activity, TrendingUp } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface NavCard {
@@ -18,6 +18,11 @@ const navCards: NavCard[] = [
 		title: 'AI 对比',
 		path: '/chat-hub',
 		icon: GitCompare,
+	},
+	{
+		title: '信息流',
+		path: '/feed',
+		icon: Activity,
 	},
 	{
 		title: '通用型CRUD体验',

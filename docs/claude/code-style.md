@@ -74,7 +74,7 @@
 - 充分利用类型推断，避免冗余类型注解
 - 函数类返回值只有复杂类型要加注解，如 `string` `boolean` `Promise<void>` 返回都不要加
 - 导入时优先解构，避免命名空间导入
-- 尽可能使用解构导入变量
+- 尽可能使用解构导入变量，如果有较多的a.b.c代码，仅考虑解构出b
 - 使用 `Record` 代替 `Map`
 - 禁用严格的 lint 规则（`noUnusedImports`, `noUnusedVariables` 等）
 - 尽量使用 `interface` 代替 `type`

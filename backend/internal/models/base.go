@@ -8,9 +8,9 @@ import (
 
 // BaseModel 基础模型
 type BaseModel struct {
-	ID        uint64 `gorm:"primaryKey" swaggertype:"string"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint64 `json:"id" gorm:"primaryKey" swaggertype:"string"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // BaseSoftModel 基础软删除模型
@@ -24,13 +24,13 @@ type BaseSoftModel struct {
 
 // Pagination 分页模型
 type Pagination struct {
-	Current  int
-	PageSize int
-	Total    int
+	Current  int `json:"current"`
+	PageSize int `json:"page_size"`
+	Total    int `json:"total"`
 }
 
 // PaginationResponse 分页响应模型 (non-generic version for Swagger compatibility)
 type PaginationResponse struct {
-	Data       []any
-	Pagination Pagination
+	Data       []any `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }

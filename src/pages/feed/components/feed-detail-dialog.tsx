@@ -43,7 +43,6 @@ export const FeedDetailDialog = () => {
 		addComment(postId, newComment)
 	}
 
-
 	// 处理回复
 	const handleReply = (postId: string, username: string) => {
 		// TODO: 实现回复逻辑
@@ -70,28 +69,20 @@ export const FeedDetailDialog = () => {
 		}
 	}, [detailDialog.isOpen])
 
-	// const contentClass = cn('p-0 overflow-hidden', isMobile ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' : 'w-[85vw] h-[85vh]')
-	const contentClass = cn('p-0 pr-4', isMobile ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' : 'w-[85vw]')
+	const contentClass = cn('p-0 pr-4', isMobile ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' : 'w-[85vw] h-[85vh]')
 
 	return (
 		<Dialog open={detailDialog.isOpen} onOpenChange={(open) => !open && handleClose()} data-slot="feed-detail-dialog">
 			<DialogContent className={contentClass} style={isMobile ? {} : { maxWidth: 'unset' }}>
 				{/* 隐藏的聚焦元素，避免自动聚焦到头部按钮 */}
-				<div tabIndex={-1} className="sr-only" />
-				
+				<div tabIndex={0} className="sr-only" />
+
 				<DialogHeader className="sr-only">
 					<DialogTitle>帖子详情</DialogTitle>
 					<DialogDescription>查看帖子详情和评论</DialogDescription>
 				</DialogHeader>
 
-				<FeedDetailContent
-					post={currentPost}
-					showNavigateButton={true}
-					onNavigateToPage={handleNavigateToPage}
-					onAddComment={handleAddComment}
-						onReply={handleReply}
-					className="h-full"
-				/>
+				<FeedDetailContent post={currentPost} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} onAddComment={handleAddComment} onReply={handleReply} className="h-full" />
 			</DialogContent>
 		</Dialog>
 	)

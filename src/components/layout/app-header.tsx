@@ -3,18 +3,30 @@ import { MyAvatar } from '@/pages/user/components/my-avatar'
 import { ArrowLeft, Home } from 'lucide-react'
 import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { RouteHandle } from '@/router/router'
+import { useHeaderStore } from '@/store/header-store'
+import { useEffect } from 'react'
 
 export const AppHeader = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const matches = useMatches()
-
 	const isHome = location.pathname === '/' || location.pathname === '/home'
+	const { title } = useHeaderStore()
 
-	// 从当前路由匹配中获取标题
-	const currentTitle = matches.filter((match) => match.handle && typeof match.handle === 'object' && 'title' in match.handle).pop()?.handle as RouteHandle | undefined
+	const getRouteTitle = () => {
+		let result = ''
+		for (let i = 0; i < matches.length; i++) {
+			const match = matches[i]
+			const handle = match.handle as RouteHandle | undefined
+			if (handle && 'title' in handle) {
+				result = handle.title
+				break
+			}
+		}
+		return result
+	}
 
-	const title = currentTitle?.title || 'AI对话'
+	const finalTitle = title || getRouteTitle()
 
 	return (
 		<header className="flex-shrink-0 border-b bg-card px-4 py-3" data-slot="app-header">
@@ -37,8 +49,8 @@ export const AppHeader = () => {
 				</div>
 
 				{/* 中间标题 */}
-				<div className="flex-1 text-center px-4">
-					<h1 className="text-lg font-semibold">{title}</h1>
+				<div className="flex gap-4 items-center">
+					<h1 className="text-lg font-semibold">{finalTitle}</h1>
 				</div>
 
 				{/* 右侧操作区 */}

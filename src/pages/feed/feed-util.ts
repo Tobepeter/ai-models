@@ -25,7 +25,7 @@ class FeedUtil {
 		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前` // 24小时内
 		if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}天前` // 7天内
 		return time.format('MM-DD') // 超过7天显示日期
-	} // console.log(emojis) // 遍历所有分类
+	}
 
 	truncateContent(content: string, maxLength: number = this.MAX_CONTENT_LENGTH) {
 		return truncate(content, { length: maxLength, omission: '...' })
@@ -40,7 +40,7 @@ class FeedUtil {
 		return content.match(hashtagRegex) || []
 	}
 
-	generateCursor(timestamp: number, postId: string) {
+	genCursor(timestamp: number, postId: string) {
 		return `${timestamp}_${postId}` // 格式: timestamp_postId
 	}
 

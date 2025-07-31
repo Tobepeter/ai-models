@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"ai-models-backend/internal/models"
 	"ai-models-backend/internal/services"
@@ -128,7 +129,7 @@ func (h *FeedHandler) ToggleLikePost(c *gin.Context) {
 		return
 	}
 
-	err := h.feedService.ToggleLikePost(userID, postID)
+	err := h.feedService.ToggleFeedPostLike(userID, postID)
 	if err != nil {
 		if err.Error() == "post not found" {
 			response.Error(c, http.StatusNotFound, "帖子不存在")
@@ -232,20 +233,21 @@ func (h *FeedHandler) CreateFeedComment(c *gin.Context) {
 	response.Success(c, comment)
 }
 
-// ToggleLikeComment 切换评论点赞状态
-// @Summary 切换评论点赞状态
-// @Description 点赞或取消点赞评论，需要登录
+// SetCommentLike 设置评论点赞状态
+// @Summary 设置评论点赞状态
+// @Description 设置评论点赞或取消点赞状态，需要登录
 // @Tags Feed
 // @Accept json
 // @Produce json
 // @Param comment_id path string true "评论ID"
+// @Param request body models.SetFeedCommentLikeRequest true "点赞状态"
 // @Success 200 {object} response.Response
 // @Failure 400 {object} response.Response
 // @Failure 401 {object} response.Response
 // @Failure 404 {object} response.Response
 // @Failure 500 {object} response.Response
 // @Router /api/feed/comments/{comment_id}/like [post]
-func (h *FeedHandler) ToggleLikeComment(c *gin.Context) {
+func (h *FeedHandler) SetCommentLike(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -257,11 +259,26 @@ func (h *FeedHandler) ToggleLikeComment(c *gin.Context) {
 		return
 	}
 
-	err := h.feedService.ToggleLikeComment(userID, commentID)
+	var req models.SetFeedCommentLikeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "参数错误: "+err.Error())
+		return
+	}
+
+	err := h.feedService.SetFeedCommentLike(userID, commentID, req.IsLike)
 	if err != nil {
 		if err.Error() == "comment not found" {
 			response.Error(c, http.StatusNotFound, "评论不存在")
 			return
+		}
+		// 检查是否是业务错误码
+		if len(err.Error()) > 15 && err.Error()[:15] == "BUSINESS_ERROR:" {
+			// 格式: BUSINESS_ERROR:1001:已点赞
+			parts := strings.Split(err.Error(), ":")
+			if len(parts) >= 3 {
+				response.Error(c, http.StatusOK, parts[2]) // 业务错误不用500状态码
+				return
+			}
 		}
 		response.Error(c, http.StatusInternalServerError, "操作失败")
 		return

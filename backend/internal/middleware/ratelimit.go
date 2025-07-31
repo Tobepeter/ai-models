@@ -60,6 +60,7 @@ func (rl *rateLimiter) cleanup() {
 
 // 生成限流key
 func getKey(c *gin.Context) string {
+	// NOTE: 这里允许不存在
 	if userID, exists := c.Get("user_id"); exists {
 		return fmt.Sprintf("user:%v", userID)
 	}

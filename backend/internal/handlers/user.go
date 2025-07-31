@@ -97,7 +97,10 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Failure 500 {object} response.Response
 // @Router /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint64)
+	userID, ok := h.GetUserID(c)
+	if !ok {
+		return
+	}
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		logrus.Error("Failed to get user:", err)

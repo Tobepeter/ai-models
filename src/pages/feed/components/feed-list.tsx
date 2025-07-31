@@ -77,7 +77,7 @@ export const FeedList = (props: FeedListProps) => {
 	return (
 		<div className={cn('flex-1 min-h-0', className)} data-slot="feed-list">
 			{/* 虚拟滚动容器 */}
-			<div ref={parentRef} className="h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+			<div ref={parentRef} className="h-full overflow-auto scrollbar-hide">
 				<div
 					style={{
 						height: virtualizer.getTotalSize(),

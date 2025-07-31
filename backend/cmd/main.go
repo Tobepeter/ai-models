@@ -4,6 +4,7 @@
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
+
 // @contact.email support@example.com
 
 // @license.name MIT
@@ -187,10 +188,10 @@ func setupRouter(c *container.Container) *gin.Engine {
 			feedAuth := feed.Group("")
 			feedAuth.Use(middleware.AuthRequired(c.AuthService))
 			{
-				feedAuth.POST("/posts", c.FeedHandler.CreateFeedPost)                        // 创建信息流帖子
-				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.ToggleLikePost)          // 切换帖子点赞状态
-				feedAuth.POST("/posts/:post_id/comments", c.FeedHandler.CreateFeedComment)   // 创建帖子评论
-				feedAuth.POST("/comments/:comment_id/like", c.FeedHandler.ToggleLikeComment) // 切换评论点赞状态
+				feedAuth.POST("/posts", c.FeedHandler.CreateFeedPost)                      // 创建信息流帖子
+				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.ToggleLikePost)        // 切换帖子点赞状态
+				feedAuth.POST("/posts/:post_id/comments", c.FeedHandler.CreateFeedComment) // 创建帖子评论
+				feedAuth.POST("/comments/:comment_id/like", c.FeedHandler.SetCommentLike)  // 设置评论点赞状态
 			}
 		}
 
@@ -207,6 +208,15 @@ func setupRouter(c *container.Container) *gin.Engine {
 				err.GET("/network/:type", c.TestHandler.TestNetworkError)   // 测试网络错误
 				err.GET("/business/:type", c.TestHandler.TestBusinessError) // 测试业务错误
 			}
+
+			// 测试JSON字段命名
+			test.GET("/str-case", func(c *gin.Context) {
+				type TestStruct struct {
+					UserID uint64 `json:"user_id"`
+				}
+				data := TestStruct{UserID: 123}
+				c.JSON(http.StatusOK, data)
+			})
 		}
 	}
 

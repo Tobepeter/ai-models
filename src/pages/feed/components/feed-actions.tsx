@@ -29,7 +29,8 @@ export const FeedActions = (props: FeedActionsProps) => {
 	return (
 		<div
 			className={cn('flex items-center space-x-4 pt-2', className)}
-			onClick={(e) => e.stopPropagation()} data-slot="feed-actions" // 阻止冒泡到父级点击事件
+			onClick={(e) => e.stopPropagation()}
+			data-slot="feed-actions" // 阻止冒泡到父级点击事件
 		>
 			{/* 点赞 */}
 			<Button
@@ -59,13 +60,7 @@ export const FeedActions = (props: FeedActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInput
-				postId={postId}
-				commentCount={commentCount}
-				onAddComment={onAddComment}
-				replyTo={replyTo}
-				onClearReply={onClearReply}
-			/>
+			<CommentInput postId={postId} commentCount={commentCount} onAddComment={onAddComment} replyTo={replyTo} onClearReply={onClearReply} />
 
 			{/* 分享按钮 */}
 			<Button variant="ghost" size="sm" className="h-8 px-2 min-w-[40px] justify-center text-muted-foreground hover:text-green-500 transition-colors" onClick={handleShare}>

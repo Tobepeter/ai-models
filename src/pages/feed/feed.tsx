@@ -4,24 +4,21 @@ import { feedMgr } from './feed-mgr'
 import { FeedList } from './components/feed-list'
 import { FeedSkeleton } from './components/feed-skeleton'
 import { FeedDetailDialog } from './components/feed-detail-dialog'
+import { FeedNavHeader } from './components/feed-nav-header'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, AlertCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { AlertCircle } from 'lucide-react'
+import { useHeader } from '@/hooks/use-header'
 
 /* 信息流主页面 - 支持无限滚动和下拉刷新 */
 export const Feed = () => {
-	const { posts, loading, refreshing, hasMore, error, clearError } = useFeedStore()
+	const { posts, loading, hasMore, error, clearError } = useFeedStore()
+	const { setTitle } = useHeader() // 使用hook，自动处理unmount reset
 
-	// 初始化数据加载
+	// 初始化数据加载和header设置
 	useMount(() => {
 		feedMgr.loadInitial()
+		setTitle(<FeedNavHeader />)
 	})
-
-
-	const handleRefresh = async () => {
-		clearError()
-		await feedMgr.refresh()
-	}
 
 	const handleLike = (postId: string) => feedMgr.toggleLike(postId)
 	const handleToggleExpand = (postId: string) => feedMgr.toggleExpand(postId)
@@ -43,16 +40,6 @@ export const Feed = () => {
 
 	return (
 		<div className="max-w-2xl mx-auto h-screen bg-background flex flex-col" data-slot="feed">
-			{/* 固定顶部栏 - 标题和刷新按钮 */}
-			<div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border p-4 flex-shrink-0">
-				<div className="flex items-center justify-between">
-					<h1 className="text-lg font-semibold">信息流</h1>
-					<Button variant="ghost" size="sm" onClick={handleRefresh} disabled={loading} className="h-8 w-8 p-0">
-						<RefreshCw className={cn('h-4 w-4', refreshing && 'animate-spin')} />
-					</Button>
-				</div>
-			</div>
-
 			{/* 错误提示条 */}
 			{error && (
 				<div className="p-4 m-4 bg-destructive/10 border border-destructive/20 rounded-lg flex-shrink-0">

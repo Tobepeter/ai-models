@@ -579,7 +579,7 @@ const docTemplate = `{
         },
         "/api/feed/comments/{comment_id}/like": {
             "post": {
-                "description": "点赞或取消点赞评论，需要登录",
+                "description": "设置评论点赞或取消点赞状态，需要登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -589,7 +589,7 @@ const docTemplate = `{
                 "tags": [
                     "Feed"
                 ],
-                "summary": "切换评论点赞状态",
+                "summary": "设置评论点赞状态",
                 "parameters": [
                     {
                         "type": "string",
@@ -597,6 +597,15 @@ const docTemplate = `{
                         "name": "comment_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "点赞状态",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -2457,10 +2466,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "isActive": {
+                "is_active": {
                     "type": "boolean"
                 },
-                "maxTokens": {
+                "max_tokens": {
                     "type": "integer"
                 },
                 "name": {
@@ -2496,7 +2505,7 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "model": {
@@ -2527,7 +2536,7 @@ const docTemplate = `{
         "ai-models-backend_internal_models.ChatResponse": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
@@ -2555,7 +2564,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 500
                 },
-                "replyTo": {
+                "reply_to": {
                     "description": "回复的用户名",
                     "type": "string",
                     "maxLength": 100
@@ -2570,7 +2579,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "imageURL": {
+                "image_url": {
                     "description": "图片URL",
                     "type": "string"
                 }
@@ -2597,7 +2606,7 @@ const docTemplate = `{
                 "category": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "data": {
@@ -2606,7 +2615,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2629,10 +2638,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.DeleteFileRequest": {
             "type": "object",
             "required": [
-                "objectKey"
+                "object_key"
             ],
             "properties": {
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 }
             }
@@ -2647,29 +2656,29 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "likeCount": {
+                "like_count": {
                     "type": "integer"
                 },
-                "postID": {
+                "post_id": {
                     "type": "string"
                 },
-                "replyTo": {
+                "reply_to": {
                     "description": "回复的用户名",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "string"
                 },
-                "userProfileVersion": {
+                "user_profile_version": {
                     "description": "用户信息版本号",
                     "type": "integer"
                 },
@@ -2688,10 +2697,10 @@ const docTemplate = `{
                         "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
                     }
                 },
-                "hasMore": {
+                "has_more": {
                     "type": "boolean"
                 },
-                "nextCursor": {
+                "next_cursor": {
                     "type": "string"
                 },
                 "total": {
@@ -2706,37 +2715,37 @@ const docTemplate = `{
                     "description": "冗余头像",
                     "type": "string"
                 },
-                "commentCount": {
+                "comment_count": {
                     "type": "integer"
                 },
                 "content": {
                     "description": "文字内容（可选）",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "imageURL": {
+                "image_url": {
                     "description": "图片URL（可选）",
                     "type": "string"
                 },
-                "likeCount": {
+                "like_count": {
                     "type": "integer"
                 },
                 "status": {
                     "description": "用户状态emoji",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "string"
                 },
-                "userProfileVersion": {
+                "user_profile_version": {
                     "description": "用户信息版本号",
                     "type": "integer"
                 },
@@ -2749,10 +2758,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.FeedPostResponse": {
             "type": "object",
             "properties": {
-                "hasMore": {
+                "has_more": {
                     "type": "boolean"
                 },
-                "nextCursor": {
+                "next_cursor": {
                     "type": "string"
                 },
                 "posts": {
@@ -2766,13 +2775,13 @@ const docTemplate = `{
         "ai-models-backend_internal_models.FileInfo": {
             "type": "object",
             "properties": {
-                "lastModified": {
+                "last_modified": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 },
                 "size": {
@@ -2792,10 +2801,10 @@ const docTemplate = `{
                         "$ref": "#/definitions/ai-models-backend_internal_models.FileInfo"
                     }
                 },
-                "isTruncated": {
+                "is_truncated": {
                     "type": "boolean"
                 },
-                "nextMarker": {
+                "next_marker": {
                     "type": "string"
                 }
             }
@@ -2803,11 +2812,11 @@ const docTemplate = `{
         "ai-models-backend_internal_models.FileUploadResponse": {
             "type": "object",
             "properties": {
-                "hashifyName": {
+                "hashify_name": {
                     "description": "哈希化文件名",
                     "type": "string"
                 },
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 },
                 "size": {
@@ -2816,7 +2825,7 @@ const docTemplate = `{
                 "type": {
                     "type": "string"
                 },
-                "uploadTime": {
+                "upload_time": {
                     "type": "string"
                 },
                 "url": {
@@ -2848,7 +2857,7 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
@@ -2865,10 +2874,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.GetURLRequest": {
             "type": "object",
             "required": [
-                "objectKey"
+                "object_key"
             ],
             "properties": {
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 }
             }
@@ -2876,7 +2885,7 @@ const docTemplate = `{
         "ai-models-backend_internal_models.GetURLResponse": {
             "type": "object",
             "properties": {
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 },
                 "url": {
@@ -2887,10 +2896,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.HashifyNameRequest": {
             "type": "object",
             "required": [
-                "fileName"
+                "file_name"
             ],
             "properties": {
-                "fileName": {
+                "file_name": {
                     "type": "string"
                 }
             }
@@ -2898,7 +2907,7 @@ const docTemplate = `{
         "ai-models-backend_internal_models.HashifyNameResponse": {
             "type": "object",
             "properties": {
-                "hashifyName": {
+                "hashify_name": {
                     "type": "string"
                 }
             }
@@ -2910,7 +2919,7 @@ const docTemplate = `{
                 "model"
             ],
             "properties": {
-                "maxTokens": {
+                "max_tokens": {
                     "type": "integer"
                 },
                 "messages": {
@@ -2931,7 +2940,7 @@ const docTemplate = `{
                 "temperature": {
                     "type": "number"
                 },
-                "topP": {
+                "top_p": {
                     "type": "number"
                 }
             }
@@ -2965,7 +2974,7 @@ const docTemplate = `{
         "ai-models-backend_internal_models.OpenAIChoice": {
             "type": "object",
             "properties": {
-                "finishReason": {
+                "finish_reason": {
                     "type": "string"
                 },
                 "index": {
@@ -2994,13 +3003,13 @@ const docTemplate = `{
         "ai-models-backend_internal_models.OpenAIUsage": {
             "type": "object",
             "properties": {
-                "completionTokens": {
+                "completion_tokens": {
                     "type": "integer"
                 },
-                "promptTokens": {
+                "prompt_tokens": {
                     "type": "integer"
                 },
-                "totalTokens": {
+                "total_tokens": {
                     "type": "integer"
                 }
             }
@@ -3011,7 +3020,7 @@ const docTemplate = `{
                 "current": {
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "type": "integer"
                 },
                 "total": {
@@ -3057,18 +3066,30 @@ const docTemplate = `{
                 }
             }
         },
+        "ai-models-backend_internal_models.SetFeedCommentLikeRequest": {
+            "type": "object",
+            "required": [
+                "is_like"
+            ],
+            "properties": {
+                "is_like": {
+                    "description": "是否点赞",
+                    "type": "boolean"
+                }
+            }
+        },
         "ai-models-backend_internal_models.SignRequest": {
             "type": "object",
             "properties": {
-                "fileName": {
+                "file_name": {
                     "description": "文件名",
                     "type": "string"
                 },
-                "fileType": {
+                "file_type": {
                     "description": "文件类型，用于路径计算",
                     "type": "string"
                 },
-                "objectKey": {
+                "object_key": {
                     "description": "完整的objectKey，如果提供则直接使用",
                     "type": "string"
                 },
@@ -3081,10 +3102,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.SignResponse": {
             "type": "object",
             "properties": {
-                "objectKey": {
+                "object_key": {
                     "type": "string"
                 },
-                "signedURL": {
+                "signed_url": {
                     "type": "string"
                 }
             }
@@ -3099,7 +3120,7 @@ const docTemplate = `{
                     "description": "可选",
                     "type": "string"
                 },
-                "dueDate": {
+                "due_date": {
                     "description": "可选",
                     "type": "string"
                 },
@@ -3155,13 +3176,13 @@ const docTemplate = `{
                 "completed": {
                     "type": "boolean"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
                 },
-                "dueDate": {
+                "due_date": {
                     "type": "string"
                 },
                 "id": {
@@ -3176,7 +3197,7 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -3192,7 +3213,7 @@ const docTemplate = `{
                     "description": "可选，不传不更新",
                     "type": "string"
                 },
-                "dueDate": {
+                "due_date": {
                     "description": "可选，不传不更新",
                     "type": "string"
                 },
@@ -3213,13 +3234,13 @@ const docTemplate = `{
         "ai-models-backend_internal_models.Usage": {
             "type": "object",
             "properties": {
-                "completionTokens": {
+                "completion_tokens": {
                     "type": "integer"
                 },
-                "promptTokens": {
+                "prompt_tokens": {
                     "type": "integer"
                 },
-                "totalTokens": {
+                "total_tokens": {
                     "type": "integer"
                 }
             }
@@ -3289,10 +3310,10 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
-                "avatarOssKey": {
+                "avatar_oss_key": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "email": {
@@ -3304,10 +3325,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "isActive": {
+                "is_active": {
                     "type": "boolean"
                 },
-                "profileVersion": {
+                "profile_version": {
                     "type": "integer"
                 },
                 "role": {
@@ -3316,7 +3337,7 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "username": {
@@ -3330,7 +3351,7 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
-                "avatarOssKey": {
+                "avatar_oss_key": {
                     "type": "string"
                 },
                 "email": {

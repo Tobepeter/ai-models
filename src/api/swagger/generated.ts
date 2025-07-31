@@ -14,8 +14,8 @@ export interface AIModel {
   capabilities?: string[];
   description?: string;
   id?: string;
-  isActive?: boolean;
-  maxTokens?: number;
+  is_active?: boolean;
+  max_tokens?: number;
   name?: string;
   provider?: string;
   type?: string;
@@ -29,7 +29,7 @@ export interface ChangePasswordRequest {
 
 export interface ChatMessage {
   content?: string;
-  createdAt?: string;
+  created_at?: string;
   model?: string;
   role?: string;
 }
@@ -41,7 +41,7 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
-  createdAt?: string;
+  created_at?: string;
   id?: string;
   message?: string;
   model?: string;
@@ -58,7 +58,7 @@ export interface CreateFeedCommentRequest {
    * 回复的用户名
    * @maxLength 100
    */
-  replyTo?: string;
+  reply_to?: string;
 }
 
 export interface CreateFeedPostRequest {
@@ -68,7 +68,7 @@ export interface CreateFeedPostRequest {
    */
   content?: string;
   /** 图片URL */
-  imageURL?: string;
+  image_url?: string;
 }
 
 export interface CrudCreateRequest {
@@ -79,10 +79,10 @@ export interface CrudCreateRequest {
 
 export interface CrudResponse {
   category?: string;
-  createdAt?: string;
+  created_at?: string;
   data?: string;
   id?: string;
-  updatedAt?: string;
+  updated_at?: string;
 }
 
 export interface CrudUpdateRequest {
@@ -92,82 +92,82 @@ export interface CrudUpdateRequest {
 }
 
 export interface DeleteFileRequest {
-  objectKey: string;
+  object_key: string;
 }
 
 export interface FeedComment {
   /** 冗余头像 */
   avatar?: string;
   content?: string;
-  createdAt?: string;
+  created_at?: string;
   id?: string;
-  likeCount?: number;
-  postID?: string;
+  like_count?: number;
+  post_id?: string;
   /** 回复的用户名 */
-  replyTo?: string;
-  updatedAt?: string;
-  userID?: string;
+  reply_to?: string;
+  updated_at?: string;
+  user_id?: string;
   /** 用户信息版本号 */
-  userProfileVersion?: number;
+  user_profile_version?: number;
   /** 冗余字段 */
   username?: string;
 }
 
 export interface FeedCommentResponse {
   comments?: FeedComment[];
-  hasMore?: boolean;
-  nextCursor?: string;
+  has_more?: boolean;
+  next_cursor?: string;
   total?: number;
 }
 
 export interface FeedPost {
   /** 冗余头像 */
   avatar?: string;
-  commentCount?: number;
+  comment_count?: number;
   /** 文字内容（可选） */
   content?: string;
-  createdAt?: string;
+  created_at?: string;
   id?: string;
   /** 图片URL（可选） */
-  imageURL?: string;
-  likeCount?: number;
+  image_url?: string;
+  like_count?: number;
   /** 用户状态emoji */
   status?: string;
-  updatedAt?: string;
-  userID?: string;
+  updated_at?: string;
+  user_id?: string;
   /** 用户信息版本号 */
-  userProfileVersion?: number;
+  user_profile_version?: number;
   /** 冗余字段 */
   username?: string;
 }
 
 export interface FeedPostResponse {
-  hasMore?: boolean;
-  nextCursor?: string;
+  has_more?: boolean;
+  next_cursor?: string;
   posts?: FeedPost[];
 }
 
 export interface FileInfo {
-  lastModified?: string;
+  last_modified?: string;
   name?: string;
-  objectKey?: string;
+  object_key?: string;
   size?: number;
   url?: string;
 }
 
 export interface FileListResponse {
   files?: FileInfo[];
-  isTruncated?: boolean;
-  nextMarker?: string;
+  is_truncated?: boolean;
+  next_marker?: string;
 }
 
 export interface FileUploadResponse {
   /** 哈希化文件名 */
-  hashifyName?: string;
-  objectKey?: string;
+  hashify_name?: string;
+  object_key?: string;
   size?: number;
   type?: string;
-  uploadTime?: string;
+  upload_time?: string;
   url?: string;
 }
 
@@ -179,37 +179,37 @@ export interface GenerateRequest {
 
 export interface GenerateResponse {
   content?: string;
-  createdAt?: string;
+  created_at?: string;
   id?: string;
   model?: string;
   usage?: Usage;
 }
 
 export interface GetURLRequest {
-  objectKey: string;
+  object_key: string;
 }
 
 export interface GetURLResponse {
-  objectKey?: string;
+  object_key?: string;
   url?: string;
 }
 
 export interface HashifyNameRequest {
-  fileName: string;
+  file_name: string;
 }
 
 export interface HashifyNameResponse {
-  hashifyName?: string;
+  hashify_name?: string;
 }
 
 export interface OpenAIChatCompletionRequest {
-  maxTokens?: number;
+  max_tokens?: number;
   messages: OpenAIMessage[];
   model: string;
   platform?: string;
   stream?: boolean;
   temperature?: number;
-  topP?: number;
+  top_p?: number;
 }
 
 export interface OpenAIChatCompletionResponse {
@@ -222,7 +222,7 @@ export interface OpenAIChatCompletionResponse {
 }
 
 export interface OpenAIChoice {
-  finishReason?: string;
+  finish_reason?: string;
   index?: number;
   message?: OpenAIMessage;
 }
@@ -233,14 +233,14 @@ export interface OpenAIMessage {
 }
 
 export interface OpenAIUsage {
-  completionTokens?: number;
-  promptTokens?: number;
-  totalTokens?: number;
+  completion_tokens?: number;
+  prompt_tokens?: number;
+  total_tokens?: number;
 }
 
 export interface Pagination {
   current?: number;
-  pageSize?: number;
+  page_size?: number;
   total?: number;
 }
 
@@ -261,27 +261,32 @@ export interface STSResponse {
   credentials?: STSCredentials;
 }
 
+export interface SetFeedCommentLikeRequest {
+  /** 是否点赞 */
+  is_like: boolean;
+}
+
 export interface SignRequest {
   /** 文件名 */
-  fileName?: string;
+  file_name?: string;
   /** 文件类型，用于路径计算 */
-  fileType?: string;
+  file_type?: string;
   /** 完整的objectKey，如果提供则直接使用 */
-  objectKey?: string;
+  object_key?: string;
   /** 路径前缀 */
   prefix?: string;
 }
 
 export interface SignResponse {
-  objectKey?: string;
-  signedURL?: string;
+  object_key?: string;
+  signed_url?: string;
 }
 
 export interface TodoCreateRequest {
   /** 可选 */
   description?: string;
   /** 可选 */
-  dueDate?: string;
+  due_date?: string;
   /** 可选，不传则自动分配 */
   position?: number;
   /** 可选 */
@@ -304,14 +309,14 @@ export interface TodoPositionUpdateRequest {
 
 export interface TodoResponse {
   completed?: boolean;
-  createdAt?: string;
+  created_at?: string;
   description?: string;
-  dueDate?: string;
+  due_date?: string;
   id?: string;
   position?: number;
   priority?: number;
   title?: string;
-  updatedAt?: string;
+  updated_at?: string;
 }
 
 export interface TodoUpdateRequest {
@@ -320,7 +325,7 @@ export interface TodoUpdateRequest {
   /** 可选，不传不更新 */
   description?: string;
   /** 可选，不传不更新 */
-  dueDate?: string;
+  due_date?: string;
   /** 可选，支持更新排序位置 */
   position?: number;
   /** 可选，不传不更新 */
@@ -330,9 +335,9 @@ export interface TodoUpdateRequest {
 }
 
 export interface Usage {
-  completionTokens?: number;
-  promptTokens?: number;
-  totalTokens?: number;
+  completion_tokens?: number;
+  prompt_tokens?: number;
+  total_tokens?: number;
 }
 
 export interface UserCreateRequest {
@@ -363,22 +368,22 @@ export interface UserLoginResponse {
 
 export interface UserResponse {
   avatar?: string;
-  avatarOssKey?: string;
-  createdAt?: string;
+  avatar_oss_key?: string;
+  created_at?: string;
   email?: string;
   extra?: string;
   id?: string;
-  isActive?: boolean;
-  profileVersion?: number;
+  is_active?: boolean;
+  profile_version?: number;
   role?: string;
   status?: string;
-  updatedAt?: string;
+  updated_at?: string;
   username?: string;
 }
 
 export interface UserUpdateRequest {
   avatar?: string;
-  avatarOssKey?: string;
+  avatar_oss_key?: string;
   email?: string;
   extra?: string;
   status?: string;
@@ -1080,17 +1085,22 @@ export class Api<
   };
   api = {
     /**
-     * @description 点赞或取消点赞评论，需要登录
+     * @description 设置评论点赞或取消点赞状态，需要登录
      *
      * @tags Feed
      * @name FeedCommentsLikeCreate
-     * @summary 切换评论点赞状态
+     * @summary 设置评论点赞状态
      * @request POST:/api/feed/comments/{comment_id}/like
      */
-    feedCommentsLikeCreate: (commentId: string, params: RequestParams = {}) =>
+    feedCommentsLikeCreate: (
+      commentId: string,
+      request: SetFeedCommentLikeRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<FeedCommentsLikeCreateData, Response>({
         path: `/api/feed/comments/${commentId}/like`,
         method: "POST",
+        body: request,
         type: ContentType.Json,
         format: "json",
         ...params,

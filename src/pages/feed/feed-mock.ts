@@ -2,132 +2,26 @@ import { feedUtil } from './feed-util'
 import type { FeedPost, FeedComment } from './feed-types'
 import { dummy } from '@/utils/dummy'
 import { random } from 'node-emoji'
+import { faker } from '@faker-js/faker/locale/zh_CN'
 
-/* 中文姓名列表 */
-const CHINESE_NAMES = [
-	'张伟',
-	'王芳',
-	'李娜',
-	'刘洋',
-	'陈静',
-	'杨帆',
-	'赵雷',
-	'黄敏',
-	'周杰',
-	'吴琳',
-	'徐强',
-	'朱丽',
-	'胡斌',
-	'郭敏',
-	'林峰',
-	'何静',
-	'高伟',
-	'梁芳',
-	'宋涛',
-	'唐丽',
-	'韩磊',
-	'冯娟',
-	'于勇',
-	'董敏',
-	'薛峰',
-	'白雪',
-	'石磊',
-	'罗丽',
-	'毛伟',
-	'贺芳',
-	'龙涛',
-	'叶静',
-	'方磊',
-	'孔丽',
-	'左伟',
-	'崔芳',
-	'成涛',
-	'戴静',
-	'谭磊',
-	'邹丽',
-]
+const { number, datatype } = faker
+const { arrayElement } = faker.helpers
 
-/* 中文内容模板 */
-const CONTENT_TEMPLATES = [
-	'今天天气真不错，心情也特别好！',
-	'刚刚看了一部很棒的电影，强烈推荐给大家。',
-	'周末和朋友们一起去爬山，风景超美的。',
-	'最近在学习新技能，感觉很充实。',
-	'今天做了一道新菜，味道还不错呢。',
-	'工作虽然忙碌，但是很有成就感。',
-	'和家人一起度过了愉快的晚餐时光。',
-	'读了一本很有意思的书，收获颇丰。',
-	'今天的日落特别美，忍不住拍了很多照片。',
-	'运动完之后感觉整个人都精神了。',
-	'发现了一家很棒的咖啡店，环境超赞。',
-	'最近迷上了摄影，到处拍拍拍。',
-	'和老朋友重聚，聊了很多有趣的话题。',
-	'今天学会了一个新技能，很有成就感。',
-	'周末在家整理房间，看着干净整洁的空间心情很好。',
-	'尝试了新的健身方式，感觉很不错。',
-	'今天的工作效率特别高，提前完成了任务。',
-	'和宠物一起玩耍的时光总是那么快乐。',
-	'发现了一个很有意思的地方，下次还要再去。',
-	'今天收到了朋友的惊喜礼物，太开心了！',
-]
+/* 内容生成模板类型 */
+// prettier-ignore
+const CONTENT_TYPES = [
+	'weather', 'movie', 'travel', 'learning', 'food', 'work', 
+	'family', 'reading', 'photo', 'sport', 'cafe', 'hobby',
+	'friend', 'skill', 'home', 'fitness', 'achievement', 'pet',
+	'discovery', 'gift', 'mood', 'tech', 'music', 'art'
+] as const
 
-/* 评论内容模板 */
-const COMMENT_TEMPLATES = [
-	'说得很对！',
-	'同感，我也是这样想的。',
-	'哈哈哈，太有趣了',
-	'学到了，谢谢分享',
-	'支持！',
-	'赞同你的观点',
-	'确实如此',
-	'我也遇到过类似的情况',
-	'很有道理',
-	'期待更多分享',
-	'太棒了！',
-	'受益匪浅',
-	'说到心坎里了',
-	'完全同意',
-	'很实用的建议',
-	'这个想法不错',
-	'我觉得可以试试',
-	'有同样的感受',
-	'写得真好',
-	'深有同感',
-	'值得思考',
-	'很有启发',
-	'说出了我的心声',
-	'非常认同',
-	'学习了',
-	'收藏了',
-	'转发给朋友看看',
-	'太真实了',
-	'笑死我了',
-	'确实是这样',
-	'我也想试试',
-	'好羡慕啊',
-	'太厉害了',
-	'佩服佩服',
-	'加油！',
-]
-
-/* 回复内容模板 */
-const REPLY_TEMPLATES = [
-	'哈哈，是的',
-	'同意你的看法',
-	'我也这么觉得',
-	'说得对',
-	'确实如此',
-	'有道理',
-	'学到了',
-	'谢谢分享',
-	'受教了',
-	'很棒的观点',
-	'我也有同感',
-	'说得太好了',
-	'完全赞同',
-	'很有意思',
-	'值得深思',
-]
+/* 评论情感类型 */
+// prettier-ignore
+const COMMENT_SENTIMENTS = [
+	'positive', 'supportive', 'funny', 'grateful', 'agree',
+	'amazed', 'thoughtful', 'encouraging', 'relatable'
+] as const
 
 /**
  * 信息流Mock管理器
@@ -135,28 +29,28 @@ const REPLY_TEMPLATES = [
  */
 class FeedMock {
 	/* 生成模拟数据 - 可配置时间基准点 */
-	generateMockPosts(count: number, beforeTimestamp?: number): FeedPost[] {
+	genPosts(count: number, beforeTimestamp?: number): FeedPost[] {
 		const posts: FeedPost[] = []
 		const now = beforeTimestamp || Date.now()
 
 		for (let i = 0; i < count; i++) {
-			const timestamp = now - i * 1000 * 60 * Math.random() * 60 // 递减时间戳
+			const timestamp = now - i * 1000 * 60 * number.int({ min: 1, max: 60 }) // 随机时间间隔
 			const postId = feedUtil.generatePostId()
 
 			const post: FeedPost = {
 				id: postId,
 				userId: feedUtil.generateUserId(),
-				username: this.randomName(),
+				username: faker.person.fullName(),
 				avatar: this.randomAvatar(),
-				status: Math.random() > 0.3 ? random().emoji : undefined, // 70%概率有状态
-				content: Math.random() > 0.2 ? this.randomContent() : undefined, // 80%概率有内容
-				image: Math.random() > 0.4 ? this.randomImage() : undefined, // 60%概率有图片
+				status: datatype.boolean({ probability: 0.7 }) ? random().emoji : undefined,
+				content: datatype.boolean({ probability: 0.8 }) ? this.randomContent() : undefined,
+				image: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
 				createdAt: new Date(timestamp).toISOString(),
-				likeCount: Math.floor(Math.random() * 1000),
-				commentCount: Math.floor(Math.random() * 100),
-				isLiked: Math.random() > 0.7,
+				likeCount: number.int({ min: 0, max: 1000 }),
+				commentCount: number.int({ min: 0, max: 100 }),
+				isLiked: datatype.boolean({ probability: 0.3 }),
 				isExpanded: false,
-				comments: this.generateMockComments(postId, Math.floor(Math.random() * 15 + 5)), // 5-20条评论
+				comments: this.genComments(postId, number.int({ min: 5, max: 20 })),
 			}
 
 			posts.push(post)
@@ -166,25 +60,25 @@ class FeedMock {
 	}
 
 	/* 生成模拟评论 */
-	generateMockComments(postId: string, count: number): FeedComment[] {
+	genComments(postId: string, count: number): FeedComment[] {
 		const comments: FeedComment[] = []
 		const now = Date.now()
 
 		for (let i = 0; i < count; i++) {
-			const timestamp = now - i * 1000 * 60 * Math.random() * 120 // 2小时内随机时间
-			const isReply = i > 2 && Math.random() > 0.6 // 40%概率是回复（前3条不是回复）
+			const timestamp = now - i * 1000 * 60 * number.int({ min: 1, max: 120 }) // 2小时内随机时间
+			const isReply = i > 2 && datatype.boolean({ probability: 0.4 }) // 40%概率是回复
 
 			const comment: FeedComment = {
 				id: feedUtil.generatePostId(),
 				postId,
 				userId: feedUtil.generateUserId(),
-				username: this.randomName(),
+				username: faker.person.fullName(),
 				avatar: this.randomAvatar(),
-				content: isReply ? this.randomReplyContent() : this.randomCommentContent(),
-				replyTo: isReply ? comments[Math.floor(Math.random() * Math.min(i, 10))].username : undefined, // 回复最近10条中的一条
+				content: this.randomCommentContent(isReply),
+				replyTo: isReply ? comments[number.int({ min: 0, max: Math.min(i - 1, 9) })].username : undefined,
 				createdAt: new Date(timestamp).toISOString(),
-				likeCount: Math.floor(Math.random() * 100),
-				isLiked: Math.random() > 0.85,
+				likeCount: number.int({ min: 0, max: 100 }),
+				isLiked: datatype.boolean({ probability: 0.15 }),
 			}
 
 			comments.push(comment)
@@ -194,7 +88,7 @@ class FeedMock {
 	}
 
 	/* 生成单个评论 - 用于添加新评论 */
-	generateComment(postId: string, content: string, replyTo?: string): FeedComment {
+	genComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: feedUtil.generatePostId(),
 			postId,
@@ -209,40 +103,116 @@ class FeedMock {
 		}
 	}
 
-	private randomName() {
-		return CHINESE_NAMES[Math.floor(Math.random() * CHINESE_NAMES.length)]
-	}
-
 	private randomAvatar() {
-		const avatars = [dummy.images.avatar, dummy.images.avatarFemale, dummy.images.avatarMale, 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70 + 1)]
-		return avatars[Math.floor(Math.random() * avatars.length)]
+		const staticAvatars = [dummy.images.avatar, dummy.images.avatarFemale, dummy.images.avatarMale]
+		const dynamicAvatar = `https://i.pravatar.cc/150?img=${number.int({ min: 1, max: 70 })}`
+		return arrayElement([...staticAvatars, dynamicAvatar])
 	}
 
 	private randomContent() {
-		const template = CONTENT_TEMPLATES[Math.floor(Math.random() * CONTENT_TEMPLATES.length)]
+		const contentType = arrayElement(CONTENT_TYPES)
+		const result = this.genContentByType(contentType)
 
-		if (Math.random() > 0.7) {
-			const additionalContent = CONTENT_TEMPLATES.filter((t) => t !== template)
-				.slice(0, Math.floor(Math.random() * 3 + 1))
-				.join(' ')
-			return template + ' ' + additionalContent
+		// 30%概率生成长内容
+		if (datatype.boolean({ probability: 0.3 })) {
+			const additionalType = arrayElement(CONTENT_TYPES.filter((t) => t !== contentType))
+			return result + ' ' + this.genContentByType(additionalType)
 		}
 
-		return template
+		return result
+	}
+
+	private genContentByType(type: (typeof CONTENT_TYPES)[number]) {
+		switch (type) {
+			case 'weather':
+				return `今天${arrayElement(['天气真不错', '阳光明媚', '微风习习', '下了小雨'])}，${arrayElement(['心情也特别好', '很适合出门', '在家也很舒服'])}！`
+			case 'movie':
+				return `刚刚看了${arrayElement(['一部很棒的电影', '一个有趣的纪录片', '经典老片'])}，${arrayElement(['强烈推荐', '值得一看', '感动到了'])}。`
+			case 'travel':
+				return `${arrayElement(['周末', '昨天', '今天'])}和${arrayElement(['朋友们', '家人', '同事'])}一起去${arrayElement(['爬山', '海边', '公园', '古镇'])}，${arrayElement(['风景超美', '很放松', '收获满满'])}的。`
+			case 'food':
+				return `今天${arrayElement(['做了', '尝试了', '品尝了'])}${arrayElement(['一道新菜', '家常菜', '特色小吃'])}，${arrayElement(['味道还不错', '超级好吃', '下次还要做'])}呢。`
+			case 'work':
+				return `${arrayElement(['工作', '项目', '任务'])}虽然${arrayElement(['忙碌', '有挑战', '紧张'])}，但是${arrayElement(['很有成就感', '学到很多', '团队配合很好'])}。`
+			case 'reading':
+				return `读了${arrayElement(['一本很有意思的书', '最新的小说', '技术文章'])}，${arrayElement(['收获颇丰', '很有启发', '推荐给大家'])}。`
+			case 'photo':
+				return `今天的${arrayElement(['日落', '云彩', '风景', '花朵'])}特别美，忍不住拍了${arrayElement(['很多照片', '好几张', '一堆'])}。`
+			case 'sport':
+				return `${arrayElement(['运动', '健身', '跑步', '瑜伽'])}完之后感觉${arrayElement(['整个人都精神了', '很舒服', '充满活力'])}。`
+			default:
+				return faker.lorem.sentence({ min: 8, max: 15 })
+		}
 	}
 
 	private randomImage() {
-		const images = [dummy.images.landscape, dummy.images.portrait, dummy.images.square, dummy.getImage('landscape'), dummy.getImage('portrait'), dummy.getImage('square')]
-		return images[Math.floor(Math.random() * images.length)]
+		const staticImages = [dummy.images.landscape, dummy.images.portrait, dummy.images.square]
+		const dynamicImages = [dummy.getImage('landscape'), dummy.getImage('portrait'), dummy.getImage('square')]
+		return arrayElement([...staticImages, ...dynamicImages])
 	}
 
-	private randomCommentContent() {
-		return COMMENT_TEMPLATES[Math.floor(Math.random() * COMMENT_TEMPLATES.length)]
+	private randomCommentContent(isReply = false) {
+		const sentiment = arrayElement(COMMENT_SENTIMENTS)
+		return this.genCommentContent(sentiment, isReply)
 	}
 
-	private randomReplyContent() {
-		return REPLY_TEMPLATES[Math.floor(Math.random() * REPLY_TEMPLATES.length)]
+	private genCommentContent(sentiment: (typeof COMMENT_SENTIMENTS)[number], isReply = false) {
+		if (isReply) {
+			switch (sentiment) {
+				case 'positive':
+					return faker.helpers.arrayElement(['哈哈，是的', '同意你的看法', '说得对'])
+				case 'supportive':
+					return faker.helpers.arrayElement(['我也这么觉得', '确实如此', '完全赞同'])
+				case 'funny':
+					return faker.helpers.arrayElement(['哈哈哈', '笑死我了', '太搞笑了'])
+				case 'grateful':
+					return faker.helpers.arrayElement(['谢谢分享', '学到了', '受教了'])
+				case 'agree':
+					return faker.helpers.arrayElement(['有道理', '很棒的观点', '我也有同感'])
+				default:
+					return faker.helpers.arrayElement(['说得太好了', '很有意思', '值得深思'])
+			}
+		}
+
+		switch (sentiment) {
+			case 'positive':
+				return faker.helpers.arrayElement(['说得很对！', '太棒了！', '很不错呢'])
+			case 'supportive':
+				return faker.helpers.arrayElement(['支持！', '赞同你的观点', '完全同意'])
+			case 'funny':
+				return faker.helpers.arrayElement(['哈哈哈，太有趣了', '笑死我了', '确实是这样'])
+			case 'grateful':
+				return faker.helpers.arrayElement(['学到了，谢谢分享', '受益匪浅', '收藏了'])
+			case 'agree':
+				return faker.helpers.arrayElement(['同感，我也是这样想的', '确实如此', '很有道理'])
+			case 'amazed':
+				return faker.helpers.arrayElement(['太厉害了', '佩服佩服', '好羡慕啊'])
+			case 'thoughtful':
+				return faker.helpers.arrayElement(['值得思考', '很有启发', '说到心坎里了'])
+			case 'encouraging':
+				return faker.helpers.arrayElement(['加油！', '期待更多分享', '继续努力'])
+			case 'relatable':
+				return faker.helpers.arrayElement(['我也遇到过类似的情况', '有同样的感受', '说出了我的心声'])
+			default:
+				return faker.helpers.arrayElement(['写得真好', '深有同感', '非常认同'])
+		}
+	}
+
+	getInitDelay() {
+		return number.int({ min: 800, max: 1200 })
+	}
+
+	getLoadMoreDelay() {
+		return number.int({ min: 500, max: 1000 })
+	}
+
+	getLikeDelay() {
+		return number.int({ min: 200, max: 500 })
+	}
+
+	getCommentDelay() {
+		return number.int({ min: 300, max: 800 })
 	}
 }
 
-export const feedMock = new FeedMock() // 30%概率生成长内容
+export const feedMock = new FeedMock()

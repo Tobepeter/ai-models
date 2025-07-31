@@ -14,9 +14,9 @@ import { debounce } from 'lodash-es'
  */
 class FeedManager {
 	// 拆分为独立的计时器，避免不同业务操作相互干扰
-	private loadTimer: Nullable<CancelablePromise> = null      // 数据加载计时器（初始化、加载更多、刷新）
-	private likeTimer: Nullable<CancelablePromise> = null      // 点赞操作计时器
-	private commentTimer: Nullable<CancelablePromise> = null   // 评论操作计时器
+	private loadTimer: Nullable<CancelablePromise> = null // 数据加载计时器（初始化、加载更多、刷新）
+	private likeTimer: Nullable<CancelablePromise> = null // 点赞操作计时器
+	private commentTimer: Nullable<CancelablePromise> = null // 评论操作计时器
 
 	private getStore() {
 		return useFeedStore.getState()
@@ -62,13 +62,13 @@ class FeedManager {
 			store.clearError()
 
 			this.clearLoadTimer()
-			this.loadTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
+			this.loadTimer = delayC(feedMock.getInitDelay())
 			await this.loadTimer
 
-			const posts = feedMock.generateMockPosts(20)
+			const posts = feedMock.genPosts(20)
 
 			const lastPost = posts[posts.length - 1]
-			const cursor = lastPost ? feedUtil.generateCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
+			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
 
 			store.setData({ posts, cursor, hasMore: true, loading: false })
 			return posts
@@ -94,7 +94,7 @@ class FeedManager {
 			store.clearError()
 
 			this.clearLoadTimer()
-			this.loadTimer = delayC(faker.number.int({ min: 500, max: 1000 }))
+			this.loadTimer = delayC(feedMock.getLoadMoreDelay())
 			await this.loadTimer
 
 			let beforeTimestamp = Date.now()
@@ -103,7 +103,7 @@ class FeedManager {
 				if (parsed) beforeTimestamp = parsed.timestamp
 			}
 
-			const posts = feedMock.generateMockPosts(15, beforeTimestamp) // 生成更早的数据
+			const posts = feedMock.genPosts(15, beforeTimestamp) // 生成更早的数据
 
 			if (posts.length === 0) {
 				store.setData({ hasMore: false, loading: false })
@@ -111,7 +111,7 @@ class FeedManager {
 			}
 
 			const lastPost = posts[posts.length - 1]
-			const newCursor = feedUtil.generateCursor(new Date(lastPost.createdAt).getTime(), lastPost.id)
+			const newCursor = feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id)
 
 			store.appendPosts(posts)
 			store.setData({
@@ -140,13 +140,13 @@ class FeedManager {
 			store.clearError()
 
 			this.clearLoadTimer()
-			this.loadTimer = delayC(faker.number.int({ min: 800, max: 1200 }))
+			this.loadTimer = delayC(feedMock.getInitDelay())
 			await this.loadTimer
 
-			const posts = feedMock.generateMockPosts(10) // 生成新的数据
+			const posts = feedMock.genPosts(10) // 生成新的数据
 
 			const lastPost = posts[posts.length - 1]
-			const cursor = lastPost ? feedUtil.generateCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
+			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
 
 			store.setData({ posts, cursor, hasMore: true, refreshing: false, loading: false })
 			return posts
@@ -161,22 +161,26 @@ class FeedManager {
 	}
 
 	/* 切换点赞状态 */
-	toggleLike = debounce(async (postId: string) => {
-		const store = this.getStore()
+	toggleLike = debounce(
+		async (postId: string) => {
+			const store = this.getStore()
 
-		try {
-			store.toggleLike(postId) // 乐观更新
-			this.clearLikeTimer()
-			this.likeTimer = delayC(faker.number.int({ min: 200, max: 500 }))
-			await this.likeTimer
-			console.log(`[FeedManager] 切换点赞状态: ${postId}`)
-		} catch (error) {
-			console.error('[FeedManager] 切换点赞失败:', error)
-			store.toggleLike(postId) // 失败时回滚
-		} finally {
-			this.likeTimer = null
-		}
-	}, 150, { leading: true, trailing: false })
+			try {
+				store.toggleLike(postId) // 乐观更新
+				this.clearLikeTimer()
+				this.likeTimer = delayC(feedMock.getLikeDelay())
+				await this.likeTimer
+				console.log(`[FeedManager] 切换点赞状态: ${postId}`)
+			} catch (error) {
+				console.error('[FeedManager] 切换点赞失败:', error)
+				store.toggleLike(postId) // 失败时回滚
+			} finally {
+				this.likeTimer = null
+			}
+		},
+		150,
+		{ leading: true, trailing: false }
+	)
 
 	toggleExpand(postId: string) {
 		this.getStore().toggleExpand(postId) // 切换内容展开状态
@@ -188,10 +192,10 @@ class FeedManager {
 
 		try {
 			this.clearCommentTimer()
-			this.commentTimer = delayC(faker.number.int({ min: 300, max: 800 }))
+			this.commentTimer = delayC(feedMock.getCommentDelay())
 			await this.commentTimer
 
-			const comment = feedMock.generateComment(postId, content, replyTo)
+			const comment = feedMock.genComment(postId, content, replyTo)
 
 			store.addComment(postId, comment)
 			console.log(`[FeedManager] 添加评论成功: ${postId}`)

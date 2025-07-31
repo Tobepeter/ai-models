@@ -69,7 +69,7 @@ func (m *FeedSyncManager) syncUserProfiles() {
 	}
 
 	for _, user := range users {
-		if err := m.feedService.SyncUserProfile(user.ID); err != nil {
+		if err := m.feedService.SyncFeedUserProfile(user.ID); err != nil {
 			logrus.WithError(err).WithField("user_id", user.ID).Error("Failed to sync user profile")
 		}
 	}
@@ -83,7 +83,7 @@ func (m *FeedSyncManager) syncUserProfiles() {
 func (m *FeedSyncManager) cleanOrphanData() {
 	logrus.Debug("Starting orphan data cleanup task")
 
-	if err := m.feedService.CleanOrphanData(); err != nil {
+	if err := m.feedService.CleanFeedOrphanData(); err != nil {
 		logrus.WithError(err).Error("Failed to clean orphan data")
 		return
 	}

@@ -29,34 +29,29 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.Feed
 
 	query := s.DB.Model(&models.FeedPost{})
 
-	// 根据排序类型设置排序规则
-	switch params.Sort {
-	case "like":
-		query = query.Order("like_count DESC, id DESC")
-	case "comment":
-		query = query.Order("comment_count DESC, id DESC")
-	default: // "time"
-		query = query.Order("created_at DESC, id DESC")
-	}
-
-	// Cursor分页处理
+	// 计算排序方式
 	if params.AfterID != "" {
-		var lastPost models.FeedPost
-		if err := s.DB.Where("id = ?", params.AfterID).First(&lastPost).Error; err != nil {
-			return nil, "", false, fmt.Errorf("invalid cursor: %w", err)
-		}
-
-		// 根据排序类型设置cursor条件
+		// 有cursor分页，设置排序和cursor条件
 		switch params.Sort {
 		case "like":
-			query = query.Where("(like_count < ? OR (like_count = ? AND id < ?))",
-				lastPost.LikeCount, lastPost.LikeCount, lastPost.ID)
+			query = query.Order("like_count DESC, id DESC").Where("(like_count < (SELECT like_count FROM feed_posts WHERE id = ?) OR (like_count = (SELECT like_count FROM feed_posts WHERE id = ?) AND id < ?))",
+				params.AfterID, params.AfterID, params.AfterID)
 		case "comment":
-			query = query.Where("(comment_count < ? OR (comment_count = ? AND id < ?))",
-				lastPost.CommentCount, lastPost.CommentCount, lastPost.ID)
+			query = query.Order("comment_count DESC, id DESC").Where("(comment_count < (SELECT comment_count FROM feed_posts WHERE id = ?) OR (comment_count = (SELECT comment_count FROM feed_posts WHERE id = ?) AND id < ?))",
+				params.AfterID, params.AfterID, params.AfterID)
 		default: // "time"
-			query = query.Where("(created_at < ? OR (created_at = ? AND id < ?))",
-				lastPost.CreatedAt, lastPost.CreatedAt, lastPost.ID)
+			query = query.Order("created_at DESC, id DESC").Where("(created_at < (SELECT created_at FROM feed_posts WHERE id = ?) OR (created_at = (SELECT created_at FROM feed_posts WHERE id = ?) AND id < ?))",
+				params.AfterID, params.AfterID, params.AfterID)
+		}
+	} else {
+		// 无cursor分页，只设置排序
+		switch params.Sort {
+		case "like":
+			query = query.Order("like_count DESC, id DESC")
+		case "comment":
+			query = query.Order("comment_count DESC, id DESC")
+		default: // "time"
+			query = query.Order("created_at DESC, id DESC")
 		}
 	}
 
@@ -133,8 +128,8 @@ func (s *FeedService) GetFeedPostByID(postID string) (*models.FeedPost, error) {
 	return &post, nil
 }
 
-// ToggleLikePost 切换帖子点赞状态
-func (s *FeedService) ToggleLikePost(userID uint64, postID string) error {
+// ToggleFeedPostLike 切换信息流帖子点赞状态
+func (s *FeedService) ToggleFeedPostLike(userID uint64, postID string) error {
 	postIDUint, err := s.ParseStringToUint64(postID)
 	if err != nil {
 		return err
@@ -149,11 +144,9 @@ func (s *FeedService) ToggleLikePost(userID uint64, postID string) error {
 		return err
 	}
 
-	userID64 := userID
-
 	// 检查用户是否已点赞
 	var existingLike models.PostLike
-	err = s.DB.Where("post_id = ? AND user_id = ?", postIDUint, userID64).First(&existingLike).Error
+	err = s.DB.Where("post_id = ? AND user_id = ?", postIDUint, userID).First(&existingLike).Error
 
 	// 使用事务处理点赞状态切换
 	return s.DB.Transaction(func(tx *gorm.DB) error {
@@ -168,7 +161,7 @@ func (s *FeedService) ToggleLikePost(userID uint64, postID string) error {
 			// 用户未点赞，添加点赞
 			newLike := models.PostLike{
 				PostID: postIDUint,
-				UserID: userID64,
+				UserID: userID,
 			}
 			if err := tx.Create(&newLike).Error; err != nil {
 				return err
@@ -281,8 +274,8 @@ func (s *FeedService) CreateFeedComment(userID uint64, postID string, req models
 	return comment, nil
 }
 
-// ToggleLikeComment 切换评论点赞状态
-func (s *FeedService) ToggleLikeComment(userID uint64, commentID string) error {
+// SetFeedCommentLike 设置信息流评论点赞状态
+func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike bool) error {
 	commentIDUint, err := s.ParseStringToUint64(commentID)
 	if err != nil {
 		return err
@@ -297,24 +290,63 @@ func (s *FeedService) ToggleLikeComment(userID uint64, commentID string) error {
 		return err
 	}
 
-	// TODO: 实现用户点赞状态记录表
-	// 目前简化处理，直接增加点赞数
-	return s.DB.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count + 1")).Error
+	// 检查用户是否已点赞
+	var existingLike models.FeedCommentLike
+	err = s.DB.Where("comment_id = ? AND user_id = ?", commentIDUint, userID).First(&existingLike).Error
+
+	// 使用事务处理点赞状态设置
+	return s.DB.Transaction(func(tx *gorm.DB) error {
+		if isLike {
+			// 要点赞
+			if err == nil {
+				// 已经点赞了，返回业务错误码
+				return fmt.Errorf("BUSINESS_ERROR:1001:已点赞")
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				// 未点赞，添加点赞
+				newLike := models.FeedCommentLike{
+					CommentID: commentIDUint,
+					UserID:    userID,
+				}
+				if err := tx.Create(&newLike).Error; err != nil {
+					return err
+				}
+				// 增加点赞数
+				return tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count + 1")).Error
+			} else {
+				// 其他数据库错误
+				return err
+			}
+		} else {
+			// 要取消点赞
+			if err == nil {
+				// 已点赞，取消点赞
+				if err := tx.Delete(&existingLike).Error; err != nil {
+					return err
+				}
+				// 减少点赞数
+				return tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count - 1")).Error
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				// 未点赞，无需操作，直接返回成功
+				return nil
+			} else {
+				// 其他数据库错误
+				return err
+			}
+		}
+	})
 }
 
-// SyncUserProfile 同步用户资料到信息流
-func (s *FeedService) SyncUserProfile(userID uint64) error {
+// SyncFeedUserProfile 同步用户资料到信息流
+func (s *FeedService) SyncFeedUserProfile(userID uint64) error {
 	// 获取最新用户信息
 	var user models.User
 	if err := s.DB.First(&user, userID).Error; err != nil {
 		return err
 	}
 
-	userID64 := userID
-
 	// 批量更新帖子中的用户信息
 	err := s.DB.Model(&models.FeedPost{}).
-		Where("user_id = ? AND user_profile_version < ?", userID64, user.ProfileVersion).
+		Where("user_id = ? AND user_profile_version < ?", userID, user.ProfileVersion).
 		Updates(map[string]any{
 			"username":             user.Username,
 			"avatar":               user.Avatar,
@@ -327,7 +359,7 @@ func (s *FeedService) SyncUserProfile(userID uint64) error {
 
 	// 批量更新评论中的用户信息
 	return s.DB.Model(&models.FeedComment{}).
-		Where("user_id = ? AND user_profile_version < ?", userID64, user.ProfileVersion).
+		Where("user_id = ? AND user_profile_version < ?", userID, user.ProfileVersion).
 		Updates(map[string]any{
 			"username":             user.Username,
 			"avatar":               user.Avatar,
@@ -335,8 +367,8 @@ func (s *FeedService) SyncUserProfile(userID uint64) error {
 		}).Error
 }
 
-// CleanOrphanData 清理孤儿数据
-func (s *FeedService) CleanOrphanData() error {
+// CleanFeedOrphanData 清理信息流孤儿数据
+func (s *FeedService) CleanFeedOrphanData() error {
 	// 删除用户不存在的帖子
 	subQuery := s.DB.Table("users").Select("id").Where("users.id = feed_posts.user_id")
 	if err := s.DB.Where("NOT EXISTS (?)", subQuery).Delete(&models.FeedPost{}).Error; err != nil {
@@ -363,5 +395,17 @@ func (s *FeedService) CleanOrphanData() error {
 
 	// 删除用户不存在的点赞记录
 	subQuery5 := s.DB.Table("users").Select("id").Where("users.id = post_likes.user_id")
-	return s.DB.Where("NOT EXISTS (?)", subQuery5).Delete(&models.PostLike{}).Error
+	if err := s.DB.Where("NOT EXISTS (?)", subQuery5).Delete(&models.PostLike{}).Error; err != nil {
+		return err
+	}
+
+	// 删除评论不存在的评论点赞记录
+	subQuery6 := s.DB.Table("feed_comments").Select("id").Where("feed_comments.id = feed_comment_likes.comment_id")
+	if err := s.DB.Where("NOT EXISTS (?)", subQuery6).Delete(&models.FeedCommentLike{}).Error; err != nil {
+		return err
+	}
+
+	// 删除用户不存在的评论点赞记录
+	subQuery7 := s.DB.Table("users").Select("id").Where("users.id = feed_comment_likes.user_id")
+	return s.DB.Where("NOT EXISTS (?)", subQuery7).Delete(&models.FeedCommentLike{}).Error
 }

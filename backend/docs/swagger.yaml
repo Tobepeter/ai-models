@@ -10,9 +10,9 @@ definitions:
         type: string
       id:
         type: string
-      isActive:
+      is_active:
         type: boolean
-      maxTokens:
+      max_tokens:
         type: integer
       name:
         type: string
@@ -36,7 +36,7 @@ definitions:
     properties:
       content:
         type: string
-      createdAt:
+      created_at:
         type: string
       model:
         type: string
@@ -56,7 +56,7 @@ definitions:
     type: object
   ai-models-backend_internal_models.ChatResponse:
     properties:
-      createdAt:
+      created_at:
         type: string
       id:
         type: string
@@ -73,7 +73,7 @@ definitions:
         description: 评论内容，最多500字符
         maxLength: 500
         type: string
-      replyTo:
+      reply_to:
         description: 回复的用户名
         maxLength: 100
         type: string
@@ -86,7 +86,7 @@ definitions:
         description: 最多2000字符
         maxLength: 2000
         type: string
-      imageURL:
+      image_url:
         description: 图片URL
         type: string
     type: object
@@ -104,13 +104,13 @@ definitions:
     properties:
       category:
         type: string
-      createdAt:
+      created_at:
         type: string
       data:
         type: string
       id:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   ai-models-backend_internal_models.CrudUpdateRequest:
@@ -125,10 +125,10 @@ definitions:
     type: object
   ai-models-backend_internal_models.DeleteFileRequest:
     properties:
-      objectKey:
+      object_key:
         type: string
     required:
-    - objectKey
+    - object_key
     type: object
   ai-models-backend_internal_models.FeedComment:
     properties:
@@ -137,22 +137,22 @@ definitions:
         type: string
       content:
         type: string
-      createdAt:
+      created_at:
         type: string
       id:
         type: string
-      likeCount:
+      like_count:
         type: integer
-      postID:
+      post_id:
         type: string
-      replyTo:
+      reply_to:
         description: 回复的用户名
         type: string
-      updatedAt:
+      updated_at:
         type: string
-      userID:
+      user_id:
         type: string
-      userProfileVersion:
+      user_profile_version:
         description: 用户信息版本号
         type: integer
       username:
@@ -165,9 +165,9 @@ definitions:
         items:
           $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
         type: array
-      hasMore:
+      has_more:
         type: boolean
-      nextCursor:
+      next_cursor:
         type: string
       total:
         type: integer
@@ -177,28 +177,28 @@ definitions:
       avatar:
         description: 冗余头像
         type: string
-      commentCount:
+      comment_count:
         type: integer
       content:
         description: 文字内容（可选）
         type: string
-      createdAt:
+      created_at:
         type: string
       id:
         type: string
-      imageURL:
+      image_url:
         description: 图片URL（可选）
         type: string
-      likeCount:
+      like_count:
         type: integer
       status:
         description: 用户状态emoji
         type: string
-      updatedAt:
+      updated_at:
         type: string
-      userID:
+      user_id:
         type: string
-      userProfileVersion:
+      user_profile_version:
         description: 用户信息版本号
         type: integer
       username:
@@ -207,9 +207,9 @@ definitions:
     type: object
   ai-models-backend_internal_models.FeedPostResponse:
     properties:
-      hasMore:
+      has_more:
         type: boolean
-      nextCursor:
+      next_cursor:
         type: string
       posts:
         items:
@@ -218,11 +218,11 @@ definitions:
     type: object
   ai-models-backend_internal_models.FileInfo:
     properties:
-      lastModified:
+      last_modified:
         type: string
       name:
         type: string
-      objectKey:
+      object_key:
         type: string
       size:
         type: integer
@@ -235,23 +235,23 @@ definitions:
         items:
           $ref: '#/definitions/ai-models-backend_internal_models.FileInfo'
         type: array
-      isTruncated:
+      is_truncated:
         type: boolean
-      nextMarker:
+      next_marker:
         type: string
     type: object
   ai-models-backend_internal_models.FileUploadResponse:
     properties:
-      hashifyName:
+      hashify_name:
         description: 哈希化文件名
         type: string
-      objectKey:
+      object_key:
         type: string
       size:
         type: integer
       type:
         type: string
-      uploadTime:
+      upload_time:
         type: string
       url:
         type: string
@@ -272,7 +272,7 @@ definitions:
     properties:
       content:
         type: string
-      createdAt:
+      created_at:
         type: string
       id:
         type: string
@@ -283,33 +283,33 @@ definitions:
     type: object
   ai-models-backend_internal_models.GetURLRequest:
     properties:
-      objectKey:
+      object_key:
         type: string
     required:
-    - objectKey
+    - object_key
     type: object
   ai-models-backend_internal_models.GetURLResponse:
     properties:
-      objectKey:
+      object_key:
         type: string
       url:
         type: string
     type: object
   ai-models-backend_internal_models.HashifyNameRequest:
     properties:
-      fileName:
+      file_name:
         type: string
     required:
-    - fileName
+    - file_name
     type: object
   ai-models-backend_internal_models.HashifyNameResponse:
     properties:
-      hashifyName:
+      hashify_name:
         type: string
     type: object
   ai-models-backend_internal_models.OpenAIChatCompletionRequest:
     properties:
-      maxTokens:
+      max_tokens:
         type: integer
       messages:
         items:
@@ -323,7 +323,7 @@ definitions:
         type: boolean
       temperature:
         type: number
-      topP:
+      top_p:
         type: number
     required:
     - messages
@@ -348,7 +348,7 @@ definitions:
     type: object
   ai-models-backend_internal_models.OpenAIChoice:
     properties:
-      finishReason:
+      finish_reason:
         type: string
       index:
         type: integer
@@ -367,18 +367,18 @@ definitions:
     type: object
   ai-models-backend_internal_models.OpenAIUsage:
     properties:
-      completionTokens:
+      completion_tokens:
         type: integer
-      promptTokens:
+      prompt_tokens:
         type: integer
-      totalTokens:
+      total_tokens:
         type: integer
     type: object
   ai-models-backend_internal_models.Pagination:
     properties:
       current:
         type: integer
-      pageSize:
+      page_size:
         type: integer
       total:
         type: integer
@@ -408,15 +408,23 @@ definitions:
       credentials:
         $ref: '#/definitions/ai-models-backend_internal_models.STSCredentials'
     type: object
+  ai-models-backend_internal_models.SetFeedCommentLikeRequest:
+    properties:
+      is_like:
+        description: 是否点赞
+        type: boolean
+    required:
+    - is_like
+    type: object
   ai-models-backend_internal_models.SignRequest:
     properties:
-      fileName:
+      file_name:
         description: 文件名
         type: string
-      fileType:
+      file_type:
         description: 文件类型，用于路径计算
         type: string
-      objectKey:
+      object_key:
         description: 完整的objectKey，如果提供则直接使用
         type: string
       prefix:
@@ -425,9 +433,9 @@ definitions:
     type: object
   ai-models-backend_internal_models.SignResponse:
     properties:
-      objectKey:
+      object_key:
         type: string
-      signedURL:
+      signed_url:
         type: string
     type: object
   ai-models-backend_internal_models.TodoCreateRequest:
@@ -435,7 +443,7 @@ definitions:
       description:
         description: 可选
         type: string
-      dueDate:
+      due_date:
         description: 可选
         type: string
       position:
@@ -476,11 +484,11 @@ definitions:
     properties:
       completed:
         type: boolean
-      createdAt:
+      created_at:
         type: string
       description:
         type: string
-      dueDate:
+      due_date:
         type: string
       id:
         type: string
@@ -490,7 +498,7 @@ definitions:
         type: integer
       title:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   ai-models-backend_internal_models.TodoUpdateRequest:
@@ -501,7 +509,7 @@ definitions:
       description:
         description: 可选，不传不更新
         type: string
-      dueDate:
+      due_date:
         description: 可选，不传不更新
         type: string
       position:
@@ -516,11 +524,11 @@ definitions:
     type: object
   ai-models-backend_internal_models.Usage:
     properties:
-      completionTokens:
+      completion_tokens:
         type: integer
-      promptTokens:
+      prompt_tokens:
         type: integer
-      totalTokens:
+      total_tokens:
         type: integer
     type: object
   ai-models-backend_internal_models.UserCreateRequest:
@@ -567,9 +575,9 @@ definitions:
     properties:
       avatar:
         type: string
-      avatarOssKey:
+      avatar_oss_key:
         type: string
-      createdAt:
+      created_at:
         type: string
       email:
         type: string
@@ -577,15 +585,15 @@ definitions:
         type: string
       id:
         type: string
-      isActive:
+      is_active:
         type: boolean
-      profileVersion:
+      profile_version:
         type: integer
       role:
         type: string
       status:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       username:
         type: string
@@ -594,7 +602,7 @@ definitions:
     properties:
       avatar:
         type: string
-      avatarOssKey:
+      avatar_oss_key:
         type: string
       email:
         type: string
@@ -962,13 +970,19 @@ paths:
     post:
       consumes:
       - application/json
-      description: 点赞或取消点赞评论，需要登录
+      description: 设置评论点赞或取消点赞状态，需要登录
       parameters:
       - description: 评论ID
         in: path
         name: comment_id
         required: true
         type: string
+      - description: 点赞状态
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest'
       produces:
       - application/json
       responses:
@@ -992,7 +1006,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-      summary: 切换评论点赞状态
+      summary: 设置评论点赞状态
       tags:
       - Feed
   /api/feed/posts:

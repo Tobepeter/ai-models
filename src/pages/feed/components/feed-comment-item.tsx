@@ -27,28 +27,15 @@ export const FeedCommentItem = (props: FeedCommentItemProps) => {
 	return (
 		<div className={cn('flex space-x-3 py-2 transition-colors hover:bg-muted/30 rounded-lg', className)} data-slot="comment-item">
 			{/* 用户头像 */}
-			<UserAvatar
-				src={comment.avatar}
-				alt={`${comment.username}的头像`}
-				size={28}
-				className="flex-shrink-0 mt-0.5"
-				fallbackText={comment.username.charAt(0)}
-			/>
+			<UserAvatar src={comment.avatar} alt={`${comment.username}的头像`} size={28} className="flex-shrink-0 mt-0.5" fallbackText={comment.username.charAt(0)} />
 
 			{/* 评论内容 */}
 			<div className="flex-1 min-w-0">
 				<div className="text-sm text-foreground leading-relaxed">
 					{comment.replyTo && <span className="text-primary mr-1">@{comment.replyTo} </span>}
-					<CommentInputPopup
-						postId={comment.postId}
-						onAddComment={handleAddComment}
-						replyTo={replyTo}
-						onClearReply={handleClearReply}
-					>
-						<button 
-							onClick={handleReply}
-							className="text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer mr-1"
-						>
+					<CommentInputPopup postId={comment.postId} onAddComment={handleAddComment} replyTo={replyTo} onClearReply={handleClearReply}>
+						{/* 艾特 */}
+						<button onClick={handleReply} className="text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer mr-1">
 							@{comment.username}
 						</button>
 					</CommentInputPopup>

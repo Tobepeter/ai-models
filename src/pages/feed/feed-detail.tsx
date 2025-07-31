@@ -11,28 +11,17 @@ import { feedMgr } from './feed-mgr'
  */
 export const FeedDetail = () => {
 	const { postId } = useParams<{ postId: string }>()
-	
-	const { 
-		posts, 
-		postsById,
-		loading,
-		error,
-		addComment,
-	} = useFeedStore()
+
+	const { posts, postsById, loading, error, addComment } = useFeedStore()
 
 	// 获取当前帖子
-	const currentPost = postId 
-		? (postsById[postId] || posts.find(p => p.id === postId))
-		: null
-
-
+	const currentPost = postId ? postsById[postId] || posts.find((p) => p.id === postId) : null
 
 	// 处理添加评论
 	const handleAddComment = (postId: string, content: string, replyTo?: string) => {
 		const newComment = feedUtil.createComment(postId, content, replyTo)
 		addComment(postId, newComment)
 	}
-
 
 	// 处理回复
 	const handleReply = (postId: string, username: string) => {
@@ -51,7 +40,7 @@ export const FeedDetail = () => {
 	// 如果没有 postId，返回 404
 	if (!postId) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
+			<div className="h-screen flex items-center justify-center">
 				<div className="text-center">
 					<h1 className="text-2xl font-bold mb-4">页面不存在</h1>
 					<p className="text-muted-foreground">请使用导航栏返回</p>
@@ -98,17 +87,16 @@ export const FeedDetail = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-background" data-slot="feed-detail">
+		<div className="h-full bg-background" data-slot="feed-detail">
 			{/* 详情内容 */}
-			<div className="container max-w-4xl mx-auto py-6">
-				<div className="bg-card rounded-lg shadow-sm overflow-hidden">
-					<FeedDetailContent
-						post={currentPost}
-						showNavigateButton={false} // 详情页不需要跳转按钮
-						onAddComment={handleAddComment}
-							onReply={handleReply}
-					/>
-				</div>
+			<div className="container max-w-4xl mx-auto py-6 h-full">
+				<FeedDetailContent
+					post={currentPost}
+					showNavigateButton={false} // 详情页不需要跳转按钮
+					onAddComment={handleAddComment}
+					onReply={handleReply}
+					className="h-full"
+				/>
 			</div>
 		</div>
 	)

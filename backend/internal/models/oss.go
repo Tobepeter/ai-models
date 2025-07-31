@@ -13,31 +13,31 @@ type STSCredentials struct {
 
 // STS响应
 type STSResponse struct {
-	Credentials STSCredentials
+	Credentials STSCredentials `json:"credentials"`
 }
 
 // 签名请求
 type SignRequest struct {
-	ObjectKey string `json:",omitempty"` // 完整的objectKey，如果提供则直接使用
-	FileType  string `json:",omitempty"` // 文件类型，用于路径计算
-	Prefix    string `json:",omitempty"` // 路径前缀
-	FileName  string `json:",omitempty"` // 文件名
+	ObjectKey string `json:"object_key,omitempty"` // 完整的objectKey，如果提供则直接使用
+	FileType  string `json:"file_type,omitempty"` // 文件类型，用于路径计算
+	Prefix    string `json:"prefix,omitempty"` // 路径前缀
+	FileName  string `json:"file_name,omitempty"` // 文件名
 }
 
 // 签名响应
 type SignResponse struct {
-	SignedURL string
-	ObjectKey string
+	SignedURL string `json:"signed_url"`
+	ObjectKey string `json:"object_key"`
 }
 
 // 哈希文件名请求
 type HashifyNameRequest struct {
-	FileName string `binding:"required"`
+	FileName string `json:"file_name" binding:"required"`
 }
 
 // 哈希文件名响应
 type HashifyNameResponse struct {
-	HashifyName string
+	HashifyName string `json:"hashify_name"`
 }
 
 // 文件上传请求
@@ -50,28 +50,28 @@ type FileUploadRequest struct {
 
 // 文件上传响应
 type FileUploadResponse struct {
-	ObjectKey   string
-	URL         string `json:",omitempty"`
-	HashifyName string `json:",omitempty"` // 哈希化文件名
-	Size        int64
-	Type        string
-	UploadTime  string
+	ObjectKey   string `json:"object_key"`
+	URL         string `json:"url,omitempty"`
+	HashifyName string `json:"hashify_name,omitempty"` // 哈希化文件名
+	Size        int64 `json:"size"`
+	Type        string `json:"type"`
+	UploadTime  string `json:"upload_time"`
 }
 
 // 获取URL请求
 type GetURLRequest struct {
-	ObjectKey string `binding:"required"`
+	ObjectKey string `json:"object_key" binding:"required"`
 }
 
 // 获取URL响应
 type GetURLResponse struct {
-	URL       string
-	ObjectKey string
+	URL       string `json:"url"`
+	ObjectKey string `json:"object_key"`
 }
 
 // 删除文件请求
 type DeleteFileRequest struct {
-	ObjectKey string `binding:"required"`
+	ObjectKey string `json:"object_key" binding:"required"`
 }
 
 // 文件列表查询参数
@@ -82,16 +82,16 @@ type FileListQuery struct {
 
 // 文件信息
 type FileInfo struct {
-	Name         string
-	Size         int64
-	LastModified time.Time
-	ObjectKey    string
-	URL          string
+	Name         string `json:"name"`
+	Size         int64 `json:"size"`
+	LastModified time.Time `json:"last_modified"`
+	ObjectKey    string `json:"object_key"`
+	URL          string `json:"url"`
 }
 
 // 文件列表响应
 type FileListResponse struct {
-	Files       []FileInfo
-	IsTruncated bool
-	NextMarker  string `json:",omitempty"`
+	Files       []FileInfo `json:"files"`
+	IsTruncated bool `json:"is_truncated"`
+	NextMarker  string `json:"next_marker,omitempty"`
 }

@@ -8,6 +8,7 @@ import (
 )
 
 // JWTClaims JWT 声明
+// NOTE: 之类不需要设置 json tag，jwt内部使用 golang-jwt/jwt 转换为 user_id
 type JWTClaims struct {
 	UserID uint64
 	jwt.RegisteredClaims
