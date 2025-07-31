@@ -6,7 +6,7 @@ import { zodUtil } from '@/utils/zod-util'
 export const registerSchema = z
 	.object({
 		username: zodUtil.username(),
-		email: z.email(), // 使用 zod v4 新的顶层 API
+		email: z.string().email(), // 使用 zod v3 语法
 		password: zodUtil.password(),
 		confirmPassword: z.string().min(1), // 前端专用验证字段，使用自动中文提示
 	} satisfies Record<keyof UserCreateRequest, z.ZodType> & { confirmPassword: z.ZodType })

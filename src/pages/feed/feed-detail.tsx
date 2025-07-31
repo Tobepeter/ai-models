@@ -33,11 +33,6 @@ export const FeedDetail = () => {
 		addComment(postId, newComment)
 	}
 
-	// 处理评论点赞
-	const handleLikeComment = (commentId: string) => {
-		// TODO: 实现评论点赞逻辑
-		console.log('点赞评论:', commentId)
-	}
 
 	// 处理回复
 	const handleReply = (postId: string, username: string) => {
@@ -111,8 +106,7 @@ export const FeedDetail = () => {
 						post={currentPost}
 						showNavigateButton={false} // 详情页不需要跳转按钮
 						onAddComment={handleAddComment}
-						onLikeComment={handleLikeComment}
-						onReply={handleReply}
+							onReply={handleReply}
 					/>
 				</div>
 			</div>

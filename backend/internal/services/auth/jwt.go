@@ -9,12 +9,12 @@ import (
 
 // JWTClaims JWT 声明
 type JWTClaims struct {
-	UserID uint `json:"user_id"`
+	UserID uint64
 	jwt.RegisteredClaims
 }
 
 // GenerateToken 生成JWT token
-func (s *AuthService) GenerateToken(userID uint) (string, error) {
+func (s *AuthService) GenerateToken(userID uint64) (string, error) {
 	claims := JWTClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{

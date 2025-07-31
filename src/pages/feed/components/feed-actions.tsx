@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Heart, Share } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CommentInputPopover } from './feed-comment-input'
+import { CommentInput } from './feed-comment-input-popup'
 import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
@@ -59,7 +59,7 @@ export const FeedActions = (props: FeedActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInputPopover
+			<CommentInput
 				postId={postId}
 				commentCount={commentCount}
 				onAddComment={onAddComment}

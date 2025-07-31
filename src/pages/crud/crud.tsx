@@ -12,7 +12,7 @@ import { Edit, Trash2, Plus, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface CrudItem {
-	id: number
+	id: string
 	data: string
 	category: string
 	created_at: string

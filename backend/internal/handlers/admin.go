@@ -61,14 +61,14 @@ func (h *AdminHandler) GetSystemStatus(c *gin.Context) {
 // @Description 管理员重置指定用户的密码，通常用于用户忘记密码或管理员主动重置的场景
 // @Tags Admin
 // @Param id path string true "用户ID"
-// @Param request body object{new_password=string} true "新密码"
+// @Param request body object{newPassword=string} true "新密码"
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /admin/users/{id}/reset-password [post]
 func (h *AdminHandler) ResetUserPassword(c *gin.Context) {
 	userID := c.Param("id")
 
 	var req struct {
-		NewPassword string `json:"new_password" binding:"required,min=6"`
+		NewPassword string `binding:"required,min=6"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {

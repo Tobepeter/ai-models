@@ -6,36 +6,36 @@ import type { TodoResponse, TodoCreateRequest, TodoUpdateRequest, GetTodoListPar
 // 模拟数据
 const mockTodos: TodoResponse[] = [
 	{
-		id: 1,
+		id: '1',
 		title: '完成项目文档',
 		description: '整理项目的技术文档和用户手册',
 		completed: false,
 		priority: 2,
-		due_date: '2025-01-30T10:00:00.000Z',
-		created_at: '2025-01-25T08:00:00.000Z',
-		updated_at: '2025-01-25T08:00:00.000Z',
+		dueDate: '2025-01-30T10:00:00.000Z',
+		createdAt: '2025-01-25T08:00:00.000Z',
+		updatedAt: '2025-01-25T08:00:00.000Z',
 		position: 1,
 	},
 	{
-		id: 2,
+		id: '2',
 		title: '学习新技术',
 		description: '深入学习 React 18 的新特性',
 		completed: true,
 		priority: 1,
-		due_date: null,
-		created_at: '2025-01-24T14:30:00.000Z',
-		updated_at: '2025-01-25T09:15:00.000Z',
+		dueDate: null,
+		createdAt: '2025-01-24T14:30:00.000Z',
+		updatedAt: '2025-01-25T09:15:00.000Z',
 		position: 2,
 	},
 	{
-		id: 3,
+		id: '3',
 		title: '修复线上bug',
 		description: '解决用户反馈的登录问题',
 		completed: false,
 		priority: 3,
-		due_date: '2025-01-28T18:00:00.000Z',
-		created_at: '2025-01-25T10:45:00.000Z',
-		updated_at: '2025-01-25T10:45:00.000Z',
+		dueDate: '2025-01-28T18:00:00.000Z',
+		createdAt: '2025-01-25T10:45:00.000Z',
+		updatedAt: '2025-01-25T10:45:00.000Z',
 		position: 3,
 	},
 ]
@@ -110,13 +110,13 @@ class TodoUtil {
 	}
 
 	/* 更新todo（如果用户已登录则发送到服务器） */
-	async updateTodo(id: number, updates: TodoUpdateRequest): Promise<TodoResponse | null> {
+	async updateTodo(id: string, updates: TodoUpdateRequest): Promise<TodoResponse | null> {
 		if (!this.isLoggedIn()) {
 			return null
 		}
 
 		try {
-			const response = await api.todos.updateTodo(id.toString(), updates)
+			const response = await api.todos.updateTodo(id, updates)
 			if (response?.data) {
 				return response.data
 			}
@@ -128,13 +128,13 @@ class TodoUtil {
 	}
 
 	/* 删除todo（如果用户已登录则发送到服务器） */
-	async deleteTodo(id: number): Promise<boolean> {
+	async deleteTodo(id: string): Promise<boolean> {
 		if (!this.isLoggedIn()) {
 			return false
 		}
 
 		try {
-			const response = await api.todos.deleteTodo(id.toString())
+			const response = await api.todos.deleteTodo(id)
 			return !!response
 		} catch (error) {
 			console.error('[TodoUtil] Failed to delete todo:', error)
@@ -143,7 +143,7 @@ class TodoUtil {
 	}
 
 	/* 切换todo完成状态（如果用户已登录则发送到服务器） */
-	async toggleTodo(id: number): Promise<TodoResponse | null> {
+	async toggleTodo(id: string): Promise<TodoResponse | null> {
 		if (!this.isLoggedIn()) {
 			return null
 		}

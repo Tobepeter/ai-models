@@ -6,141 +6,140 @@ import (
 
 // 聊天请求
 type ChatRequest struct {
-	Message string `json:"message" binding:"required"`
-	Model   string `json:"model,omitempty"`
-	Stream  bool   `json:"stream,omitempty"`
+	Message string `binding:"required"`
+	Model   string
+	Stream  bool `json:",omitempty"`
 }
 
 // 聊天响应
 type ChatResponse struct {
-	ID        string    `json:"id"`
-	Message   string    `json:"message"`
-	Model     string    `json:"model"`
-	CreatedAt time.Time `json:"created_at"`
-	Usage     Usage     `json:"usage"`
+	ID        string
+	Message   string
+	Model     string
+	CreatedAt time.Time
+	Usage     Usage
 }
 
 // 生成请求
 type GenerateRequest struct {
-	Prompt     string         `json:"prompt" binding:"required"`
-	Model      string         `json:"model,omitempty"`
-	Parameters map[string]any `json:"parameters,omitempty"`
+	Prompt     string `binding:"required"`
+	Model      string `json:",omitempty"`
+	Parameters map[string]any
 }
 
 // 生成响应
 type GenerateResponse struct {
-	ID        string    `json:"id"`
-	Content   string    `json:"content"`
-	Model     string    `json:"model"`
-	CreatedAt time.Time `json:"created_at"`
-	Usage     Usage     `json:"usage"`
+	ID        string
+	Content   string
+	Model     string
+	CreatedAt time.Time
+	Usage     Usage
 }
 
 // token 使用信息
 type Usage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens"`
-	TotalTokens      int `json:"total_tokens"`
+	PromptTokens     int
+	CompletionTokens int
+	TotalTokens      int
 }
 
 // AI 模型
 type AIModel struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Description  string   `json:"description"`
-	Provider     string   `json:"provider"`
-	Type         string   `json:"type"`
-	Capabilities []string `json:"capabilities"`
-	MaxTokens    int      `json:"max_tokens"`
-	IsActive     bool     `json:"is_active"`
+	ID           string
+	Name         string
+	Description  string
+	Provider     string
+	Type         string
+	Capabilities []string
+	MaxTokens    int
+	IsActive     bool
 }
 
 // 聊天消息
 type ChatMessage struct {
-	Role      string    `json:"role"`
-	Content   string    `json:"content"`
-	Model     string    `json:"model,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
+	Role      string
+	Content   string
+	Model     string
+	CreatedAt time.Time
 }
 
 // 对话历史
 type ConversationHistory struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	UserID    uint      `json:"user_id" gorm:"not null"`
-	SessionID string    `json:"session_id" gorm:"not null"`
-	Role      string    `json:"role" gorm:"not null"`
-	Content   string    `json:"content" gorm:"type:text;not null"`
-	Model     string    `json:"model"`
-	CreatedAt time.Time `json:"created_at"`
-
-	User User `json:"-" gorm:"foreignKey:UserID"`
+	ID        uint64 `gorm:"primaryKey"`
+	UserID    uint64 `gorm:"not null"`
+	SessionID string `gorm:"not null"`
+	Role      string `gorm:"not null"`
+	Content   string `gorm:"type:text;not null"`
+	Model     string
+	CreatedAt time.Time
+	User      User `json:"-" gorm:"foreignKey:UserID"`
 }
 
 // OpenAI 兼容模型
 type OpenAIMessage struct {
-	Role    string `json:"role" binding:"required"`
-	Content string `json:"content" binding:"required"`
+	Role    string `binding:"required"`
+	Content string `binding:"required"`
 }
 
 type OpenAIChatCompletionRequest struct {
-	Model       string          `json:"model" binding:"required"`
-	Messages    []OpenAIMessage `json:"messages" binding:"required"`
-	Stream      bool            `json:"stream,omitempty"`
-	MaxTokens   int             `json:"max_tokens,omitempty"`
-	Temperature float64         `json:"temperature,omitempty"`
-	TopP        float64         `json:"top_p,omitempty"`
-	Platform    string          `json:"platform,omitempty"`
+	Model       string          `binding:"required"`
+	Messages    []OpenAIMessage `binding:"required"`
+	Stream      bool
+	MaxTokens   int
+	Temperature float64
+	TopP        float64
+	Platform    string
 }
 
 type OpenAIChoice struct {
-	Index        int           `json:"index"`
-	Message      OpenAIMessage `json:"message"`
-	FinishReason string        `json:"finish_reason"`
+	Index        int
+	Message      OpenAIMessage
+	FinishReason string
 }
 
 type OpenAIUsage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens"`
-	TotalTokens      int `json:"total_tokens"`
+	PromptTokens     int
+	CompletionTokens int
+	TotalTokens      int
 }
 
 type OpenAIChatCompletionResponse struct {
-	ID      string         `json:"id"`
-	Object  string         `json:"object"`
-	Created int64          `json:"created"`
-	Model   string         `json:"model"`
-	Choices []OpenAIChoice `json:"choices"`
-	Usage   OpenAIUsage    `json:"usage"`
+	ID      string
+	Object  string
+	Created int64
+	Model   string
+	Choices []OpenAIChoice
+	Usage   OpenAIUsage
 }
 
 type OpenAIStreamChoice struct {
-	Index int `json:"index"`
+	Index int
 	Delta struct {
-		Role    string `json:"role,omitempty"`
-		Content string `json:"content,omitempty"`
-	} `json:"delta"`
-	FinishReason *string `json:"finish_reason"`
+		Role    string `json:",omitempty"`
+		Content string
+	}
+	FinishReason *string
 }
 
 type OpenAIChatCompletionStreamResponse struct {
-	ID      string               `json:"id"`
-	Object  string               `json:"object"`
-	Created int64                `json:"created"`
-	Model   string               `json:"model"`
-	Choices []OpenAIStreamChoice `json:"choices"`
+	ID      string
+	Object  string
+	Created int64
+	Model   string
+	Choices []OpenAIStreamChoice
 }
 
 // OpenAI错误响应
 type OpenAIErrorResponse struct {
-	Error OpenAIError `json:"error"`
+	Error OpenAIError
 }
 
 type OpenAIError struct {
-	Message string `json:"message"`
-	Type    string `json:"type"`
+	Message string
+	Type    string
 }
 
 // 图片生成响应
 type ImageGenerationResponse struct {
-	Data []string `json:"data"`
+	Data []string
 }

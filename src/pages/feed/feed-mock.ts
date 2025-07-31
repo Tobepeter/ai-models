@@ -1,6 +1,7 @@
 import { feedUtil } from './feed-util'
-import { type FeedPost, type Comment } from './feed-store'
+import type { FeedPost, FeedComment } from './feed-types'
 import { dummy } from '@/utils/dummy'
+import { random } from 'node-emoji'
 
 /* 中文姓名列表 */
 const CHINESE_NAMES = [
@@ -147,7 +148,7 @@ class FeedMock {
 				userId: feedUtil.generateUserId(),
 				username: this.randomName(),
 				avatar: this.randomAvatar(),
-				status: Math.random() > 0.3 ? feedUtil.randomStatus() : undefined, // 70%概率有状态
+				status: Math.random() > 0.3 ? random().emoji : undefined, // 70%概率有状态
 				content: Math.random() > 0.2 ? this.randomContent() : undefined, // 80%概率有内容
 				image: Math.random() > 0.4 ? this.randomImage() : undefined, // 60%概率有图片
 				createdAt: new Date(timestamp).toISOString(),
@@ -165,15 +166,15 @@ class FeedMock {
 	}
 
 	/* 生成模拟评论 */
-	generateMockComments(postId: string, count: number): Comment[] {
-		const comments: Comment[] = []
+	generateMockComments(postId: string, count: number): FeedComment[] {
+		const comments: FeedComment[] = []
 		const now = Date.now()
 
 		for (let i = 0; i < count; i++) {
 			const timestamp = now - i * 1000 * 60 * Math.random() * 120 // 2小时内随机时间
 			const isReply = i > 2 && Math.random() > 0.6 // 40%概率是回复（前3条不是回复）
 
-			const comment: Comment = {
+			const comment: FeedComment = {
 				id: feedUtil.generatePostId(),
 				postId,
 				userId: feedUtil.generateUserId(),
@@ -193,7 +194,7 @@ class FeedMock {
 	}
 
 	/* 生成单个评论 - 用于添加新评论 */
-	generateComment(postId: string, content: string, replyTo?: string): Comment {
+	generateComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: feedUtil.generatePostId(),
 			postId,

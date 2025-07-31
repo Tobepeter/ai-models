@@ -10,9 +10,9 @@ definitions:
         type: string
       id:
         type: string
-      is_active:
+      isActive:
         type: boolean
-      max_tokens:
+      maxTokens:
         type: integer
       name:
         type: string
@@ -36,7 +36,7 @@ definitions:
     properties:
       content:
         type: string
-      created_at:
+      createdAt:
         type: string
       model:
         type: string
@@ -56,7 +56,7 @@ definitions:
     type: object
   ai-models-backend_internal_models.ChatResponse:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
@@ -73,7 +73,7 @@ definitions:
         description: 评论内容，最多500字符
         maxLength: 500
         type: string
-      reply_to:
+      replyTo:
         description: 回复的用户名
         maxLength: 100
         type: string
@@ -86,7 +86,7 @@ definitions:
         description: 最多2000字符
         maxLength: 2000
         type: string
-      image_url:
+      imageURL:
         description: 图片URL
         type: string
     type: object
@@ -104,13 +104,13 @@ definitions:
     properties:
       category:
         type: string
-      created_at:
+      createdAt:
         type: string
       data:
         type: string
       id:
-        type: integer
-      updated_at:
+        type: string
+      updatedAt:
         type: string
     type: object
   ai-models-backend_internal_models.CrudUpdateRequest:
@@ -137,22 +137,22 @@ definitions:
         type: string
       content:
         type: string
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
-      like_count:
+      likeCount:
         type: integer
-      post_id:
+      postID:
         type: string
-      reply_to:
+      replyTo:
         description: 回复的用户名
         type: string
-      updated_at:
+      updatedAt:
         type: string
-      user_id:
+      userID:
         type: string
-      user_profile_version:
+      userProfileVersion:
         description: 用户信息版本号
         type: integer
       username:
@@ -165,9 +165,9 @@ definitions:
         items:
           $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
         type: array
-      has_more:
+      hasMore:
         type: boolean
-      next_cursor:
+      nextCursor:
         type: string
       total:
         type: integer
@@ -177,28 +177,28 @@ definitions:
       avatar:
         description: 冗余头像
         type: string
-      comment_count:
+      commentCount:
         type: integer
       content:
         description: 文字内容（可选）
         type: string
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
-      image_url:
+      imageURL:
         description: 图片URL（可选）
         type: string
-      like_count:
+      likeCount:
         type: integer
       status:
         description: 用户状态emoji
         type: string
-      updated_at:
+      updatedAt:
         type: string
-      user_id:
+      userID:
         type: string
-      user_profile_version:
+      userProfileVersion:
         description: 用户信息版本号
         type: integer
       username:
@@ -207,9 +207,9 @@ definitions:
     type: object
   ai-models-backend_internal_models.FeedPostResponse:
     properties:
-      has_more:
+      hasMore:
         type: boolean
-      next_cursor:
+      nextCursor:
         type: string
       posts:
         items:
@@ -272,7 +272,7 @@ definitions:
     properties:
       content:
         type: string
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
@@ -309,7 +309,7 @@ definitions:
     type: object
   ai-models-backend_internal_models.OpenAIChatCompletionRequest:
     properties:
-      max_tokens:
+      maxTokens:
         type: integer
       messages:
         items:
@@ -323,7 +323,7 @@ definitions:
         type: boolean
       temperature:
         type: number
-      top_p:
+      topP:
         type: number
     required:
     - messages
@@ -348,7 +348,7 @@ definitions:
     type: object
   ai-models-backend_internal_models.OpenAIChoice:
     properties:
-      finish_reason:
+      finishReason:
         type: string
       index:
         type: integer
@@ -367,11 +367,11 @@ definitions:
     type: object
   ai-models-backend_internal_models.OpenAIUsage:
     properties:
-      completion_tokens:
+      completionTokens:
         type: integer
-      prompt_tokens:
+      promptTokens:
         type: integer
-      total_tokens:
+      totalTokens:
         type: integer
     type: object
   ai-models-backend_internal_models.Pagination:
@@ -427,7 +427,7 @@ definitions:
     properties:
       objectKey:
         type: string
-      signedUrl:
+      signedURL:
         type: string
     type: object
   ai-models-backend_internal_models.TodoCreateRequest:
@@ -435,7 +435,7 @@ definitions:
       description:
         description: 可选
         type: string
-      due_date:
+      dueDate:
         description: 可选
         type: string
       position:
@@ -454,7 +454,7 @@ definitions:
     properties:
       id:
         description: 必填
-        type: integer
+        type: string
       position:
         description: 必填
         type: number
@@ -476,21 +476,21 @@ definitions:
     properties:
       completed:
         type: boolean
-      created_at:
+      createdAt:
         type: string
       description:
         type: string
-      due_date:
+      dueDate:
         type: string
       id:
-        type: integer
+        type: string
       position:
         type: number
       priority:
         type: integer
       title:
         type: string
-      updated_at:
+      updatedAt:
         type: string
     type: object
   ai-models-backend_internal_models.TodoUpdateRequest:
@@ -501,7 +501,7 @@ definitions:
       description:
         description: 可选，不传不更新
         type: string
-      due_date:
+      dueDate:
         description: 可选，不传不更新
         type: string
       position:
@@ -516,11 +516,11 @@ definitions:
     type: object
   ai-models-backend_internal_models.Usage:
     properties:
-      completion_tokens:
+      completionTokens:
         type: integer
-      prompt_tokens:
+      promptTokens:
         type: integer
-      total_tokens:
+      totalTokens:
         type: integer
     type: object
   ai-models-backend_internal_models.UserCreateRequest:
@@ -567,25 +567,25 @@ definitions:
     properties:
       avatar:
         type: string
-      avatar_oss_key:
+      avatarOssKey:
         type: string
-      created_at:
+      createdAt:
         type: string
       email:
         type: string
       extra:
         type: string
       id:
-        type: integer
-      is_active:
+        type: string
+      isActive:
         type: boolean
-      profile_version:
+      profileVersion:
         type: integer
       role:
         type: string
       status:
         type: string
-      updated_at:
+      updatedAt:
         type: string
       username:
         type: string
@@ -594,7 +594,7 @@ definitions:
     properties:
       avatar:
         type: string
-      avatar_oss_key:
+      avatarOssKey:
         type: string
       email:
         type: string
@@ -781,7 +781,7 @@ paths:
         required: true
         schema:
           properties:
-            new_password:
+            newPassword:
               type: string
           type: object
       responses:

@@ -54,13 +54,13 @@ func (h *CrudHandler) Create(c *gin.Context) {
 // @Router /crud/{id} [get]
 func (h *CrudHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
+	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	crud, err := h.crudService.GetCrudByID(uint(id))
+	crud, err := h.crudService.GetCrudByID(id)
 	if err != nil {
 		logrus.Error("Failed to get crud:", err)
 		if err.Error() == "记录不存在" {
@@ -108,7 +108,7 @@ func (h *CrudHandler) GetList(c *gin.Context) {
 // @Router /crud/{id} [put]
 func (h *CrudHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
+	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
@@ -120,7 +120,7 @@ func (h *CrudHandler) Update(c *gin.Context) {
 		return
 	}
 
-	crud, err := h.crudService.UpdateCrud(uint(id), req)
+	crud, err := h.crudService.UpdateCrud(id, req)
 	if err != nil {
 		logrus.Error("Failed to update crud:", err)
 		if err.Error() == "记录不存在" {
@@ -143,13 +143,13 @@ func (h *CrudHandler) Update(c *gin.Context) {
 // @Router /crud/{id} [delete]
 func (h *CrudHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
+	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	err = h.crudService.DeleteCrud(uint(id))
+	err = h.crudService.DeleteCrud(id)
 	if err != nil {
 		logrus.Error("Failed to delete crud:", err)
 		if err.Error() == "记录不存在" {

@@ -83,7 +83,7 @@ func (s *CrudService) checkLimitsBeforeCreate(data, category string) error {
 }
 
 // GetCrudByID 根据ID获取记录
-func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
+func (s *CrudService) GetCrudByID(id uint64) (*models.Crud, error) {
 	var crud models.Crud
 	if err := s.DB.First(&crud, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -95,7 +95,7 @@ func (s *CrudService) GetCrudByID(id uint) (*models.Crud, error) {
 }
 
 // UpdateCrud 更新记录信息
-func (s *CrudService) UpdateCrud(id uint, req models.CrudUpdateRequest) (*models.Crud, error) {
+func (s *CrudService) UpdateCrud(id uint64, req models.CrudUpdateRequest) (*models.Crud, error) {
 	var crud models.Crud
 	if err := s.DB.First(&crud, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -147,6 +147,6 @@ func (s *CrudService) GetCruds(page, limit int, category string) (map[string]any
 }
 
 // DeleteCrud 硬删除记录
-func (s *CrudService) DeleteCrud(id uint) error {
+func (s *CrudService) DeleteCrud(id uint64) error {
 	return s.HardDelete(&models.Crud{}, id)
 }

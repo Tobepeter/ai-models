@@ -13,14 +13,14 @@ import (
 )
 
 // Chat 聊天（非流式）
-func (s *AIService) Chat(userID uint, req models.ChatRequest) (*models.ChatResponse, error) {
+func (s *AIService) Chat(userID uint64, req models.ChatRequest) (*models.ChatResponse, error) {
 	platform := s.getDefaultPlatform()
-	
+
 	// 检查是否是 mock 平台
 	if platform == PlatformMock {
 		return s.mockChat(userID, req)
 	}
-	
+
 	client, err := s.getClient(platform)
 	if err != nil {
 		return nil, err
@@ -63,14 +63,14 @@ func (s *AIService) Chat(userID uint, req models.ChatRequest) (*models.ChatRespo
 }
 
 // StreamChat 聊天（流式）
-func (s *AIService) StreamChat(userID uint, req models.ChatRequest, responseChan chan<- string) error {
+func (s *AIService) StreamChat(userID uint64, req models.ChatRequest, responseChan chan<- string) error {
 	platform := s.getDefaultPlatform()
-	
+
 	// 检查是否是 mock 平台
 	if platform == PlatformMock {
 		return s.mockStreamChat(userID, req, responseChan)
 	}
-	
+
 	client, err := s.getClient(platform)
 	if err != nil {
 		return err

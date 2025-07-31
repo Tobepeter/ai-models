@@ -43,11 +43,11 @@ export const Todo = () => {
 		}
 	}
 
-	const handleEdit = async (id: number, title: string) => {
+	const handleEdit = async (id: string, title: string) => {
 		await updateTodo(id, { title })
 	}
 
-	const handleDelete = async (id: number) => {
+	const handleDelete = async (id: string) => {
 		const todo = todos.find((t) => t.id === id)
 		if (!todo) return
 

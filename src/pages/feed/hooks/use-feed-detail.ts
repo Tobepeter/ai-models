@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useFeedStore } from '../feed-store'
 import { feedUtil } from '../feed-util'
-import { type FeedPost, type Comment } from '../feed-store'
+import { type FeedPost, type FeedComment } from '../feed-types'
 
 /**
  * Feed详情页面逻辑Hook
@@ -51,7 +51,7 @@ export const useFeedDetail = (post: FeedPost) => {
 	}
 
 	// 生成新评论
-	const createComment = (content: string, replyTo?: string): Comment =>
+	const createComment = (content: string, replyTo?: string): FeedComment =>
 		feedUtil.createComment(post.id, content, replyTo)
 
 	return {

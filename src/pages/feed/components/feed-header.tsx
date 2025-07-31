@@ -1,6 +1,12 @@
 import { UserAvatar } from '@/components/common/user-avatar'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal } from 'lucide-react'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Flag, Trash2, MoreHorizontal, ExternalLink } from 'lucide-react'
 import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
 
@@ -8,7 +14,23 @@ import { cn } from '@/lib/utils'
  * 信息流头部组件 - 显示用户头像、用户名、状态和时间
  */
 export const FeedHeader = (props: FeedHeaderProps) => {
-	const { userId, username, avatar, status, createdAt, className } = props
+	const { userId, username, avatar, status, createdAt, showNavigateButton, onNavigateToPage, className } = props
+
+	// 更多操作配置
+	const moreActions = [
+		{
+			key: 'report',
+			label: '举报',
+			icon: Flag,
+			onClick: () => console.log('举报用户:', userId)
+		},
+		{
+			key: 'delete',
+			label: '删除',
+			icon: Trash2,
+			onClick: () => console.log('删除帖子:', userId)
+		}
+	]
 
 	return (
 		<div className={cn('flex items-start justify-between', className)} data-slot="feed-header">
@@ -30,18 +52,52 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 				</div>
 			</div>
 
-			{/* 右侧更多操作 */}
-			<Button
-				variant="ghost"
-				size="sm"
-				className="h-8 w-8 p-0 flex-shrink-0 text-muted-foreground hover:text-foreground"
-				onClick={(e) => {
-					e.stopPropagation()
-					console.log('更多操作:', userId) // TODO: 实现更多操作菜单
-				}}
-			>
-				<MoreHorizontal className="h-4 w-4" />
-			</Button>
+			{/* 右侧操作按钮区域 */}
+			<div className="flex items-center space-x-2">
+				{/* 新页面打开按钮 */}
+				{showNavigateButton && (
+					<Button
+						variant="ghost"
+						size="sm"
+						className="square-4 p-0 flex-shrink-0 text-muted-foreground hover:text-foreground"
+						onClick={(e) => {
+							e.stopPropagation()
+							onNavigateToPage?.(userId)
+						}}
+						title="新页面打开"
+					>
+						<ExternalLink className="square-4" />
+					</Button>
+				)}
+
+				{/* 更多操作 */}
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="square-8 p-0 flex-shrink-0 text-muted-foreground hover:text-foreground"
+							onClick={(e) => e.stopPropagation()}
+						>
+							<MoreHorizontal className="square-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+						{moreActions.map((action) => (
+							<DropdownMenuItem
+								key={action.key}
+								onClick={(e) => {
+									e.stopPropagation()
+									action.onClick()
+								}}
+							>
+								<action.icon className="square-4 mr-2" />
+								{action.label}
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
 		</div>
 	)
 }
@@ -52,5 +108,7 @@ export interface FeedHeaderProps {
 	avatar: string
 	status?: string
 	createdAt: string
+	showNavigateButton?: boolean
+	onNavigateToPage?: (postId: string) => void
 	className?: string
 }

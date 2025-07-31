@@ -23,7 +23,7 @@ func NewTodoService() *TodoService {
 }
 
 // CreateTodo 创建TODO
-func (s *TodoService) CreateTodo(userID uint, req models.TodoCreateRequest) (*models.Todo, error) {
+func (s *TodoService) CreateTodo(userID uint64, req models.TodoCreateRequest) (*models.Todo, error) {
 	position := float64(0)
 
 	// 如果没有指定位置，自动分配到最后
@@ -54,7 +54,7 @@ func (s *TodoService) CreateTodo(userID uint, req models.TodoCreateRequest) (*mo
 }
 
 // GetTodoByID 根据ID获取TODO（仅限用户自己的）
-func (s *TodoService) GetTodoByID(userID, todoID uint) (*models.Todo, error) {
+func (s *TodoService) GetTodoByID(userID, todoID uint64) (*models.Todo, error) {
 	var todo models.Todo
 	if err := s.DB.Where("id = ? AND user_id = ?", todoID, userID).First(&todo).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -66,7 +66,7 @@ func (s *TodoService) GetTodoByID(userID, todoID uint) (*models.Todo, error) {
 }
 
 // UpdateTodo 更新TODO信息（仅限用户自己的）
-func (s *TodoService) UpdateTodo(userID, todoID uint, req models.TodoUpdateRequest) (*models.Todo, error) {
+func (s *TodoService) UpdateTodo(userID, todoID uint64, req models.TodoUpdateRequest) (*models.Todo, error) {
 	var todo models.Todo
 	if err := s.DB.Where("id = ? AND user_id = ?", todoID, userID).First(&todo).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -112,7 +112,7 @@ func (s *TodoService) UpdateTodo(userID, todoID uint, req models.TodoUpdateReque
 }
 
 // GetTodos 获取用户的TODO列表（按位置排序）
-func (s *TodoService) GetTodos(userID uint, page, limit int, completed *bool) (map[string]any, error) {
+func (s *TodoService) GetTodos(userID uint64, page, limit int, completed *bool) (map[string]any, error) {
 	var todos []models.Todo
 
 	// 如果前端没有提供分页参数，使用大的默认值
@@ -153,7 +153,7 @@ func (s *TodoService) GetTodos(userID uint, page, limit int, completed *bool) (m
 }
 
 // UpdateTodoPositions 批量更新TODO位置（支持拖拽排序）
-func (s *TodoService) UpdateTodoPositions(userID uint, req models.TodoPositionUpdateRequest) error {
+func (s *TodoService) UpdateTodoPositions(userID uint64, req models.TodoPositionUpdateRequest) error {
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		for _, item := range req.Items {
 			// 验证TODO是否属于当前用户
@@ -175,7 +175,7 @@ func (s *TodoService) UpdateTodoPositions(userID uint, req models.TodoPositionUp
 }
 
 // ToggleTodoComplete 切换TODO完成状态（仅限用户自己的）
-func (s *TodoService) ToggleTodoComplete(userID, todoID uint) (*models.Todo, error) {
+func (s *TodoService) ToggleTodoComplete(userID, todoID uint64) (*models.Todo, error) {
 	var todo models.Todo
 	if err := s.DB.Where("id = ? AND user_id = ?", todoID, userID).First(&todo).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -196,7 +196,7 @@ func (s *TodoService) ToggleTodoComplete(userID, todoID uint) (*models.Todo, err
 }
 
 // DeleteTodo 硬删除TODO（仅限用户自己的）
-func (s *TodoService) DeleteTodo(userID, todoID uint) error {
+func (s *TodoService) DeleteTodo(userID, todoID uint64) error {
 	result := s.DB.Where("id = ? AND user_id = ?", todoID, userID).Delete(&models.Todo{})
 	if result.Error != nil {
 		return result.Error
@@ -208,7 +208,7 @@ func (s *TodoService) DeleteTodo(userID, todoID uint) error {
 }
 
 // GetTodoStats 获取用户的TODO统计信息
-func (s *TodoService) GetTodoStats(userID uint) (map[string]any, error) {
+func (s *TodoService) GetTodoStats(userID uint64) (map[string]any, error) {
 	var total, completed, pending int64
 
 	// 总数
@@ -232,7 +232,7 @@ func (s *TodoService) GetTodoStats(userID uint) (map[string]any, error) {
 }
 
 // RebalancePositions 重新平衡位置值（当位置值变得过小时使用）
-func (s *TodoService) RebalancePositions(userID uint) error {
+func (s *TodoService) RebalancePositions(userID uint64) error {
 	var todos []models.Todo
 	if err := s.DB.Where("user_id = ?", userID).Order("position ASC").Find(&todos).Error; err != nil {
 		return err

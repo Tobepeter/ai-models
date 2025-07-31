@@ -59,7 +59,7 @@ func (m *FeedSyncManager) StopSyncTasks() {
 // syncUserProfiles 同步用户资料
 func (m *FeedSyncManager) syncUserProfiles() {
 	logrus.Debug("Starting user profile sync task")
-	
+
 	// 获取最近更新的用户列表（简化实现）
 	// 实际应该有专门的用户更新记录表
 	users, err := m.userService.GetRecentlyUpdatedUsers(time.Now().Add(-30 * time.Second))
@@ -82,7 +82,7 @@ func (m *FeedSyncManager) syncUserProfiles() {
 // cleanOrphanData 清理孤儿数据
 func (m *FeedSyncManager) cleanOrphanData() {
 	logrus.Debug("Starting orphan data cleanup task")
-	
+
 	if err := m.feedService.CleanOrphanData(); err != nil {
 		logrus.WithError(err).Error("Failed to clean orphan data")
 		return
@@ -94,14 +94,14 @@ func (m *FeedSyncManager) cleanOrphanData() {
 // fullDataCleanup 全量数据清理
 func (m *FeedSyncManager) fullDataCleanup() {
 	logrus.Info("Starting full data cleanup task")
-	
+
 	// 清理孤儿数据
 	m.cleanOrphanData()
-	
+
 	// 可以添加更多清理逻辑，如：
 	// - 清理过期的缓存数据
 	// - 清理无效的图片资源
 	// - 统计数据重新计算等
-	
+
 	logrus.Info("Full data cleanup completed")
 }

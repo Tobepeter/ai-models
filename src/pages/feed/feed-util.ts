@@ -1,9 +1,8 @@
-import { truncate } from 'lodash-es'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
-import data from '@emoji-mart/data'
-import { type Comment } from './feed-store'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { truncate } from 'lodash-es'
+import { type FeedComment } from './feed-types'
 
 dayjs.extend(relativeTime) // 配置中文相对时间
 dayjs.locale('zh-cn')
@@ -14,29 +13,6 @@ dayjs.locale('zh-cn')
  */
 class FeedUtil {
 	readonly MAX_CONTENT_LENGTH = 200 // 内容最大长度
-	readonly STATUS_EMOJIS = this.getAllEmojis()
-
-	/* 从emoji-mart数据中获取所有表情 */
-	getAllEmojis(): string[] {
-		const emojis: string[] = []
-		const emojiMartData = data as any
-
-		const categories = emojiMartData.categories || []
-		const emojiMapping = emojiMartData.emojis || {}
-
-		for (const category of categories) {
-			const categoryEmojis = category.emojis || []
-			for (const emojiId of categoryEmojis) {
-				const emoji = emojiMapping[emojiId]
-				if (emoji?.skins?.[0]?.native) {
-					emojis.push(emoji.skins[0].native)
-				}
-			}
-		}
-
-
-		return emojis.length > 0 ? emojis : ['😀', '😃', '😄'] // 回退到默认表情
-	}
 
 	/* 格式化时间为中文相对时间 */
 	formatTime(timestamp: string) {
@@ -80,10 +56,6 @@ class FeedUtil {
 		}
 	}
 
-	randomStatus() {
-		return this.STATUS_EMOJIS[Math.floor(Math.random() * this.STATUS_EMOJIS.length)]
-	}
-
 	generateUserId() {
 		return `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 	}
@@ -96,7 +68,6 @@ class FeedUtil {
 		const delay = Math.floor(Math.random() * (max - min + 1)) + min
 		return new Promise((resolve) => setTimeout(resolve, delay))
 	}
-
 
 	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M, >999M显示999M+ */
 	formatCount(count: number) {
@@ -126,7 +97,7 @@ class FeedUtil {
 	}
 
 	/** 创建新评论 */
-	createComment(postId: string, content: string, replyTo?: string): Comment {
+	createComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
 			postId,

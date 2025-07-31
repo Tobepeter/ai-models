@@ -3,6 +3,7 @@ package services
 import (
 	"ai-models-backend/internal/models"
 	"errors"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ type BaseService struct {
 }
 
 // ExistsByID 根据ID查找记录是否存在
-func (s *BaseService) ExistsByID(model any, id uint) bool {
+func (s *BaseService) ExistsByID(model any, id uint64) bool {
 	var count int64
 	s.DB.Model(model).Where("id = ?", id).Count(&count)
 	return count > 0
@@ -26,7 +27,7 @@ func (s *BaseService) ExistsByCondition(model any, condition map[string]any) boo
 }
 
 // ExistsByConditionExcludeID 根据条件查找记录是否存在（排除指定ID）
-func (s *BaseService) ExistsByConditionExcludeID(model any, condition map[string]any, excludeID uint) bool {
+func (s *BaseService) ExistsByConditionExcludeID(model any, condition map[string]any, excludeID uint64) bool {
 	var count int64
 	query := s.DB.Model(model).Where(condition).Where("id != ?", excludeID)
 	query.Count(&count)
@@ -34,7 +35,7 @@ func (s *BaseService) ExistsByConditionExcludeID(model any, condition map[string
 }
 
 // SoftDelete 软删除记录
-func (s *BaseService) SoftDelete(model any, id uint) error {
+func (s *BaseService) SoftDelete(model any, id uint64) error {
 	result := s.DB.Delete(model, id)
 	if result.Error != nil {
 		return result.Error
@@ -46,7 +47,7 @@ func (s *BaseService) SoftDelete(model any, id uint) error {
 }
 
 // HardDelete 硬删除记录
-func (s *BaseService) HardDelete(model any, id uint) error {
+func (s *BaseService) HardDelete(model any, id uint64) error {
 	result := s.DB.Unscoped().Delete(model, id)
 	if result.Error != nil {
 		return result.Error
@@ -58,7 +59,7 @@ func (s *BaseService) HardDelete(model any, id uint) error {
 }
 
 // UpdateField 更新单个字段
-func (s *BaseService) UpdateField(model any, id uint, field string, value any) error {
+func (s *BaseService) UpdateField(model any, id uint64, field string, value any) error {
 	result := s.DB.Model(model).Where("id = ?", id).Update(field, value)
 	if result.Error != nil {
 		return result.Error
@@ -94,7 +95,7 @@ func (s *BaseService) CreatePageResp(data any, page, limit int, total int64) map
 		"pagination": models.Pagination{
 			Current:  page,
 			PageSize: limit,
-			Total:    total,
+			Total:    int(total),
 		},
 	}
 }
@@ -105,7 +106,7 @@ func (s *BaseService) Create(model any) error {
 }
 
 // GetByID 根据ID获取记录
-func (s *BaseService) GetByID(model any, id uint) error {
+func (s *BaseService) GetByID(model any, id uint64) error {
 	result := s.DB.First(model, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -127,7 +128,7 @@ func (s *BaseService) GetByCondition(model any, dest any, condition map[string]a
 }
 
 // Update 更新记录
-func (s *BaseService) Update(model any, id uint, updates map[string]any) error {
+func (s *BaseService) Update(model any, id uint64, updates map[string]any) error {
 	result := s.DB.Model(model).Where("id = ?", id).Updates(updates)
 	if result.Error != nil {
 		return result.Error
@@ -159,4 +160,18 @@ func (s *BaseService) PaginateWithCondition(model any, dest any, page, limit int
 	}
 
 	return total, nil
+}
+
+// ParseStringToUint64 将字符串转换为uint64，统一处理ID转换
+func (s *BaseService) ParseStringToUint64(str string) (uint64, error) {
+	if str == "" {
+		return 0, errors.New("ID不能为空")
+	}
+
+	id, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return 0, errors.New("ID格式错误")
+	}
+
+	return id, nil
 }

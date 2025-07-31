@@ -30,7 +30,7 @@ func (s *AIService) getClient(platform Platform) (*openai.Client, error) {
 	if platform == PlatformMock {
 		return nil, nil
 	}
-	
+
 	client, ok := s.clients[platform]
 	if !ok {
 		return nil, fmt.Errorf("platform %s not available", platform)

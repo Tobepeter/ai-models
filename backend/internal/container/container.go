@@ -90,12 +90,12 @@ func (c *Container) Initialize() error {
 	if err := c.AuthService.CreateDefaultAdmin(); err != nil {
 		return err
 	}
-	
+
 	// 启动Feed同步任务
 	if err := c.FeedSyncManager.StartSyncTasks(); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

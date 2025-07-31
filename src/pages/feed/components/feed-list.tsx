@@ -1,106 +1,117 @@
-import { useEffect, useRef, useState, CSSProperties } from 'react'
-import { FixedSizeList as List } from 'react-window'
-import { useInViewport } from 'ahooks'
+import { useEffect, useRef, useState } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { useMount } from 'ahooks'
 import { FeedItem } from './feed-item'
 import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
-import { type FeedPost } from '../feed-store'
+import { type FeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
-
-/** 预估的单个项目高度 */
-const ESTIMATED_ITEM_HEIGHT = 200
-
-/** 虚拟滚动的缓冲区大小 */
-const OVERSCAN_COUNT = 5
 
 /**
  * 虚拟滚动信息流列表组件
  */
 export const FeedList = (props: FeedListProps) => {
-	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onLikeComment, onReply, onLoadMore, className } = props
+	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onReply, onLoadMore, className } = props
 
-	const listRef = useRef<List>(null)
-	const [listHeight, setListHeight] = useState(600)
-	const loadMoreRef = useRef<HTMLDivElement>(null)
-	const [loadMoreInViewport] = useInViewport(loadMoreRef)
+	const parentRef = useRef<HTMLDivElement>(null)
+	const [parentHeight, setParentHeight] = useState(0)
 
-	// 动态计算列表高度
-	useEffect(() => {
+	// 提取常用计算值
+	const postsLength = posts.length
+
+	// 计算父容器精确高度
+	useMount(() => {
 		const updateHeight = () => {
-			const windowHeight = window.innerHeight
-			const headerHeight = 80 // 估算头部高度
-			const footerHeight = 80 // 估算底部高度
-			setListHeight(windowHeight - headerHeight - footerHeight)
+			if (parentRef.current) {
+				const rect = parentRef.current.getBoundingClientRect()
+				setParentHeight(rect.height)
+			}
 		}
 
 		updateHeight()
 		window.addEventListener('resize', updateHeight)
 		return () => window.removeEventListener('resize', updateHeight)
-	}, [])
+	})
 
-	// 触底加载更多
+	// const estimateSize = 600 // 预估的单个项目高度
+	const estimateSize = 600 // 预估的单个项目高度
+	const overscan = 5 // 虚拟滚动的预渲染数量
+
+	// TanStack Virtual 配置
+	const virtualizer = useVirtualizer({
+		count: postsLength,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => estimateSize,
+		overscan: overscan,
+	})
+
+	// 基于索引判断无限滚动
 	useEffect(() => {
-		if (loadMoreInViewport && hasMore && !loading) {
+		const virtualItems = virtualizer.getVirtualItems()
+		if (!virtualItems.length) return
+
+		const lastItem = virtualItems[virtualItems.length - 1]
+		// 当最后可见项接近数据末尾时触发加载
+		if (lastItem && lastItem.index >= postsLength - 3 && hasMore && !loading) {
 			onLoadMore()
 		}
-	}, [loadMoreInViewport, hasMore, loading, onLoadMore])
+	}, [virtualizer.getVirtualItems(), postsLength, hasMore, loading, onLoadMore])
 
-	// 渲染单个列表项
-	const renderItem = ({ index, style }: { index: number; style: CSSProperties }) => {
-		const post = posts[index]
-
-		if (!post) {
-			return (
-				<div style={style}>
-					<FeedSkeleton count={1} />
-				</div>
-			)
-		}
-
-		return (
-			<div style={style}>
-				<FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} onLikeComment={onLikeComment} onReply={onReply} />
-			</div>
-		)
-	}
-
-	// 如果没有数据且正在加载，显示骨架屏
-	if (posts.length === 0 && loading) {
-		return (
+	// 如果没有数据，显示骨架屏或空状态
+	if (postsLength === 0) {
+		return loading ? (
 			<div className={cn('space-y-0', className)}>
 				<FeedSkeleton count={5} />
 			</div>
-		)
-	}
-
-	// 如果没有数据且不在加载，显示空状态
-	if (posts.length === 0) {
-		return (
+		) : (
 			<div className={cn('text-center py-20', className)}>
 				<div className="text-muted-foreground text-sm mb-4">暂无内容</div>
 			</div>
 		)
 	}
 
+	// 获取虚拟项目和样式
+	const virtualItems = virtualizer.getVirtualItems()
+	const itemStyle = { position: 'absolute' as const, top: 0, left: 0, width: '100%' }
+	const loadMoreStyle = { position: 'absolute' as const, top: virtualizer.getTotalSize(), left: 0, width: '100%' }
+
 	return (
-		<div className={cn('w-full', className)} data-slot="feed-list">
-			{/* 虚拟滚动列表 */}
-			<List
-				ref={listRef}
-				height={listHeight}
-				width="100%"
-				itemCount={posts.length}
-				itemSize={ESTIMATED_ITEM_HEIGHT}
-				overscanCount={OVERSCAN_COUNT}
-				className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
-			>
-				{renderItem}
-			</List>
+		<div className={cn('flex-1 min-h-0', className)} data-slot="feed-list">
+			{/* 虚拟滚动容器 */}
+			<div ref={parentRef} className="h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+				<div
+					style={{
+						height: virtualizer.getTotalSize(),
+						width: '100%',
+						position: 'relative',
+					}}
+				>
+					{/* 渲染可见的虚拟项目 */}
+					{virtualItems.map((virtualItem) => {
+						const post = posts[virtualItem.index]
+						return (
+							<div
+								key={virtualItem.key}
+								style={{ ...itemStyle, transform: `translateY(${virtualItem.start}px)` }}
+								data-index={virtualItem.index}
+								ref={(el) => virtualizer.measureElement(el)} // 让虚拟列表测量真实高度
+							>
+								{post ? (
+									<FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} onReply={onReply} />
+								) : (
+									<FeedSkeleton count={1} />
+								)}
+							</div>
+						)
+					})}
 
-			{/* 加载更多区域 */}
-			<div ref={loadMoreRef} className="py-4">
-				{loading && hasMore && <LoadMoreSkeleton />}
-
-				{!hasMore && posts.length > 0 && <div className="text-center text-muted-foreground text-sm py-8">没有更多内容了</div>}
+					{/* 底部加载状态 */}
+					{postsLength > 0 && (
+						<div style={loadMoreStyle} className="py-4">
+							{loading && hasMore && <LoadMoreSkeleton />}
+							{!hasMore && <div className="text-center text-muted-foreground text-sm py-8">没有更多内容了</div>}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	)
@@ -113,7 +124,6 @@ export interface FeedListProps {
 	onLike: (postId: string) => void
 	onToggleExpand: (postId: string) => void
 	onAddComment: (postId: string, content: string, replyTo?: string) => void
-	onLikeComment?: (commentId: string) => void
 	onReply?: (postId: string, username: string) => void
 	onLoadMore: () => void
 	className?: string

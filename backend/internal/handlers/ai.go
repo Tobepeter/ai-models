@@ -55,7 +55,7 @@ func (h *AIHandler) Chat(c *gin.Context) {
 	response.Success(c, chatResponse)
 }
 
-func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint, req models.ChatRequest) {
+func (h *AIHandler) handleStreamingChat(c *gin.Context, userID uint64, req models.ChatRequest) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
@@ -259,8 +259,8 @@ func (h *AIHandler) handleOpenAIStreamingChat(c *gin.Context, platform ai.Platfo
 // @Router /ai/v1/images/generations [post]
 func (h *AIHandler) GenerateImages(c *gin.Context) {
 	var req struct {
-		Prompt string `json:"prompt" binding:"required"`
-		Model  string `json:"model"`
+		Prompt string `binding:"required"`
+		Model  string
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {

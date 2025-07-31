@@ -33,7 +33,7 @@ func IsValidUsername(username string) bool {
 	if len(username) < 3 || len(username) > 50 {
 		return false
 	}
-	
+
 	// Check if username contains only alphanumeric characters and underscores
 	usernameRegex := regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 	return usernameRegex.MatchString(username)
@@ -44,12 +44,12 @@ func IsValidPassword(password string) bool {
 	if len(password) < 6 {
 		return false
 	}
-	
+
 	// Check for at least one uppercase letter, one lowercase letter, and one digit
 	hasUpper := false
 	hasLower := false
 	hasDigit := false
-	
+
 	for _, char := range password {
 		if unicode.IsUpper(char) {
 			hasUpper = true
@@ -61,7 +61,7 @@ func IsValidPassword(password string) bool {
 			hasDigit = true
 		}
 	}
-	
+
 	return hasUpper && hasLower && hasDigit
 }
 
@@ -70,10 +70,10 @@ func SanitizeString(input string) string {
 	// Remove HTML tags
 	re := regexp.MustCompile(`<[^>]*>`)
 	sanitized := re.ReplaceAllString(input, "")
-	
+
 	// Remove extra whitespace
 	sanitized = strings.TrimSpace(sanitized)
-	
+
 	return sanitized
 }
 
@@ -110,14 +110,14 @@ func RemoveString(slice []string, item string) []string {
 func UniqueStrings(slice []string) []string {
 	seen := make(map[string]bool)
 	var result []string
-	
+
 	for _, s := range slice {
 		if !seen[s] {
 			seen[s] = true
 			result = append(result, s)
 		}
 	}
-	
+
 	return result
 }
 
@@ -187,7 +187,7 @@ type PaginationInfo struct {
 // NewPaginationInfo creates new pagination information
 func NewPaginationInfo(page, limit int, total int64) PaginationInfo {
 	totalPages := int((total + int64(limit) - 1) / int64(limit))
-	
+
 	return PaginationInfo{
 		Page:       page,
 		Limit:      limit,

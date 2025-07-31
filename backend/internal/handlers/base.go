@@ -13,11 +13,11 @@ type BaseHandler struct{}
 
 // GetUserID retrieves the user ID from the Gin context
 // Returns the user ID and a boolean indicating success
-func (h *BaseHandler) GetUserID(c *gin.Context) (uint, bool) {
+func (h *BaseHandler) GetUserID(c *gin.Context) (uint64, bool) {
 	userID, exists := c.Get("user_id")
 	if !exists {
 		response.Error(c, http.StatusUnauthorized, "User not found in context")
 		return 0, false
 	}
-	return userID.(uint), true
+	return userID.(uint64), true
 }

@@ -89,7 +89,7 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.Feed
 }
 
 // CreateFeedPost 创建信息流帖子
-func (s *FeedService) CreateFeedPost(userID uint, req models.CreateFeedPostRequest) (*models.FeedPost, error) {
+func (s *FeedService) CreateFeedPost(userID uint64, req models.CreateFeedPostRequest) (*models.FeedPost, error) {
 	// 获取用户信息
 	var user models.User
 	if err := s.DB.First(&user, userID).Error; err != nil {
@@ -98,7 +98,7 @@ func (s *FeedService) CreateFeedPost(userID uint, req models.CreateFeedPostReque
 
 	// 创建帖子
 	post := &models.FeedPost{
-		UserID:             uint64(userID),
+		UserID:             userID,
 		Username:           user.Username,
 		Avatar:             user.Avatar,
 		Status:             user.Status,
@@ -117,9 +117,14 @@ func (s *FeedService) CreateFeedPost(userID uint, req models.CreateFeedPostReque
 }
 
 // GetFeedPostByID 根据ID获取帖子详情
-func (s *FeedService) GetFeedPostByID(postID uint64) (*models.FeedPost, error) {
+func (s *FeedService) GetFeedPostByID(postID string) (*models.FeedPost, error) {
+	postIDUint, err := s.ParseStringToUint64(postID)
+	if err != nil {
+		return nil, err
+	}
+
 	var post models.FeedPost
-	if err := s.DB.Where("id = ?", postID).First(&post).Error; err != nil {
+	if err := s.DB.Where("id = ?", postIDUint).First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("post not found")
 		}
@@ -129,22 +134,27 @@ func (s *FeedService) GetFeedPostByID(postID uint64) (*models.FeedPost, error) {
 }
 
 // ToggleLikePost 切换帖子点赞状态
-func (s *FeedService) ToggleLikePost(userID uint, postID uint64) error {
+func (s *FeedService) ToggleLikePost(userID uint64, postID string) error {
+	postIDUint, err := s.ParseStringToUint64(postID)
+	if err != nil {
+		return err
+	}
+
 	// 检查帖子是否存在
 	var post models.FeedPost
-	if err := s.DB.Where("id = ?", postID).First(&post).Error; err != nil {
+	if err := s.DB.Where("id = ?", postIDUint).First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("post not found")
 		}
 		return err
 	}
 
-	userID64 := uint64(userID)
-	
+	userID64 := userID
+
 	// 检查用户是否已点赞
 	var existingLike models.PostLike
-	err := s.DB.Where("post_id = ? AND user_id = ?", postID, userID64).First(&existingLike).Error
-	
+	err = s.DB.Where("post_id = ? AND user_id = ?", postIDUint, userID64).First(&existingLike).Error
+
 	// 使用事务处理点赞状态切换
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		if err == nil {
@@ -157,7 +167,7 @@ func (s *FeedService) ToggleLikePost(userID uint, postID uint64) error {
 		} else if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 用户未点赞，添加点赞
 			newLike := models.PostLike{
-				PostID: postID,
+				PostID: postIDUint,
 				UserID: userID64,
 			}
 			if err := tx.Create(&newLike).Error; err != nil {
@@ -216,10 +226,15 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) ([]model
 }
 
 // CreateFeedComment 创建帖子评论
-func (s *FeedService) CreateFeedComment(userID uint, postID uint64, req models.CreateFeedCommentRequest) (*models.FeedComment, error) {
+func (s *FeedService) CreateFeedComment(userID uint64, postID string, req models.CreateFeedCommentRequest) (*models.FeedComment, error) {
+	postIDUint, err := s.ParseStringToUint64(postID)
+	if err != nil {
+		return nil, err
+	}
+
 	// 检查帖子是否存在
 	var post models.FeedPost
-	if err := s.DB.Where("id = ?", postID).First(&post).Error; err != nil {
+	if err := s.DB.Where("id = ?", postIDUint).First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("post not found")
 		}
@@ -234,8 +249,8 @@ func (s *FeedService) CreateFeedComment(userID uint, postID uint64, req models.C
 
 	// 创建评论
 	comment := &models.FeedComment{
-		PostID:             postID,
-		UserID:             uint64(userID),
+		PostID:             postIDUint,
+		UserID:             userID,
 		Username:           user.Username,
 		Avatar:             user.Avatar,
 		Content:            req.Content,
@@ -245,7 +260,7 @@ func (s *FeedService) CreateFeedComment(userID uint, postID uint64, req models.C
 	}
 
 	// 事务处理：创建评论并更新帖子评论数
-	err := s.DB.Transaction(func(tx *gorm.DB) error {
+	err = s.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建评论
 		if err := tx.Create(comment).Error; err != nil {
 			return err
@@ -267,10 +282,15 @@ func (s *FeedService) CreateFeedComment(userID uint, postID uint64, req models.C
 }
 
 // ToggleLikeComment 切换评论点赞状态
-func (s *FeedService) ToggleLikeComment(userID uint, commentID uint64) error {
+func (s *FeedService) ToggleLikeComment(userID uint64, commentID string) error {
+	commentIDUint, err := s.ParseStringToUint64(commentID)
+	if err != nil {
+		return err
+	}
+
 	// 检查评论是否存在
 	var comment models.FeedComment
-	if err := s.DB.Where("id = ?", commentID).First(&comment).Error; err != nil {
+	if err := s.DB.Where("id = ?", commentIDUint).First(&comment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("comment not found")
 		}
@@ -283,14 +303,14 @@ func (s *FeedService) ToggleLikeComment(userID uint, commentID uint64) error {
 }
 
 // SyncUserProfile 同步用户资料到信息流
-func (s *FeedService) SyncUserProfile(userID uint) error {
+func (s *FeedService) SyncUserProfile(userID uint64) error {
 	// 获取最新用户信息
 	var user models.User
 	if err := s.DB.First(&user, userID).Error; err != nil {
 		return err
 	}
 
-	userID64 := uint64(userID)
+	userID64 := userID
 
 	// 批量更新帖子中的用户信息
 	err := s.DB.Model(&models.FeedPost{}).

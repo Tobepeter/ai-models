@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { FileUpload } from '@/components/common/file-upload'
-import { AppEmojiMart } from '@/components/common/app-emoji-mart'
+import { AppEmojiPicker } from '@/components/common/app-emoji-picker'
 import { QuickEdit } from '@/components/common/quick-edit'
 import { useUserStore } from '@/store/user-store'
 import { userUtil, parseUserExtra } from '../user-util'
@@ -109,7 +109,7 @@ export const UserCard = () => {
 							{isLoggedIn && (
 								<>
 									{userExtra.status ? (
-										<AppEmojiMart
+										<AppEmojiPicker
 											onEmojiSelect={handleStatusSelect}
 											onClear={handleStatusClear}
 											trigger={
@@ -119,7 +119,7 @@ export const UserCard = () => {
 											}
 										/>
 									) : (
-										<AppEmojiMart
+										<AppEmojiPicker
 											onEmojiSelect={handleStatusSelect}
 											trigger={
 												<Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-muted-foreground flex-shrink-0">

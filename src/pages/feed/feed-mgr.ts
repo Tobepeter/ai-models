@@ -1,4 +1,5 @@
-import { useFeedStore, type FeedPost } from './feed-store'
+import { useFeedStore } from './feed-store'
+import { type FeedPost } from './feed-types'
 import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
 import { delayC } from '../../utils/common'

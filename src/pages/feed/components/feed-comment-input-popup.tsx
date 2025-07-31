@@ -1,0 +1,196 @@
+import { useState, useEffect, type PropsWithChildren } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { UserAvatar } from '@/components/common/user-avatar'
+import { MessageCircle, Send, X } from 'lucide-react'
+import { feedUtil } from '../feed-util'
+import { cn } from '@/lib/utils'
+
+/**
+ * 评论输入弹窗组件 - 支持自定义触发器
+ */
+export const CommentInputPopup = (props: CommentInputPopupProps) => {
+	const { postId, onAddComment, replyTo, onClearReply, placeholder, className, children } = props
+	const [open, setOpen] = useState(false)
+	const [content, setContent] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
+
+	useEffect(() => {
+		if (replyTo) {
+			setOpen(true)
+			setContent(`@${replyTo} `) // 自动插入@username
+		}
+	}, [replyTo])
+
+	const handleSubmit = async () => {
+		if (!content.trim() || isSubmitting) return
+
+		setIsSubmitting(true)
+		try {
+			await onAddComment(content.trim(), replyTo)
+			setContent('')
+			setOpen(false)
+			onClearReply?.()
+		} finally {
+			setIsSubmitting(false)
+		}
+	}
+
+	const handleCancel = () => {
+		setOpen(false)
+		setContent('')
+		onClearReply?.()
+	}
+
+	const handleOpenChange = (newOpen: boolean) => {
+		setOpen(newOpen)
+		if (!newOpen) {
+			setContent('')
+			onClearReply?.()
+		}
+	}
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+			e.preventDefault()
+			handleSubmit()
+		}
+		
+		// 防止删除@username前缀
+		if (replyTo && (e.key === 'Backspace' || e.key === 'Delete')) {
+			const target = e.target as HTMLTextAreaElement
+			const { selectionStart, selectionEnd } = target
+			const atMention = `@${replyTo} `
+			
+			// 如果选择或光标位置会影响到@mention，阻止删除
+			if (selectionStart <= atMention.length || (selectionStart !== selectionEnd && selectionEnd <= atMention.length)) {
+				e.preventDefault()
+			}
+		}
+	}
+
+	const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const newContent = e.target.value
+		
+		// 如果是回复模式，确保@username前缀不被删除
+		if (replyTo) {
+			const atMention = `@${replyTo} `
+			if (!newContent.startsWith(atMention)) {
+				setContent(atMention) // 恢复@username前缀
+				return
+			}
+		}
+		
+		setContent(newContent)
+	}
+
+	const displayPlaceholder = placeholder || (replyTo ? `回复 ${replyTo}...` : '写下你的想法...')
+
+	return (
+		<Popover open={open} onOpenChange={handleOpenChange} data-slot="comment-input-popup">
+			<PopoverTrigger asChild className={className}>
+				{children}
+			</PopoverTrigger>
+
+			<PopoverContent className="w-[420px] p-0" align="start">
+				<div className="p-4">
+					{replyTo && (
+						<div className="flex items-center justify-between mb-3 p-2 bg-muted/50 rounded-lg">
+							<span className="text-sm text-muted-foreground">
+								回复 <span className="font-medium text-foreground">@{replyTo}</span>
+							</span>
+							<Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onClearReply?.()}>
+								<X className="h-3 w-3" />
+							</Button>
+						</div>
+					)}
+
+					<div className="flex space-x-3">
+						<UserAvatar 
+							src="https://i.pravatar.cc/150?img=1" 
+							alt="当前用户头像" 
+							size={36} 
+							className="flex-shrink-0" 
+							fallbackText="我" 
+						/>
+
+						<div className="flex-1 space-y-3">
+							<Textarea
+								value={content}
+								onChange={handleContentChange}
+								onKeyDown={handleKeyDown}
+								placeholder={displayPlaceholder}
+								className="min-h-[100px] resize-none"
+							/>
+
+							<div className="flex justify-end space-x-2">
+								<Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSubmitting}>
+									取消
+								</Button>
+								<Button 
+									size="sm" 
+									onClick={handleSubmit} 
+									disabled={!content.trim() || isSubmitting}
+								>
+									{isSubmitting ? (
+										<>
+											<div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+											发送中
+										</>
+									) : (
+										<>
+											<Send className="h-3 w-3 mr-1" />
+											发送
+										</>
+									)}
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
+	)
+}
+
+export interface CommentInputPopupProps extends PropsWithChildren {
+	postId: string
+	onAddComment: (content: string, replyTo?: string) => void
+	replyTo?: string
+	onClearReply?: () => void
+	placeholder?: string
+	className?: string
+}
+
+/**
+ * 兼容旧版评论输入组件
+ */
+export const CommentInput = (props: CommentInputProps) => {
+	const { postId, commentCount, onAddComment, replyTo, onClearReply, placeholder, className } = props
+	return (
+		<CommentInputPopup
+			postId={postId}
+			onAddComment={onAddComment}
+			replyTo={replyTo}
+			onClearReply={onClearReply}
+			placeholder={placeholder}
+			className={className}
+		>
+			<Button variant="ghost" size="sm" className="h-8 px-2">
+				<MessageCircle className="h-4 w-4 mr-1" />
+				<span className="text-xs">{feedUtil.formatCount(commentCount)}</span>
+			</Button>
+		</CommentInputPopup>
+	)
+}
+
+export interface CommentInputProps {
+	postId: string
+	commentCount: number
+	onAddComment: (content: string, replyTo?: string) => void
+	replyTo?: string
+	onClearReply?: () => void
+	placeholder?: string
+	className?: string
+}

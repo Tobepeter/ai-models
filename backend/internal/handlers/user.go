@@ -97,7 +97,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Failure 500 {object} response.Response
 // @Router /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(uint64)
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		logrus.Error("Failed to get user:", err)
@@ -169,13 +169,13 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 // @Router /admin/users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
-	id, err := strconv.ParseUint(userID, 10, 32)
+	id, err := strconv.ParseUint(userID, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
-	if err := h.userService.DeleteUser(uint(id)); err != nil {
+	if err := h.userService.DeleteUser(id); err != nil {
 		logrus.Error("Failed to delete user:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to delete user")
 		return
@@ -193,13 +193,13 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 // @Router /admin/users/{id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	userIDStr := c.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
-	user, err := h.userService.GetUserByID(uint(userID))
+	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		logrus.Error("Failed to get user:", err)
 		response.Error(c, http.StatusNotFound, "User not found")
@@ -219,13 +219,13 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Router /admin/users/{id}/activate [post]
 func (h *UserHandler) ActivateUser(c *gin.Context) {
 	userIDStr := c.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
-	if err := h.userService.ActivateUser(uint(userID)); err != nil {
+	if err := h.userService.ActivateUser(userID); err != nil {
 		logrus.Error("Failed to activate user:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to activate user")
 		return
@@ -242,13 +242,13 @@ func (h *UserHandler) ActivateUser(c *gin.Context) {
 // @Router /admin/users/{id}/deactivate [post]
 func (h *UserHandler) DeactivateUser(c *gin.Context) {
 	userIDStr := c.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
-	if err := h.userService.DeactivateUser(uint(userID)); err != nil {
+	if err := h.userService.DeactivateUser(userID); err != nil {
 		logrus.Error("Failed to deactivate user:", err)
 		response.Error(c, http.StatusInternalServerError, "Failed to deactivate user")
 		return

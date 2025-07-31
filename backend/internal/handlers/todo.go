@@ -66,13 +66,13 @@ func (h *TodoHandler) GetTodoByID(c *gin.Context) {
 	}
 
 	idStr := c.Param("id")
-	todoID, err := strconv.ParseUint(idStr, 10, 32)
+	todoID, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	todo, err := h.todoService.GetTodoByID(userID, uint(todoID))
+	todo, err := h.todoService.GetTodoByID(userID, todoID)
 	if err != nil {
 		logrus.Error("Failed to get todo:", err)
 		if err.Error() == "TODO不存在" {
@@ -137,7 +137,7 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 	}
 
 	idStr := c.Param("id")
-	todoID, err := strconv.ParseUint(idStr, 10, 32)
+	todoID, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
@@ -149,7 +149,7 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	todo, err := h.todoService.UpdateTodo(userID, uint(todoID), req)
+	todo, err := h.todoService.UpdateTodo(userID, todoID, req)
 	if err != nil {
 		logrus.Error("Failed to update todo:", err)
 		if err.Error() == "TODO不存在" {
@@ -228,13 +228,13 @@ func (h *TodoHandler) ToggleTodoComplete(c *gin.Context) {
 	}
 
 	idStr := c.Param("id")
-	todoID, err := strconv.ParseUint(idStr, 10, 32)
+	todoID, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	todo, err := h.todoService.ToggleTodoComplete(userID, uint(todoID))
+	todo, err := h.todoService.ToggleTodoComplete(userID, todoID)
 	if err != nil {
 		logrus.Error("Failed to toggle todo:", err)
 		if err.Error() == "TODO不存在" {
@@ -262,13 +262,13 @@ func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 	}
 
 	idStr := c.Param("id")
-	todoID, err := strconv.ParseUint(idStr, 10, 32)
+	todoID, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
-	err = h.todoService.DeleteTodo(userID, uint(todoID))
+	err = h.todoService.DeleteTodo(userID, todoID)
 	if err != nil {
 		logrus.Error("Failed to delete todo:", err)
 		if err.Error() == "TODO不存在" {

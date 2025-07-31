@@ -75,7 +75,7 @@ func (s *UserService) CreateUser(req models.UserCreateRequest) (*models.User, er
 }
 
 // GetUserByID 根据ID获取用户
-func (s *UserService) GetUserByID(id uint) (*models.User, error) {
+func (s *UserService) GetUserByID(id uint64) (*models.User, error) {
 	var user models.User
 	if err := s.DB.First(&user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -87,7 +87,7 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 }
 
 // UpdateUser 更新用户信息
-func (s *UserService) UpdateUser(id uint, req models.UserUpdateRequest) (*models.User, error) {
+func (s *UserService) UpdateUser(id uint64, req models.UserUpdateRequest) (*models.User, error) {
 	var user models.User
 	if err := s.DB.First(&user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -163,7 +163,7 @@ func (s *UserService) GetUsers(page, limit int) (*models.PaginationResponse, err
 		Pagination: models.Pagination{
 			Current:  page,
 			PageSize: limit,
-			Total:    total,
+			Total:    int(total),
 		},
 	}
 
@@ -175,7 +175,7 @@ func (s *UserService) GetUsers(page, limit int) (*models.PaginationResponse, err
 }
 
 // DeleteUser 删除用户
-func (s *UserService) DeleteUser(id uint) error {
+func (s *UserService) DeleteUser(id uint64) error {
 	// 先获取用户信息，检查是否有OSS key需要删除
 	user, err := s.GetUserByID(id)
 	if err != nil {
@@ -196,17 +196,17 @@ func (s *UserService) DeleteUser(id uint) error {
 }
 
 // ActivateUser 启用用户
-func (s *UserService) ActivateUser(id uint) error {
+func (s *UserService) ActivateUser(id uint64) error {
 	return s.UpdateField(&models.User{}, id, "is_active", true)
 }
 
 // DeactivateUser 禁用用户
-func (s *UserService) DeactivateUser(id uint) error {
+func (s *UserService) DeactivateUser(id uint64) error {
 	return s.UpdateField(&models.User{}, id, "is_active", false)
 }
 
 // ChangePassword 修改用户密码
-func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordRequest) error {
+func (s *UserService) ChangePassword(userID uint64, req models.ChangePasswordRequest) error {
 	// 获取用户信息
 	var user models.User
 	if err := s.DB.First(&user, userID).Error; err != nil {
@@ -244,17 +244,17 @@ func (s *UserService) ChangePassword(userID uint, req models.ChangePasswordReque
 }
 
 // GetUserCount 获取用户总数
-func (s *UserService) GetUserCount() (int64, error) {
+func (s *UserService) GetUserCount() (int, error) {
 	var count int64
 	err := s.DB.Model(&models.User{}).Count(&count).Error
-	return count, err
+	return int(count), err
 }
 
 // GetAdminUserCount 获取管理员用户数
-func (s *UserService) GetAdminUserCount() (int64, error) {
+func (s *UserService) GetAdminUserCount() (int, error) {
 	var count int64
 	err := s.DB.Model(&models.User{}).Where("role = ?", models.RoleAdmin).Count(&count).Error
-	return count, err
+	return int(count), err
 }
 
 // ResetPassword 重置用户密码
@@ -279,7 +279,7 @@ func (s *UserService) ResetPassword(userID string, newPassword string) error {
 }
 
 // IsAdmin 检查用户是否为管理员
-func (s *UserService) IsAdmin(userID uint) (bool, error) {
+func (s *UserService) IsAdmin(userID uint64) (bool, error) {
 	user, err := s.GetUserByID(userID)
 	if err != nil {
 		return false, err

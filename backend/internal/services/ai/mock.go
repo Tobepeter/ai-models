@@ -20,14 +20,14 @@ const (
 )
 
 // Mock 聊天（非流式）
-func (s *AIService) mockChat(userID uint, req models.ChatRequest) (*models.ChatResponse, error) {
+func (s *AIService) mockChat(userID uint64, req models.ChatRequest) (*models.ChatResponse, error) {
 	// 模拟延迟
 	delay := time.Duration(rand.Intn(500)+200) * time.Millisecond
 	time.Sleep(delay)
 
 	// 生成模拟回复
 	content := s.generateMockResponse(req.Message)
-	
+
 	return &models.ChatResponse{
 		ID:        fmt.Sprintf("chatcmpl-%s", uuid.New().String()),
 		Message:   content,
@@ -42,7 +42,7 @@ func (s *AIService) mockChat(userID uint, req models.ChatRequest) (*models.ChatR
 }
 
 // Mock 流式聊天
-func (s *AIService) mockStreamChat(userID uint, req models.ChatRequest, responseChan chan<- string) error {
+func (s *AIService) mockStreamChat(userID uint64, req models.ChatRequest, responseChan chan<- string) error {
 	// 生成完整回复
 	fullResponse := s.generateMockResponse(req.Message)
 	chunks := strings.Split(fullResponse, "")
@@ -52,11 +52,11 @@ func (s *AIService) mockStreamChat(userID uint, req models.ChatRequest, response
 		if chunk == "" {
 			continue
 		}
-		
+
 		// 随机延迟
 		delay := time.Duration(rand.Intn(50)+10) * time.Millisecond
 		time.Sleep(delay)
-		
+
 		responseChan <- chunk
 	}
 
@@ -76,7 +76,7 @@ func (s *AIService) mockChatCompletion(req models.OpenAIChatCompletionRequest) (
 	}
 
 	content := s.generateMockResponse(userMessage)
-	
+
 	return &models.OpenAIChatCompletionResponse{
 		ID:      fmt.Sprintf("chatcmpl-%s", uuid.New().String()),
 		Object:  "chat.completion",

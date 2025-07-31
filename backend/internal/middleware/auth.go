@@ -82,7 +82,7 @@ func AdminRequired(authService *auth.AuthService, userService *services.UserServ
 		}
 
 		// 认证成功，检查管理员权限
-		isAdmin, err := userService.IsAdmin(userID.(uint))
+		isAdmin, err := userService.IsAdmin(userID.(uint64))
 		if err != nil {
 			logrus.Error("Failed to check admin status:", err)
 			response.Error(c, http.StatusInternalServerError, "Failed to verify admin status")

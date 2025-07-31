@@ -39,7 +39,7 @@ func NewAIService(cfg *config.Config) *AIService {
 }
 
 // Generate 文本生成（兼容旧接口）
-func (s *AIService) Generate(userID uint, req models.GenerateRequest) (*models.GenerateResponse, error) {
+func (s *AIService) Generate(userID uint64, req models.GenerateRequest) (*models.GenerateResponse, error) {
 	// 转换为聊天请求
 	chatReq := models.ChatRequest{
 		Message: req.Prompt,
@@ -65,34 +65,34 @@ func (s *AIService) Generate(userID uint, req models.GenerateRequest) (*models.G
 func (s *AIService) GetAvailableModels() ([]models.AIModel, error) {
 	models := []models.AIModel{
 		{
-			ID:          "gpt-3.5-turbo",
-			Name:        "GPT-3.5 Turbo",
-			Description: "Fast and efficient language model",
-			Provider:    "OpenAI",
-			Type:        "chat",
+			ID:           "gpt-3.5-turbo",
+			Name:         "GPT-3.5 Turbo",
+			Description:  "Fast and efficient language model",
+			Provider:     "OpenAI",
+			Type:         "chat",
 			Capabilities: []string{"text-generation", "chat"},
-			MaxTokens:   4096,
-			IsActive:    true,
+			MaxTokens:    4096,
+			IsActive:     true,
 		},
 		{
-			ID:          "gpt-4",
-			Name:        "GPT-4",
-			Description: "Most capable language model",
-			Provider:    "OpenAI",
-			Type:        "chat",
+			ID:           "gpt-4",
+			Name:         "GPT-4",
+			Description:  "Most capable language model",
+			Provider:     "OpenAI",
+			Type:         "chat",
 			Capabilities: []string{"text-generation", "chat"},
-			MaxTokens:   8192,
-			IsActive:    true,
+			MaxTokens:    8192,
+			IsActive:     true,
 		},
 		{
-			ID:          "deepseek-chat",
-			Name:        "DeepSeek Chat",
-			Description: "Fast Chinese language model",
-			Provider:    "DeepSeek",
-			Type:        "chat",
+			ID:           "deepseek-chat",
+			Name:         "DeepSeek Chat",
+			Description:  "Fast Chinese language model",
+			Provider:     "DeepSeek",
+			Type:         "chat",
 			Capabilities: []string{"text-generation", "chat"},
-			MaxTokens:   4096,
-			IsActive:    true,
+			MaxTokens:    4096,
+			IsActive:     true,
 		},
 	}
 
@@ -100,11 +100,11 @@ func (s *AIService) GetAvailableModels() ([]models.AIModel, error) {
 }
 
 // GetChatHistory 获取聊天历史（Mock实现）
-func (s *AIService) GetChatHistory(userID uint, sessionID string) ([]models.ConversationHistory, error) {
+func (s *AIService) GetChatHistory(userID uint64, sessionID string) ([]models.ConversationHistory, error) {
 	return []models.ConversationHistory{}, nil
 }
 
 // ClearChatHistory 清除聊天历史（Mock实现）
-func (s *AIService) ClearChatHistory(userID uint, sessionID string) error {
+func (s *AIService) ClearChatHistory(userID uint64, sessionID string) error {
 	return nil
 }

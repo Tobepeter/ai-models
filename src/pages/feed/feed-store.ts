@@ -2,52 +2,13 @@ import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 import { feedConfig } from './feed-config'
+import type { FeedComment, FeedPost, FeedCommentList } from './feed-types'
 
-/* 评论数据结构 */
-export interface Comment {
-	id: string
-	postId: string
-	userId: string
-	username: string
-	avatar: string
-	content: string
-	replyTo?: string // 回复的用户名
-	createdAt: string
-	likeCount: number
-	isLiked: boolean
-}
-
-/* 信息流帖子数据结构 */
-export interface FeedPost {
-	id: string
-	userId: string
-	username: string
-	avatar: string
-	status?: string // 用户状态emoji
-	content?: string // 可选文字内容
-	image?: string // 可选单张图片
-	createdAt: string
-	likeCount: number
-	commentCount: number
-	isLiked: boolean
-	isExpanded: boolean // 长内容展开状态
-	comments: Comment[] // 评论列表
-}
+// 重新导出类型
+export type { FeedComment, FeedPost, FeedCommentList }
 
 /* 评论分页配置 */
 export const COMMENT_PAGE_SIZE = feedConfig.commentPageSize
-
-/* 评论分页数据结构 */
-export interface CommentPage {
-	comments: string[] // commentId 数组
-	commentsById: Record<string, Comment> // 评论详情
-	nextCursor?: string
-	prevCursor?: string
-	total: number
-	pageSize: number
-	loading: boolean
-	error?: string
-}
 
 /* 信息流状态 */
 const feedState = {
@@ -61,7 +22,7 @@ const feedState = {
 
 	// 新增：扁平化存储结构
 	postsById: {} as Record<string, FeedPost>, // Post 数据表
-	commentsByPostId: {} as Record<string, CommentPage>, // 评论分页数据
+	commentsByPostId: {} as Record<string, FeedCommentList>, // 评论分页数据
 
 	// 弹窗状态
 	detailDialog: {
@@ -118,7 +79,7 @@ const stateCreator = () => {
 		},
 
 
-		addComment: (postId: string, comment: Comment) => {
+		addComment: (postId: string, comment: FeedComment) => {
 			const { posts } = get()
 			const updatedPosts = posts.map((post) => {
 				if (post.id === postId) {
@@ -152,7 +113,7 @@ const stateCreator = () => {
 				const postComments = commentsByPostId[detailDialog.postId]
 				if (postComments && postComments.comments.length > COMMENT_PAGE_SIZE) {
 					const firstPageComments = postComments.comments.slice(0, COMMENT_PAGE_SIZE)
-					const firstPageCommentsById: Record<string, Comment> = {}
+					const firstPageCommentsById: Record<string, FeedComment> = {}
 					firstPageComments.forEach(id => {
 						if (postComments.commentsById[id]) {
 							firstPageCommentsById[id] = postComments.commentsById[id]
@@ -193,7 +154,7 @@ const stateCreator = () => {
 		},
 
 		// 评论分页管理
-		setPostComments: (postId: string, comments: Comment[], cursor?: string, total?: number) => {
+		setPostComments: (postId: string, comments: FeedComment[], cursor?: string, total?: number) => {
 			const { commentsByPostId } = get()
 			const currentPage = commentsByPostId[postId] || {
 				comments: [],

@@ -1,4 +1,4 @@
-.PHONY: help dev docker-dev docker-down build run test clean bootstrap swagger
+.PHONY: help dev docker-dev docker-down build run test fmt vet clean bootstrap swagger
 
 BINARY_NAME=main
 MAIN_PATH=./cmd/main.go
@@ -19,10 +19,12 @@ help: ## 显示帮助信息
 	@echo "  build        构建二进制文件"
 	@echo "  run          直接运行应用"
 	@echo ""
-	@echo "测试:"
+	@echo "测试和代码质量:"
 	@echo "  test         运行所有测试"
 	@echo "  test-coverage 运行测试并生成覆盖率报告"
 	@echo "  test-clean   清理测试文件"
+	@echo "  fmt          格式化代码"
+	@echo "  vet          静态代码检查"
 	@echo ""
 	@echo "工具:"
 	@echo "  bootstrap    安装开发依赖 (Air)"
@@ -53,6 +55,12 @@ run:
 # 工具命令
 test:
 	go test -v ./...
+
+fmt: ## 格式化代码
+	go fmt ./...
+
+vet: ## 静态代码检查
+	go vet ./...
 
 clean:
 	go clean

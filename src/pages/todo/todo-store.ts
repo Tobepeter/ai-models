@@ -17,10 +17,10 @@ interface TodoActions {
 
 	// TODO 操作
 	addTodo: (todo: TodoCreateRequest) => Promise<void>
-	updateTodo: (id: number, updates: TodoUpdateRequest) => Promise<void>
-	deleteTodo: (id: number) => Promise<void>
-	toggleTodo: (id: number) => Promise<void>
-	reorderTodo: (id: number, newPosition: number) => Promise<void>
+	updateTodo: (id: string, updates: TodoUpdateRequest) => Promise<void>
+	deleteTodo: (id: string) => Promise<void>
+	toggleTodo: (id: string) => Promise<void>
+	reorderTodo: (id: string, newPosition: number) => Promise<void>
 
 	// 初始化加载
 	loadTodos: () => Promise<void>
@@ -80,12 +80,12 @@ const stateCreator = () => {
 				const now = new Date().toISOString()
 				const newTodo: TodoResponse = {
 					...todoWithPosition,
-					id: Date.now(),
-					created_at: now,
-					updated_at: now,
+					id: Date.now().toString(),
+					createdAt: now,
+					updatedAt: now,
 					description: todo.description ?? '',
 					priority: todo.priority ?? 1,
-					due_date: todo.due_date ?? null,
+					dueDate: todo.due_date ?? null,
 					completed: false,
 				}
 
@@ -95,7 +95,7 @@ const stateCreator = () => {
 			}
 		},
 
-		updateTodo: async (id: number, updates: TodoUpdateRequest) => {
+		updateTodo: async (id: string, updates: TodoUpdateRequest) => {
 			// 尝试通过API更新
 			const updatedTodo = await todoUtil.updateTodo(id, updates)
 
@@ -118,7 +118,7 @@ const stateCreator = () => {
 			}
 		},
 
-		deleteTodo: async (id: number) => {
+		deleteTodo: async (id: string) => {
 			// 尝试通过API删除
 			const success = await todoUtil.deleteTodo(id)
 
@@ -131,7 +131,7 @@ const stateCreator = () => {
 			todoUtil.savePersist(todos)
 		},
 
-		toggleTodo: async (id: number) => {
+		toggleTodo: async (id: string) => {
 			// 尝试通过API切换
 			const toggledTodo = await todoUtil.toggleTodo(id)
 
@@ -154,7 +154,7 @@ const stateCreator = () => {
 			}
 		},
 
-		reorderTodo: async (id: number, newPosition: number) => {
+		reorderTodo: async (id: string, newPosition: number) => {
 			// 先更新本地状态
 			const todos = get()
 				.todos.map((todo) => (todo.id === id ? { ...todo, position: newPosition, updated_at: new Date().toISOString() } : todo))

@@ -14,8 +14,8 @@ export interface AIModel {
   capabilities?: string[];
   description?: string;
   id?: string;
-  is_active?: boolean;
-  max_tokens?: number;
+  isActive?: boolean;
+  maxTokens?: number;
   name?: string;
   provider?: string;
   type?: string;
@@ -29,7 +29,7 @@ export interface ChangePasswordRequest {
 
 export interface ChatMessage {
   content?: string;
-  created_at?: string;
+  createdAt?: string;
   model?: string;
   role?: string;
 }
@@ -41,7 +41,7 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
-  created_at?: string;
+  createdAt?: string;
   id?: string;
   message?: string;
   model?: string;
@@ -58,7 +58,7 @@ export interface CreateFeedCommentRequest {
    * 回复的用户名
    * @maxLength 100
    */
-  reply_to?: string;
+  replyTo?: string;
 }
 
 export interface CreateFeedPostRequest {
@@ -68,7 +68,7 @@ export interface CreateFeedPostRequest {
    */
   content?: string;
   /** 图片URL */
-  image_url?: string;
+  imageURL?: string;
 }
 
 export interface CrudCreateRequest {
@@ -79,10 +79,10 @@ export interface CrudCreateRequest {
 
 export interface CrudResponse {
   category?: string;
-  created_at?: string;
+  createdAt?: string;
   data?: string;
-  id?: number;
-  updated_at?: string;
+  id?: string;
+  updatedAt?: string;
 }
 
 export interface CrudUpdateRequest {
@@ -99,51 +99,51 @@ export interface FeedComment {
   /** 冗余头像 */
   avatar?: string;
   content?: string;
-  created_at?: string;
+  createdAt?: string;
   id?: string;
-  like_count?: number;
-  post_id?: string;
+  likeCount?: number;
+  postID?: string;
   /** 回复的用户名 */
-  reply_to?: string;
-  updated_at?: string;
-  user_id?: string;
+  replyTo?: string;
+  updatedAt?: string;
+  userID?: string;
   /** 用户信息版本号 */
-  user_profile_version?: number;
+  userProfileVersion?: number;
   /** 冗余字段 */
   username?: string;
 }
 
 export interface FeedCommentResponse {
   comments?: FeedComment[];
-  has_more?: boolean;
-  next_cursor?: string;
+  hasMore?: boolean;
+  nextCursor?: string;
   total?: number;
 }
 
 export interface FeedPost {
   /** 冗余头像 */
   avatar?: string;
-  comment_count?: number;
+  commentCount?: number;
   /** 文字内容（可选） */
   content?: string;
-  created_at?: string;
+  createdAt?: string;
   id?: string;
   /** 图片URL（可选） */
-  image_url?: string;
-  like_count?: number;
+  imageURL?: string;
+  likeCount?: number;
   /** 用户状态emoji */
   status?: string;
-  updated_at?: string;
-  user_id?: string;
+  updatedAt?: string;
+  userID?: string;
   /** 用户信息版本号 */
-  user_profile_version?: number;
+  userProfileVersion?: number;
   /** 冗余字段 */
   username?: string;
 }
 
 export interface FeedPostResponse {
-  has_more?: boolean;
-  next_cursor?: string;
+  hasMore?: boolean;
+  nextCursor?: string;
   posts?: FeedPost[];
 }
 
@@ -179,7 +179,7 @@ export interface GenerateRequest {
 
 export interface GenerateResponse {
   content?: string;
-  created_at?: string;
+  createdAt?: string;
   id?: string;
   model?: string;
   usage?: Usage;
@@ -203,13 +203,13 @@ export interface HashifyNameResponse {
 }
 
 export interface OpenAIChatCompletionRequest {
-  max_tokens?: number;
+  maxTokens?: number;
   messages: OpenAIMessage[];
   model: string;
   platform?: string;
   stream?: boolean;
   temperature?: number;
-  top_p?: number;
+  topP?: number;
 }
 
 export interface OpenAIChatCompletionResponse {
@@ -222,7 +222,7 @@ export interface OpenAIChatCompletionResponse {
 }
 
 export interface OpenAIChoice {
-  finish_reason?: string;
+  finishReason?: string;
   index?: number;
   message?: OpenAIMessage;
 }
@@ -233,9 +233,9 @@ export interface OpenAIMessage {
 }
 
 export interface OpenAIUsage {
-  completion_tokens?: number;
-  prompt_tokens?: number;
-  total_tokens?: number;
+  completionTokens?: number;
+  promptTokens?: number;
+  totalTokens?: number;
 }
 
 export interface Pagination {
@@ -274,14 +274,14 @@ export interface SignRequest {
 
 export interface SignResponse {
   objectKey?: string;
-  signedUrl?: string;
+  signedURL?: string;
 }
 
 export interface TodoCreateRequest {
   /** 可选 */
   description?: string;
   /** 可选 */
-  due_date?: string;
+  dueDate?: string;
   /** 可选，不传则自动分配 */
   position?: number;
   /** 可选 */
@@ -292,7 +292,7 @@ export interface TodoCreateRequest {
 
 export interface TodoPositionItem {
   /** 必填 */
-  id: number;
+  id: string;
   /** 必填 */
   position: number;
 }
@@ -304,14 +304,14 @@ export interface TodoPositionUpdateRequest {
 
 export interface TodoResponse {
   completed?: boolean;
-  created_at?: string;
+  createdAt?: string;
   description?: string;
-  due_date?: string;
-  id?: number;
+  dueDate?: string;
+  id?: string;
   position?: number;
   priority?: number;
   title?: string;
-  updated_at?: string;
+  updatedAt?: string;
 }
 
 export interface TodoUpdateRequest {
@@ -320,7 +320,7 @@ export interface TodoUpdateRequest {
   /** 可选，不传不更新 */
   description?: string;
   /** 可选，不传不更新 */
-  due_date?: string;
+  dueDate?: string;
   /** 可选，支持更新排序位置 */
   position?: number;
   /** 可选，不传不更新 */
@@ -330,9 +330,9 @@ export interface TodoUpdateRequest {
 }
 
 export interface Usage {
-  completion_tokens?: number;
-  prompt_tokens?: number;
-  total_tokens?: number;
+  completionTokens?: number;
+  promptTokens?: number;
+  totalTokens?: number;
 }
 
 export interface UserCreateRequest {
@@ -363,22 +363,22 @@ export interface UserLoginResponse {
 
 export interface UserResponse {
   avatar?: string;
-  avatar_oss_key?: string;
-  created_at?: string;
+  avatarOssKey?: string;
+  createdAt?: string;
   email?: string;
   extra?: string;
-  id?: number;
-  is_active?: boolean;
-  profile_version?: number;
+  id?: string;
+  isActive?: boolean;
+  profileVersion?: number;
   role?: string;
   status?: string;
-  updated_at?: string;
+  updatedAt?: string;
   username?: string;
 }
 
 export interface UserUpdateRequest {
   avatar?: string;
-  avatar_oss_key?: string;
+  avatarOssKey?: string;
   email?: string;
   extra?: string;
   status?: string;
@@ -416,7 +416,7 @@ export type UsersDeactivateCreateData = Response<Record<string, any>>;
 
 /** 新密码 */
 export interface UsersResetPasswordCreatePayload {
-  new_password?: string;
+  newPassword?: string;
 }
 
 export type UsersResetPasswordCreateData = Response<Record<string, any>>;

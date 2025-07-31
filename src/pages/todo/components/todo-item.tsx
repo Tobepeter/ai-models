@@ -9,8 +9,8 @@ import type { TodoResponse } from '@/api/swagger/generated'
 
 export interface TodoItemProps {
 	todo: TodoResponse
-	onEdit?: (id: number, title: string) => Promise<void>
-	onDelete?: (id: number) => Promise<void>
+	onEdit?: (id: string, title: string) => Promise<void>
+	onDelete?: (id: string) => Promise<void>
 }
 
 /** 简单的todo项组件 */

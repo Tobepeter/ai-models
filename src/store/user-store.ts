@@ -9,7 +9,7 @@ import type { UserResponse } from '@/api/swagger/generated'
 // Initial user state
 const userState = {
 	info: {
-		id: 0,
+		id: '0',
 		username: 'anonymous',
 		email: 'anonymous@example.com',
 		avatar: '',
