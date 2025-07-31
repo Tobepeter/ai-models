@@ -35,28 +35,57 @@ class FeedMock {
 
 		for (let i = 0; i < count; i++) {
 			const timestamp = now - i * 1000 * 60 * number.int({ min: 1, max: 60 }) // 随机时间间隔
-			const postId = feedUtil.generatePostId()
-
-			const post: FeedPost = {
-				id: postId,
-				userId: feedUtil.generateUserId(),
-				username: faker.person.fullName(),
-				avatar: this.randomAvatar(),
-				status: datatype.boolean({ probability: 0.7 }) ? random().emoji : undefined,
-				content: datatype.boolean({ probability: 0.8 }) ? this.randomContent() : undefined,
-				image: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
-				createdAt: new Date(timestamp).toISOString(),
-				likeCount: number.int({ min: 0, max: 1000 }),
-				commentCount: number.int({ min: 0, max: 100 }),
-				isLiked: datatype.boolean({ probability: 0.3 }),
-				isExpanded: false,
-				comments: this.genComments(postId, number.int({ min: 5, max: 20 })),
-			}
-
+			const post = this.genSinglePost(timestamp)
 			posts.push(post)
 		}
 
 		return posts
+	}
+
+	/* 生成单个帖子 */
+	genSinglePost(timestamp?: number): FeedPost {
+		const now = timestamp || Date.now()
+		const postId = feedUtil.generatePostId()
+
+		const post: FeedPost = {
+			id: postId,
+			userId: feedUtil.generateUserId(),
+			username: faker.person.fullName(),
+			avatar: this.randomAvatar(),
+			status: datatype.boolean({ probability: 0.7 }) ? random().emoji : undefined,
+			content: datatype.boolean({ probability: 0.8 }) ? this.randomContent() : undefined,
+			image: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
+			createdAt: new Date(now).toISOString(),
+			likeCount: number.int({ min: 0, max: 1000 }),
+			commentCount: number.int({ min: 0, max: 100 }),
+			isLiked: datatype.boolean({ probability: 0.3 }),
+			isExpanded: false,
+			comments: this.genComments(postId, number.int({ min: 5, max: 20 })),
+		}
+
+		return post
+	}
+
+	/* 创建用户自定义的帖子 */
+	createUserPost(content: string, image?: string): FeedPost {
+		const postId = feedUtil.generatePostId()
+		const now = Date.now()
+
+		return {
+			id: postId,
+			userId: 'current-user', // 当前用户ID
+			username: '我', // 当前用户名
+			avatar: this.randomAvatar(),
+			status: undefined, // 不支持心情状态
+			content,
+			image,
+			createdAt: new Date(now).toISOString(),
+			likeCount: 0,
+			commentCount: 0,
+			isLiked: false,
+			isExpanded: false,
+			comments: [],
+		}
 	}
 
 	/* 生成模拟评论 */

@@ -41,7 +41,10 @@ export const Login = () => {
 
 	const handleSubmit = async (data: LoginFormData) => {
 		try {
-			const result = await authApi.login(data)
+			const result = await authApi.login({
+				username: data.username,
+				password: data.password,
+			})
 			// 登录成功后跳转到重定向地址，使用replace清空回退历史
 			if (result) {
 				navigate(redirectTo, { replace: true })

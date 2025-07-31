@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { FeedHeader } from './feed-header'
+import { FeedItemHeader } from './feed-item-header'
 import { FeedText } from './feed-text'
-import { FeedImage } from './feed-image'
+import { FeedItemImage } from './feed-item-image'
 import { FeedActions } from './feed-actions'
 import { FeedDetailCommentList } from './feed-detail-comment-list'
 import { useFeedStore } from '../feed-store'
@@ -31,7 +31,6 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const loading = commentPage?.loading || false
 	const error = commentPage?.error
 
-
 	// 处理函数
 	const handleLike = (postId: string) => toggleLike(postId)
 	const handleToggleExpand = (postId: string) => toggleExpand(postId)
@@ -48,7 +47,6 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 
 	// 重试加载
 	const handleRetry = () => handleLoadMore()
-
 
 	// 渲染不同状态
 	const renderEmptyPost = () => (
@@ -75,18 +73,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	)
 
 	const renderCommentList = () => {
-		return (
-			<FeedDetailCommentList
-				comments={comments}
-				hasMore={hasMoreComments}
-				loading={loading}
-				error={error}
-				onReply={handleReply}
-				onAddComment={handleAddComment}
-				onLoadMore={handleLoadMore}
-				onRetry={handleRetry}
-			/>
-		)
+		return <FeedDetailCommentList comments={comments} hasMore={hasMoreComments} loading={loading} error={error} onAddComment={handleAddComment} onLoadMore={handleLoadMore} onRetry={handleRetry} />
 	}
 
 	// 主要状态判断
@@ -98,12 +85,12 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 			{/* 帖子内容区域 */}
 			<div className="flex-shrink-0 p-6 border-b">
 				{/* 用户信息 */}
-				<FeedHeader 
-					userId={post.userId} 
-					username={post.username} 
-					avatar={post.avatar} 
-					status={post.status} 
-					createdAt={post.createdAt} 
+				<FeedItemHeader
+					userId={post.userId}
+					username={post.username}
+					avatar={post.avatar}
+					status={post.status}
+					createdAt={post.createdAt}
 					className="mb-4"
 					showNavigateButton={showNavigateButton}
 					onNavigateToPage={handleNavigateToPage}
@@ -113,7 +100,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 				{post.content && <FeedText content={post.content} isExpanded={post.isExpanded} onToggleExpand={() => handleToggleExpand(post.id)} className="mb-4" />}
 
 				{/* 图片内容 */}
-				{post.image && <FeedImage src={post.image} className="mb-4 mx-auto" />}
+				{post.image && <FeedItemImage src={post.image} className="mb-4 mx-auto" />}
 
 				{/* 交互按钮 */}
 				<FeedActions postId={post.id} likeCount={post.likeCount} commentCount={post.commentCount} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />

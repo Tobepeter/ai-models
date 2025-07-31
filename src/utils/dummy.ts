@@ -24,6 +24,7 @@ class Dummy {
 		avatar: 'https://i.pravatar.cc/150?img=1',
 		avatarFemale: 'https://randomuser.me/api/portraits/women/44.jpg',
 		avatarMale: 'https://randomuser.me/api/portraits/men/32.jpg',
+		dicevar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
 
 		// == picsum（这个会重定向） ==
 		landscape: 'https://picsum.photos/800/600',

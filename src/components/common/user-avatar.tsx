@@ -48,7 +48,17 @@ export const UserAvatar = (props: UserAvatarProps) => {
 
 	// 使用noInteraction来控制是否可预览（相当于noPreview）
 	return (
-		<ImagePreview url={src} size={size} aspectRatio="1/1" noEditable={!finialEditable} noPreview={finalNoPreview} loading={loading} className={cn('rounded-full', className)} style={boxStyle} data-slot="user-avatar">
+		<ImagePreview
+			url={src}
+			size={size}
+			aspectRatio="1/1"
+			noEditable={!finialEditable}
+			noPreview={finalNoPreview}
+			loading={loading}
+			className={cn('rounded-full', className)}
+			style={boxStyle}
+			data-slot="user-avatar"
+		>
 			{avatarContent}
 		</ImagePreview>
 	)

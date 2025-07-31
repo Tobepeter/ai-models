@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { useMount } from 'ahooks'
 import { FeedItem } from './feed-item'
 import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
 import { type FeedPost } from '../feed-types'
@@ -10,29 +9,11 @@ import { cn } from '@/lib/utils'
  * 虚拟滚动信息流列表组件
  */
 export const FeedList = (props: FeedListProps) => {
-	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onReply, onLoadMore, className } = props
+	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onLoadMore, className } = props
 
 	const parentRef = useRef<HTMLDivElement>(null)
-	const [parentHeight, setParentHeight] = useState(0)
 
-	// 提取常用计算值
-	const postsLength = posts.length
-
-	// 计算父容器精确高度
-	useMount(() => {
-		const updateHeight = () => {
-			if (parentRef.current) {
-				const rect = parentRef.current.getBoundingClientRect()
-				setParentHeight(rect.height)
-			}
-		}
-
-		updateHeight()
-		window.addEventListener('resize', updateHeight)
-		return () => window.removeEventListener('resize', updateHeight)
-	})
-
-	// const estimateSize = 600 // 预估的单个项目高度
+	const postsLength = posts.length // 提取常用计算值
 	const estimateSize = 600 // 预估的单个项目高度
 	const overscan = 5 // 虚拟滚动的预渲染数量
 
@@ -95,11 +76,7 @@ export const FeedList = (props: FeedListProps) => {
 								data-index={virtualItem.index}
 								ref={(el) => virtualizer.measureElement(el)} // 让虚拟列表测量真实高度
 							>
-								{post ? (
-									<FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} onReply={onReply} />
-								) : (
-									<FeedSkeleton count={1} />
-								)}
+								{post ? <FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} /> : <FeedSkeleton count={1} />}
 							</div>
 						)
 					})}
@@ -124,7 +101,6 @@ export interface FeedListProps {
 	onLike: (postId: string) => void
 	onToggleExpand: (postId: string) => void
 	onAddComment: (postId: string, content: string, replyTo?: string) => void
-	onReply?: (postId: string, username: string) => void
 	onLoadMore: () => void
 	className?: string
 }

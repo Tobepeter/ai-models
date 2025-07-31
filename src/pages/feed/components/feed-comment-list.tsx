@@ -1,36 +1,31 @@
-import { FeedCommentItem } from './feed-comment-item'
-import { type FeedComment } from '../feed-types'
 import { cn } from '@/lib/utils'
-
-const MAX_COMMENTS_DISPLAY = 10 // 最多显示10条评论
+import { type FeedComment } from '../feed-types'
+import { FeedCommentItem } from './feed-comment-item'
+import { feedConfig } from '../feed-config'
 
 /**
  * 评论区组件 - 只显示评论列表，不包含输入框
  */
 export const FeedCommentList = (props: FeedCommentListProps) => {
-	const { postId, comments = [], onViewMore, onReply, onAddComment, className } = props
+	const { postId, comments = [], onViewMore, onAddComment, className } = props
 
-	// 确保comments是数组
-	const safeComments = Array.isArray(comments) ? comments : []
-
-	// 显示the评论列表（最多10条）
-	const displayComments = safeComments.slice(0, MAX_COMMENTS_DISPLAY)
-	const hasMoreComments = safeComments.length > MAX_COMMENTS_DISPLAY
+	// 显示评论列表（最多显示配置数量）
+	const displayComments = comments.slice(0, feedConfig.maxCommentsDisplay)
+	const hasMoreComments = comments.length > feedConfig.maxCommentsDisplay
 
 	// 如果没有评论，不显示任何内容
-	if (safeComments.length === 0) {
+	if (comments.length === 0) {
 		return null
 	}
 
 	return (
-		<div className={cn('mt-3', className)} data-slot="comment-section">
-			{/* 评论列表 - 始终可见 */}
+		<div className={cn('mt-3', className)} data-slot="feed-comment-list">
+			{/* 评论列表 */}
 			<div className="relative">
-				{/* 评论列表 - 直接内嵌 */}
 				{displayComments.length > 0 && (
-					<div className="py-3 space-y-1" data-slot="comment-list">
+					<div className="py-3 space-y-1">
 						{displayComments.map((comment) => (
-							<FeedCommentItem key={comment.id} comment={comment} onReply={onReply} onAddComment={onAddComment} />
+							<FeedCommentItem key={comment.id} comment={comment} onAddComment={onAddComment} />
 						))}
 					</div>
 				)}
@@ -52,7 +47,6 @@ export interface FeedCommentListProps {
 	postId: string
 	comments?: FeedComment[] // 评论列表可能为空
 	onViewMore: () => void // 查看更多评论的回调
-	onReply?: (username: string) => void
 	onAddComment?: (content: string, replyTo?: string) => void
 	className?: string
 }

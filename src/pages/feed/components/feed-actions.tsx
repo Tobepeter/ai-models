@@ -11,7 +11,7 @@ import { useMemo } from 'react'
  * 信息流交互按钮组件 - 包含点赞、评论、分享功能
  */
 export const FeedActions = (props: FeedActionsProps) => {
-	const { postId, likeCount, commentCount, isLiked, onLike, onAddComment, replyTo, onClearReply, className } = props
+	const { postId, likeCount, commentCount, isLiked, onLike, onAddComment, replyTo, className } = props
 
 	// 缓存格式化后的数字，避免重复计算
 	const formattedLikeCount = useMemo(() => feedUtil.formatCount(likeCount), [likeCount])
@@ -60,7 +60,7 @@ export const FeedActions = (props: FeedActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInput postId={postId} commentCount={commentCount} onAddComment={onAddComment} replyTo={replyTo} onClearReply={onClearReply} />
+			<CommentInput postId={postId} commentCount={commentCount} onAddComment={onAddComment} replyTo={replyTo} />
 
 			{/* 分享按钮 */}
 			<Button variant="ghost" size="sm" className="h-8 px-2 min-w-[40px] justify-center text-muted-foreground hover:text-green-500 transition-colors" onClick={handleShare}>
@@ -78,6 +78,5 @@ export interface FeedActionsProps {
 	onLike: (postId: string) => void
 	onAddComment: (content: string, replyTo?: string) => void
 	replyTo?: string
-	onClearReply?: () => void
 	className?: string
 }

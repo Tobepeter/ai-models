@@ -1,20 +1,33 @@
 import { UserAvatar } from '@/components/common/user-avatar'
 import { Button } from '@/components/ui/button'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Flag, Trash2, MoreHorizontal, ExternalLink } from 'lucide-react'
 import { feedUtil } from '../feed-util'
 import { cn } from '@/lib/utils'
+import { notify } from '@/components/common/notify'
 
 /**
  * 信息流头部组件 - 显示用户头像、用户名、状态和时间
  */
-export const FeedHeader = (props: FeedHeaderProps) => {
+export const FeedItemHeader = (props: FeedItemHeaderProps) => {
 	const { userId, username, avatar, status, createdAt, showNavigateButton, onNavigateToPage, className } = props
+
+	// 删除操作处理
+	const handleDelete = () => {
+		notify.confirm({
+			title: '确认删除',
+			description: '此操作将永久删除该帖子，是否继续？',
+			confirmText: '删除',
+			cancelText: '取消',
+			onConfirm: () => {
+				console.log('删除帖子:', userId)
+				notify.success('帖子已删除')
+			},
+			onCancel: () => {
+				console.log('取消删除操作')
+			},
+		})
+	}
 
 	// 更多操作配置
 	const moreActions = [
@@ -22,14 +35,14 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 			key: 'report',
 			label: '举报',
 			icon: Flag,
-			onClick: () => console.log('举报用户:', userId)
+			onClick: () => console.log('举报用户:', userId),
 		},
 		{
 			key: 'delete',
 			label: '删除',
 			icon: Trash2,
-			onClick: () => console.log('删除帖子:', userId)
-		}
+			onClick: handleDelete,
+		},
 	]
 
 	return (
@@ -73,12 +86,7 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 				{/* 更多操作 */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="square-8 p-0 flex-shrink-0 text-muted-foreground hover:text-foreground"
-							onClick={(e) => e.stopPropagation()}
-						>
+						<Button variant="ghost" size="sm" className="square-8 p-0 flex-shrink-0 text-muted-foreground hover:text-foreground" onClick={(e) => e.stopPropagation()}>
 							<MoreHorizontal className="square-4" />
 						</Button>
 					</DropdownMenuTrigger>
@@ -102,7 +110,7 @@ export const FeedHeader = (props: FeedHeaderProps) => {
 	)
 }
 
-export interface FeedHeaderProps {
+export interface FeedItemHeaderProps {
 	userId: string
 	username: string
 	avatar: string

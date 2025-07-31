@@ -45,7 +45,7 @@ export const AppEmojiPicker = (props: AppEmojiPickerProps) => {
 						onEmojiClick={handleEmojiSelect}
 						theme={resolvedTheme === 'dark' ? Theme.DARK : Theme.LIGHT}
 						previewConfig={{
-							showPreview: false
+							showPreview: false,
 						}}
 						skinTonesDisabled={true}
 						searchDisabled={false}

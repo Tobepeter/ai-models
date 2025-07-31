@@ -27,12 +27,19 @@ func SetupTestDB(t *testing.T) {
 
 // CleanupTestDB 清空所有测试表数据，重置自增ID，确保测试间数据隔离
 func CleanupTestDB(t *testing.T) {
+
 	if TestDB == nil {
 		return
 	}
 
+	// NOTE：暂时不允许清空，我有超级用户也给删除了
+
 	tables := []string{
-		"users",
+		// "feed_comment_likes",
+		// "post_likes",
+		// "feed_comments",
+		// "feed_posts",
+		// "users",
 		// "conversation_histories",
 	}
 

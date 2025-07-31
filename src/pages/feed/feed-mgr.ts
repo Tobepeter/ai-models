@@ -205,6 +205,37 @@ class FeedManager {
 			this.commentTimer = null
 		}
 	}
+
+	/* 创建新的feed */
+	async createFeed(content: string, image?: string): Promise<FeedPost> {
+		const store = this.getStore()
+
+		try {
+			// 设置loading状态
+			store.setLoading(true)
+
+			// 模拟网络延迟
+			this.clearLoadTimer()
+			this.loadTimer = delayC(feedMock.getLoadMoreDelay())
+			await this.loadTimer
+
+			// 创建新的post
+			const newPost = feedMock.createUserPost(content, image)
+
+			// 添加到store的开头
+			store.addNewPost(newPost)
+
+			console.log(`[FeedManager] 创建feed成功: ${newPost.id}`)
+			return newPost
+		} catch (error) {
+			console.error('[FeedManager] 创建feed失败:', error)
+			store.setError('创建失败，请重试')
+			throw error
+		} finally {
+			store.setLoading(false)
+			this.loadTimer = null
+		}
+	}
 }
 
 export const feedMgr = new FeedManager() // 更新游标为新的最后一条 // 解析游标获取时间基准点

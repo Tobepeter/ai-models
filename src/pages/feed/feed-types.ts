@@ -25,8 +25,8 @@ export interface FeedPost {
 	likeCount: number
 	commentCount: number
 	isLiked: boolean
-	isExpanded: boolean // 长内容展开状态  
-	comments: FeedComment[] // 评论列表
+	isExpanded: boolean // 长内容展开状态
+	comments?: FeedComment[] // 评论列表
 }
 
 /* 评论分页数据结构 */

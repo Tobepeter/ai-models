@@ -1,30 +1,25 @@
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { differenceInMinutes, format, parseISO } from 'date-fns'
 import { truncate } from 'lodash-es'
 import { type FeedComment } from './feed-types'
 
-dayjs.extend(relativeTime) // 配置中文相对时间
-dayjs.locale('zh-cn')
-
 /**
  * 信息流工具类 - 提供时间格式化、内容处理、分页游标等功能
- * 使用 dayjs 处理时间，lodash 处理字符串和防抖
+ * 使用 date-fns 处理时间，lodash 处理字符串和防抖
  */
 class FeedUtil {
 	readonly MAX_CONTENT_LENGTH = 200 // 内容最大长度
 
 	/* 格式化时间为中文相对时间 */
 	formatTime(timestamp: string) {
-		const now = dayjs()
-		const time = dayjs(timestamp)
-		const diffInMinutes = now.diff(time, 'minute')
+		const now = new Date()
+		const time = parseISO(timestamp)
+		const diffInMinutes = differenceInMinutes(now, time)
 
 		if (diffInMinutes < 1) return '刚刚'
 		if (diffInMinutes < 60) return `${diffInMinutes}分钟前`
 		if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前` // 24小时内
 		if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}天前` // 7天内
-		return time.format('MM-DD') // 超过7天显示日期
+		return format(time, 'MM-dd') // 超过7天显示日期
 	}
 
 	truncateContent(content: string, maxLength: number = this.MAX_CONTENT_LENGTH) {

@@ -10,28 +10,28 @@ export class CancelablePromise<T = any> extends Promise<T> {
 	constructor(executor: CancelableExecutor<T>) {
 		let _resolve: (value: T | PromiseLike<T>) => void
 		let _reject: (reason?: any) => void
-		
+
 		super((resolve, reject) => {
 			_resolve = resolve
 			_reject = reject
 		})
-		
+
 		const wrappedResolve = (value: T | PromiseLike<T>) => {
 			if (this._isCanceled || this._isDone) return
 			this._isDone = true
 			_resolve(value)
 		}
-		
+
 		const wrappedReject = (reason?: any) => {
 			if (this._isCanceled || this._isDone) return
 			this._isDone = true
 			_reject(reason)
 		}
-		
+
 		const onCancel = (cb: AnyFn) => {
 			this._cancelHandlers.push(cb)
 		}
-		
+
 		executor(wrappedResolve, wrappedReject, onCancel)
 	}
 
@@ -51,7 +51,7 @@ export class CancelablePromise<T = any> extends Promise<T> {
 	get isCanceled() {
 		return this._isCanceled
 	}
-	
+
 	get isDone() {
 		return this._isDone
 	}

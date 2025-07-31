@@ -81,11 +81,11 @@ const stateCreator = () => {
 				const newTodo: TodoResponse = {
 					...todoWithPosition,
 					id: Date.now().toString(),
-					createdAt: now,
-					updatedAt: now,
+					created_at: now,
+					updated_at: now,
 					description: todo.description ?? '',
 					priority: todo.priority ?? 1,
-					dueDate: todo.due_date ?? null,
+					due_date: todo.due_date ?? null,
 					completed: false,
 				}
 

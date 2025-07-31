@@ -55,9 +55,7 @@ export default {
 		 */
 		function hasPropsParameter(node) {
 			const params = node.params
-			return params.length === 1 && 
-				   params[0].type === 'Identifier' && 
-				   params[0].name === 'props'
+			return params.length === 1 && params[0].type === 'Identifier' && params[0].name === 'props'
 		}
 
 		/**
@@ -97,11 +95,9 @@ export default {
 
 			// 获取节点前的注释
 			const comments = sourceCode.getCommentsBefore(targetNode)
-			
+
 			// 检查是否有 JSDoc 风格的注释（以 /** 开头）
-			return comments.some(comment => 
-				comment.type === 'Block' && comment.value.startsWith('*')
-			)
+			return comments.some((comment) => comment.type === 'Block' && comment.value.startsWith('*'))
 		}
 
 		/**

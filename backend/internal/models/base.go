@@ -8,7 +8,7 @@ import (
 
 // BaseModel 基础模型
 type BaseModel struct {
-	ID        uint64 `json:"id" gorm:"primaryKey" swaggertype:"string"`
+	ID        uint64    `json:"id" gorm:"primaryKey;autoIncrement" swaggertype:"string"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -31,6 +31,6 @@ type Pagination struct {
 
 // PaginationResponse 分页响应模型 (non-generic version for Swagger compatibility)
 type PaginationResponse struct {
-	Data       []any `json:"data"`
+	Data       []any      `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }

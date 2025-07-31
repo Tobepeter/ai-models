@@ -7,7 +7,11 @@ import { HTMLAttributes } from 'react'
 const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
 	const { className, ...restProps } = props
 	return (
-		<div className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)} {...restProps} data-slot="skeleton-box" />
+		<div
+			className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)}
+			{...restProps}
+			data-slot="skeleton-box"
+		/>
 	)
 }
 

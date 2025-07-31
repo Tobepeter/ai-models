@@ -1,19 +1,21 @@
 /**
- * ESLint 自定义规则：要求 React 组件的顶级元素添加 data-slot 属性
- * 
- * 目标：强制 TSX 文件中的 React 组件在返回的第一个非 Fragment 元素上添加 data-slot 属性
+ * ESLint 自定义规则：要求 React 组件的顶级原生元素添加 data-slot 属性
+ *
+ * 目标：强制 TSX 文件中的 React 组件在返回的原生 HTML 元素上添加 data-slot 属性
  * 用于提升调试体验和组件定位能力
- * 
+ *
  * 规范：
  * 1. 检查 React 组件的 return 语句
- * 2. 如果返回的是 JSX 元素（非 Fragment），必须包含 data-slot 属性
+ * 2. 如果返回的是原生 HTML 元素（小写开头），必须包含 data-slot 属性
  * 3. data-slot 的值应该是 kebab-case 格式的组件名
- * 
+ * 4. 自定义组件（大写开头）和 Fragment 不需要 data-slot
+ *
  * 示例：
  * ❌ return <div className="feed-item">...</div>
  * ✅ return <div data-slot="feed-item" className="feed-item">...</div>
  * ✅ return <article data-slot="feed-item">...</article>
  * ✅ return <>...</> // Fragment 不需要 data-slot
+ * ✅ return <MyComponent /> // 自定义组件不需要 data-slot
  */
 export default {
 	meta: {
@@ -89,9 +91,7 @@ export default {
 		 * 将组件名转换为 kebab-case
 		 */
 		function toKebabCase(str) {
-			return str
-				.replace(/([a-z])([A-Z])/g, '$1-$2')
-				.toLowerCase()
+			return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 		}
 
 		/**
@@ -99,12 +99,8 @@ export default {
 		 */
 		function hasDataSlot(jsxElement) {
 			if (!jsxElement.openingElement) return false
-			
-			return jsxElement.openingElement.attributes.some(attr => 
-				attr.type === 'JSXAttribute' && 
-				attr.name && 
-				attr.name.name === 'data-slot'
-			)
+
+			return jsxElement.openingElement.attributes.some((attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'data-slot')
 		}
 
 		/**
@@ -112,15 +108,33 @@ export default {
 		 */
 		function isFragment(jsxElement) {
 			if (!jsxElement.openingElement) return false
-			
+
 			const elementName = jsxElement.openingElement.name
 			return (
 				elementName.type === 'JSXFragment' ||
 				(elementName.type === 'JSXIdentifier' && elementName.name === 'Fragment') ||
-				(elementName.type === 'JSXMemberExpression' && 
-				 elementName.object.name === 'React' && 
-				 elementName.property.name === 'Fragment')
+				(elementName.type === 'JSXMemberExpression' && elementName.object.name === 'React' && elementName.property.name === 'Fragment')
 			)
+		}
+
+		/**
+		 * 检查是否为自定义组件（大写开头）
+		 */
+		function isCustomComponent(jsxElement) {
+			if (!jsxElement.openingElement) return false
+
+			const elementName = jsxElement.openingElement.name
+			if (elementName.type === 'JSXIdentifier') {
+				// 大写开头表示自定义组件
+				return /^[A-Z]/.test(elementName.name)
+			}
+
+			// JSXMemberExpression 也视为自定义组件
+			if (elementName.type === 'JSXMemberExpression') {
+				return true
+			}
+
+			return false
 		}
 
 		/**
@@ -162,6 +176,11 @@ export default {
 				return
 			}
 
+			// 自定义组件（大写开头）不需要 data-slot
+			if (isCustomComponent(topLevelJSX)) {
+				return
+			}
+
 			// 检查是否有 data-slot 属性
 			if (!hasDataSlot(topLevelJSX)) {
 				const componentName = getComponentName(node)
@@ -170,19 +189,21 @@ export default {
 				context.report({
 					node: topLevelJSX.openingElement,
 					message: `React 组件的顶级元素缺少 data-slot 属性，建议使用 data-slot="${suggestedSlot}"`,
-					fix: autoFix ? (fixer) => {
-						// 自动修复：在开标签中添加 data-slot 属性
-						const openingElement = topLevelJSX.openingElement
-						const lastAttr = openingElement.attributes[openingElement.attributes.length - 1]
-						
-						if (lastAttr) {
-							// 在最后一个属性后添加
-							return fixer.insertTextAfter(lastAttr, ` data-slot="${suggestedSlot}"`)
-						} else {
-							// 在标签名后添加
-							return fixer.insertTextAfter(openingElement.name, ` data-slot="${suggestedSlot}"`)
-						}
-					} : null,
+					fix: autoFix
+						? (fixer) => {
+								// 自动修复：在开标签中添加 data-slot 属性
+								const openingElement = topLevelJSX.openingElement
+								const lastAttr = openingElement.attributes[openingElement.attributes.length - 1]
+
+								if (lastAttr) {
+									// 在最后一个属性后添加
+									return fixer.insertTextAfter(lastAttr, ` data-slot="${suggestedSlot}"`)
+								} else {
+									// 在标签名后添加
+									return fixer.insertTextAfter(openingElement.name, ` data-slot="${suggestedSlot}"`)
+								}
+							}
+						: null,
 				})
 			}
 		}

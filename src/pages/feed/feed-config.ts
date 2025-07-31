@@ -5,6 +5,7 @@ export const feedConfig = {
 	commentVirtualScrollThreshold: 50, // 启用虚拟滚动的评论数阈值
 	commentItemHeight: 46, // 评论项预估高度
 	commentAutoLoadDistance: 200, // 自动加载距离（px）
+	maxCommentsDisplay: 10, // 最多显示评论数
 
 	// Feed相关配置
 	feedPageSize: 20, // Feed分页大小
@@ -21,7 +22,7 @@ export const feedConfig = {
 			icon: 'Flag',
 			onClick: (userId: string) => {
 				console.log('举报用户:', userId)
-			}
+			},
 		},
 		{
 			key: 'delete',
@@ -29,7 +30,7 @@ export const feedConfig = {
 			icon: 'Trash2',
 			onClick: (userId: string) => {
 				console.log('删除帖子:', userId)
-			}
-		}
-	]
+			},
+		},
+	],
 }

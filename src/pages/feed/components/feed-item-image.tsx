@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 /**
  * 信息流图片组件
  */
-export const FeedImage = (props: FeedImageProps) => {
+export const FeedItemImage = (props: FeedImageProps) => {
 	const { src, className } = props
 
 	return (

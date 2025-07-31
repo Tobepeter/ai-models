@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { authApi } from './api/auth/auth-api'
 import { NotifyHub } from './components/common/notify'
+import { GlobalFloatingContainer } from './components/common/global-floating-container'
 import { useGitHubPagesRouter } from './hooks/useGitHubPagesRouter'
 import { useUserStore } from './store/user-store'
 import debug from './utils/debug'
@@ -45,6 +46,7 @@ function App() {
 		<div className="bg-background text-foreground" data-slot="app">
 			<Outlet />
 			<NotifyHub />
+			{/* <GlobalFloatingContainer /> */}
 			{/* {isDev && <GM />} */}
 		</div>
 	)

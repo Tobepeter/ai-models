@@ -45,7 +45,8 @@ const DraggableButton = (props: DraggableButtonProps) => {
 			)}
 			onClick={onClick}
 			{...attributes}
-			{...listeners} data-slot="draggable-button"
+			{...listeners}
+			data-slot="draggable-button"
 		>
 			{title}
 		</button>

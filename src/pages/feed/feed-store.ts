@@ -30,6 +30,12 @@ const feedState = {
 		postId: null as string | null,
 		scrollTop: 0, // 记录滚动位置
 	},
+	createDialog: {
+		isOpen: false,
+	},
+
+	// 蒙层状态 - 用于评论弹窗
+	isMaskOpen: false,
 }
 
 type FeedState = typeof feedState
@@ -48,6 +54,11 @@ const stateCreator = () => {
 		appendPosts: (newPosts: FeedPost[]) => {
 			const { posts } = get()
 			set({ posts: [...posts, ...newPosts] }) // 加载更多时新数据加在后面
+		},
+
+		addNewPost: (newPost: FeedPost) => {
+			const { posts } = get()
+			set({ posts: [newPost, ...posts] }) // 新创建的post加在最前面
 		},
 
 		updatePost: (postId: string, updates: Partial<FeedPost>) => {
@@ -78,7 +89,6 @@ const stateCreator = () => {
 			set({ posts: updatedPosts })
 		},
 
-
 		addComment: (postId: string, comment: FeedComment) => {
 			const { posts } = get()
 			const updatedPosts = posts.map((post) => {
@@ -101,8 +111,8 @@ const stateCreator = () => {
 				detailDialog: {
 					isOpen: true,
 					postId,
-					scrollTop: 0
-				}
+					scrollTop: 0,
+				},
 			})
 		},
 
@@ -114,7 +124,7 @@ const stateCreator = () => {
 				if (postComments && postComments.comments.length > COMMENT_PAGE_SIZE) {
 					const firstPageComments = postComments.comments.slice(0, COMMENT_PAGE_SIZE)
 					const firstPageCommentsById: Record<string, FeedComment> = {}
-					firstPageComments.forEach(id => {
+					firstPageComments.forEach((id) => {
 						if (postComments.commentsById[id]) {
 							firstPageCommentsById[id] = postComments.commentsById[id]
 						}
@@ -128,8 +138,8 @@ const stateCreator = () => {
 								comments: firstPageComments,
 								commentsById: firstPageCommentsById,
 								nextCursor: firstPageComments.length >= COMMENT_PAGE_SIZE ? postComments.nextCursor : undefined,
-							}
-						}
+							},
+						},
 					})
 				}
 			}
@@ -138,8 +148,8 @@ const stateCreator = () => {
 				detailDialog: {
 					isOpen: false,
 					postId: null,
-					scrollTop: 0
-				}
+					scrollTop: 0,
+				},
 			})
 		},
 
@@ -148,10 +158,31 @@ const stateCreator = () => {
 			set({
 				detailDialog: {
 					...detailDialog,
-					scrollTop
-				}
+					scrollTop,
+				},
 			})
 		},
+
+		// 创建弹窗管理
+		openCreateDialog: () => {
+			set({
+				createDialog: {
+					isOpen: true,
+				},
+			})
+		},
+
+		closeCreateDialog: () => {
+			set({
+				createDialog: {
+					isOpen: false,
+				},
+			})
+		},
+
+		// 蒙层管理
+		showMask: () => set({ isMaskOpen: true }),
+		hideMask: () => set({ isMaskOpen: false }),
 
 		// 评论分页管理
 		setPostComments: (postId: string, comments: FeedComment[], cursor?: string, total?: number) => {
@@ -166,7 +197,7 @@ const stateCreator = () => {
 
 			// 构建新的评论数据
 			const newCommentsById = { ...currentPage.commentsById }
-			const newCommentIds = comments.map(comment => {
+			const newCommentIds = comments.map((comment) => {
 				newCommentsById[comment.id] = comment
 				return comment.id
 			})
@@ -186,8 +217,8 @@ const stateCreator = () => {
 						total: total ?? currentPage.total,
 						loading: false,
 						error: undefined,
-					}
-				}
+					},
+				},
 			})
 		},
 
@@ -200,7 +231,7 @@ export const useFeedStore = create(
 	persist(stateCreator(), {
 		name: storageKeys.feed || 'feed-storage',
 		partialize: (state) => ({
-			posts: state.posts.slice(0, 50).map(post => ({
+			posts: state.posts.slice(0, 50).map((post) => ({
 				...post,
 				isExpanded: false, // 不持久化内容展开状态
 			})),
@@ -214,11 +245,14 @@ export const useFeedStore = create(
 						// 只保留第一页评论
 						comments: page.comments.slice(0, COMMENT_PAGE_SIZE),
 						commentsById: Object.fromEntries(
-							page.comments.slice(0, COMMENT_PAGE_SIZE).map(id => [id, page.commentsById[id]]).filter(([, comment]) => comment)
+							page.comments
+								.slice(0, COMMENT_PAGE_SIZE)
+								.map((id) => [id, page.commentsById[id]])
+								.filter(([, comment]) => comment)
 						),
 						loading: false, // 不持久化加载状态
 						error: undefined, // 不持久化错误状态
-					}
+					},
 				])
 			),
 			// 不持久化弹窗状态
