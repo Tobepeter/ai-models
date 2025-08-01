@@ -110,7 +110,7 @@
 		"remark-gfm": "^4.0.1",
 		"sonner": "^2.0.6",
 		"tailwind-merge": "^3.3.1",
-		"tailwind-scrollbar-hide": "^4.0.0",
+		"tailwind-scrollbar": "^4.0.2",
 		"uuid": "^11.1.0",
 		"weighted": "^1.0.0",
 		"ws": "^8.18.3",

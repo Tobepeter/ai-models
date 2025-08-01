@@ -80,7 +80,7 @@ export const FeedDetailCommentList = (props: FeedDetailCommentListProps) => {
 	return (
 		<div className={rootClass} data-slot="feed-detail-comment-list">
 			{/* 虚拟滚动容器 */}
-			<div ref={parentRef} className="h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+			<div ref={parentRef} className="h-full overflow-auto scrollbar-none">
 				<div
 					style={{
 						height: virtualizer.getTotalSize(),

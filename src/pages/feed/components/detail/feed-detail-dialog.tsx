@@ -70,6 +70,9 @@ export const FeedDetailDialog = () => {
 	}, [detailDialog.isOpen])
 
 	const contentClass = cn('p-0 pr-4', isMobile ? 'w-full h-full max-w-none max-h-none m-0 rounded-none' : 'w-[85vw] h-[85vh]')
+	// const detailContentClass = 'h-full'
+	// NOTE: 我是在是想不明白，为什么不能使用 100% 继承弹窗的高度，但是如果弹窗内部用到了 flex-1 的滚动条，底部必定溢出，必须使用 vh 单位，非常奇怪
+	const detailContentClass = isMobile ? 'h-full' : 'h-[85vh]'
 
 	return (
 		<Dialog open={detailDialog.isOpen} onOpenChange={(open) => !open && handleClose()} data-slot="feed-detail-dialog">
@@ -82,7 +85,7 @@ export const FeedDetailDialog = () => {
 					<DialogDescription>查看帖子详情和评论</DialogDescription>
 				</DialogHeader>
 
-				<FeedDetailContent post={currentPost} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} onAddComment={handleAddComment} onReply={handleReply} className="h-full" />
+				<FeedDetailContent post={currentPost} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} onAddComment={handleAddComment} onReply={handleReply} className={detailContentClass} />
 			</DialogContent>
 		</Dialog>
 	)

@@ -26,12 +26,10 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 		console.log('分享:', postId) // TODO: 实现分享功能
 	})
 
+	const rootClass = cn('flex items-center space-x-4 pt-2', className)
+
 	return (
-		<div
-			className={cn('flex items-center space-x-4 pt-2', className)}
-			onClick={(e) => e.stopPropagation()}
-			data-slot="feed-actions" // 阻止冒泡到父级点击事件
-		>
+		<div className={rootClass} data-slot="feed-actions">
 			{/* 点赞 */}
 			<Button
 				variant="ghost"

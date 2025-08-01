@@ -21,13 +21,15 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 		// 如果要打开弹窗，检查是否有其他弹窗已打开
 		if (newIsOpen) {
 			const { isCommentInputOpen, lastCommentCloseTime } = useFeedStore.getState()
-			
+
 			// 如果有其他弹窗打开，阻止操作
 			if (isCommentInputOpen) return
-			
+
 			// 目前有一个问题，先打开a，点击b，会先关闭a，这时候b可以打开了
-			// 如果刚刚关闭了弹窗（100ms内），也阻止打开，防止快速切换
-			if (lastCommentCloseTime > 0 && Date.now() - lastCommentCloseTime < 100) return
+			// 如果刚刚关闭了弹窗，也阻止打开，防止快速切换
+			const delta = Date.now() - lastCommentCloseTime
+			const delay = 300 // NOTE: 我也不知道为什么这么卡，我打开居然时间差能到300ms以上
+			if (lastCommentCloseTime > 0 && delta < delay) return
 
 			// 如果是回复模式且内容为空，设置初始内容
 			if (replyTo && !content) {

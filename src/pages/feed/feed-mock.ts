@@ -60,7 +60,7 @@ class FeedMock {
 			commentCount: number.int({ min: 0, max: 100 }),
 			isLiked: datatype.boolean({ probability: 0.3 }),
 			isExpanded: false,
-			comments: this.genComments(postId, number.int({ min: 5, max: 20 })),
+			comments: this.genComments(postId, number.int({ min: 5, max: 50 })),
 		}
 
 		return post

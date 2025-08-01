@@ -90,6 +90,10 @@ class UserUtil {
 			extra: stringifyUserExtra(newExtra),
 		})
 	}
+
+	isLogin() {
+		return !!useUserStore.getState().token
+	}
 }
 
 export const userUtil = new UserUtil()

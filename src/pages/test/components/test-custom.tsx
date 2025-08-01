@@ -1,46 +1,86 @@
 import { ShimmerOp } from '@/components/common/shimmer-op'
 
 /**
- * 测试基于 opacity 的 shimmer 效果组件
+ * Flex 高度测试 - 解决 flex-1 子节点 100% 高度问题
  */
 const TestCustom = () => {
+	// 模拟数据
+	const mockData = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}: This is a test content item with some longer text to show scrolling behavior.`)
+
 	return (
-		<div className="p-6 max-w-2xl mx-auto" data-slot="test-custom">
-			<div className="space-y-6">
-				<h1 className="text-2xl font-bold">ShimmerOp 测试</h1>
+		<div className="p-6 max-w-4xl mx-auto h-screen" data-slot="test-custom">
+			<div className="space-y-6 h-full">
+				<h1 className="text-2xl font-bold flex-shrink-0">Flex 高度测试</h1>
 
-				{/* 基本效果 */}
-				<div className="space-y-4">
-					<h2 className="text-lg font-semibold">基本效果</h2>
-					<div className="text-lg">
-						<ShimmerOp text="人工智能是一门综合性学科" />
+				<div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
+					{/* 错误示例 - 使用 h-full */}
+					<div className="space-y-4">
+						<h2 className="text-lg font-semibold text-red-600">❌ 错误 (h-full)</h2>
+						<div className="border rounded-lg p-4 flex flex-col bg-red-50" style={{ height: '300px' }}>
+							{/* 固定内容 */}
+							<div className="p-2 bg-white rounded mb-2">Header Content</div>
+
+							{/* flex-1 容器 */}
+							<div className="flex-1 min-h-0 bg-blue-100 p-2 rounded">
+								<div className="text-sm mb-2">flex-1 容器</div>
+								{/* 子节点使用 h-full - 这里有问题 */}
+								<div className="h-full">
+									<div className="h-full overflow-auto bg-white rounded p-2">
+										{mockData.map((item, i) => (
+											<div key={i} className="py-1 text-sm border-b border-gray-100">
+												{item}
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* 正确示例 - 移除 h-full，依赖拉伸 */}
+					<div className="space-y-4">
+						<h2 className="text-lg font-semibold text-green-600">✅ 正确 (移除 h-full)</h2>
+						<div className="border rounded-lg p-4 flex flex-col bg-green-50" style={{ height: '300px' }}>
+							{/* 固定内容 */}
+							<div className="flex-shrink-0 p-2 bg-white rounded mb-2">Header Content</div>
+
+							{/* flex-1 容器 */}
+							<div className="flex-1 min-h-0 bg-blue-100 p-2 rounded">
+								<div className="text-sm mb-2">flex-1 容器</div>
+								{/* 子节点移除 h-full，依赖默认拉伸 */}
+								<div className="overflow-auto bg-white rounded p-2">
+									<div className="text-xs text-gray-600 mb-2">拉伸子容器 (正确)</div>
+									{mockData.map((item, i) => (
+										<div key={i} className="py-1 text-sm border-b border-gray-100">
+											{item}
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 
-				{/* 多行文本测试 */}
+				{/* 绝对定位方案 */}
 				<div className="space-y-4">
-					<h2 className="text-lg font-semibold">多行文本</h2>
-					<div className="space-y-2">
-						<div className="text-base">
-							<ShimmerOp text="现代AI主要基于机器学习技术，" />
-						</div>
-						<div className="text-base">
-							<ShimmerOp text="特别是深度学习，通过大量数据训练模型" />
-						</div>
-						<div className="text-base">
-							<ShimmerOp text="来实现智能行为。" />
-						</div>
-					</div>
-				</div>
+					<h2 className="text-lg font-semibold text-blue-600">🔧 方案3: 绝对定位</h2>
+					<div className="border rounded-lg p-4 flex flex-col bg-blue-50" style={{ height: '200px' }}>
+						{/* 固定内容 */}
+						<div className="flex-shrink-0 p-2 bg-white rounded mb-2">Header Content</div>
 
-				{/* 长文本测试 */}
-				<div className="space-y-4">
-					<h2 className="text-lg font-semibold">长文本</h2>
-					<div className="text-base">
-						<ShimmerOp
-							text="人工智能（Artificial Intelligence，简称AI）是一门综合性学科，涉及计算机科学、数学、认知科学、心理学等多个领域。它的核心目标是创造能够执行通常需要人类智能才能完成的任务的计算机系统。"
-							range={8}
-						/>
+						{/* flex-1 容器设为 relative */}
+						<div className="flex-1 min-h-0 bg-gray-100 p-2 rounded relative">
+							<div className="text-sm mb-2">flex-1 relative 容器</div>
+							{/* 子节点绝对定位填满父容器 */}
+							<div className="absolute inset-2 top-8 overflow-auto bg-white rounded p-2">
+								<div className="text-xs text-gray-600 mb-2">absolute inset-0 子容器</div>
+								{mockData.slice(0, 20).map((item, i) => (
+									<div key={i} className="py-1 text-sm border-b border-gray-100">
+										{item}
+									</div>
+								))}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

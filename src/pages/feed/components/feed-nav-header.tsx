@@ -3,10 +3,14 @@ import { cn } from '@/lib/utils'
 import { RefreshCw, Plus } from 'lucide-react'
 import { feedMgr } from '../feed-mgr'
 import { useFeedStore } from '../feed-store'
+import { userUtil } from '@/pages/user/user-util'
+import { notify } from '@/components/common/notify'
+import { useUserStore } from '@/store/user-store'
 
 /* Feed 导航标题组件 */
 export const FeedNavHeader = () => {
 	const { loading, refreshing, clearError, openCreateDialog } = useFeedStore()
+	const { goLogin } = useUserStore()
 
 	const handleRefresh = () => {
 		clearError()
@@ -14,6 +18,15 @@ export const FeedNavHeader = () => {
 	}
 
 	const handleCreate = () => {
+		if (!userUtil.isLogin()) {
+			notify.confirm({
+				title: '需要登录',
+				description: '请先登录后再创建内容',
+				confirmText: '去登录',
+				onConfirm: () => goLogin(),
+			})
+			return
+		}
 		openCreateDialog()
 	}
 
