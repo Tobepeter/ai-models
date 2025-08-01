@@ -27,7 +27,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 		return commentPage.comments.map((id) => commentPage.commentsById[id]).filter(Boolean)
 	}, [post, commentPage])
 
-	const hasMoreComments = Boolean(commentPage?.nextCursor || (commentPage?.total || 0) > comments.length)
+	const hasMoreComments = Boolean(commentPage?.next_cursor || (commentPage?.total || 0) > comments.length)
 	const loading = commentPage?.loading || false
 	const error = commentPage?.error
 
@@ -42,7 +42,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const handleLoadMore = async () => {
 		if (!commentPage || loading) return
 		// TODO: 调用 manager 加载更多评论
-		console.log('加载更多评论:', post!.id, commentPage.nextCursor)
+		console.log('加载更多评论:', post!.id, commentPage.next_cursor)
 	}
 
 	// 重试加载
@@ -86,11 +86,11 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 			<div className="flex-shrink-0 p-6 border-b">
 				{/* 用户信息 */}
 				<FeedItemHeader
-					userId={post.userId}
+					userId={post.user_id}
 					username={post.username}
 					avatar={post.avatar}
 					status={post.status}
-					createdAt={post.createdAt}
+					createdAt={post.created_at}
 					className="mb-4"
 					showNavigateButton={showNavigateButton}
 					onNavigateToPage={handleNavigateToPage}
@@ -100,10 +100,10 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 				{post.content && <FeedText content={post.content} isExpanded={post.isExpanded} onToggleExpand={() => handleToggleExpand(post.id)} className="mb-4" />}
 
 				{/* 图片内容 */}
-				{post.image && <FeedItemImage src={post.image} className="mb-4 mx-auto" />}
+				{post.image_url && <FeedItemImage src={post.image_url} className="mb-4 mx-auto" />}
 
 				{/* 交互按钮 */}
-				<FeedItemActions postId={post.id} likeCount={post.likeCount} commentCount={post.commentCount} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />
+				<FeedItemActions postId={post.id} likeCount={post.like_count} commentCount={post.comment_count} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />
 			</div>
 
 			{/* 评论区域 - 自适应剩余空间 */}

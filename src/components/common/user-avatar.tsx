@@ -5,18 +5,17 @@ import { Loading } from './loading'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
-/**
- * 用户头像组件
- * 基于shadcn Avatar和ImagePreview封装，支持点击预览功能
- */
+/** 用户头像组件 */
 export const UserAvatar = (props: UserAvatarProps) => {
 	const dfIcon = <User className="w-1/2 h-1/2 text-gray-400" />
-	const { src, alt = '用户头像', size = 40, className, style, fallbackIcon = dfIcon, fallbackText, noPreview, editable, dragable, loading } = props
+	const { src, username, size = 40, className, style, fallbackIcon = dfIcon, fallbackText, noPreview, editable, dragable, loading } = props
+	const alt = fallbackText || username || '' // alt默认为空，如果有fallbackText用fallbackText，否则用username
+	const computedFallbackText = fallbackText || username?.charAt(0).toUpperCase() // fallbackText优先，否则用username的首字母大写
 
 	const boxStyle = { width: size, height: size, ...style }
 
-	// 仅在无src且无fallbackText时展示静态内容
-	if (!src && !fallbackText) {
+	if (!src && !computedFallbackText) {
+		// 仅在无src且无computedFallbackText时展示静态内容
 		return (
 			<div className={cn('relative overflow-hidden rounded-full bg-gray-100 flex items-center justify-center select-none', className)} style={boxStyle}>
 				{fallbackIcon}
@@ -28,26 +27,23 @@ export const UserAvatar = (props: UserAvatarProps) => {
 	const avatarContent = (
 		<Avatar className="relative w-full h-full" style={boxStyle}>
 			{src && <AvatarImage src={src} alt={alt} draggable={dragable} className="select-none" />}
-			{!src && fallbackText && (
+			{!src && computedFallbackText && (
 				<AvatarFallback className="select-none text-gray-600 font-medium" style={{ fontSize: size * 0.4 }}>
-					{fallbackText}
+					{computedFallbackText}
 				</AvatarFallback>
 			)}
-			{/* Loading浮层 - 放在Avatar内部继承圆角 */}
-			<Loading loading={loading} className="text-white" />
+			<Loading loading={loading} className="text-white" /> {/* Loading浮层 - 放在Avatar内部继承圆角 */}
 		</Avatar>
 	)
 
-	const displayFallbackText = !!fallbackText && !src
+	const displayFallbackText = !!computedFallbackText && !src
 
-	// 如果是fallbackText，不能编辑
-	const finialEditable = editable && displayFallbackText
+	const finialEditable = editable && displayFallbackText // 如果是fallbackText，不能编辑
 
-	// 如果是fallbackText，不能预览
-	const finalNoPreview = displayFallbackText || noPreview
+	const finalNoPreview = displayFallbackText || noPreview // 如果是fallbackText，不能预览
 
-	// 使用noInteraction来控制是否可预览（相当于noPreview）
 	return (
+		// 使用noInteraction来控制是否可预览（相当于noPreview）
 		<ImagePreview
 			url={src}
 			size={size}
@@ -66,7 +62,7 @@ export const UserAvatar = (props: UserAvatarProps) => {
 
 export interface UserAvatarProps {
 	src?: string // 头像图片URL
-	alt?: string // 图片alt文本
+	username?: string // 用户名，用于生成fallback文本和alt
 	size?: number // 头像尺寸（像素）
 	className?: string // 自定义样式类名
 	style?: CSSProperties // 内联样式

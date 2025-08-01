@@ -49,15 +49,15 @@ class FeedMock {
 
 		const post: FeedPost = {
 			id: postId,
-			userId: feedUtil.generateUserId(),
+			user_id: feedUtil.generateUserId(),
 			username: faker.person.fullName(),
 			avatar: this.randomAvatar(),
 			status: datatype.boolean({ probability: 0.7 }) ? random().emoji : undefined,
 			content: datatype.boolean({ probability: 0.8 }) ? this.randomContent() : undefined,
-			image: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
-			createdAt: new Date(now).toISOString(),
-			likeCount: number.int({ min: 0, max: 1000 }),
-			commentCount: number.int({ min: 0, max: 100 }),
+			image_url: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
+			created_at: new Date(now).toISOString(),
+			like_count: number.int({ min: 0, max: 1000 }),
+			comment_count: number.int({ min: 0, max: 100 }),
 			isLiked: datatype.boolean({ probability: 0.3 }),
 			isExpanded: false,
 			comments: this.genComments(postId, number.int({ min: 5, max: 50 })),
@@ -73,15 +73,15 @@ class FeedMock {
 
 		return {
 			id: postId,
-			userId: 'current-user', // 当前用户ID
+			user_id: 'current-user', // 当前用户ID
 			username: '我', // 当前用户名
 			avatar: this.randomAvatar(),
 			status: undefined, // 不支持心情状态
 			content,
-			image,
-			createdAt: new Date(now).toISOString(),
-			likeCount: 0,
-			commentCount: 0,
+			image_url: image,
+			created_at: new Date(now).toISOString(),
+			like_count: 0,
+			comment_count: 0,
 			isLiked: false,
 			isExpanded: false,
 			comments: [],
@@ -99,14 +99,14 @@ class FeedMock {
 
 			const comment: FeedComment = {
 				id: feedUtil.generatePostId(),
-				postId,
-				userId: feedUtil.generateUserId(),
+				post_id: postId,
+				user_id: feedUtil.generateUserId(),
 				username: faker.person.fullName(),
 				avatar: this.randomAvatar(),
 				content: this.randomCommentContent(isReply),
-				replyTo: isReply ? comments[number.int({ min: 0, max: Math.min(i - 1, 9) })].username : undefined,
-				createdAt: new Date(timestamp).toISOString(),
-				likeCount: number.int({ min: 0, max: 100 }),
+				reply_to: isReply ? comments[number.int({ min: 0, max: Math.min(i - 1, 9) })].username : undefined,
+				created_at: new Date(timestamp).toISOString(),
+				like_count: number.int({ min: 0, max: 100 }),
 				isLiked: datatype.boolean({ probability: 0.15 }),
 			}
 
@@ -120,14 +120,14 @@ class FeedMock {
 	genComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: feedUtil.generatePostId(),
-			postId,
-			userId: 'current_user_id',
+			post_id: postId,
+			user_id: 'current_user_id',
 			username: '当前用户',
 			avatar: dummy.images.avatar,
 			content,
-			replyTo,
-			createdAt: new Date().toISOString(),
-			likeCount: 0,
+			reply_to: replyTo,
+			created_at: new Date().toISOString(),
+			like_count: 0,
 			isLiked: false,
 		}
 	}

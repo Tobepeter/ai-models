@@ -67,7 +67,7 @@ class FeedManager {
 			const posts = feedMock.genPosts(20)
 
 			const lastPost = posts[posts.length - 1]
-			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
+			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.created_at).getTime(), lastPost.id) : null
 
 			store.setData({ posts, cursor, hasMore: true, loading: false })
 			return posts
@@ -110,7 +110,7 @@ class FeedManager {
 			}
 
 			const lastPost = posts[posts.length - 1]
-			const newCursor = feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id)
+			const newCursor = feedUtil.genCursor(new Date(lastPost.created_at).getTime(), lastPost.id)
 
 			store.appendPosts(posts)
 			store.setData({
@@ -145,7 +145,7 @@ class FeedManager {
 			const posts = feedMock.genPosts(10) // 生成新的数据
 
 			const lastPost = posts[posts.length - 1]
-			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.createdAt).getTime(), lastPost.id) : null
+			const cursor = lastPost ? feedUtil.genCursor(new Date(lastPost.created_at).getTime(), lastPost.id) : null
 
 			store.setData({ posts, cursor, hasMore: true, refreshing: false, loading: false })
 			return posts

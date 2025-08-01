@@ -19,7 +19,7 @@ export const useFeedDetail = (post: FeedPost) => {
 		return commentPage.comments.map((id) => commentPage.commentsById[id]).filter(Boolean)
 	}, [commentPage, post.comments])
 
-	const hasMoreComments = Boolean(commentPage?.nextCursor || (commentPage?.total || 0) > comments.length)
+	const hasMoreComments = Boolean(commentPage?.next_cursor || (commentPage?.total || 0) > comments.length)
 
 	// 处理点赞
 	const handleLike = (postId: string) => {
@@ -36,7 +36,7 @@ export const useFeedDetail = (post: FeedPost) => {
 		if (!commentPage || commentPage.loading) return
 
 		// TODO: 调用 manager 加载更多评论
-		console.log('加载更多评论:', post.id, commentPage.nextCursor)
+		console.log('加载更多评论:', post.id, commentPage.next_cursor)
 	}
 
 	// 重试加载

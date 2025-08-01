@@ -77,7 +77,7 @@ const stateCreator = () => {
 					return {
 						...post,
 						isLiked,
-						likeCount: isLiked ? post.likeCount + 1 : post.likeCount - 1, // 同步更新点赞数
+						like_count: isLiked ? post.like_count + 1 : post.like_count - 1, // 同步更新点赞数
 					}
 				}
 				return post
@@ -99,7 +99,7 @@ const stateCreator = () => {
 					return {
 						...post,
 						comments: [comment, ...existingComments], // 新评论在前
-						commentCount: post.commentCount + 1,
+						comment_count: post.comment_count + 1,
 					}
 				}
 				return post
@@ -139,7 +139,7 @@ const stateCreator = () => {
 								...postComments,
 								comments: firstPageComments,
 								commentsById: firstPageCommentsById,
-								nextCursor: firstPageComments.length >= COMMENT_PAGE_SIZE ? postComments.nextCursor : undefined,
+								next_cursor: firstPageComments.length >= COMMENT_PAGE_SIZE ? postComments.next_cursor : undefined,
 							},
 						},
 					})
@@ -221,7 +221,7 @@ const stateCreator = () => {
 						...currentPage,
 						comments: updatedComments,
 						commentsById: newCommentsById,
-						nextCursor: cursor,
+						next_cursor: cursor,
 						total: total ?? currentPage.total,
 						loading: false,
 						error: undefined,

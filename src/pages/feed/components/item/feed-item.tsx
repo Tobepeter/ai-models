@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
  */
 export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, onLike, onToggleExpand, onAddComment, className } = props
-	const { id, userId, username, avatar, status, createdAt, content, isExpanded, image, likeCount, commentCount, isLiked, comments } = post
+	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, comments } = post
 	const { openDetailDialog } = useFeedStore()
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
@@ -53,14 +53,14 @@ export const FeedItem = memo((props: FeedItemProps) => {
 			<div className="relative rounded-lg border border-transparent cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50" onClick={handleContentClick}>
 				{/* post内容 */}
 				<div className="p-4">
-					<FeedItemHeader userId={userId} username={username} avatar={avatar} status={status} createdAt={createdAt} className="mb-3" />
+					<FeedItemHeader userId={user_id} username={username} avatar={avatar} status={status} createdAt={created_at} className="mb-3" />
 					{content && <FeedText content={content} isExpanded={isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
-					{image && <FeedItemImage src={image} className="mb-3" />}
+					{image_url && <FeedItemImage src={image_url} className="mb-3" />}
 				</div>
 
 				{/* 交互按钮栏 */}
 				<div className="px-4 pb-4">
-					<FeedItemActions postId={id} likeCount={likeCount} commentCount={commentCount} isLiked={isLiked} onLike={onLike} onAddComment={handleAddComment} />
+					<FeedItemActions postId={id} likeCount={like_count} commentCount={comment_count} isLiked={isLiked} onLike={onLike} onAddComment={handleAddComment} />
 				</div>
 			</div>
 

@@ -104,14 +104,14 @@ class FeedUtil {
 	createComment(postId: string, content: string, replyTo?: string): FeedComment {
 		return {
 			id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-			postId,
-			userId: 'current-user', // TODO: 从用户状态获取
+			post_id: postId,
+			user_id: 'current-user', // TODO: 从用户状态获取
 			username: '当前用户', // TODO: 从用户状态获取
 			avatar: '/placeholder-avatar.jpg', // TODO: 从用户状态获取
 			content,
-			replyTo,
-			createdAt: new Date().toISOString(),
-			likeCount: 0,
+			reply_to: replyTo,
+			created_at: new Date().toISOString(),
+			like_count: 0,
 			isLiked: false,
 		}
 	}
