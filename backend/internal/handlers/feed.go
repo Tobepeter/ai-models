@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 
 	"ai-models-backend/internal/models"
 	"ai-models-backend/internal/services"
@@ -24,18 +23,12 @@ func NewFeedHandler(feedService *services.FeedService) *FeedHandler {
 	}
 }
 
-// GetFeedPosts 获取信息流帖子列表
 // @Summary 获取信息流帖子列表
 // @Description 支持多种排序方式和cursor分页
+// @ID getFeedPosts
 // @Tags Feed
-// @Accept json
-// @Produce json
-// @Param sort query string false "排序类型" Enums(time,like,comment) default(time)
-// @Param after_id query string false "cursor分页的after_id"
-// @Param limit query int false "每页数量" default(20) minimum(1) maximum(50)
-// @Success 200 {object} models.FeedPostResponse
-// @Failure 400 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Param params query models.FeedQueryParams true "查询参数"
+// @Success 200 {object} response.Response{data=models.FeedPostResponse}
 // @Router /api/feed/posts [get]
 func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 	var params models.FeedQueryParams
@@ -65,17 +58,12 @@ func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 	})
 }
 
-// CreateFeedPost 创建信息流帖子
 // @Summary 创建信息流帖子
 // @Description 创建新的信息流帖子，需要登录
+// @ID createFeedPost
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param request body models.CreateFeedPostRequest true "帖子内容"
-// @Success 200 {object} models.FeedPost
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Success 200 {object} response.Response{data=models.FeedPost}
 // @Router /api/feed/posts [post]
 func (h *FeedHandler) CreateFeedPost(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
@@ -104,20 +92,15 @@ func (h *FeedHandler) CreateFeedPost(c *gin.Context) {
 	response.Success(c, post)
 }
 
-// ToggleLikePost 切换帖子点赞状态
-// @Summary 切换帖子点赞状态
-// @Description 点赞或取消点赞帖子，需要登录
+// @Summary 设置帖子点赞状态
+// @Description 设置帖子点赞或取消点赞状态，需要登录
+// @ID setFeedPostLike
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param post_id path string true "帖子ID"
-// @Success 200 {object} response.Response
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Param request body models.SetFeedPostLikeRequest true "点赞状态"
+// @Success 200 {object} response.Response{data=models.LikeResult}
 // @Router /api/feed/posts/{post_id}/like [post]
-func (h *FeedHandler) ToggleLikePost(c *gin.Context) {
+func (h *FeedHandler) SetLikePost(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
 		return
@@ -129,7 +112,13 @@ func (h *FeedHandler) ToggleLikePost(c *gin.Context) {
 		return
 	}
 
-	err := h.feedService.ToggleFeedPostLike(userID, postID)
+	var req models.SetFeedPostLikeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "参数错误: "+err.Error())
+		return
+	}
+
+	result, err := h.feedService.SetFeedPostLike(userID, postID, req.IsLike)
 	if err != nil {
 		if err.Error() == "post not found" {
 			response.Error(c, http.StatusNotFound, "帖子不存在")
@@ -139,21 +128,16 @@ func (h *FeedHandler) ToggleLikePost(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "操作成功")
+	response.Success(c, result)
 }
 
-// GetFeedComments 获取帖子评论列表
 // @Summary 获取帖子评论列表
 // @Description 获取指定帖子的评论列表，支持cursor分页
+// @ID getFeedComments
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param post_id path string true "帖子ID"
-// @Param after_id query string false "cursor分页的after_id"
-// @Param limit query int false "每页数量" default(20) minimum(1) maximum(50)
-// @Success 200 {object} models.FeedCommentResponse
-// @Failure 400 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Param params query models.CommentQueryParams true "查询参数"
+// @Success 200 {object} response.Response{data=models.FeedCommentResponse}
 // @Router /api/feed/posts/{post_id}/comments [get]
 func (h *FeedHandler) GetFeedComments(c *gin.Context) {
 	postID := c.Param("post_id")
@@ -188,19 +172,13 @@ func (h *FeedHandler) GetFeedComments(c *gin.Context) {
 	})
 }
 
-// CreateFeedComment 创建帖子评论
 // @Summary 创建帖子评论
 // @Description 为指定帖子创建评论，需要登录
+// @ID createFeedComment
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param post_id path string true "帖子ID"
 // @Param request body models.CreateFeedCommentRequest true "评论内容"
-// @Success 200 {object} models.FeedComment
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Success 200 {object} response.Response{data=models.FeedComment}
 // @Router /api/feed/posts/{post_id}/comments [post]
 func (h *FeedHandler) CreateFeedComment(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
@@ -233,19 +211,13 @@ func (h *FeedHandler) CreateFeedComment(c *gin.Context) {
 	response.Success(c, comment)
 }
 
-// SetCommentLike 设置评论点赞状态
 // @Summary 设置评论点赞状态
 // @Description 设置评论点赞或取消点赞状态，需要登录
+// @ID setFeedCommentLike
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param comment_id path string true "评论ID"
 // @Param request body models.SetFeedCommentLikeRequest true "点赞状态"
-// @Success 200 {object} response.Response
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Success 200 {object} response.Response{data=models.LikeResult}
 // @Router /api/feed/comments/{comment_id}/like [post]
 func (h *FeedHandler) SetCommentLike(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
@@ -265,39 +237,25 @@ func (h *FeedHandler) SetCommentLike(c *gin.Context) {
 		return
 	}
 
-	err := h.feedService.SetFeedCommentLike(userID, commentID, req.IsLike)
+	result, err := h.feedService.SetFeedCommentLike(userID, commentID, req.IsLike)
 	if err != nil {
 		if err.Error() == "comment not found" {
 			response.Error(c, http.StatusNotFound, "评论不存在")
 			return
 		}
-		// 检查是否是业务错误码
-		if len(err.Error()) > 15 && err.Error()[:15] == "BUSINESS_ERROR:" {
-			// 格式: BUSINESS_ERROR:1001:已点赞
-			parts := strings.Split(err.Error(), ":")
-			if len(parts) >= 3 {
-				response.Error(c, http.StatusOK, parts[2]) // 业务错误不用500状态码
-				return
-			}
-		}
 		response.Error(c, http.StatusInternalServerError, "操作失败")
 		return
 	}
 
-	response.Success(c, "操作成功")
+	response.Success(c, result)
 }
 
-// GetFeedPostDetail 获取帖子详情
 // @Summary 获取帖子详情
 // @Description 获取指定帖子的详细信息
+// @ID getFeedPostDetail
 // @Tags Feed
-// @Accept json
-// @Produce json
 // @Param post_id path string true "帖子ID"
-// @Success 200 {object} models.FeedPost
-// @Failure 400 {object} response.Response
-// @Failure 404 {object} response.Response
-// @Failure 500 {object} response.Response
+// @Success 200 {object} response.Response{data=models.FeedPost}
 // @Router /api/feed/posts/{post_id} [get]
 func (h *FeedHandler) GetFeedPostDetail(c *gin.Context) {
 	postID := c.Param("post_id")

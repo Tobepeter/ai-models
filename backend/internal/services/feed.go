@@ -128,51 +128,61 @@ func (s *FeedService) GetFeedPostByID(postID string) (*models.FeedPost, error) {
 	return &post, nil
 }
 
-// ToggleFeedPostLike 切换信息流帖子点赞状态
-func (s *FeedService) ToggleFeedPostLike(userID uint64, postID string) error {
+// SetFeedPostLike 设置信息流帖子点赞状态
+func (s *FeedService) SetFeedPostLike(userID uint64, postID string, isLike bool) (*models.LikeResult, error) {
 	postIDUint, err := s.ParseStringToUint64(postID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 检查帖子是否存在
 	var post models.FeedPost
 	if err := s.DB.Where("id = ?", postIDUint).First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("post not found")
+			return nil, errors.New("post not found")
 		}
-		return err
+		return nil, err
 	}
 
-	// 检查用户是否已点赞
+	// 检查当前点赞状态
+	var currentLiked bool
 	var existingLike models.PostLike
-	err = s.DB.Where("post_id = ? AND user_id = ?", postIDUint, userID).First(&existingLike).Error
+	err = s.DB.Where("post_id = ? AND user_id = ?", postIDUint, userID).
+		First(&existingLike).Error
+	currentLiked = err == nil
 
-	// 使用事务处理点赞状态切换
-	return s.DB.Transaction(func(tx *gorm.DB) error {
-		if err == nil {
-			// 用户已点赞，取消点赞
-			if err := tx.Delete(&existingLike).Error; err != nil {
-				return err
-			}
-			// 减少点赞数
-			return tx.Model(&post).UpdateColumn("like_count", gorm.Expr("like_count - 1")).Error
-		} else if errors.Is(err, gorm.ErrRecordNotFound) {
-			// 用户未点赞，添加点赞
-			newLike := models.PostLike{
-				PostID: postIDUint,
-				UserID: userID,
-			}
-			if err := tx.Create(&newLike).Error; err != nil {
+	// 状态无变化，直接返回
+	if currentLiked == isLike {
+		return &models.LikeResult{Changed: false, IsLiked: isLike}, nil
+	}
+
+	// 使用事务处理状态变更
+	result := &models.LikeResult{Changed: true, IsLiked: isLike}
+	txErr := s.DB.Transaction(func(tx *gorm.DB) error {
+		if isLike {
+			// 添加点赞记录
+			like := models.PostLike{PostID: postIDUint, UserID: userID}
+			if err := tx.Create(&like).Error; err != nil {
 				return err
 			}
 			// 增加点赞数
 			return tx.Model(&post).UpdateColumn("like_count", gorm.Expr("like_count + 1")).Error
 		} else {
-			// 其他数据库错误
-			return err
+			// 删除点赞记录
+			if err := tx.Where("post_id = ? AND user_id = ?", postIDUint, userID).
+				Delete(&models.PostLike{}).Error; err != nil {
+				return err
+			}
+			// 减少点赞数
+			return tx.Model(&post).UpdateColumn("like_count", gorm.Expr("like_count - 1")).Error
 		}
 	})
+
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	return result, nil
 }
 
 // GetFeedComments 获取帖子评论列表
@@ -275,32 +285,36 @@ func (s *FeedService) CreateFeedComment(userID uint64, postID string, req models
 }
 
 // SetFeedCommentLike 设置信息流评论点赞状态
-func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike bool) error {
+func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike bool) (*models.LikeResult, error) {
 	commentIDUint, err := s.ParseStringToUint64(commentID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 检查评论是否存在
 	var comment models.FeedComment
 	if err := s.DB.Where("id = ?", commentIDUint).First(&comment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("comment not found")
+			return nil, errors.New("comment not found")
 		}
-		return err
+		return nil, err
 	}
 
 	// 检查用户是否已点赞
 	var existingLike models.FeedCommentLike
 	err = s.DB.Where("comment_id = ? AND user_id = ?", commentIDUint, userID).First(&existingLike).Error
 
+	result := &models.LikeResult{}
+
 	// 使用事务处理点赞状态设置
-	return s.DB.Transaction(func(tx *gorm.DB) error {
+	txErr := s.DB.Transaction(func(tx *gorm.DB) error {
 		if isLike {
 			// 要点赞
 			if err == nil {
-				// 已经点赞了，返回业务错误码
-				return fmt.Errorf("BUSINESS_ERROR:1001:已点赞")
+				// 已点赞，无需操作
+				result.Changed = false
+				result.IsLiked = true
+				return nil
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
 				// 未点赞，添加点赞
 				newLike := models.FeedCommentLike{
@@ -311,7 +325,12 @@ func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike
 					return err
 				}
 				// 增加点赞数
-				return tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count + 1")).Error
+				if err := tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count + 1")).Error; err != nil {
+					return err
+				}
+				result.Changed = true
+				result.IsLiked = true
+				return nil
 			} else {
 				// 其他数据库错误
 				return err
@@ -324,9 +343,16 @@ func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike
 					return err
 				}
 				// 减少点赞数
-				return tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count - 1")).Error
+				if err := tx.Model(&comment).UpdateColumn("like_count", gorm.Expr("like_count - 1")).Error; err != nil {
+					return err
+				}
+				result.Changed = true
+				result.IsLiked = false
+				return nil
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
-				// 未点赞，无需操作，直接返回成功
+				// 未点赞，无需操作
+				result.Changed = false
+				result.IsLiked = false
 				return nil
 			} else {
 				// 其他数据库错误
@@ -334,6 +360,12 @@ func (s *FeedService) SetFeedCommentLike(userID uint64, commentID string, isLike
 			}
 		}
 	})
+
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	return result, nil
 }
 
 // SyncFeedUserProfile 同步用户资料到信息流

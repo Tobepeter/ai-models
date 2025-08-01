@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useCallback } from 'react'
 import { type FeedComment } from '../../feed-types'
 import { FeedCommentItem } from './feed-comment-item'
 import { feedConfig } from '../../feed-config'
@@ -8,6 +9,11 @@ import { feedConfig } from '../../feed-config'
  */
 export const FeedCommentList = (props: FeedCommentListProps) => {
 	const { postId, comments = [], onViewMore, onAddComment, className } = props
+
+	// for memo stable ref
+	const handleAddComment = useCallback((content: string, replyTo?: string) => {
+		onAddComment?.(content, replyTo)
+	}, [onAddComment])
 
 	// 显示评论列表（最多显示配置数量）
 	const displayComments = comments.slice(0, feedConfig.maxCommentsDisplay)
@@ -25,7 +31,7 @@ export const FeedCommentList = (props: FeedCommentListProps) => {
 				{displayComments.length > 0 && (
 					<div className="py-3 space-y-1">
 						{displayComments.map((comment) => (
-							<FeedCommentItem key={comment.id} comment={comment} onAddComment={onAddComment} />
+							<FeedCommentItem key={comment.id} comment={comment} onAddComment={handleAddComment} />
 						))}
 					</div>
 				)}

@@ -1,22 +1,23 @@
 package models
 
+import "time"
+
 // FeedPost 信息流帖子模型
 type FeedPost struct {
-	BaseModel                 // 嵌入基础模型，获得uint64 ID + 时间戳
+	// == from BaseModel ==
+	ID        uint64    `json:"id" gorm:"primaryKey;autoIncrement;index:idx_like_id;index:idx_comment_id;index:idx_time_id" swaggertype:"string"`
+	CreatedAt time.Time `json:"created_at" gorm:"index:idx_time_id"`
+	UpdatedAt time.Time `json:"updated_at"`
+
 	UserID             uint64 `json:"user_id" gorm:"not null;index" swaggertype:"string"`
 	Username           string `json:"username" gorm:"type:varchar(100);not null"` // 冗余字段
-	Avatar             string `json:"avatar" gorm:"type:varchar(500)"`          // 冗余头像
-	Status             string `json:"status" gorm:"type:varchar(50)"`           // 用户状态emoji
-	Content            string `json:"content" gorm:"type:text"`                  // 文字内容（可选）
-	ImageURL           string `json:"image_url" gorm:"type:varchar(500)"`          // 图片URL（可选）
-	LikeCount          int    `json:"like_count" gorm:"default:0"`
-	CommentCount       int    `json:"comment_count" gorm:"default:0"`
+	Avatar             string `json:"avatar" gorm:"type:varchar(500)"`            // 冗余头像
+	Status             string `json:"status" gorm:"type:varchar(50)"`             // 用户状态emoji
+	Content            string `json:"content" gorm:"type:text"`                   // 文字内容（可选）
+	ImageURL           string `json:"image_url" gorm:"type:varchar(500)"`         // 图片URL（可选）
+	LikeCount          int    `json:"like_count" gorm:"default:0;index:idx_like_id"`
+	CommentCount       int    `json:"comment_count" gorm:"default:0;index:idx_comment_id"`
 	UserProfileVersion int64  `json:"user_profile_version"` // 用户信息版本号
-
-	// 复合索引优化
-	// idx_like_count: like_count DESC, id
-	// idx_comment_count: comment_count DESC, id
-	// idx_user_created: userId, created_at DESC
 }
 
 // FeedComment 信息流评论模型
@@ -25,7 +26,7 @@ type FeedComment struct {
 	PostID             uint64 `json:"post_id" gorm:"not null;index:idx_post_created" swaggertype:"string"`
 	UserID             uint64 `json:"user_id" gorm:"not null;index:idx_user_created" swaggertype:"string"`
 	Username           string `json:"username" gorm:"type:varchar(100);not null"` // 冗余字段
-	Avatar             string `json:"avatar" gorm:"type:varchar(500)"`          // 冗余头像
+	Avatar             string `json:"avatar" gorm:"type:varchar(500)"`            // 冗余头像
 	Content            string `json:"content" gorm:"type:text;not null"`
 	ReplyTo            string `json:"reply_to" gorm:"type:varchar(100)"` // 回复的用户名
 	LikeCount          int    `json:"like_count" gorm:"default:0"`
@@ -35,27 +36,27 @@ type FeedComment struct {
 // FeedPostResponse 帖子响应结构
 type FeedPostResponse struct {
 	Posts      []FeedPost `json:"posts"`
-	NextCursor string `json:"next_cursor,omitempty"`
-	HasMore    bool `json:"has_more"`
+	NextCursor string     `json:"next_cursor,omitempty"`
+	HasMore    bool       `json:"has_more"`
 }
 
 // FeedCommentResponse 评论响应结构
 type FeedCommentResponse struct {
 	Comments   []FeedComment `json:"comments"`
-	NextCursor string `json:"next_cursor,omitempty"`
-	HasMore    bool `json:"has_more"`
-	Total      int64 `json:"total"`
+	NextCursor string        `json:"next_cursor,omitempty"`
+	HasMore    bool          `json:"has_more"`
+	Total      int64         `json:"total"`
 }
 
 // CreateFeedPostRequest 创建帖子请求
 type CreateFeedPostRequest struct {
 	Content  string `json:"content,omitempty" validate:"max=2000"` // 最多2000字符
-	ImageURL string `json:"image_url,omitempty" validate:"url"`      // 图片URL
+	ImageURL string `json:"image_url,omitempty" validate:"url"`    // 图片URL
 }
 
 // CreateFeedCommentRequest 创建评论请求
 type CreateFeedCommentRequest struct {
-	Content string `json:"content" validate:"required,max=500"`          // 评论内容，最多500字符
+	Content string `json:"content" validate:"required,max=500"`   // 评论内容，最多500字符
 	ReplyTo string `json:"reply_to,omitempty" validate:"max=100"` // 回复的用户名
 }
 
@@ -67,6 +68,17 @@ type ToggleLikeRequest struct {
 // SetFeedCommentLikeRequest 设置评论点赞请求
 type SetFeedCommentLikeRequest struct {
 	IsLike bool `json:"is_like" binding:"required"` // 是否点赞
+}
+
+// SetFeedPostLikeRequest 设置帖子点赞请求
+type SetFeedPostLikeRequest struct {
+	IsLike bool `json:"is_like" binding:"required"` // 是否点赞
+}
+
+// LikeResult 点赞操作结果
+type LikeResult struct {
+	Changed bool `json:"changed"`  // 状态是否改变
+	IsLiked bool `json:"is_liked"` // 当前点赞状态
 }
 
 // FeedQueryParams 信息流查询参数

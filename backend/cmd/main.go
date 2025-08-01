@@ -189,7 +189,7 @@ func setupRouter(c *container.Container) *gin.Engine {
 			feedAuth.Use(middleware.AuthRequired(c.AuthService))
 			{
 				feedAuth.POST("/posts", c.FeedHandler.CreateFeedPost)                      // 创建信息流帖子
-				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.ToggleLikePost)        // 切换帖子点赞状态
+				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.SetLikePost)          // 设置帖子点赞状态
 				feedAuth.POST("/posts/:post_id/comments", c.FeedHandler.CreateFeedComment) // 创建帖子评论
 				feedAuth.POST("/comments/:comment_id/like", c.FeedHandler.SetCommentLike)  // 设置评论点赞状态
 			}

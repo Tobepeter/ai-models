@@ -1,4 +1,5 @@
 import { UserAvatar } from '@/components/common/user-avatar'
+import { memo } from 'react'
 import { type FeedComment } from '../../feed-types'
 import { feedUtil } from '../../feed-util'
 import { cn } from '@/lib/utils'
@@ -8,7 +9,7 @@ import { useFeedStore } from '../../feed-store'
 /**
  * 单条评论组件 - 支持点击回复，包含头像和背景hover效果
  */
-export const FeedCommentItem = (props: FeedCommentItemProps) => {
+export const FeedCommentItem = memo((props: FeedCommentItemProps) => {
 	const { comment, onAddComment, className } = props
 	const { isCommentInputOpen } = useFeedStore()
 	const { username, avatar, replyTo: originalReplyTo, postId, content, createdAt } = comment
@@ -47,7 +48,7 @@ export const FeedCommentItem = (props: FeedCommentItemProps) => {
 			</div>
 		</CommentInputPopup>
 	)
-}
+})
 
 interface FeedCommentItemProps {
 	comment: FeedComment

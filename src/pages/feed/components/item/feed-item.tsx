@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { memo } from 'react'
 import { FeedItemHeader } from './feed-item-header'
 import { FeedText } from '../feed-text'
 import { FeedItemImage } from './feed-item-image'
@@ -12,7 +13,7 @@ import { cn } from '@/lib/utils'
 /**
  * 信息流单项组件
  */
-export const FeedItem = (props: FeedItemProps) => {
+export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, onLike, onToggleExpand, onAddComment, className } = props
 	const { id, userId, username, avatar, status, createdAt, content, isExpanded, image, likeCount, commentCount, isLiked, comments } = post
 	const { openDetailDialog } = useFeedStore()
@@ -69,7 +70,7 @@ export const FeedItem = (props: FeedItemProps) => {
 			</div>
 		</article>
 	)
-}
+})
 
 export interface FeedItemProps {
 	post: FeedPost

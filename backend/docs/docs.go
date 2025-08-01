@@ -580,16 +580,11 @@ const docTemplate = `{
         "/api/feed/comments/{comment_id}/like": {
             "post": {
                 "description": "设置评论点赞或取消点赞状态，需要登录",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "设置评论点赞状态",
+                "operationId": "setFeedCommentLike",
                 "parameters": [
                     {
                         "type": "string",
@@ -612,31 +607,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.LikeResult"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -645,29 +628,12 @@ const docTemplate = `{
         "/api/feed/posts": {
             "get": {
                 "description": "支持多种排序方式和cursor分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "获取信息流帖子列表",
+                "operationId": "getFeedPosts",
                 "parameters": [
-                    {
-                        "enum": [
-                            "time",
-                            "like",
-                            "comment"
-                        ],
-                        "type": "string",
-                        "default": "time",
-                        "description": "排序类型",
-                        "name": "sort",
-                        "in": "query"
-                    },
                     {
                         "type": "string",
                         "description": "cursor分页的after_id",
@@ -678,9 +644,19 @@ const docTemplate = `{
                         "maximum": 50,
                         "minimum": 1,
                         "type": "integer",
-                        "default": 20,
-                        "description": "每页数量",
+                        "description": "每页数量，最多50",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "time",
+                            "like",
+                            "comment"
+                        ],
+                        "type": "string",
+                        "description": "排序类型：time, like, comment",
+                        "name": "sort",
                         "in": "query"
                     }
                 ],
@@ -688,35 +664,30 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPostResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPostResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "post": {
                 "description": "创建新的信息流帖子，需要登录",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "创建信息流帖子",
+                "operationId": "createFeedPost",
                 "parameters": [
                     {
                         "description": "帖子内容",
@@ -732,25 +703,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -759,16 +724,11 @@ const docTemplate = `{
         "/api/feed/posts/{post_id}": {
             "get": {
                 "description": "获取指定帖子的详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "获取帖子详情",
+                "operationId": "getFeedPostDetail",
                 "parameters": [
                     {
                         "type": "string",
@@ -782,25 +742,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -809,16 +763,11 @@ const docTemplate = `{
         "/api/feed/posts/{post_id}/comments": {
             "get": {
                 "description": "获取指定帖子的评论列表，支持cursor分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "获取帖子评论列表",
+                "operationId": "getFeedComments",
                 "parameters": [
                     {
                         "type": "string",
@@ -837,45 +786,45 @@ const docTemplate = `{
                         "maximum": 50,
                         "minimum": 1,
                         "type": "integer",
-                        "default": 20,
-                        "description": "每页数量",
+                        "description": "每页数量，最多50",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "post_id",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedCommentResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedCommentResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "post": {
                 "description": "为指定帖子创建评论，需要登录",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Feed"
                 ],
                 "summary": "创建帖子评论",
+                "operationId": "createFeedComment",
                 "parameters": [
                     {
                         "type": "string",
@@ -898,31 +847,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -930,17 +867,12 @@ const docTemplate = `{
         },
         "/api/feed/posts/{post_id}/like": {
             "post": {
-                "description": "点赞或取消点赞帖子，需要登录",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "设置帖子点赞或取消点赞状态，需要登录",
                 "tags": [
                     "Feed"
                 ],
-                "summary": "切换帖子点赞状态",
+                "summary": "设置帖子点赞状态",
+                "operationId": "setFeedPostLike",
                 "parameters": [
                     {
                         "type": "string",
@@ -948,37 +880,34 @@ const docTemplate = `{
                         "name": "post_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "点赞状态",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.LikeResult"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -2726,6 +2655,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "== from BaseModel ==",
                     "type": "string"
                 },
                 "image_url": {
@@ -2912,6 +2842,19 @@ const docTemplate = `{
                 }
             }
         },
+        "ai-models-backend_internal_models.LikeResult": {
+            "type": "object",
+            "properties": {
+                "changed": {
+                    "description": "状态是否改变",
+                    "type": "boolean"
+                },
+                "is_liked": {
+                    "description": "当前点赞状态",
+                    "type": "boolean"
+                }
+            }
+        },
         "ai-models-backend_internal_models.OpenAIChatCompletionRequest": {
             "type": "object",
             "required": [
@@ -3067,6 +3010,18 @@ const docTemplate = `{
             }
         },
         "ai-models-backend_internal_models.SetFeedCommentLikeRequest": {
+            "type": "object",
+            "required": [
+                "is_like"
+            ],
+            "properties": {
+                "is_like": {
+                    "description": "是否点赞",
+                    "type": "boolean"
+                }
+            }
+        },
+        "ai-models-backend_internal_models.SetFeedPostLikeRequest": {
             "type": "object",
             "required": [
                 "is_like"

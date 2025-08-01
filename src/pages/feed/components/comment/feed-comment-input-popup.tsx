@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { Send, X } from 'lucide-react'
-import { useState, type PropsWithChildren } from 'react'
+import { useState, useEffect, useRef, type PropsWithChildren } from 'react'
 import { useFeedStore } from '../../feed-store'
 
 /**
@@ -15,6 +15,42 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	const [isOpen, setIsOpen] = useState(false)
 	const [content, setContent] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+	// 获取保护区域长度
+	const getProtectedLength = () => (replyTo ? `@${replyTo} `.length : 0)
+
+	// 监听内容变化，确保回复模式下光标位置正确
+	useEffect(() => {
+		if (isOpen && replyTo && textareaRef.current) {
+			const textarea = textareaRef.current
+			const atMention = `@${replyTo} `
+
+			// 如果内容刚刚设置为@username，将光标移动到末尾
+			if (content === atMention) {
+				setTimeout(() => {
+					textarea.setSelectionRange(atMention.length, atMention.length)
+					textarea.focus()
+				}, 0)
+			}
+		}
+	}, [isOpen, replyTo, content])
+
+	// NOTE: 这个逻辑很别扭，不过能工作，唯一的缺点点击时候会闪烁一下
+	// 处理选择变化，阻止选择保护区域
+	const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+		if (!replyTo) return
+
+		const textarea = e.currentTarget
+		const protectedLength = getProtectedLength()
+
+		// 如果选择范围涉及保护区域，直接阻止并重置到安全位置
+		if (textarea.selectionStart < protectedLength || textarea.selectionEnd < protectedLength) {
+			e.preventDefault()
+			// 立即重置到安全位置，不通过状态更新
+			textarea.setSelectionRange(protectedLength, protectedLength)
+		}
+	}
 
 	// 统一管理弹窗开关状态
 	const changeIsOpen = (newIsOpen: boolean) => {
@@ -63,21 +99,34 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	}
 
 	// 处理键盘事件
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		const textarea = e.currentTarget
+		const protectedLength = getProtectedLength()
+
 		if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
 			e.preventDefault()
 			handleSubmit()
+			return
 		}
 
 		// 防止删除@username前缀
 		if (replyTo && (e.key === 'Backspace' || e.key === 'Delete')) {
-			const target = e.target as HTMLTextAreaElement
-			const { selectionStart, selectionEnd } = target
+			const { selectionStart, selectionEnd } = textarea
 			const atMention = `@${replyTo} `
 
 			if (selectionStart <= atMention.length || (selectionStart !== selectionEnd && selectionEnd <= atMention.length)) {
 				// 如果选择或光标位置会影响到@mention，阻止删除
 				e.preventDefault()
+			}
+		}
+
+		// 处理方向键，防止光标移动到保护区域
+		if (replyTo && (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'Home')) {
+			const { selectionStart } = textarea
+			// 如果当前光标在保护区域边界或内部，且按键会让光标进入保护区域，则阻止
+			if ((e.key === 'ArrowLeft' && selectionStart <= protectedLength) || (e.key === 'ArrowUp' && selectionStart < protectedLength) || e.key === 'Home') {
+				e.preventDefault()
+				textarea.setSelectionRange(protectedLength, protectedLength)
 			}
 		}
 	}
@@ -113,7 +162,16 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 						<UserAvatar src="https://i.pravatar.cc/150?img=1" alt="当前用户头像" size={36} className="flex-shrink-0" fallbackText="我" />
 
 						<div className="flex-1 space-y-3">
-							<Textarea value={content} onChange={handleContentChange} onKeyDown={handleKeyDown} placeholder={displayPlaceholder} className="min-h-[100px] resize-none" autoFocus />
+							<Textarea
+								ref={textareaRef}
+								value={content}
+								onChange={handleContentChange}
+								onKeyDown={handleKeyDown}
+								onSelect={handleSelect}
+								placeholder={displayPlaceholder}
+								className="min-h-[100px] resize-none"
+								autoFocus
+							/>
 
 							<div className="flex justify-end space-x-2">
 								<Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSubmitting}>
@@ -141,11 +199,9 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	)
 }
 
-interface CommentInputPopupProps {
+export interface CommentInputPopupProps {
 	postId: string
 	onAddComment: (content: string, replyTo?: string) => void
 	replyTo?: string
 	className?: string
 }
-
-export { type CommentInputPopupProps }

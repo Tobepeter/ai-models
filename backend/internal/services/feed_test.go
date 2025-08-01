@@ -123,26 +123,31 @@ func TestFeedService_PostLike(t *testing.T) {
 
 		postIDStr := strconv.FormatUint(post.ID, 10)
 
+		// 检查初始点赞数
+		initialPost, err := feedService.GetFeedPostByID(postIDStr)
+		require.NoError(t, err)
+		initialLikeCount := initialPost.LikeCount
+
 		// 用户2点赞
-		err = feedService.ToggleFeedPostLike(user2.ID, postIDStr)
+		_, err = feedService.SetFeedPostLike(user2.ID, postIDStr, true)
 		require.NoError(t, err)
 
 		// 验证点赞数增加
 		updatedPost, err := feedService.GetFeedPostByID(postIDStr)
 		require.NoError(t, err)
-		assert.Equal(t, 1, updatedPost.LikeCount)
+		assert.Equal(t, initialLikeCount+1, updatedPost.LikeCount)
 
 		// 用户2取消点赞
-		err = feedService.ToggleFeedPostLike(user2.ID, postIDStr)
+		_, err = feedService.SetFeedPostLike(user2.ID, postIDStr, false)
 		require.NoError(t, err)
 
 		// 验证点赞数减少
 		updatedPost2, err := feedService.GetFeedPostByID(postIDStr)
 		require.NoError(t, err)
-		assert.Equal(t, 0, updatedPost2.LikeCount)
+		assert.Equal(t, initialLikeCount, updatedPost2.LikeCount)
 
 		// 测试不存在的帖子
-		err = feedService.ToggleFeedPostLike(user1.ID, "999999")
+		_, err = feedService.SetFeedPostLike(user1.ID, "999999", true)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "post not found")
 
@@ -216,16 +221,16 @@ func TestFeedService_Comments(t *testing.T) {
 
 		// 测试评论点赞
 		commentIDStr := strconv.FormatUint(comment1.ID, 10)
-		err = feedService.SetFeedCommentLike(user1.ID, commentIDStr, true)
+		_, err = feedService.SetFeedCommentLike(user1.ID, commentIDStr, true)
 		require.NoError(t, err)
 
-		// 重复点赞应该返回业务错误
-		err = feedService.SetFeedCommentLike(user1.ID, commentIDStr, true)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "已点赞")
+		// 重复点赞应该不会改变状态
+		result, err := feedService.SetFeedCommentLike(user1.ID, commentIDStr, true)
+		require.NoError(t, err)
+		assert.False(t, result.Changed)
 
 		// 取消点赞
-		err = feedService.SetFeedCommentLike(user1.ID, commentIDStr, false)
+		_, err = feedService.SetFeedCommentLike(user1.ID, commentIDStr, false)
 		require.NoError(t, err)
 
 		// 清理测试数据

@@ -185,6 +185,7 @@ definitions:
       created_at:
         type: string
       id:
+        description: == from BaseModel ==
         type: string
       image_url:
         description: 图片URL（可选）
@@ -307,6 +308,15 @@ definitions:
       hashify_name:
         type: string
     type: object
+  ai-models-backend_internal_models.LikeResult:
+    properties:
+      changed:
+        description: 状态是否改变
+        type: boolean
+      is_liked:
+        description: 当前点赞状态
+        type: boolean
+    type: object
   ai-models-backend_internal_models.OpenAIChatCompletionRequest:
     properties:
       max_tokens:
@@ -409,6 +419,14 @@ definitions:
         $ref: '#/definitions/ai-models-backend_internal_models.STSCredentials'
     type: object
   ai-models-backend_internal_models.SetFeedCommentLikeRequest:
+    properties:
+      is_like:
+        description: 是否点赞
+        type: boolean
+    required:
+    - is_like
+    type: object
+  ai-models-backend_internal_models.SetFeedPostLikeRequest:
     properties:
       is_like:
         description: 是否点赞
@@ -968,9 +986,8 @@ paths:
       - AI
   /api/feed/comments/{comment_id}/like:
     post:
-      consumes:
-      - application/json
       description: 设置评论点赞或取消点赞状态，需要登录
+      operationId: setFeedCommentLike
       parameters:
       - description: 评论ID
         in: path
@@ -983,40 +1000,35 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+              type: object
       summary: 设置评论点赞状态
       tags:
       - Feed
   /api/feed/posts:
     get:
-      consumes:
-      - application/json
       description: 支持多种排序方式和cursor分页
+      operationId: getFeedPosts
       parameters:
-      - default: time
-        description: 排序类型
+      - description: cursor分页的after_id
+        in: query
+        name: after_id
+        type: string
+      - description: 每页数量，最多50
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        type: integer
+      - description: 排序类型：time, like, comment
         enum:
         - time
         - like
@@ -1024,39 +1036,22 @@ paths:
         in: query
         name: sort
         type: string
-      - description: cursor分页的after_id
-        in: query
-        name: after_id
-        type: string
-      - default: 20
-        description: 每页数量
-        in: query
-        maximum: 50
-        minimum: 1
-        name: limit
-        type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponse'
+              type: object
       summary: 获取信息流帖子列表
       tags:
       - Feed
     post:
-      consumes:
-      - application/json
       description: 创建新的信息流帖子，需要登录
+      operationId: createFeedPost
       parameters:
       - description: 帖子内容
         in: body
@@ -1064,66 +1059,46 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedPostRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+              type: object
       summary: 创建信息流帖子
       tags:
       - Feed
   /api/feed/posts/{post_id}:
     get:
-      consumes:
-      - application/json
       description: 获取指定帖子的详细信息
+      operationId: getFeedPostDetail
       parameters:
       - description: 帖子ID
         in: path
         name: post_id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+              type: object
       summary: 获取帖子详情
       tags:
       - Feed
   /api/feed/posts/{post_id}/comments:
     get:
-      consumes:
-      - application/json
       description: 获取指定帖子的评论列表，支持cursor分页
+      operationId: getFeedComments
       parameters:
       - description: 帖子ID
         in: path
@@ -1134,35 +1109,32 @@ paths:
         in: query
         name: after_id
         type: string
-      - default: 20
-        description: 每页数量
+      - description: 每页数量，最多50
         in: query
         maximum: 50
         minimum: 1
         name: limit
         type: integer
-      produces:
-      - application/json
+      - in: query
+        name: post_id
+        required: true
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.FeedCommentResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedCommentResponse'
+              type: object
       summary: 获取帖子评论列表
       tags:
       - Feed
     post:
-      consumes:
-      - application/json
       description: 为指定帖子创建评论，需要登录
+      operationId: createFeedComment
       parameters:
       - description: 帖子ID
         in: path
@@ -1175,67 +1147,46 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedCommentRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
+              type: object
       summary: 创建帖子评论
       tags:
       - Feed
   /api/feed/posts/{post_id}/like:
     post:
-      consumes:
-      - application/json
-      description: 点赞或取消点赞帖子，需要登录
+      description: 设置帖子点赞或取消点赞状态，需要登录
+      operationId: setFeedPostLike
       parameters:
       - description: 帖子ID
         in: path
         name: post_id
         required: true
         type: string
-      produces:
-      - application/json
+      - description: 点赞状态
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-      summary: 切换帖子点赞状态
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+              type: object
+      summary: 设置帖子点赞状态
       tags:
       - Feed
   /crud:
