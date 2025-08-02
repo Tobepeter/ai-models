@@ -1,4 +1,5 @@
 import { UserAvatar } from '@/components/common/user-avatar'
+import { UserCardPopup } from '@/components/common/user-card-popup'
 import { memo } from 'react'
 import { type AppFeedComment } from '../../feed-types'
 import { feedUtil } from '../../feed-util'
@@ -19,6 +20,14 @@ export const FeedCommentItem = memo((props: FeedCommentItemProps) => {
 		feedMgr.addComment(post_id, content, replyTo)
 	}
 
+	// 构造用户卡片需要的数据
+	const userData = {
+		username: username || '',
+		email: `${username}@example.com`, // FeedComment 中没有邮箱字段，使用占位符
+		avatar: avatar || '',
+		extra: '', // 如果有 user 表的额外信息，可以在这里传入
+	}
+
 	// 移除独立的点击处理，统一通过 CommentInputPopup 处理
 
 	return (
@@ -30,8 +39,10 @@ export const FeedCommentItem = memo((props: FeedCommentItemProps) => {
 					<div className="text-sm text-foreground leading-relaxed">
 						{/* 如过有回复，展示艾特用户 */}
 						{originalReplyTo && <span className="text-primary mr-1">@{originalReplyTo} </span>}
-						{/* 用户名 */}
-						<span className="text-primary font-medium mr-1">@{username}</span>
+						{/* 用户名 - 集成悬停卡片 */}
+						<UserCardPopup userData={userData}>
+							<span className="text-primary font-medium mr-1 cursor-pointer hover:underline">@{username}</span>
+						</UserCardPopup>
 						<span className="break-words">{content}</span>
 						<span className="text-xs text-muted-foreground ml-2">({feedUtil.formatTime(created_at)})</span>
 					</div>

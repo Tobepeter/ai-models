@@ -4,7 +4,6 @@ import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
 import { delayC } from '../../utils/common'
 import { CancelablePromise } from '../../utils/cancelable-promise'
-import { faker } from '@faker-js/faker'
 import { debounce } from 'lodash-es'
 
 /**
@@ -185,7 +184,7 @@ class FeedManager {
 		this.getStore().toggleExpand(postId) // 切换内容展开状态
 	}
 
-	/* 添加评论 */
+	/* 添加评论 - 乐观更新 */
 	async addComment(postId: string, content: string, replyTo?: string) {
 		const store = this.getStore()
 
@@ -196,13 +195,86 @@ class FeedManager {
 
 			const comment = feedMock.genComment(postId, content, replyTo)
 
+			// 乐观更新：同时更新预加载评论和详情页评论（如果存在）
 			store.addComment(postId, comment)
+
 			console.log(`[FeedManager] 添加评论成功: ${postId}`)
 		} catch (error) {
 			console.error('[FeedManager] 添加评论失败:', error)
 		} finally {
 			this.commentTimer = null
 		}
+	}
+
+	/* 初始化详情页评论 - 基于预加载数据 */
+	async loadPostComments(postId: string): Promise<void> {
+		const store = this.getStore()
+		const post = store.posts.find((p) => p.id === postId)
+
+		if (!post) {
+			console.error('[FeedManager] 帖子不存在:', postId)
+			return
+		}
+
+		try {
+			// 模拟加载延迟
+			store.setPostCommentsLoading(postId, true)
+			this.clearCommentTimer()
+			this.commentTimer = delayC(feedMock.getCommentDelay())
+			await this.commentTimer
+
+			// 基于预加载评论初始化详情页评论
+			const preloadedComments = post.preloaded_comments || []
+			const hasMore = (post.comment_count || 0) > preloadedComments.length
+
+			store.setPostDetailComments(postId, {
+				loaded_comments: [...preloadedComments],
+				next_cursor: (post as any).preloaded_comments_cursor, // 临时访问mock字段
+				has_more: hasMore,
+				loading: false,
+			})
+
+			console.log(`[FeedManager] 初始化详情页评论成功: ${postId}`)
+		} catch (error) {
+			console.error('[FeedManager] 初始化详情页评论失败:', error)
+			store.setPostCommentsError(postId, '加载评论失败')
+		} finally {
+			this.commentTimer = null
+		}
+	}
+
+	/* 加载更多评论 */
+	async loadMoreComments(postId: string): Promise<void> {
+		const store = this.getStore()
+		const post = store.posts.find((p) => p.id === postId)
+
+		if (!post?.detail_comments || post.detail_comments.loading) {
+			return
+		}
+
+		try {
+			store.setPostCommentsLoading(postId, true)
+			this.clearCommentTimer()
+			this.commentTimer = delayC(feedMock.getCommentDelay())
+			await this.commentTimer
+
+			// 使用mock生成分页数据
+			const result = feedMock.genCommentPage(postId, post.detail_comments.next_cursor)
+
+			store.appendPostComments(postId, result.comments, result.next_cursor, result.has_more)
+
+			console.log(`[FeedManager] 加载更多评论成功: ${postId}, 新增${result.comments.length}条`)
+		} catch (error) {
+			console.error('[FeedManager] 加载更多评论失败:', error)
+			store.setPostCommentsError(postId, '加载更多评论失败')
+		} finally {
+			this.commentTimer = null
+		}
+	}
+
+	/* 清理详情页评论数据 */
+	clearPostComments(postId: string) {
+		this.getStore().clearPostDetailComments(postId)
 	}
 
 	/* 创建新的feed */

@@ -1,11 +1,12 @@
 import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
+import { produce } from 'immer'
 import { feedConfig } from './feed-config'
-import type { AppFeedComment, AppFeedPost, FeedCommentList } from './feed-types'
+import type { AppFeedComment, AppFeedPost, DetailComments } from './feed-types'
 
 // 重新导出类型
-export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost, FeedCommentList }
+export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost, DetailComments }
 
 const { commentPageSize } = feedConfig
 
@@ -18,9 +19,6 @@ const feedState = {
 	hasMore: true,
 	cursor: null as string | null, // 分页游标
 	error: null as string | null,
-
-	// 评论分页数据
-	commentsByPostId: {} as Record<string, FeedCommentList>,
 
 	// 弹窗状态
 	detailDialog: {
@@ -46,62 +44,82 @@ const stateCreator = () => {
 		setError: (error: string | null) => set({ error }),
 
 		prependPosts: (newPosts: AppFeedPost[]) => {
-			const { posts } = get()
-			set({ posts: [...newPosts, ...posts] }) // 刷新时新数据加在前面
+			set(
+				produce((draft) => {
+					draft.posts.unshift(...newPosts) // 刷新时新数据加在前面
+				})
+			)
 		},
 
 		appendPosts: (newPosts: AppFeedPost[]) => {
-			const { posts } = get()
-			set({ posts: [...posts, ...newPosts] }) // 加载更多时新数据加在后面
+			set(
+				produce((draft) => {
+					draft.posts.push(...newPosts) // 加载更多时新数据加在后面
+				})
+			)
 		},
 
 		addNewPost: (newPost: AppFeedPost) => {
-			const { posts } = get()
-			set({ posts: [newPost, ...posts] }) // 新创建的post加在最前面
+			set(
+				produce((draft) => {
+					draft.posts.unshift(newPost) // 新创建的post加在最前面
+				})
+			)
 		},
 
 		updatePost: (postId: string, updates: Partial<AppFeedPost>) => {
-			const { posts } = get()
-			const updatedPosts = posts.map((post) => (post.id === postId ? { ...post, ...updates } : post))
-			set({ posts: updatedPosts })
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						Object.assign(post, updates)
+					}
+				})
+			)
 		},
 
 		toggleLike: (postId: string) => {
-			const { posts } = get()
-			const updatedPosts = posts.map((post) => {
-				if (post.id === postId) {
-					const isLiked = !post.isLiked
-					return {
-						...post,
-						isLiked,
-						like_count: isLiked ? post.like_count + 1 : post.like_count - 1, // 同步更新点赞数
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						post.isLiked = !post.isLiked
+						post.like_count += post.isLiked ? 1 : -1 // 同步更新点赞数
 					}
-				}
-				return post
-			})
-			set({ posts: updatedPosts })
+				})
+			)
 		},
 
 		toggleExpand: (postId: string) => {
-			const { posts } = get()
-			const updatedPosts = posts.map((post) => (post.id === postId ? { ...post, isExpanded: !post.isExpanded } : post))
-			set({ posts: updatedPosts })
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						post.isExpanded = !post.isExpanded
+					}
+				})
+			)
 		},
 
 		addComment: (postId: string, comment: AppFeedComment) => {
-			const { posts } = get()
-			const updatedPosts = posts.map((post) => {
-				if (post.id === postId) {
-					const existingComments = Array.isArray(post.comments) ? post.comments : []
-					return {
-						...post,
-						comments: [comment, ...existingComments], // 新评论在前
-						comment_count: post.comment_count + 1,
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						// 更新预加载评论
+						post.preloaded_comments = post.preloaded_comments || []
+						post.preloaded_comments.unshift(comment)
+
+						// 更新详情页评论（如果存在）
+						if (post.detail_comments) {
+							post.detail_comments.loaded_comments.unshift(comment)
+						}
+
+						// 更新评论数量
+						post.comment_count = (post.comment_count || 0) + 1
 					}
-				}
-				return post
-			})
-			set({ posts: updatedPosts })
+				})
+			)
 		},
 
 		// 详情页弹窗管理
@@ -116,31 +134,17 @@ const stateCreator = () => {
 		},
 
 		closeDetailDialog: () => {
-			const { detailDialog, commentsByPostId } = get()
-			// 清理多余评论缓存，只保留第一页
+			const { detailDialog } = get()
+			// 清理详情页评论数据，保留预加载评论
 			if (detailDialog.postId) {
-				const postComments = commentsByPostId[detailDialog.postId]
-				if (postComments && postComments.comments.length > commentPageSize) {
-					const firstPageComments = postComments.comments.slice(0, commentPageSize)
-					const firstPageCommentsById: Record<string, AppFeedComment> = {}
-					firstPageComments.forEach((id) => {
-						if (postComments.commentsById[id]) {
-							firstPageCommentsById[id] = postComments.commentsById[id]
+				set(
+					produce((draft) => {
+						const post = draft.posts.find((p: AppFeedPost) => p.id === detailDialog.postId)
+						if (post) {
+							delete post.detail_comments
 						}
 					})
-
-					set({
-						commentsByPostId: {
-							...commentsByPostId,
-							[detailDialog.postId]: {
-								...postComments,
-								comments: firstPageComments,
-								commentsById: firstPageCommentsById,
-								next_cursor: firstPageComments.length >= commentPageSize ? postComments.next_cursor : undefined,
-							},
-						},
-					})
-				}
+				)
 			}
 
 			set({
@@ -189,42 +193,65 @@ const stateCreator = () => {
 			}
 		},
 
-		// 评论分页管理
-		setPostComments: (postId: string, comments: AppFeedComment[], cursor?: string, total?: number) => {
-			const { commentsByPostId } = get()
-			const currentPage = commentsByPostId[postId] || {
-				comments: [],
-				commentsById: {},
-				total: 0,
-				pageSize: commentPageSize,
-				loading: false,
-			}
+		// 详情页评论管理
+		setPostDetailComments: (postId: string, detailComments: DetailComments) => {
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						post.detail_comments = detailComments
+					}
+				})
+			)
+		},
 
-			// 构建新的评论数据
-			const newCommentsById = { ...currentPage.commentsById }
-			const newCommentIds = comments.map((comment) => {
-				newCommentsById[comment.id] = comment
-				return comment.id
-			})
+		appendPostComments: (postId: string, newComments: AppFeedComment[], nextCursor?: string, hasMore?: boolean) => {
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post?.detail_comments) {
+						post.detail_comments.loaded_comments.push(...newComments)
+						post.detail_comments.next_cursor = nextCursor
+						post.detail_comments.has_more = hasMore
+						post.detail_comments.loading = false
+						post.detail_comments.error = undefined
+					}
+				})
+			)
+		},
 
-			const updatedComments = cursor
-				? [...currentPage.comments, ...newCommentIds] // 追加模式
-				: newCommentIds // 替换模式
+		setPostCommentsLoading: (postId: string, loading: boolean) => {
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post?.detail_comments) {
+						post.detail_comments.loading = loading
+					}
+				})
+			)
+		},
 
-			set({
-				commentsByPostId: {
-					...commentsByPostId,
-					[postId]: {
-						...currentPage,
-						comments: updatedComments,
-						commentsById: newCommentsById,
-						next_cursor: cursor,
-						total: total ?? currentPage.total,
-						loading: false,
-						error: undefined,
-					},
-				},
-			})
+		setPostCommentsError: (postId: string, error?: string) => {
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post?.detail_comments) {
+						post.detail_comments.loading = false
+						post.detail_comments.error = error
+					}
+				})
+			)
+		},
+
+		clearPostDetailComments: (postId: string) => {
+			set(
+				produce((draft) => {
+					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
+					if (post) {
+						delete post.detail_comments
+					}
+				})
+			)
 		},
 
 		reset: () => set(feedState), // 重置为初始状态
@@ -239,26 +266,9 @@ export const useFeedStore = create(
 			posts: state.posts.slice(0, 50).map((post) => ({
 				...post,
 				isExpanded: false, // 不持久化内容展开状态
+				detail_comments: undefined, // 不持久化详情页评论状态
 			})),
 			cursor: state.cursor,
-			commentsByPostId: Object.fromEntries(
-				Object.entries(state.commentsByPostId).map(([postId, page]) => [
-					postId,
-					{
-						...page,
-						// 只保留第一页评论
-						comments: page.comments.slice(0, commentPageSize),
-						commentsById: Object.fromEntries(
-							page.comments
-								.slice(0, commentPageSize)
-								.map((id) => [id, page.commentsById[id]])
-								.filter(([, comment]) => comment)
-						),
-						loading: false, // 不持久化加载状态
-						error: undefined, // 不持久化错误状态
-					},
-				])
-			),
 			// 不持久化弹窗状态
 		}),
 	})

@@ -10,23 +10,40 @@ import { notify } from '@/components/common/notify'
 import { LogIn, Upload, Smile } from 'lucide-react'
 import { useState } from 'react'
 import { MyAvatar } from './my-avatar'
+import { PropsWithChildren } from 'react'
 
-export const UserCard = () => {
+/** 用户信息卡片组件，支持编辑和只读模式 */
+export const UserCard = (props: PropsWithChildren<UserCardProps>) => {
+	const { readonly = false, userData, className } = props
 	const { info: user, token, goLogin } = useUserStore()
 	const [avatarLoading, setAvatarLoading] = useState(false)
 
 	const isLoggedIn = token && user && user.username !== 'anonymous'
-	const userExtra = parseUserExtra(user?.extra)
 
-	const displayUser = isLoggedIn
-		? user
-		: {
-				username: 'anonymous',
-				email: 'anonymous@example.com',
+	// 只读模式下使用外部数据，否则使用当前用户数据
+	const currentUser = readonly ? userData : user
+	const userExtra = parseUserExtra(currentUser?.extra)
+
+	const displayUser = readonly
+		? userData || {
+				username: 'unknown',
+				email: 'unknown@example.com',
 				avatar: '',
 				created_at: '',
 				updated_at: '',
 			}
+		: isLoggedIn
+			? user
+			: {
+					username: 'anonymous',
+					email: 'anonymous@example.com',
+					avatar: '',
+					created_at: '',
+					updated_at: '',
+				}
+
+	// 只读模式下不允许编辑
+	const canEdit = !readonly && isLoggedIn
 
 	const handleAvatarUpload = async (file: File) => {
 		setAvatarLoading(true)
@@ -75,14 +92,14 @@ export const UserCard = () => {
 	}
 
 	return (
-		<Card data-slot="user-card">
+		<Card data-slot="user-card" className={className}>
 			<CardHeader className="pb-4">
 				{/* 头部区域：头像 + 基本信息 */}
 				<div className="flex items-start space-x-4">
 					{/* 头像区域 */}
 					<div className="flex flex-col items-center">
-						<MyAvatar size={64} />
-						{isLoggedIn && (
+						<MyAvatar size={64} userData={readonly ? userData : undefined} />
+						{canEdit && (
 							<FileUpload onUpload={handleAvatarUpload}>
 								<Button variant="ghost" size="sm" className="mt-1 h-7 px-2 text-xs" disabled={avatarLoading}>
 									<Upload className="h-3 w-3 mr-1" />
@@ -96,7 +113,7 @@ export const UserCard = () => {
 					<div className="flex-1 min-w-0">
 						{/* 用户名编辑 */}
 						<div className="mb-1">
-							{isLoggedIn ? (
+							{canEdit ? (
 								<QuickEdit value={displayUser.username} maxLength={10} allowEmpty={false} onSubmitChange={handleUsernameSubmit} textClassName="text-lg font-semibold" containerClassName="w-fit" />
 							) : (
 								<CardTitle className="text-lg truncate">{displayUser.username}</CardTitle>
@@ -106,7 +123,7 @@ export const UserCard = () => {
 						{/* 邮箱和状态表情 */}
 						<CardDescription className="flex items-center gap-2 mb-2">
 							<span className="truncate">{displayUser.email}</span>
-							{isLoggedIn && (
+							{canEdit && (
 								<>
 									{userExtra.status ? (
 										<AppEmojiPicker
@@ -130,29 +147,35 @@ export const UserCard = () => {
 									)}
 								</>
 							)}
+							{/* 只读模式下显示状态但不可编辑 */}
+							{readonly && userExtra.status && <span className="text-xl flex-shrink-0">{userExtra.status}</span>}
 						</CardDescription>
 
 						{/* 签名区域 */}
-						{isLoggedIn && (
+						{(canEdit || (readonly && userExtra.bio)) && (
 							<div className="flex items-center gap-2">
 								<div className="text-sm text-muted-foreground font-medium flex-shrink-0">签名</div>
-								<QuickEdit
-									value={userExtra.bio || ''}
-									placeholder="此人很懒得签名..."
-									maxLength={50}
-									showCharCount={true}
-									onSubmitChange={handleBioSubmit}
-									textClassName="text-sm text-muted-foreground"
-									containerClassName="w-fit"
-								/>
+								{canEdit ? (
+									<QuickEdit
+										value={userExtra.bio || ''}
+										placeholder="此人很懒得签名..."
+										maxLength={50}
+										showCharCount={true}
+										onSubmitChange={handleBioSubmit}
+										textClassName="text-sm text-muted-foreground"
+										containerClassName="w-fit"
+									/>
+								) : (
+									<span className="text-sm text-muted-foreground">{userExtra.bio || '此人很懒得签名...'}</span>
+								)}
 							</div>
 						)}
 
-						{!isLoggedIn && <p className="text-sm text-muted-foreground">请登录以查看详细信息</p>}
+						{!canEdit && !readonly && <p className="text-sm text-muted-foreground">请登录以查看详细信息</p>}
 					</div>
 
 					{/* 登录按钮 */}
-					{!isLoggedIn && (
+					{!isLoggedIn && !readonly && (
 						<Button onClick={() => goLogin()} size="sm" className="flex-shrink-0">
 							<LogIn className="h-4 w-4 mr-2" />
 							登录
@@ -162,4 +185,15 @@ export const UserCard = () => {
 			</CardHeader>
 		</Card>
 	)
+}
+
+export interface UserCardProps {
+	readonly?: boolean // 只读模式，用于展示其他用户信息
+	userData?: {
+		username: string
+		email: string
+		avatar: string
+		extra?: string
+	} // 外部传入的用户数据
+	className?: string
 }

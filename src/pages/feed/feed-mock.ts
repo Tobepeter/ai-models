@@ -7,6 +7,14 @@ import { faker } from '@faker-js/faker/locale/zh_CN'
 const { number, datatype } = faker
 const { arrayElement } = faker.helpers
 
+/* Mock评论分页结果 */
+export interface MockCommentPageResult {
+	comments: AppFeedComment[]
+	next_cursor?: string
+	has_more: boolean
+	total: number
+}
+
 /* 内容生成模板类型 */
 // prettier-ignore
 const CONTENT_TYPES = [
@@ -46,6 +54,12 @@ class FeedMock {
 	genSinglePost(timestamp?: number): AppFeedPost {
 		const now = timestamp || Date.now()
 		const postId = feedUtil.generatePostId()
+		const totalComments = number.int({ min: 5, max: 100 })
+		const preloadedCount = Math.min(totalComments, number.int({ min: 3, max: 8 }))
+
+		// 生成预加载评论
+		const preloadedComments = this.genComments(postId, preloadedCount, now)
+		const preloadedCommentsCursor = preloadedCount < totalComments ? this.genCommentCursor(preloadedComments[preloadedComments.length - 1]) : undefined
 
 		const post: AppFeedPost = {
 			id: postId,
@@ -57,11 +71,14 @@ class FeedMock {
 			image_url: datatype.boolean({ probability: 0.6 }) ? this.randomImage() : undefined,
 			created_at: new Date(now).toISOString(),
 			like_count: number.int({ min: 0, max: 1000 }),
-			comment_count: number.int({ min: 0, max: 100 }),
+			comment_count: totalComments,
+			preloaded_comments: preloadedComments,
 			isLiked: datatype.boolean({ probability: 0.3 }),
 			isExpanded: false,
-			comments: this.genComments(postId, number.int({ min: 5, max: 50 })),
-		}
+		} as AppFeedPost & { preloaded_comments_cursor?: string } // 临时类型扩展
+
+		// 添加mock字段
+		;(post as any).preloaded_comments_cursor = preloadedCommentsCursor
 
 		return post
 	}
@@ -82,16 +99,16 @@ class FeedMock {
 			created_at: new Date(now).toISOString(),
 			like_count: 0,
 			comment_count: 0,
+			preloaded_comments: [],
 			isLiked: false,
 			isExpanded: false,
-			comments: [],
 		}
 	}
 
 	/* 生成模拟评论 */
-	genComments(postId: string, count: number): AppFeedComment[] {
+	genComments(postId: string, count: number, baseTimestamp?: number): AppFeedComment[] {
 		const comments: AppFeedComment[] = []
-		const now = Date.now()
+		const now = baseTimestamp || Date.now()
 
 		for (let i = 0; i < count; i++) {
 			const timestamp = now - i * 1000 * 60 * number.int({ min: 1, max: 120 }) // 2小时内随机时间
@@ -129,6 +146,47 @@ class FeedMock {
 			created_at: new Date().toISOString(),
 			like_count: 0,
 			isLiked: false,
+		}
+	}
+
+	/* 生成评论cursor */
+	genCommentCursor(comment: AppFeedComment) {
+		const timestamp = new Date(comment.created_at).getTime()
+		return `comment_${comment.id}_${timestamp}`
+	}
+
+	/* 解析评论cursor */
+	parseCommentCursor(cursor: string): { commentId: string; timestamp: number } | null {
+		const match = cursor.match(/^comment_(.+)_(\d+)$/)
+		if (!match) return null
+		return {
+			commentId: match[1],
+			timestamp: parseInt(match[2], 10),
+		}
+	}
+
+	/* 生成评论分页数据 */
+	genCommentPage(postId: string, cursor?: string, limit = 20): MockCommentPageResult {
+		const totalComments = number.int({ min: 20, max: 150 })
+		let startTimestamp = Date.now() - 1000 * 60 * 60 * 24 // 1天前开始
+
+		// 如果有cursor，从cursor位置开始
+		if (cursor) {
+			const parsed = this.parseCommentCursor(cursor)
+			if (parsed) {
+				startTimestamp = parsed.timestamp - 1000 * 60 // 从cursor时间前1分钟开始
+			}
+		}
+
+		const comments = this.genComments(postId, limit, startTimestamp)
+		const hasMore = comments.length >= limit && number.int({ min: 1, max: 10 }) > 3 // 70%概率有更多
+		const nextCursor = hasMore && comments.length > 0 ? this.genCommentCursor(comments[comments.length - 1]) : undefined
+
+		return {
+			comments,
+			next_cursor: nextCursor,
+			has_more: hasMore,
+			total: totalComments,
 		}
 	}
 

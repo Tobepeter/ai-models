@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
  */
 export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, className } = props
-	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, comments } = post
+	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, preloaded_comments } = post
 	const { openDetailDialog } = useFeedStore()
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
@@ -59,7 +59,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 
 			{/* 评论列表 - 独立区域，不触发弹窗 */}
 			<div className="px-4 pb-4">
-				<FeedCommentList postId={id} comments={comments} onViewMore={handleViewMore} />
+				<FeedCommentList postId={id} comments={preloaded_comments} onViewMore={handleViewMore} />
 			</div>
 		</article>
 	)

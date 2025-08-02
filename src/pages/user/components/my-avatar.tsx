@@ -3,12 +3,15 @@ import { useUserStore } from '@/store/user-store'
 
 /** 用户头像组件 */
 export const MyAvatar = (props: MyAvatarProps) => {
-	const { onClick, noPreview = false, size = 64, className } = props
+	const { onClick, noPreview = false, size = 64, className, userData } = props
 	const { info: user } = useUserStore()
-	const username = user?.username || ''
+	
+	// 优先使用外部传入的用户数据，否则使用 store 中的数据
+	const currentUser = userData || user
+	const username = currentUser?.username || ''
 
-	const avatarSrc = user?.avatar || ''
-	const fallbackText = user?.username?.charAt(0).toUpperCase() || 'U'
+	const avatarSrc = currentUser?.avatar || ''
+	const fallbackText = currentUser?.username?.charAt(0).toUpperCase() || 'U'
 
 	if (onClick) {
 		// 如果有 onClick 回调，包装点击事件
@@ -27,4 +30,8 @@ export interface MyAvatarProps {
 	noPreview?: boolean // 禁用预览功能
 	size?: number // 头像大小
 	className?: string // 额外的类名
+	userData?: {
+		username: string
+		avatar: string
+	} // 外部传入的用户数据
 }

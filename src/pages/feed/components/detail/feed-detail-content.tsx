@@ -16,28 +16,33 @@ import { FileX } from 'lucide-react'
 export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const { post, showNavigateButton = false, onNavigateToPage, onAddComment, onReply, className } = props
 
-	const { commentsByPostId, toggleLike, toggleExpand } = useFeedStore()
+	const { toggleLike, toggleExpand } = useFeedStore()
 
-	// 获取评论数据
-	const commentPage = post ? commentsByPostId[post.id] : null
+	// 获取评论数据 - 优先使用详情页加载的评论，回退到预加载评论
 	const comments = useMemo(() => {
-		if (!post || !commentPage) {
-			return post?.comments || []
+		if (!post) return []
+		
+		// 详情页已加载的评论
+		if (post.detail_comments?.loaded_comments) {
+			return post.detail_comments.loaded_comments
 		}
-		return commentPage.comments.map((id) => commentPage.commentsById[id]).filter(Boolean)
-	}, [post, commentPage])
+		
+		// 回退到预加载评论
+		return post.preloaded_comments || []
+	}, [post])
 
-	const hasMoreComments = Boolean(commentPage?.next_cursor || (commentPage?.total || 0) > comments.length)
-	const loading = commentPage?.loading || false
-	const error = commentPage?.error
+	const hasMoreComments = Boolean(post?.detail_comments?.has_more)
+	const loading = post?.detail_comments?.loading || false
+	const error = post?.detail_comments?.error
 
 	// 处理函数
 	const handleNavigateToPage = () => onNavigateToPage?.(post!.id)
 
 	// 加载更多评论
 	const handleLoadMore = async () => {
-		if (!commentPage || loading) return
+		if (!post || loading) return
 		// TODO: 调用 manager 加载更多评论
+		// feedMgr.loadMoreComments(post.id)
 	}
 
 	// 重试加载
