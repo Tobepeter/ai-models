@@ -1,5 +1,5 @@
 import { useFeedStore } from './feed-store'
-import { type FeedPost } from './feed-types'
+import { type AppFeedPost } from './feed-types'
 import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
 import { delayC } from '../../utils/common'
@@ -53,7 +53,7 @@ class FeedManager {
 	}
 
 	/* 初始化加载信息流数据 */
-	async loadInitial(): Promise<FeedPost[]> {
+	async loadInitial(): Promise<AppFeedPost[]> {
 		const store = this.getStore()
 
 		try {
@@ -82,7 +82,7 @@ class FeedManager {
 	}
 
 	/* 加载更多数据 - 用于无限滚动 */
-	async loadMore(): Promise<FeedPost[]> {
+	async loadMore(): Promise<AppFeedPost[]> {
 		const store = this.getStore()
 		const { cursor, hasMore, loading } = store
 
@@ -131,7 +131,7 @@ class FeedManager {
 	} // 设置分页游标为最后一条数据的时间戳
 
 	/* 下拉刷新数据 */
-	async refresh(): Promise<FeedPost[]> {
+	async refresh(): Promise<AppFeedPost[]> {
 		const store = this.getStore()
 
 		try {
@@ -206,7 +206,7 @@ class FeedManager {
 	}
 
 	/* 创建新的feed */
-	async createFeed(content: string, image?: string): Promise<FeedPost> {
+	async createFeed(content: string, image?: string): Promise<AppFeedPost> {
 		const store = this.getStore()
 
 		try {

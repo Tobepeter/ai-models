@@ -2,17 +2,17 @@ import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 import { feedConfig } from './feed-config'
-import type { FeedComment, FeedPost, FeedCommentList } from './feed-types'
+import type { AppFeedComment, AppFeedPost, FeedCommentList } from './feed-types'
 
 // 重新导出类型
-export type { FeedComment, FeedPost, FeedCommentList }
+export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost, FeedCommentList }
 
 const { commentPageSize } = feedConfig
 
 /* 信息流状态 */
 const feedState = {
 	// Feed 流数据
-	posts: [] as FeedPost[],
+	posts: [] as AppFeedPost[],
 	loading: false,
 	refreshing: false, // loading 的子状态，表示是刷新类型的加载
 	hasMore: true,
@@ -45,22 +45,22 @@ const stateCreator = () => {
 		setLoading: (loading: boolean) => set({ loading }),
 		setError: (error: string | null) => set({ error }),
 
-		prependPosts: (newPosts: FeedPost[]) => {
+		prependPosts: (newPosts: AppFeedPost[]) => {
 			const { posts } = get()
 			set({ posts: [...newPosts, ...posts] }) // 刷新时新数据加在前面
 		},
 
-		appendPosts: (newPosts: FeedPost[]) => {
+		appendPosts: (newPosts: AppFeedPost[]) => {
 			const { posts } = get()
 			set({ posts: [...posts, ...newPosts] }) // 加载更多时新数据加在后面
 		},
 
-		addNewPost: (newPost: FeedPost) => {
+		addNewPost: (newPost: AppFeedPost) => {
 			const { posts } = get()
 			set({ posts: [newPost, ...posts] }) // 新创建的post加在最前面
 		},
 
-		updatePost: (postId: string, updates: Partial<FeedPost>) => {
+		updatePost: (postId: string, updates: Partial<AppFeedPost>) => {
 			const { posts } = get()
 			const updatedPosts = posts.map((post) => (post.id === postId ? { ...post, ...updates } : post))
 			set({ posts: updatedPosts })
@@ -88,7 +88,7 @@ const stateCreator = () => {
 			set({ posts: updatedPosts })
 		},
 
-		addComment: (postId: string, comment: FeedComment) => {
+		addComment: (postId: string, comment: AppFeedComment) => {
 			const { posts } = get()
 			const updatedPosts = posts.map((post) => {
 				if (post.id === postId) {
@@ -122,7 +122,7 @@ const stateCreator = () => {
 				const postComments = commentsByPostId[detailDialog.postId]
 				if (postComments && postComments.comments.length > commentPageSize) {
 					const firstPageComments = postComments.comments.slice(0, commentPageSize)
-					const firstPageCommentsById: Record<string, FeedComment> = {}
+					const firstPageCommentsById: Record<string, AppFeedComment> = {}
 					firstPageComments.forEach((id) => {
 						if (postComments.commentsById[id]) {
 							firstPageCommentsById[id] = postComments.commentsById[id]
@@ -190,7 +190,7 @@ const stateCreator = () => {
 		},
 
 		// 评论分页管理
-		setPostComments: (postId: string, comments: FeedComment[], cursor?: string, total?: number) => {
+		setPostComments: (postId: string, comments: AppFeedComment[], cursor?: string, total?: number) => {
 			const { commentsByPostId } = get()
 			const currentPage = commentsByPostId[postId] || {
 				comments: [],

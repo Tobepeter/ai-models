@@ -3,7 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { FeedItem } from './item/feed-item'
 import { FeedSkeleton, FeedLoadMoreSkeleton } from './feed-skeleton'
 import { feedMgr } from '../feed-mgr'
-import { type FeedPost } from '../feed-types'
+import { type AppFeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
 
 /**
@@ -96,7 +96,7 @@ export const FeedList = (props: FeedListProps) => {
 }
 
 export interface FeedListProps {
-	posts: FeedPost[]
+	posts: AppFeedPost[]
 	loading: boolean
 	hasMore: boolean
 	className?: string

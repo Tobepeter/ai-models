@@ -1,6 +1,6 @@
 import { UserAvatar } from '@/components/common/user-avatar'
 import { memo } from 'react'
-import { type FeedComment } from '../../feed-types'
+import { type AppFeedComment } from '../../feed-types'
 import { feedUtil } from '../../feed-util'
 import { feedMgr } from '../../feed-mgr'
 import { cn } from '@/lib/utils'
@@ -42,7 +42,7 @@ export const FeedCommentItem = memo((props: FeedCommentItemProps) => {
 })
 
 interface FeedCommentItemProps {
-	comment: FeedComment
+	comment: AppFeedComment
 	className?: string
 }
 

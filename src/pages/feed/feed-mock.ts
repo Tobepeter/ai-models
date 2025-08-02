@@ -1,5 +1,5 @@
 import { feedUtil } from './feed-util'
-import type { FeedPost, FeedComment } from './feed-types'
+import type { AppFeedPost, AppFeedComment } from './feed-types'
 import { dummy } from '@/utils/dummy'
 import { random } from 'node-emoji'
 import { faker } from '@faker-js/faker/locale/zh_CN'
@@ -29,8 +29,8 @@ const COMMENT_SENTIMENTS = [
  */
 class FeedMock {
 	/* 生成模拟数据 - 可配置时间基准点 */
-	genPosts(count: number, beforeTimestamp?: number): FeedPost[] {
-		const posts: FeedPost[] = []
+	genPosts(count: number, beforeTimestamp?: number): AppFeedPost[] {
+		const posts: AppFeedPost[] = []
 		const now = beforeTimestamp || Date.now()
 
 		for (let i = 0; i < count; i++) {
@@ -43,11 +43,11 @@ class FeedMock {
 	}
 
 	/* 生成单个帖子 */
-	genSinglePost(timestamp?: number): FeedPost {
+	genSinglePost(timestamp?: number): AppFeedPost {
 		const now = timestamp || Date.now()
 		const postId = feedUtil.generatePostId()
 
-		const post: FeedPost = {
+		const post: AppFeedPost = {
 			id: postId,
 			user_id: feedUtil.generateUserId(),
 			username: faker.person.fullName(),
@@ -67,7 +67,7 @@ class FeedMock {
 	}
 
 	/* 创建用户自定义的帖子 */
-	createUserPost(content: string, image?: string): FeedPost {
+	createUserPost(content: string, image?: string): AppFeedPost {
 		const postId = feedUtil.generatePostId()
 		const now = Date.now()
 
@@ -89,15 +89,15 @@ class FeedMock {
 	}
 
 	/* 生成模拟评论 */
-	genComments(postId: string, count: number): FeedComment[] {
-		const comments: FeedComment[] = []
+	genComments(postId: string, count: number): AppFeedComment[] {
+		const comments: AppFeedComment[] = []
 		const now = Date.now()
 
 		for (let i = 0; i < count; i++) {
 			const timestamp = now - i * 1000 * 60 * number.int({ min: 1, max: 120 }) // 2小时内随机时间
 			const isReply = i > 2 && datatype.boolean({ probability: 0.4 }) // 40%概率是回复
 
-			const comment: FeedComment = {
+			const comment: AppFeedComment = {
 				id: feedUtil.generatePostId(),
 				post_id: postId,
 				user_id: feedUtil.generateUserId(),
@@ -117,7 +117,7 @@ class FeedMock {
 	}
 
 	/* 生成单个评论 - 用于添加新评论 */
-	genComment(postId: string, content: string, replyTo?: string): FeedComment {
+	genComment(postId: string, content: string, replyTo?: string): AppFeedComment {
 		return {
 			id: feedUtil.generatePostId(),
 			post_id: postId,

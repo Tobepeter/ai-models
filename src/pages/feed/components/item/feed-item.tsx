@@ -6,7 +6,7 @@ import { FeedItemImage } from './feed-item-image'
 import { FeedItemActions } from './feed-item-actions'
 import { FeedCommentList } from '../comment/feed-comment-list'
 import { useFeedStore } from '../../feed-store'
-import { type FeedPost } from '../../feed-types'
+import { type AppFeedPost } from '../../feed-types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
@@ -66,6 +66,6 @@ export const FeedItem = memo((props: FeedItemProps) => {
 })
 
 export interface FeedItemProps {
-	post: FeedPost
+	post: AppFeedPost
 	className?: string
 }

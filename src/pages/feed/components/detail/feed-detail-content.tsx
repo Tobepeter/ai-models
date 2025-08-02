@@ -38,7 +38,6 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const handleLoadMore = async () => {
 		if (!commentPage || loading) return
 		// TODO: 调用 manager 加载更多评论
-		console.log('加载更多评论:', post!.id, commentPage.next_cursor)
 	}
 
 	// 重试加载

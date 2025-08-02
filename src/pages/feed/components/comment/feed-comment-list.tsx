@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useCallback } from 'react'
-import { type FeedComment } from '../../feed-types'
+import { type AppFeedComment } from '../../feed-types'
 import { FeedCommentItem } from './feed-comment-item'
 import { feedConfig } from '../../feed-config'
 
@@ -46,7 +46,7 @@ export const FeedCommentList = (props: FeedCommentListProps) => {
 
 export interface FeedCommentListProps {
 	postId: string
-	comments?: FeedComment[] // 评论列表可能为空
+	comments?: AppFeedComment[] // 评论列表可能为空
 	onViewMore: () => void // 查看更多评论的回调
 	className?: string
 }

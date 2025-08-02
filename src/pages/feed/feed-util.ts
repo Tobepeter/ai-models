@@ -1,6 +1,6 @@
 import { differenceInMinutes, format, parseISO } from 'date-fns'
 import { truncate } from 'lodash-es'
-import { type FeedComment } from './feed-types'
+import { type AppFeedComment } from './feed-types'
 
 /**
  * 信息流工具类 - 提供时间格式化、内容处理、分页游标等功能
@@ -101,7 +101,7 @@ class FeedUtil {
 	}
 
 	// 创建新评论
-	createComment(postId: string, content: string, replyTo?: string): FeedComment {
+	createComment(postId: string, content: string, replyTo?: string): AppFeedComment {
 		return {
 			id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
 			post_id: postId,
