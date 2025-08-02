@@ -68,8 +68,9 @@ func TestFeedService_CreateAndGetPosts(t *testing.T) {
 			Sort:  "time",
 			Limit: 2, // 只获取最新的2条
 		}
-		posts, _, _, err := feedService.GetFeedPosts(params)
+		resp, err := feedService.GetFeedPosts(params)
 		require.NoError(t, err)
+		posts := resp.Posts
 		// 由于数据库中可能有其他测试数据，我们只验证新创建的帖子存在
 		assert.GreaterOrEqual(t, len(posts), 2) // 至少包含我们创建的2条
 
@@ -208,12 +209,13 @@ func TestFeedService_Comments(t *testing.T) {
 			PostID: postIDStr,
 			Limit:  10,
 		}
-		comments, nextCursor, hasMore, total, err := feedService.GetFeedComments(commentParams)
+		resp, err := feedService.GetFeedComments(commentParams)
 		require.NoError(t, err)
+		comments := resp.Comments
 		assert.Len(t, comments, 2)
-		assert.False(t, hasMore)
-		assert.Empty(t, nextCursor)
-		assert.Equal(t, int64(2), total)
+		assert.False(t, resp.HasMore)
+		assert.Empty(t, resp.NextCursor)
+		assert.Equal(t, int64(2), resp.Total)
 
 		// 验证排序（最新的在前）
 		assert.Equal(t, comment2.ID, comments[0].ID)

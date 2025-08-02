@@ -32,7 +32,7 @@ func NewFeedService(db *gorm.DB, userService *UserService) *FeedService {
 }
 
 // GetFeedPosts 获取信息流帖子列表（支持评论预载）
-func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.FeedPostResponseItem, string, bool, error) {
+func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) (*models.FeedPostResponse, error) {
 	var posts []models.FeedPost
 
 	query := s.DB.Model(&models.FeedPost{})
@@ -73,7 +73,7 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.Feed
 	// 5. 表不存在错误 - 查询的表不存在
 	// 6. 字段映射错误 - struct字段与数据库字段映射失败
 	if err := query.Limit(params.Limit + 1).Find(&posts).Error; err != nil {
-		return nil, "", false, err
+		return nil, err
 	}
 
 	// 判断是否还有更多数据
@@ -115,7 +115,11 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.Feed
 		responseItems[i] = item
 	}
 
-	return responseItems, nextCursor, hasMore, nil
+	return &models.FeedPostResponse{
+		Posts:      responseItems,
+		NextCursor: nextCursor,
+		HasMore:    hasMore,
+	}, nil
 }
 
 // CreateFeedPost 创建信息流帖子
@@ -221,13 +225,13 @@ func (s *FeedService) SetFeedPostLike(userID uint64, postID string, isLike bool)
 }
 
 // GetFeedComments 获取帖子评论列表
-func (s *FeedService) GetFeedComments(params models.CommentQueryParams) ([]models.FeedComment, string, bool, int64, error) {
+func (s *FeedService) GetFeedComments(params models.CommentQueryParams) (*models.FeedCommentResponse, error) {
 	var comments []models.FeedComment
 	var total int64
 
 	// 统计总评论数
 	if err := s.DB.Model(&models.FeedComment{}).Where("post_id = ?", params.PostID).Count(&total).Error; err != nil {
-		return nil, "", false, 0, err
+		return nil, err
 	}
 
 	query := s.DB.Model(&models.FeedComment{}).Where("post_id = ?", params.PostID).Order("created_at DESC, id DESC")
@@ -236,7 +240,7 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) ([]model
 	if params.AfterID != "" {
 		var lastComment models.FeedComment
 		if err := s.DB.Where("id = ?", params.AfterID).First(&lastComment).Error; err != nil {
-			return nil, "", false, 0, fmt.Errorf("invalid cursor: %w", err)
+			return nil, fmt.Errorf("invalid cursor: %w", err)
 		}
 
 		query = query.Where("(created_at < ? OR (created_at = ? AND id < ?))",
@@ -245,7 +249,7 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) ([]model
 
 	// 查询数据，多查一条判断是否还有更多
 	if err := query.Limit(params.Limit + 1).Find(&comments).Error; err != nil {
-		return nil, "", false, 0, err
+		return nil, err
 	}
 
 	// 判断是否还有更多数据
@@ -260,7 +264,12 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) ([]model
 		nextCursor = fmt.Sprintf("%d", comments[len(comments)-1].ID)
 	}
 
-	return comments, nextCursor, hasMore, total, nil
+	return &models.FeedCommentResponse{
+		Comments:   comments,
+		NextCursor: nextCursor,
+		HasMore:    hasMore,
+		Total:      total,
+	}, nil
 }
 
 // CreateFeedComment 创建帖子评论

@@ -7,8 +7,7 @@ import type { FeedComment, FeedPost, FeedCommentList } from './feed-types'
 // 重新导出类型
 export type { FeedComment, FeedPost, FeedCommentList }
 
-/* 评论分页配置 */
-export const COMMENT_PAGE_SIZE = feedConfig.commentPageSize
+const { commentPageSize } = feedConfig
 
 /* 信息流状态 */
 const feedState = {
@@ -32,7 +31,6 @@ const feedState = {
 	createDialog: {
 		isOpen: false,
 	},
-
 
 	// 控制打开评论时候，防止误触继续二次打开其他评论
 	isCommentInputOpen: false, // 评论输入弹窗状态
@@ -122,8 +120,8 @@ const stateCreator = () => {
 			// 清理多余评论缓存，只保留第一页
 			if (detailDialog.postId) {
 				const postComments = commentsByPostId[detailDialog.postId]
-				if (postComments && postComments.comments.length > COMMENT_PAGE_SIZE) {
-					const firstPageComments = postComments.comments.slice(0, COMMENT_PAGE_SIZE)
+				if (postComments && postComments.comments.length > commentPageSize) {
+					const firstPageComments = postComments.comments.slice(0, commentPageSize)
 					const firstPageCommentsById: Record<string, FeedComment> = {}
 					firstPageComments.forEach((id) => {
 						if (postComments.commentsById[id]) {
@@ -138,7 +136,7 @@ const stateCreator = () => {
 								...postComments,
 								comments: firstPageComments,
 								commentsById: firstPageCommentsById,
-								next_cursor: firstPageComments.length >= COMMENT_PAGE_SIZE ? postComments.next_cursor : undefined,
+								next_cursor: firstPageComments.length >= commentPageSize ? postComments.next_cursor : undefined,
 							},
 						},
 					})
@@ -198,7 +196,7 @@ const stateCreator = () => {
 				comments: [],
 				commentsById: {},
 				total: 0,
-				pageSize: COMMENT_PAGE_SIZE,
+				pageSize: commentPageSize,
 				loading: false,
 			}
 
@@ -249,10 +247,10 @@ export const useFeedStore = create(
 					{
 						...page,
 						// 只保留第一页评论
-						comments: page.comments.slice(0, COMMENT_PAGE_SIZE),
+						comments: page.comments.slice(0, commentPageSize),
 						commentsById: Object.fromEntries(
 							page.comments
-								.slice(0, COMMENT_PAGE_SIZE)
+								.slice(0, commentPageSize)
 								.map((id) => [id, page.commentsById[id]])
 								.filter(([, comment]) => comment)
 						),

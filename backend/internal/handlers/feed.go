@@ -45,17 +45,13 @@ func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 		params.Limit = 20
 	}
 
-	posts, nextCursor, hasMore, err := h.feedService.GetFeedPosts(params)
+	resp, err := h.feedService.GetFeedPosts(params)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "获取信息流失败")
 		return
 	}
 
-	response.Success(c, models.FeedPostResponse{
-		Posts:      posts,
-		NextCursor: nextCursor,
-		HasMore:    hasMore,
-	})
+	response.Success(c, resp)
 }
 
 // @Summary 创建信息流帖子
@@ -158,18 +154,13 @@ func (h *FeedHandler) GetFeedComments(c *gin.Context) {
 		params.Limit = 20
 	}
 
-	comments, nextCursor, hasMore, total, err := h.feedService.GetFeedComments(params)
+	resp, err := h.feedService.GetFeedComments(params)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "获取评论失败")
 		return
 	}
 
-	response.Success(c, models.FeedCommentResponse{
-		Comments:   comments,
-		NextCursor: nextCursor,
-		HasMore:    hasMore,
-		Total:      total,
-	})
+	response.Success(c, resp)
 }
 
 // @Summary 创建帖子评论
