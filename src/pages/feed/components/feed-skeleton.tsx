@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils'
+import { useTheme } from 'next-themes'
+import { PropsWithChildren } from 'react'
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
@@ -7,7 +9,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
  */
 const FeedItemSkeleton = () => (
 	<article className="bg-card" data-slot="feed-item-skeleton">
-		<div className="rounded-lg border border-border/20 hover:bg-accent/50 transition-all duration-200">
+		<div className="rounded-lg border border-border/20">
 			<div className="p-4">
 				{/* 头部信息栏 */}
 				<div className="flex items-start justify-between mb-3">
@@ -35,7 +37,7 @@ const FeedItemSkeleton = () => (
 				</div>
 
 				{/* 图片占位栏 */}
-				<Skeleton height={192} className="mb-3" borderRadius={8} />
+				<Skeleton height={300} className="mb-3" borderRadius={8} />
 			</div>
 
 			{/* 交互按钮栏 */}
@@ -78,49 +80,64 @@ const FeedItemSkeleton = () => (
 	</article>
 )
 
+/** 响应深色主题 */
+const FeedThemeWrap = (props: PropsWithChildren<any>) => {
+	const { children } = props
+	const { resolvedTheme } = useTheme()
+	const darkBaseColor = '#374151'
+	const darkHighlightColor = '#4b5563'
+	const baseColor = resolvedTheme === 'dark' ? darkBaseColor : undefined
+	const highlightColor = resolvedTheme === 'dark' ? darkHighlightColor : undefined
+	return (
+		<SkeletonTheme baseColor={baseColor} highlightColor={highlightColor}>
+			{children}
+		</SkeletonTheme>
+	)
+}
+
 /**
  * 信息流骨架屏组件
  */
 export const FeedSkeleton = (props: FeedSkeletonProps) => {
 	const { className, count = 3 } = props
 	return (
-		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+		<FeedThemeWrap>
 			<div className={cn('space-y-4 w-full', className)} data-slot="feed-skeleton">
 				{Array.from({ length: count }, (_, index) => (
 					<FeedItemSkeleton key={index} />
 				))}
 			</div>
-		</SkeletonTheme>
+		</FeedThemeWrap>
 	)
 }
 
 /**
  * 加载更多骨架屏
  */
-export const LoadMoreSkeleton = (props: { className?: string }) => {
+export const FeedLoadMoreSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+		<FeedThemeWrap>
 			<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="load-more-skeleton">
 				<Skeleton circle width={16} height={16} />
 				<Skeleton width={80} height={16} />
 			</div>
-		</SkeletonTheme>
+		</FeedThemeWrap>
 	)
 }
 
 /**
  * 刷新骨架屏
  */
-export const RefreshSkeleton = (props: { className?: string }) => {
+export const FeedRefreshSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+		<FeedThemeWrap>
 			<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="refresh-skeleton">
 				<Skeleton circle width={20} height={20} />
 				<Skeleton width={64} height={16} />
 			</div>
-		</SkeletonTheme>
+		</FeedThemeWrap>
 	)
 }
 

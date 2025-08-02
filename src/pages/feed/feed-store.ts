@@ -12,7 +12,7 @@ export const COMMENT_PAGE_SIZE = feedConfig.commentPageSize
 
 /* 信息流状态 */
 const feedState = {
-	// Feed 流数据 - 保持现有结构兼容性
+	// Feed 流数据
 	posts: [] as FeedPost[],
 	loading: false,
 	refreshing: false, // loading 的子状态，表示是刷新类型的加载
@@ -20,9 +20,8 @@ const feedState = {
 	cursor: null as string | null, // 分页游标
 	error: null as string | null,
 
-	// 新增：扁平化存储结构
-	postsById: {} as Record<string, FeedPost>, // Post 数据表
-	commentsByPostId: {} as Record<string, FeedCommentList>, // 评论分页数据
+	// 评论分页数据
+	commentsByPostId: {} as Record<string, FeedCommentList>,
 
 	// 弹窗状态
 	detailDialog: {
@@ -34,8 +33,9 @@ const feedState = {
 		isOpen: false,
 	},
 
-	// 评论输入弹窗状态
-	isCommentInputOpen: false,
+
+	// 控制打开评论时候，防止误触继续二次打开其他评论
+	isCommentInputOpen: false, // 评论输入弹窗状态
 	lastCommentCloseTime: -1, // 最后关闭评论弹窗的时间戳，用于防止快速切换
 }
 
@@ -243,7 +243,6 @@ export const useFeedStore = create(
 				isExpanded: false, // 不持久化内容展开状态
 			})),
 			cursor: state.cursor,
-			postsById: state.postsById, // 持久化 post 数据表
 			commentsByPostId: Object.fromEntries(
 				Object.entries(state.commentsByPostId).map(([postId, page]) => [
 					postId,

@@ -6,9 +6,9 @@ import { FeedSkeleton } from './components/feed-skeleton'
 import { FeedDetailDialog } from './components/detail/feed-detail-dialog'
 import { FeedCreateDialog } from './components/feed-create-dialog'
 import { FeedNavHeader } from './components/feed-nav-header'
-import { Button } from '@/components/ui/button'
-import { AlertCircle } from 'lucide-react'
+import { WifiOff, RefreshCw } from 'lucide-react'
 import { useHeader } from '@/hooks/use-header'
+import { Empty } from '@/components/common/empty'
 
 /* 信息流主页面 - 支持无限滚动和下拉刷新 */
 export const Feed = () => {
@@ -34,41 +34,32 @@ export const Feed = () => {
 		}
 	}
 
-	return (
-		<div className="max-w-2xl mx-auto h-screen bg-background flex flex-col" data-slot="feed">
-			{/* 错误提示条 */}
-			{error && (
-				<div className="p-4 m-4 bg-destructive/10 border border-destructive/20 rounded-lg flex-shrink-0">
-					<div className="flex items-center space-x-2 text-destructive">
-						<AlertCircle className="h-4 w-4" />
-						<span className="text-sm">{error}</span>
-					</div>
-					<Button variant="outline" size="sm" onClick={handleRetry} className="mt-2">
+	// 错误状态
+	if (error) {
+		return (
+			<Empty
+				icon={<WifiOff className="h-16 w-16 text-muted-foreground" />}
+				title="加载失败"
+				desc={`${error}\n请检查网络连接后重试`}
+				buttonText={
+					<>
+						<RefreshCw className="h-4 w-4 mr-2" />
 						重试
-					</Button>
-				</div>
-			)}
+					</>
+				}
+				onClickButton={handleRetry}
+			/>
+		)
+	}
 
-			{/* TEST */}
-			{/* <FeedSkeleton count={5} /> */}
-
-			{/* 主要内容区域 - 使用 flex-1 占满剩余空间 */}
+	return (
+		<div className="max-w-2xl mx-auto h-full bg-background flex flex-col" data-slot="feed">
+			{/* 主要内容区域 */}
 			{posts.length > 0 ? (
 				<FeedList posts={posts} loading={loading} hasMore={hasMore} />
 			) : (
 				<div className="flex-1 flex items-center justify-center">
-					{loading && !error ? (
-						<FeedSkeleton count={5} />
-					) : (
-						!error && (
-							<div className="text-center">
-								<div className="text-muted-foreground text-sm mb-4">暂无内容</div>
-								<Button variant="outline" size="sm" onClick={() => feedMgr.loadInitial()}>
-									刷新试试
-								</Button>
-							</div>
-						)
-					)}
+					{loading ? <FeedSkeleton count={5} /> : <Empty title="暂无内容" buttonText="刷新试试" onClickButton={() => feedMgr.loadInitial()} />}
 				</div>
 			)}
 

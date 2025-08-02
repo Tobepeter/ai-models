@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { FeedItem } from './item/feed-item'
-import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
+import { FeedSkeleton, FeedLoadMoreSkeleton } from './feed-skeleton'
 import { feedMgr } from '../feed-mgr'
 import { type FeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
@@ -85,7 +85,7 @@ export const FeedList = (props: FeedListProps) => {
 					{/* 底部加载状态 */}
 					{postsLength > 0 && (
 						<div style={loadMoreStyle} className="py-4">
-							{loading && hasMore && <LoadMoreSkeleton />}
+							{loading && hasMore && <FeedLoadMoreSkeleton />}
 							{!hasMore && <div className="text-center text-muted-foreground text-sm py-8">没有更多内容了</div>}
 						</div>
 					)}

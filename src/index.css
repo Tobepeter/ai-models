@@ -122,13 +122,3 @@
 			'Segoe UI Symbol', 'Noto Color Emoji';
 	}
 }
-
-/* 骨架屏shimmer动画 */
-@keyframes shimmer {
-	0% {
-		background-position: -200% 0;
-	}
-	100% {
-		background-position: 200% 0;
-	}
-}

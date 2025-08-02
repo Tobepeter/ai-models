@@ -17,14 +17,13 @@ export const FeedDetailDialog = () => {
 	const {
 		detailDialog,
 		posts,
-		postsById,
 		closeDetailDialog,
 		addComment,
 		// TODO: 添加评论点赞和回复的处理
 	} = useFeedStore()
 
 	// 获取当前显示的帖子
-	const currentPost = detailDialog.postId ? postsById[detailDialog.postId] || posts.find((p) => p.id === detailDialog.postId) : null
+	const currentPost = detailDialog.postId ? posts.find((p) => p.id === detailDialog.postId) : null
 
 	// 处理弹窗关闭
 	const handleClose = () => {

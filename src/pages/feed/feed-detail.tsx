@@ -12,10 +12,10 @@ import { feedMgr } from './feed-mgr'
 export const FeedDetail = () => {
 	const { postId } = useParams<{ postId: string }>()
 
-	const { posts, postsById, loading, error, addComment } = useFeedStore()
+	const { posts, loading, error, addComment } = useFeedStore()
 
 	// 获取当前帖子
-	const currentPost = postId ? postsById[postId] || posts.find((p) => p.id === postId) : null
+	const currentPost = postId ? posts.find((p) => p.id === postId) : null
 
 	// 处理添加评论
 	const handleAddComment = (postId: string, content: string, replyTo?: string) => {
@@ -31,11 +31,11 @@ export const FeedDetail = () => {
 
 	// 初始化数据
 	useEffect(() => {
-		if (postId && !currentPost && !loading) {
+		if (postId && !currentPost) {
 			// 如果没有找到帖子数据，尝试加载
 			feedMgr.loadInitial()
 		}
-	}, [postId, currentPost, loading])
+	}, [postId, currentPost])
 
 	// 如果没有 postId，返回 404
 	if (!postId) {
@@ -49,8 +49,8 @@ export const FeedDetail = () => {
 		)
 	}
 
-	// 加载中状态
-	if (loading && !currentPost) {
+	// 加载中状态 - 只有在初次加载且没有任何 post 数据时才显示
+	if (loading && !currentPost && posts.length === 0) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
@@ -61,8 +61,8 @@ export const FeedDetail = () => {
 		)
 	}
 
-	// 错误状态
-	if (error && !currentPost) {
+	// 错误状态 - 只有在没有任何 post 数据时才显示错误
+	if (error && !currentPost && posts.length === 0) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
