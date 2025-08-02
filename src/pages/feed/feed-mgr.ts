@@ -207,7 +207,7 @@ class FeedManager {
 	}
 
 	/* 初始化详情页评论 - 基于预加载数据 */
-	async loadPostComments(postId: string): Promise<void> {
+	async loadPostComments(postId: string) {
 		const store = this.getStore()
 		const post = store.posts.find((p) => p.id === postId)
 
@@ -244,7 +244,7 @@ class FeedManager {
 	}
 
 	/* 加载更多评论 */
-	async loadMoreComments(postId: string): Promise<void> {
+	async loadMoreComments(postId: string) {
 		const store = this.getStore()
 		const post = store.posts.find((p) => p.id === postId)
 

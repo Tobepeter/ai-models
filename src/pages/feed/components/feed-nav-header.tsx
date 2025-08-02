@@ -9,7 +9,7 @@ import { useUserStore } from '@/store/user-store'
 
 /* Feed 导航标题组件 */
 export const FeedNavHeader = () => {
-	const { loading, refreshing, error, clearError, openCreateDialog } = useFeedStore()
+	const { loading, refreshing, error, clearError, setData } = useFeedStore()
 	const { goLogin } = useUserStore()
 
 	const handleRefresh = () => {
@@ -27,7 +27,7 @@ export const FeedNavHeader = () => {
 			})
 			return
 		}
-		openCreateDialog()
+		setData({ isCreateDialogOpen: true })
 	}
 
 	const addEnable = !error && !loading

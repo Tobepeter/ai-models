@@ -30,7 +30,7 @@ type CreateFeedForm = z.infer<typeof createFeedSchema>
 
 /* 新建Feed弹窗组件 */
 export const FeedCreateDialog = () => {
-	const { loading, createDialog, closeCreateDialog } = useFeedStore()
+	const { loading, isCreateDialogOpen, setData } = useFeedStore()
 	const [imageUrl, setImageUrl] = useState('')
 	const currObjectKeyRef = useRef('') // 保存当前上传的OSS objectKey
 	const hasSubmittedRef = useRef(false) // 标记是否已经提交过
@@ -51,7 +51,7 @@ export const FeedCreateDialog = () => {
 			setImageUrl('')
 			currObjectKeyRef.current = '' // 清空 objectKey 引用
 			hasSubmittedRef.current = false // 重置提交状态
-			closeCreateDialog()
+			setData({ isCreateDialogOpen: false })
 		} catch (error) {
 			hasSubmittedRef.current = false // 提交失败时重置状态
 			console.error('创建失败:', error)
@@ -105,11 +105,11 @@ export const FeedCreateDialog = () => {
 		setImageUrl('')
 		currObjectKeyRef.current = ''
 		hasSubmittedRef.current = false // 重置提交状态
-		closeCreateDialog()
+		setData({ isCreateDialogOpen: false })
 	}
 
 	return (
-		<Dialog open={createDialog.isOpen} onOpenChange={handleClose}>
+		<Dialog open={isCreateDialogOpen} onOpenChange={handleClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>分享动态</DialogTitle>

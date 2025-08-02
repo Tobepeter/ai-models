@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, className } = props
 	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, preloaded_comments } = post
-	const { openDetailDialog } = useFeedStore()
+	const { setData } = useFeedStore()
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
 
@@ -27,7 +27,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 			navigate(`/feed/${id}`)
 		} else {
 			// PC端打开弹窗
-			openDetailDialog(id)
+			setData({ isDetailDialogOpen: true, detailDialogPostId: id })
 		}
 	}
 
@@ -36,7 +36,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 		if (isMobile) {
 			navigate(`/feed/${id}`) // 移动端直接跳转详情页
 		} else {
-			openDetailDialog(id) // PC端打开弹窗
+			setData({ isDetailDialogOpen: true, detailDialogPostId: id }) // PC端打开弹窗
 		}
 	}
 

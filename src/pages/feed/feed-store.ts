@@ -20,15 +20,10 @@ const feedState = {
 	cursor: null as string | null, // 分页游标
 	error: null as string | null,
 
-	// 弹窗状态
-	detailDialog: {
-		isOpen: false,
-		postId: null as string | null,
-		scrollTop: 0, // 记录滚动位置
-	},
-	createDialog: {
-		isOpen: false,
-	},
+	// 弹窗状态 - 直接定义简单状态
+	isDetailDialogOpen: false,
+	detailDialogPostId: '',
+	isCreateDialogOpen: false,
 
 	// 控制打开评论时候，防止误触继续二次打开其他评论
 	isCommentInputOpen: false, // 评论输入弹窗状态
@@ -38,7 +33,7 @@ const feedState = {
 type FeedState = typeof feedState
 
 const stateCreator = () => {
-	return combine(feedState, (set, get) => ({
+	return combine(feedState, (set) => ({
 		setData: (data: Partial<FeedState>) => set(data), // 更新部分状态
 		setLoading: (loading: boolean) => set({ loading }),
 		setError: (error: string | null) => set({ error }),
@@ -120,67 +115,6 @@ const stateCreator = () => {
 					}
 				})
 			)
-		},
-
-		// 详情页弹窗管理
-		openDetailDialog: (postId: string) => {
-			set({
-				detailDialog: {
-					isOpen: true,
-					postId,
-					scrollTop: 0,
-				},
-			})
-		},
-
-		closeDetailDialog: () => {
-			const { detailDialog } = get()
-			// 清理详情页评论数据，保留预加载评论
-			if (detailDialog.postId) {
-				set(
-					produce((draft) => {
-						const post = draft.posts.find((p: AppFeedPost) => p.id === detailDialog.postId)
-						if (post) {
-							delete post.detail_comments
-						}
-					})
-				)
-			}
-
-			set({
-				detailDialog: {
-					isOpen: false,
-					postId: null,
-					scrollTop: 0,
-				},
-			})
-		},
-
-		setDetailScrollTop: (scrollTop: number) => {
-			const { detailDialog } = get()
-			set({
-				detailDialog: {
-					...detailDialog,
-					scrollTop,
-				},
-			})
-		},
-
-		// 创建弹窗管理
-		openCreateDialog: () => {
-			set({
-				createDialog: {
-					isOpen: true,
-				},
-			})
-		},
-
-		closeCreateDialog: () => {
-			set({
-				createDialog: {
-					isOpen: false,
-				},
-			})
 		},
 
 		// 评论输入弹窗管理
