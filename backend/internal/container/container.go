@@ -28,15 +28,16 @@ type Container struct {
 	FeedSyncManager *services.FeedSyncManager
 
 	// 处理器层
-	UserHandler   *handlers.UserHandler
-	AdminHandler  *handlers.AdminHandler
-	AIHandler     *handlers.AIHandler
-	OSSHandler    *handlers.OSSHandler
-	HealthHandler *handlers.HealthHandler
-	CrudHandler   *handlers.CrudHandler
-	TodoHandler   *handlers.TodoHandler
-	TestHandler   *handlers.TestHandler
-	FeedHandler   *handlers.FeedHandler
+	UserHandler    *handlers.UserHandler
+	AdminHandler   *handlers.AdminHandler
+	AIHandler      *handlers.AIHandler
+	OSSHandler     *handlers.OSSHandler
+	HealthHandler  *handlers.HealthHandler
+	CrudHandler    *handlers.CrudHandler
+	TodoHandler    *handlers.TodoHandler
+	TestHandler    *handlers.TestHandler
+	FeedHandler    *handlers.FeedHandler
+	MetricsHandler *handlers.MetricsHandler
 }
 
 /* 创建新的容器实例并初始化所有依赖 */
@@ -61,6 +62,7 @@ func New(cfg *config.Config) *Container {
 	todoHandler := handlers.NewTodoHandler(todoService)
 	testHandler := handlers.NewTestHandler()
 	feedHandler := handlers.NewFeedHandler(feedService)
+	metricsHandler := handlers.NewMetricsHandler()
 
 	return &Container{
 		Config:          cfg,
@@ -81,6 +83,7 @@ func New(cfg *config.Config) *Container {
 		TodoHandler:     todoHandler,
 		TestHandler:     testHandler,
 		FeedHandler:     feedHandler,
+		MetricsHandler:  metricsHandler,
 	}
 }
 

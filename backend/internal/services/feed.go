@@ -1,6 +1,10 @@
 package services
 
 import (
+	"ai-models-backend/internal/config"
+	"ai-models-backend/internal/database"
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -8,6 +12,7 @@ import (
 
 	"gorm.io/gorm"
 )
+
 
 // FeedService 信息流服务
 type FeedService struct {
@@ -18,13 +23,16 @@ type FeedService struct {
 // NewFeedService 创建信息流服务
 func NewFeedService(db *gorm.DB, userService *UserService) *FeedService {
 	return &FeedService{
-		BaseService: BaseService{DB: db},
+		BaseService: BaseService{
+			DB:    db,
+			Redis: database.Redis,
+		},
 		userService: userService,
 	}
 }
 
-// GetFeedPosts 获取信息流帖子列表
-func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.FeedPost, string, bool, error) {
+// GetFeedPosts 获取信息流帖子列表（支持评论预载）
+func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.FeedPostResponseItem, string, bool, error) {
 	var posts []models.FeedPost
 
 	query := s.DB.Model(&models.FeedPost{})
@@ -80,7 +88,34 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) ([]models.Feed
 		nextCursor = fmt.Sprintf("%d", posts[len(posts)-1].ID)
 	}
 
-	return posts, nextCursor, hasMore, nil
+	// 构建响应项目列表
+	responseItems := make([]models.FeedPostResponseItem, len(posts))
+	for i, post := range posts {
+		item := models.FeedPostResponseItem{
+			FeedPost: post,
+		}
+
+		// 根据参数决定是否预载评论
+		if params.CommentCount > 0 {
+			comments, err := s.getCommentsFromCache(fmt.Sprintf("%d", post.ID), params.CommentCount)
+			if err == nil && len(comments) > 0 {
+				item.PreloadedComments = comments
+				item.CommentPreviewCount = len(comments)
+			} else {
+				// 即使获取评论失败，也要确保字段存在（空数组）
+				item.PreloadedComments = []models.FeedComment{}
+				item.CommentPreviewCount = 0
+			}
+		} else {
+			// 不预载评论，设置为空数组
+			item.PreloadedComments = []models.FeedComment{}
+			item.CommentPreviewCount = 0
+		}
+
+		responseItems[i] = item
+	}
+
+	return responseItems, nextCursor, hasMore, nil
 }
 
 // CreateFeedPost 创建信息流帖子
@@ -281,6 +316,9 @@ func (s *FeedService) CreateFeedComment(userID uint64, postID string, req models
 		return nil, err
 	}
 
+	// 异步清理缓存
+	go s.invalidateCommentCache(postID)
+
 	return comment, nil
 }
 
@@ -440,4 +478,83 @@ func (s *FeedService) CleanFeedOrphanData() error {
 	// 删除用户不存在的评论点赞记录
 	subQuery7 := s.DB.Table("users").Select("id").Where("users.id = feed_comment_likes.user_id")
 	return s.DB.Where("NOT EXISTS (?)", subQuery7).Delete(&models.FeedCommentLike{}).Error
+}
+
+// ==== 评论缓存相关方法 ====
+
+// getCommentsFromCache 从缓存获取评论，如果缓存未命中则从数据库获取并缓存
+func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.FeedComment, error) {
+	ctx := context.Background()
+	key := config.FeedCommentCacheKeyPrefix + postID
+
+	// 尝试从缓存获取
+	cached, err := s.Redis.Get(ctx, key).Result()
+	if err == nil {
+		// 缓存命中，解析数据
+		var cachedComments []models.FeedComment
+		if err := json.Unmarshal([]byte(cached), &cachedComments); err == nil {
+			// 返回指定数量的评论
+			if len(cachedComments) >= count {
+				return cachedComments[:count], nil
+			}
+			return cachedComments, nil
+		}
+	}
+
+	// 缓存未命中，从数据库获取
+	comments, err := s.getTopCommentsFromDB(postID, config.FeedMaxCachedComments)
+	if err != nil {
+		return nil, err
+	}
+
+	// 异步缓存数据
+	go s.cacheComments(postID, comments)
+
+	// 返回指定数量的评论
+	if len(comments) >= count {
+		return comments[:count], nil
+	}
+	return comments, nil
+}
+
+// getTopCommentsFromDB 从数据库获取指定数量的最新评论
+func (s *FeedService) getTopCommentsFromDB(postID string, count int) ([]models.FeedComment, error) {
+	var comments []models.FeedComment
+	
+	err := s.DB.Model(&models.FeedComment{}).
+		Where("post_id = ?", postID).
+		Order("created_at DESC, id DESC").
+		Limit(count).
+		Find(&comments).Error
+		
+	return comments, err
+}
+
+// cacheComments 缓存评论数据到Redis
+func (s *FeedService) cacheComments(postID string, comments []models.FeedComment) {
+	ctx := context.Background()
+	key := config.FeedCommentCacheKeyPrefix + postID
+
+	// 限制缓存数量
+	if len(comments) > config.FeedMaxCachedComments {
+		comments = comments[:config.FeedMaxCachedComments]
+	}
+
+	// 序列化为JSON
+	data, err := json.Marshal(comments)
+	if err != nil {
+		return // 序列化失败，忽略缓存
+	}
+
+	// 存储到Redis，忽略错误（缓存失败不影响主流程）
+	s.Redis.SetEx(ctx, key, data, config.FeedCommentCacheTTL)
+}
+
+// invalidateCommentCache 使评论缓存失效
+func (s *FeedService) invalidateCommentCache(postID string) {
+	ctx := context.Background()
+	key := config.FeedCommentCacheKeyPrefix + postID
+	
+	// 删除缓存，忽略错误
+	s.Redis.Del(ctx, key)
 }

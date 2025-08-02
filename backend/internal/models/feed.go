@@ -33,11 +33,18 @@ type FeedComment struct {
 	UserProfileVersion int64  `json:"user_profile_version"` // 用户信息版本号
 }
 
+// FeedPostResponseItem 帖子响应项目
+type FeedPostResponseItem struct {
+	FeedPost                                     // 内嵌原始Post
+	PreloadedComments   []FeedComment `json:"preloaded_comments"`   // 预载评论列表
+	CommentPreviewCount int           `json:"comment_preview_count"` // 预载评论数量
+}
+
 // FeedPostResponse 帖子响应结构
 type FeedPostResponse struct {
-	Posts      []FeedPost `json:"posts"`
-	NextCursor string     `json:"next_cursor,omitempty"`
-	HasMore    bool       `json:"has_more"`
+	Posts      []FeedPostResponseItem `json:"posts"`
+	NextCursor string                 `json:"next_cursor,omitempty"`
+	HasMore    bool                   `json:"has_more"`
 }
 
 // FeedCommentResponse 评论响应结构
@@ -83,9 +90,10 @@ type LikeResult struct {
 
 // FeedQueryParams 信息流查询参数
 type FeedQueryParams struct {
-	Sort    string `form:"sort" validate:"oneof=time like comment"` // 排序类型：time, like, comment
-	AfterID string `form:"after_id"`                                // cursor分页的after_id
-	Limit   int    `form:"limit" validate:"min=1,max=50"`           // 每页数量，最多50
+	Sort         string `form:"sort" validate:"oneof=time like comment"` // 排序类型：time, like, comment
+	AfterID      string `form:"after_id"`                                // cursor分页的after_id
+	Limit        int    `form:"limit" validate:"min=1,max=50"`           // 每页数量，最多50
+	CommentCount int    `form:"comment_count" validate:"min=0,max=20"`   // 预载评论数量，0表示不预载，最多20条
 }
 
 // PostLike 帖子点赞模型

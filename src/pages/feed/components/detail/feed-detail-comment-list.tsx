@@ -11,7 +11,7 @@ import { FeedCommentItem } from '../comment/feed-comment-item'
  * Feed详情评论列表 - 虚拟滚动实现
  */
 export const FeedDetailCommentList = (props: FeedDetailCommentListProps) => {
-	const { comments, hasMore, loading, error, onAddComment, onLoadMore, onRetry } = props
+	const { comments, hasMore, loading, error, onLoadMore, onRetry } = props
 	const parentRef = useRef<HTMLDivElement>(null)
 	const commentsLength = comments.length
 
@@ -100,7 +100,7 @@ export const FeedDetailCommentList = (props: FeedDetailCommentListProps) => {
 								className="px-6"
 							>
 								{comment ? (
-									<FeedCommentItem comment={comment} onAddComment={onAddComment} />
+									<FeedCommentItem comment={comment} />
 								) : (
 									<div className="py-4">
 										<Skeleton width="30%" height={16} className="mb-2" />
@@ -143,7 +143,6 @@ export interface FeedDetailCommentListProps {
 	hasMore: boolean
 	loading: boolean
 	error?: string
-	onAddComment: (content: string, replyTo?: string) => void
 	onLoadMore: () => void
 	onRetry: () => void
 }

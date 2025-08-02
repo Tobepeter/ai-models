@@ -3,7 +3,6 @@ import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 import { feedConfig } from './feed-config'
 import type { FeedComment, FeedPost, FeedCommentList } from './feed-types'
-import { reset } from 'numeral'
 
 // 重新导出类型
 export type { FeedComment, FeedPost, FeedCommentList }

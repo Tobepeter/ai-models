@@ -1,5 +1,4 @@
 import { useMount, useUnmount } from 'ahooks'
-import { useEffect, useCallback } from 'react'
 import { useFeedStore } from './feed-store'
 import { feedMgr } from './feed-mgr'
 import { FeedList } from './components/feed-list'
@@ -26,15 +25,6 @@ export const Feed = () => {
 		useFeedStore.getState().reset()
 	})
 
-	const handleLike = useCallback((postId: string) => feedMgr.toggleLike(postId), [])
-	const handleToggleExpand = useCallback((postId: string) => feedMgr.toggleExpand(postId), [])
-	const handleAddComment = useCallback((postId: string, content: string, replyTo?: string) => {
-		// 处理添加评论
-		feedMgr.addComment(postId, content, replyTo)
-	}, [])
-
-	const handleLoadMore = useCallback(() => feedMgr.loadMore(), [])
-
 	const handleRetry = () => {
 		clearError()
 		if (posts.length === 0) {
@@ -59,9 +49,12 @@ export const Feed = () => {
 				</div>
 			)}
 
+			{/* TEST */}
+			{/* <FeedSkeleton count={5} /> */}
+
 			{/* 主要内容区域 - 使用 flex-1 占满剩余空间 */}
 			{posts.length > 0 ? (
-				<FeedList posts={posts} loading={loading} hasMore={hasMore} onLike={handleLike} onToggleExpand={handleToggleExpand} onAddComment={handleAddComment} onLoadMore={handleLoadMore} />
+				<FeedList posts={posts} loading={loading} hasMore={hasMore} />
 			) : (
 				<div className="flex-1 flex items-center justify-center">
 					{loading && !error ? (

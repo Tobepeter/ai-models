@@ -1,64 +1,81 @@
 import { cn } from '@/lib/utils'
-import { HTMLAttributes } from 'react'
-
-/**
- * 骨架屏基础组件 - 带动画效果
- */
-const SkeletonBox = (props: HTMLAttributes<HTMLDivElement>) => {
-	const { className, ...restProps } = props
-	return (
-		<div
-			className={cn('bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded', 'animate-[shimmer_1.5s_ease-in-out_infinite]', className)}
-			{...restProps}
-			data-slot="skeleton-box"
-		/>
-	)
-}
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 /**
  * 单个信息流项目骨架屏
  */
 const FeedItemSkeleton = () => (
-	<div className="p-4 border-b border-gray-100" data-slot="feed-item-skeleton">
-		{/* 头部信息栏 */}
-		<div className="flex items-start space-x-3 mb-3">
-			<SkeletonBox className="w-10 h-10 rounded-full flex-shrink-0" />
-			<div className="flex-1 space-y-2">
-				<div className="flex items-center space-x-2">
-					<SkeletonBox className="h-4 w-16" />
-					<SkeletonBox className="h-3 w-3 rounded-full" />
-					<SkeletonBox className="h-3 w-12" />
+	<article className="bg-card" data-slot="feed-item-skeleton">
+		<div className="rounded-lg border border-border/20 hover:bg-accent/50 transition-all duration-200">
+			<div className="p-4">
+				{/* 头部信息栏 */}
+				<div className="flex items-start justify-between mb-3">
+					<div className="flex items-start space-x-3 flex-1">
+						<Skeleton circle width={40} height={40} className="flex-shrink-0" />
+						<div className="flex-1 space-y-1">
+							<div className="flex items-center space-x-2">
+								<Skeleton width={80} height={16} />
+								<Skeleton width={20} height={20} />
+							</div>
+							<Skeleton width={60} height={12} />
+						</div>
+					</div>
+					<div className="flex items-center space-x-2">
+						<Skeleton width={32} height={32} borderRadius={4} />
+						<Skeleton width={32} height={32} borderRadius={4} />
+					</div>
 				</div>
-			</div>
-		</div>
 
-		<div className="space-y-3">
-			{/* 文字内容栏 */}
-			<div className="space-y-2">
-				<SkeletonBox className="h-4 w-full" />
-				<SkeletonBox className="h-4 w-4/5" />
-				<SkeletonBox className="h-4 w-3/5" />
-			</div>
+				{/* 文字内容栏 */}
+				<div className="space-y-2 mb-3">
+					<Skeleton height={16} />
+					<Skeleton height={16} width="85%" />
+					<Skeleton height={16} width="65%" />
+				</div>
 
-			{/* 图片占位栏 */}
-			<SkeletonBox className="h-48 w-full rounded-lg" />
+				{/* 图片占位栏 */}
+				<Skeleton height={192} className="mb-3" borderRadius={8} />
+			</div>
 
 			{/* 交互按钮栏 */}
-			<div className="flex items-center space-x-6 pt-2">
-				<div className="flex items-center space-x-1">
-					<SkeletonBox className="w-5 h-5 rounded" />
-					<SkeletonBox className="h-3 w-6" />
-				</div>
-				<div className="flex items-center space-x-1">
-					<SkeletonBox className="w-5 h-5 rounded" />
-					<SkeletonBox className="h-3 w-6" />
-				</div>
-				<div className="flex items-center space-x-1">
-					<SkeletonBox className="w-5 h-5 rounded" />
+			<div className="px-4 pb-4">
+				<div className="flex items-center space-x-6">
+					<div className="flex items-center space-x-2">
+						<Skeleton width={20} height={20} />
+						<Skeleton width={24} height={12} />
+					</div>
+					<div className="flex items-center space-x-2">
+						<Skeleton width={20} height={20} />
+						<Skeleton width={24} height={12} />
+					</div>
+					<div className="flex items-center space-x-2">
+						<Skeleton width={20} height={20} />
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+
+		{/* 评论区域 */}
+		<div className="px-4 pb-4">
+			<div className="space-y-3">
+				<div className="flex items-start space-x-3">
+					<Skeleton circle width={32} height={32} />
+					<div className="flex-1 space-y-1">
+						<Skeleton width={60} height={12} />
+						<Skeleton height={14} width="90%" />
+					</div>
+				</div>
+				<div className="flex items-start space-x-3">
+					<Skeleton circle width={32} height={32} />
+					<div className="flex-1 space-y-1">
+						<Skeleton width={70} height={12} />
+						<Skeleton height={14} width="75%" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
 )
 
 /**
@@ -67,11 +84,13 @@ const FeedItemSkeleton = () => (
 export const FeedSkeleton = (props: FeedSkeletonProps) => {
 	const { className, count = 3 } = props
 	return (
-		<div className={cn('space-y-0', className)} data-slot="feed-skeleton">
-			{Array.from({ length: count }, (_, index) => (
-				<FeedItemSkeleton key={index} />
-			))}
-		</div>
+		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+			<div className={cn('space-y-4 w-full', className)} data-slot="feed-skeleton">
+				{Array.from({ length: count }, (_, index) => (
+					<FeedItemSkeleton key={index} />
+				))}
+			</div>
+		</SkeletonTheme>
 	)
 }
 
@@ -81,10 +100,12 @@ export const FeedSkeleton = (props: FeedSkeletonProps) => {
 export const LoadMoreSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="load-more-skeleton">
-			<SkeletonBox className="w-4 h-4 rounded-full" />
-			<SkeletonBox className="h-4 w-20" />
-		</div>
+		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+			<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="load-more-skeleton">
+				<Skeleton circle width={16} height={16} />
+				<Skeleton width={80} height={16} />
+			</div>
+		</SkeletonTheme>
 	)
 }
 
@@ -94,10 +115,12 @@ export const LoadMoreSkeleton = (props: { className?: string }) => {
 export const RefreshSkeleton = (props: { className?: string }) => {
 	const { className } = props
 	return (
-		<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="refresh-skeleton">
-			<SkeletonBox className="w-5 h-5 rounded-full" />
-			<SkeletonBox className="h-4 w-16" />
-		</div>
+		<SkeletonTheme baseColor="hsl(var(--muted))" highlightColor="hsl(var(--muted-foreground) / 0.1)">
+			<div className={cn('p-4 flex items-center justify-center space-x-2', className)} data-slot="refresh-skeleton">
+				<Skeleton circle width={20} height={20} />
+				<Skeleton width={64} height={16} />
+			</div>
+		</SkeletonTheme>
 	)
 }
 

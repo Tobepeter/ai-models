@@ -159,7 +159,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 			<PopoverContent className="w-[420px] p-0">
 				<div className="p-4">
 					<div className="flex space-x-3">
-						<UserAvatar src="https://i.pravatar.cc/150?img=1" alt="当前用户头像" size={36} className="flex-shrink-0" fallbackText="我" />
+						<UserAvatar src="https://i.pravatar.cc/150?img=1" size={36} className="flex-shrink-0" fallbackText="我" />
 
 						<div className="flex-1 space-y-3">
 							<Textarea

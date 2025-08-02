@@ -32,10 +32,6 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const error = commentPage?.error
 
 	// 处理函数
-	const handleLike = (postId: string) => toggleLike(postId)
-	const handleToggleExpand = (postId: string) => toggleExpand(postId)
-	const handleAddComment = (content: string, replyTo?: string) => onAddComment?.(post!.id, content, replyTo)
-	const handleReply = (username: string) => onReply?.(post!.id, username)
 	const handleNavigateToPage = () => onNavigateToPage?.(post!.id)
 
 	// 加载更多评论
@@ -73,7 +69,7 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	)
 
 	const renderCommentList = () => {
-		return <FeedDetailCommentList comments={comments} hasMore={hasMoreComments} loading={loading} error={error} onAddComment={handleAddComment} onLoadMore={handleLoadMore} onRetry={handleRetry} />
+		return <FeedDetailCommentList comments={comments} hasMore={hasMoreComments} loading={loading} error={error} onLoadMore={handleLoadMore} onRetry={handleRetry} />
 	}
 
 	// 主要状态判断
@@ -97,13 +93,13 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 				/>
 
 				{/* 文字内容 */}
-				{post.content && <FeedText content={post.content} isExpanded={post.isExpanded} onToggleExpand={() => handleToggleExpand(post.id)} className="mb-4" />}
+				{post.content && <FeedText postId={post.id} content={post.content} isExpanded={post.isExpanded} className="mb-4" />}
 
 				{/* 图片内容 */}
 				{post.image_url && <FeedItemImage src={post.image_url} className="mb-4 mx-auto" />}
 
 				{/* 交互按钮 */}
-				<FeedItemActions postId={post.id} likeCount={post.like_count} commentCount={post.comment_count} isLiked={post.isLiked} onLike={handleLike} onAddComment={handleAddComment} />
+				<FeedItemActions postId={post.id} likeCount={post.like_count} commentCount={post.comment_count} isLiked={post.isLiked} />
 			</div>
 
 			{/* 评论区域 - 自适应剩余空间 */}

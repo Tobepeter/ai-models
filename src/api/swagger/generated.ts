@@ -145,7 +145,33 @@ export interface FeedPost {
 export interface FeedPostResponse {
   has_more?: boolean;
   next_cursor?: string;
-  posts?: FeedPost[];
+  posts?: FeedPostResponseItem[];
+}
+
+export interface FeedPostResponseItem {
+  /** 冗余头像 */
+  avatar?: string;
+  comment_count?: number;
+  /** 预载评论数量 */
+  comment_preview_count?: number;
+  /** 文字内容（可选） */
+  content?: string;
+  created_at?: string;
+  /** == from BaseModel == */
+  id?: string;
+  /** 图片URL（可选） */
+  image_url?: string;
+  like_count?: number;
+  /** 预载评论列表 */
+  preloaded_comments?: FeedComment[];
+  /** 用户状态emoji */
+  status?: string;
+  updated_at?: string;
+  user_id?: string;
+  /** 用户信息版本号 */
+  user_profile_version?: number;
+  /** 冗余字段 */
+  username?: string;
 }
 
 export interface FileInfo {
@@ -413,6 +439,45 @@ export interface Response<T = any> {
   message?: string;
 }
 
+export interface InternalHandlersRedisKeysInfo {
+  /** 评论缓存键数量 */
+  comment_cache_keys?: number;
+  /** 过期键数量 */
+  expired_keys?: number;
+  /** 总键数量 */
+  total_keys?: number;
+}
+
+export interface InternalHandlersRedisMemoryInfo {
+  /** 内存碎片率 */
+  fragment_ratio?: number;
+  /** 最大内存（字节） */
+  max_memory?: number;
+  /** 使用百分比 */
+  usage_percent?: number;
+  /** 已使用内存（字节） */
+  used_memory?: number;
+}
+
+export interface InternalHandlersRedisMetricsResponse {
+  keys?: InternalHandlersRedisKeysInfo;
+  memory?: InternalHandlersRedisMemoryInfo;
+  stats?: InternalHandlersRedisStatsInfo;
+}
+
+export interface InternalHandlersRedisStatsInfo {
+  /** 连接的客户端数量 */
+  connected_clients?: number;
+  /** 缓存命中率 */
+  hit_rate?: number;
+  /** 缓存命中次数 */
+  keyspace_hits?: number;
+  /** 缓存未命中次数 */
+  keyspace_misses?: number;
+  /** 缓存未命中率 */
+  miss_rate?: number;
+}
+
 export type StatusListData = Response<Record<string, any>>;
 
 export interface GetUsersParams {
@@ -485,6 +550,12 @@ export interface GetFeedPostsParams {
   /** cursor分页的after_id */
   after_id?: string;
   /**
+   * 预载评论数量，0表示不预载，最多20条
+   * @min 0
+   * @max 20
+   */
+  comment_count?: number;
+  /**
    * 每页数量，最多50
    * @min 1
    * @max 50
@@ -538,6 +609,8 @@ export type GetByIdData = Response<CrudResponse>;
 export type UpdateData = Response<CrudResponse>;
 
 export type DeleteData = Response<Record<string, any>>;
+
+export type RedisListData = Response<InternalHandlersRedisMetricsResponse>;
 
 export type DeleteResult = Response<Record<string, any>>;
 
@@ -1308,6 +1381,24 @@ export class Api<
       this.request<DeleteData, any>({
         path: `/crud/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+  };
+  metrics = {
+    /**
+     * @description 获取Redis内存使用、缓存命中率等监控指标
+     *
+     * @tags metrics
+     * @name RedisList
+     * @summary 获取Redis监控指标
+     * @request GET:/metrics/redis
+     */
+    redisList: (params: RequestParams = {}) =>
+      this.request<RedisListData, any>({
+        path: `/metrics/redis`,
+        method: "GET",
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

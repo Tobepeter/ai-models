@@ -3,6 +3,7 @@ import { Heart, Share, MessageCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CommentInputPopup } from '../comment/feed-comment-input-popup'
 import { feedUtil } from '../../feed-util'
+import { feedMgr } from '../../feed-mgr'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
 import { useMemo } from 'react'
@@ -11,14 +12,19 @@ import { useMemo } from 'react'
  * 信息流交互按钮组件 - 包含点赞、评论、分享功能
  */
 export const FeedItemActions = (props: FeedItemActionsProps) => {
-	const { postId, likeCount, commentCount, isLiked, onLike, onAddComment, replyTo, className } = props
+	const { postId, likeCount, commentCount, isLiked, replyTo, className } = props
 
 	// 缓存格式化后的数字，避免重复计算
 	const formattedLikeCount = useMemo(() => feedUtil.formatCount(likeCount), [likeCount])
 
 	const handleLike = useMemoizedFn((e: React.MouseEvent) => {
 		e.stopPropagation()
-		onLike(postId)
+		feedMgr.toggleLike(postId)
+	})
+
+	const handleAddComment = useMemoizedFn((content: string, replyTo?: string) => {
+		// 直接调用 feedMgr 添加评论
+		feedMgr.addComment(postId, content, replyTo)
 	})
 
 	const handleShare = useMemoizedFn((e: React.MouseEvent) => {
@@ -58,7 +64,7 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInputPopup postId={postId} onAddComment={onAddComment} replyTo={replyTo}>
+			<CommentInputPopup postId={postId} onAddComment={handleAddComment} replyTo={replyTo}>
 				<Button variant="ghost" size="sm" className="h-8 px-2">
 					<MessageCircle className="h-4 w-4 mr-1" />
 					<span className="text-xs">{feedUtil.formatCount(commentCount)}</span>
@@ -78,8 +84,6 @@ export interface FeedItemActionsProps {
 	likeCount: number
 	commentCount: number
 	isLiked: boolean
-	onLike: (postId: string) => void
-	onAddComment: (content: string, replyTo?: string) => void
 	replyTo?: string
 	className?: string
 }

@@ -638,6 +638,14 @@
                         "in": "query"
                     },
                     {
+                        "maximum": 20,
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "预载评论数量，0表示不预载，最多20条",
+                        "name": "comment_count",
+                        "in": "query"
+                    },
+                    {
                         "maximum": 50,
                         "minimum": 1,
                         "type": "integer",
@@ -1114,6 +1122,41 @@
                                         "data": {
                                             "type": "object",
                                             "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/redis": {
+            "get": {
+                "description": "获取Redis内存使用、缓存命中率等监控指标",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "metrics"
+                ],
+                "summary": "获取Redis监控指标",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_handlers.RedisMetricsResponse"
                                         }
                                     }
                                 }
@@ -2694,8 +2737,67 @@
                 "posts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
+                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedPostResponseItem"
                     }
+                }
+            }
+        },
+        "ai-models-backend_internal_models.FeedPostResponseItem": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "冗余头像",
+                    "type": "string"
+                },
+                "comment_count": {
+                    "type": "integer"
+                },
+                "comment_preview_count": {
+                    "description": "预载评论数量",
+                    "type": "integer"
+                },
+                "content": {
+                    "description": "文字内容（可选）",
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "== from BaseModel ==",
+                    "type": "string"
+                },
+                "image_url": {
+                    "description": "图片URL（可选）",
+                    "type": "string"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "preloaded_comments": {
+                    "description": "预载评论列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
+                    }
+                },
+                "status": {
+                    "description": "用户状态emoji",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_profile_version": {
+                    "description": "用户信息版本号",
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "冗余字段",
+                    "type": "string"
                 }
             }
         },
@@ -3331,6 +3433,83 @@
                 "data": {},
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_handlers.RedisKeysInfo": {
+            "type": "object",
+            "properties": {
+                "comment_cache_keys": {
+                    "description": "评论缓存键数量",
+                    "type": "integer"
+                },
+                "expired_keys": {
+                    "description": "过期键数量",
+                    "type": "integer"
+                },
+                "total_keys": {
+                    "description": "总键数量",
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_handlers.RedisMemoryInfo": {
+            "type": "object",
+            "properties": {
+                "fragment_ratio": {
+                    "description": "内存碎片率",
+                    "type": "number"
+                },
+                "max_memory": {
+                    "description": "最大内存（字节）",
+                    "type": "integer"
+                },
+                "usage_percent": {
+                    "description": "使用百分比",
+                    "type": "number"
+                },
+                "used_memory": {
+                    "description": "已使用内存（字节）",
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_handlers.RedisMetricsResponse": {
+            "type": "object",
+            "properties": {
+                "keys": {
+                    "$ref": "#/definitions/internal_handlers.RedisKeysInfo"
+                },
+                "memory": {
+                    "$ref": "#/definitions/internal_handlers.RedisMemoryInfo"
+                },
+                "stats": {
+                    "$ref": "#/definitions/internal_handlers.RedisStatsInfo"
+                }
+            }
+        },
+        "internal_handlers.RedisStatsInfo": {
+            "type": "object",
+            "properties": {
+                "connected_clients": {
+                    "description": "连接的客户端数量",
+                    "type": "integer"
+                },
+                "hit_rate": {
+                    "description": "缓存命中率",
+                    "type": "number"
+                },
+                "keyspace_hits": {
+                    "description": "缓存命中次数",
+                    "type": "integer"
+                },
+                "keyspace_misses": {
+                    "description": "缓存未命中次数",
+                    "type": "integer"
+                },
+                "miss_rate": {
+                    "description": "缓存未命中率",
+                    "type": "number"
                 }
             }
         }

@@ -8,12 +8,7 @@ import { feedConfig } from '../../feed-config'
  * 评论区组件 - 只显示评论列表，不包含输入框
  */
 export const FeedCommentList = (props: FeedCommentListProps) => {
-	const { postId, comments = [], onViewMore, onAddComment, className } = props
-
-	// for memo stable ref
-	const handleAddComment = useCallback((content: string, replyTo?: string) => {
-		onAddComment?.(content, replyTo)
-	}, [onAddComment])
+	const { postId, comments = [], onViewMore, className } = props
 
 	// 显示评论列表（最多显示配置数量）
 	const displayComments = comments.slice(0, feedConfig.maxCommentsDisplay)
@@ -31,7 +26,7 @@ export const FeedCommentList = (props: FeedCommentListProps) => {
 				{displayComments.length > 0 && (
 					<div className="py-3 space-y-1">
 						{displayComments.map((comment) => (
-							<FeedCommentItem key={comment.id} comment={comment} onAddComment={handleAddComment} />
+							<FeedCommentItem key={comment.id} comment={comment} />
 						))}
 					</div>
 				)}
@@ -53,6 +48,5 @@ export interface FeedCommentListProps {
 	postId: string
 	comments?: FeedComment[] // 评论列表可能为空
 	onViewMore: () => void // 查看更多评论的回调
-	onAddComment?: (content: string, replyTo?: string) => void
 	className?: string
 }

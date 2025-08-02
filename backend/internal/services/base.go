@@ -5,11 +5,13 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type BaseService struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	Redis *redis.Client
 }
 
 // ExistsByID 根据ID查找记录是否存在

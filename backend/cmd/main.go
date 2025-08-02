@@ -51,6 +51,12 @@ func main() {
 	}
 	defer database.Close()
 
+	// 初始化Redis
+	if err := database.InitializeRedis(cfg); err != nil {
+		log.Fatal("Redis初始化失败:", err)
+	}
+	defer database.CloseRedis()
+
 	// 创建依赖注入容器
 	c := container.New(cfg)
 
@@ -89,6 +95,9 @@ func setupRouter(c *container.Container) *gin.Engine {
 	r.GET("/health", c.HealthHandler.Health)
 	r.GET("/ready", c.HealthHandler.Ready)
 	r.GET("/live", c.HealthHandler.Live)
+
+	// 监控指标端点
+	r.GET("/metrics/redis", c.MetricsHandler.RedisMetrics)
 
 	// Swagger文档路由 (仅在开发环境)
 	if !c.Config.IsProd {
@@ -189,7 +198,7 @@ func setupRouter(c *container.Container) *gin.Engine {
 			feedAuth.Use(middleware.AuthRequired(c.AuthService))
 			{
 				feedAuth.POST("/posts", c.FeedHandler.CreateFeedPost)                      // 创建信息流帖子
-				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.SetLikePost)          // 设置帖子点赞状态
+				feedAuth.POST("/posts/:post_id/like", c.FeedHandler.SetLikePost)           // 设置帖子点赞状态
 				feedAuth.POST("/posts/:post_id/comments", c.FeedHandler.CreateFeedComment) // 创建帖子评论
 				feedAuth.POST("/comments/:comment_id/like", c.FeedHandler.SetCommentLike)  // 设置评论点赞状态
 			}

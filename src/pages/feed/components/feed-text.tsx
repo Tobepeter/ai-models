@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { feedUtil } from '../feed-util'
+import { feedMgr } from '../feed-mgr'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -7,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
  * 信息流文本组件 - 支持长内容折叠和展开
  */
 export const FeedText = (props: FeedTextProps) => {
-	const { content, isExpanded, onToggleExpand, className } = props
+	const { postId, content, isExpanded, className } = props
 
 	if (!content) return null
 
@@ -41,7 +42,7 @@ export const FeedText = (props: FeedTextProps) => {
 					className="h-auto p-0 text-xs text-primary hover:text-primary/80 font-normal"
 					onClick={(e) => {
 						e.stopPropagation()
-						onToggleExpand()
+						feedMgr.toggleExpand(postId)
 					}}
 				>
 					{isExpanded ? '收起' : '展开全文'}
@@ -52,8 +53,8 @@ export const FeedText = (props: FeedTextProps) => {
 }
 
 export interface FeedTextProps {
+	postId: string
 	content: string
 	isExpanded: boolean
-	onToggleExpand: () => void
 	className?: string
 }

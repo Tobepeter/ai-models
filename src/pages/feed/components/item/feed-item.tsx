@@ -14,18 +14,11 @@ import { cn } from '@/lib/utils'
  * 信息流单项组件
  */
 export const FeedItem = memo((props: FeedItemProps) => {
-	const { post, onLike, onToggleExpand, onAddComment, className } = props
+	const { post, className } = props
 	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, comments } = post
 	const { openDetailDialog } = useFeedStore()
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
-
-	const handleToggleExpand = () => onToggleExpand(id) // 处理展开/收起
-
-	const handleAddComment = (content: string, replyTo?: string) => {
-		// 处理添加评论
-		onAddComment(id, content, replyTo)
-	}
 
 	const handleViewMore = () => {
 		// 处理查看更多
@@ -54,19 +47,19 @@ export const FeedItem = memo((props: FeedItemProps) => {
 				{/* post内容 */}
 				<div className="p-4">
 					<FeedItemHeader userId={user_id} username={username} avatar={avatar} status={status} createdAt={created_at} className="mb-3" />
-					{content && <FeedText content={content} isExpanded={isExpanded} onToggleExpand={handleToggleExpand} className="mb-3" />}
+					{content && <FeedText postId={id} content={content} isExpanded={isExpanded} className="mb-3" />}
 					{image_url && <FeedItemImage src={image_url} className="mb-3" />}
 				</div>
 
 				{/* 交互按钮栏 */}
 				<div className="px-4 pb-4">
-					<FeedItemActions postId={id} likeCount={like_count} commentCount={comment_count} isLiked={isLiked} onLike={onLike} onAddComment={handleAddComment} />
+					<FeedItemActions postId={id} likeCount={like_count} commentCount={comment_count} isLiked={isLiked} />
 				</div>
 			</div>
 
 			{/* 评论列表 - 独立区域，不触发弹窗 */}
 			<div className="px-4 pb-4">
-				<FeedCommentList postId={id} comments={comments} onViewMore={handleViewMore} onAddComment={onAddComment} />
+				<FeedCommentList postId={id} comments={comments} onViewMore={handleViewMore} />
 			</div>
 		</article>
 	)
@@ -74,8 +67,5 @@ export const FeedItem = memo((props: FeedItemProps) => {
 
 export interface FeedItemProps {
 	post: FeedPost
-	onLike: (postId: string) => void
-	onToggleExpand: (postId: string) => void
-	onAddComment: (postId: string, content: string, replyTo?: string) => void
 	className?: string
 }

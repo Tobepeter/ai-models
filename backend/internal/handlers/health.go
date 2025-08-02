@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ai-models-backend/internal/database"
 	"ai-models-backend/pkg/response"
 	"time"
 
@@ -31,16 +32,28 @@ func (h *HealthHandler) Health(c *gin.Context) {
 
 // Ready 就绪检查
 func (h *HealthHandler) Ready(c *gin.Context) {
+	checks := make(map[string]any)
+
+	// 数据库健康检查
+	if err := database.HealthCheck(); err != nil {
+		checks["database"] = "failed"
+	} else {
+		checks["database"] = "connected"
+	}
+
+	// Redis健康检查
+	if err := database.RedisHealthCheck(); err != nil {
+		checks["redis"] = "failed"
+	} else {
+		checks["redis"] = "connected"
+	}
+
 	data := models.ReadyResponse{
 		Status:      "ready",
 		Timestamp:   time.Now().UTC().Format(time.RFC3339),
 		Description: "应用程序已就绪，所有依赖服务正常",
 		Message:     "系统就绪状态检查通过",
-		Checks: map[string]interface{}{
-			"database":   "connected",
-			"redis":      "connected",
-			"ai_service": "available",
-		},
+		Checks:      checks,
 	}
 
 	response.Success(c, data)

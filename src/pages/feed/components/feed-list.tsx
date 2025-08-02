@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { FeedItem } from './item/feed-item'
 import { FeedSkeleton, LoadMoreSkeleton } from './feed-skeleton'
+import { feedMgr } from '../feed-mgr'
 import { type FeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
 
@@ -9,7 +10,7 @@ import { cn } from '@/lib/utils'
  * 虚拟滚动信息流列表组件
  */
 export const FeedList = (props: FeedListProps) => {
-	const { posts, loading, hasMore, onLike, onToggleExpand, onAddComment, onLoadMore, className } = props
+	const { posts, loading, hasMore, className } = props
 
 	const parentRef = useRef<HTMLDivElement>(null)
 
@@ -33,9 +34,9 @@ export const FeedList = (props: FeedListProps) => {
 		const lastItem = virtualItems[virtualItems.length - 1]
 		// 当最后可见项接近数据末尾时触发加载
 		if (lastItem && lastItem.index >= postsLength - 3 && hasMore && !loading) {
-			onLoadMore()
+			feedMgr.loadMore()
 		}
-	}, [virtualizer.getVirtualItems(), postsLength, hasMore, loading, onLoadMore])
+	}, [virtualizer.getVirtualItems(), postsLength, hasMore, loading])
 
 	// 如果没有数据，显示骨架屏或空状态
 	if (postsLength === 0) {
@@ -76,7 +77,7 @@ export const FeedList = (props: FeedListProps) => {
 								data-index={virtualItem.index}
 								ref={(el) => virtualizer.measureElement(el)} // 让虚拟列表测量真实高度
 							>
-								{post ? <FeedItem post={post} onLike={onLike} onToggleExpand={onToggleExpand} onAddComment={onAddComment} /> : <FeedSkeleton count={1} />}
+								{post ? <FeedItem post={post} /> : <FeedSkeleton count={1} />}
 							</div>
 						)
 					})}
@@ -98,9 +99,5 @@ export interface FeedListProps {
 	posts: FeedPost[]
 	loading: boolean
 	hasMore: boolean
-	onLike: (postId: string) => void
-	onToggleExpand: (postId: string) => void
-	onAddComment: (postId: string, content: string, replyTo?: string) => void
-	onLoadMore: () => void
 	className?: string
 }
