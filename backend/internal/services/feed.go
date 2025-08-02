@@ -482,7 +482,7 @@ func (s *FeedService) CleanFeedOrphanData() error {
 
 // ==== 评论缓存相关方法 ====
 
-// getCommentsFromCache 从缓存获取评论，如果缓存未命中则从数据库获取并缓存
+// getCommentsFromCache 从缓存获取评论，如果缓存未命中或数量不够则从数据库获取并缓存
 func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.FeedComment, error) {
 	ctx := context.Background()
 	key := config.FeedCommentCacheKeyPrefix + postID
@@ -493,27 +493,25 @@ func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.F
 		// 缓存命中，解析数据
 		var cachedComments []models.FeedComment
 		if err := json.Unmarshal([]byte(cached), &cachedComments); err == nil {
-			// 返回指定数量的评论
+			// 如果缓存数量足够，直接返回
 			if len(cachedComments) >= count {
 				return cachedComments[:count], nil
 			}
-			return cachedComments, nil
+			// 缓存数量不够，需要从数据库补充
 		}
 	}
 
-	// 缓存未命中，从数据库获取
-	comments, err := s.getTopCommentsFromDB(postID, config.FeedMaxCachedComments)
+	// 缓存未命中或数量不够，从数据库获取
+	comments, err := s.getTopCommentsFromDB(postID, count)
 	if err != nil {
 		return nil, err
 	}
 
-	// 异步缓存数据
-	go s.cacheComments(postID, comments)
-
-	// 返回指定数量的评论
-	if len(comments) >= count {
-		return comments[:count], nil
+	// 如果获取到的评论比当前缓存多，异步更新缓存
+	if len(comments) > 0 {
+		go s.cacheComments(postID, comments)
 	}
+
 	return comments, nil
 }
 
