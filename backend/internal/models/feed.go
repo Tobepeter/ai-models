@@ -38,6 +38,7 @@ type FeedPostResponseItem struct {
 	FeedPost                                     // 内嵌原始Post
 	PreloadedComments   []FeedComment `json:"preloaded_comments"`   // 预载评论列表
 	CommentPreviewCount int           `json:"comment_preview_count"` // 预载评论数量
+	IsLiked             *bool         `json:"is_liked,omitempty"`    // 当前用户是否点赞（游客时为nil）
 }
 
 // FeedPostResponse 帖子响应结构

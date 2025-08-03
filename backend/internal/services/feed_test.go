@@ -68,7 +68,7 @@ func TestFeedService_CreateAndGetPosts(t *testing.T) {
 			Sort:  "time",
 			Limit: 2, // 只获取最新的2条
 		}
-		resp, err := feedService.GetFeedPosts(params)
+		resp, err := feedService.GetFeedPosts(params, nil)
 		require.NoError(t, err)
 		posts := resp.Posts
 		// 由于数据库中可能有其他测试数据，我们只验证新创建的帖子存在

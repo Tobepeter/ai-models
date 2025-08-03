@@ -115,6 +115,7 @@ func setupRouter(c *container.Container) *gin.Engine {
 
 			// 用户自己的接口
 			users.POST("/logout", middleware.AuthRequired(c.AuthService), c.UserHandler.Logout)
+			users.POST("/refresh-token", middleware.AuthRequired(c.AuthService), c.UserHandler.RefreshToken)
 			users.GET("/profile", middleware.AuthRequired(c.AuthService), c.UserHandler.GetProfile)
 			users.PUT("/profile", middleware.AuthRequired(c.AuthService), c.UserHandler.UpdateProfile)
 			users.POST("/change-password", middleware.AuthRequired(c.AuthService), c.UserHandler.ChangePassword)
@@ -188,10 +189,14 @@ func setupRouter(c *container.Container) *gin.Engine {
 		// Feed 信息流接口
 		feed := api.Group("/feed")
 		{
-			// 公开接口
-			feed.GET("/posts", c.FeedHandler.GetFeedPosts)                      // 获取信息流帖子列表
-			feed.GET("/posts/:post_id", c.FeedHandler.GetFeedPostDetail)        // 获取帖子详情
-			feed.GET("/posts/:post_id/comments", c.FeedHandler.GetFeedComments) // 获取帖子评论列表
+			// 使用可选认证中间件的接口
+			feedOptional := feed.Group("")
+			feedOptional.Use(middleware.OptionalAuth(c.AuthService))
+			{
+				feedOptional.GET("/posts", c.FeedHandler.GetFeedPosts)                      // 获取信息流帖子列表（支持游客）
+				feedOptional.GET("/posts/:post_id", c.FeedHandler.GetFeedPostDetail)        // 获取帖子详情（支持游客）
+				feedOptional.GET("/posts/:post_id/comments", c.FeedHandler.GetFeedComments) // 获取帖子评论列表（支持游客）
+			}
 
 			// 需要认证的接口
 			feedAuth := feed.Group("")

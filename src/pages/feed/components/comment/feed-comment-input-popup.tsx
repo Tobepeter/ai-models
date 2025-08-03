@@ -111,10 +111,16 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 		const textarea = e.currentTarget
 		const protectedLength = getProtectedLength()
 
-		if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-			e.preventDefault()
-			handleSubmit()
-			return
+		if (e.key === 'Enter') {
+			if (e.shiftKey) {
+				// Shift+Enter 换行，不阻止默认行为
+				return
+			} else {
+				// Enter 发送
+				e.preventDefault()
+				handleSubmit()
+				return
+			}
 		}
 
 		// 防止删除@username前缀

@@ -56,6 +56,33 @@ func extractToken(c *gin.Context) (string, error) {
 	return token, nil
 }
 
+// OptionalAuth 可选认证中间件 - 解析token但不强制要求认证
+func OptionalAuth(authService *auth.AuthService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := extractToken(c)
+		if err != nil {
+			// token提取失败，不阻断请求，继续执行
+			c.Set("is_authenticated", false)
+			c.Next()
+			return
+		}
+
+		claims, err := authService.ValidateToken(token)
+		if err != nil {
+			// token验证失败，不阻断请求，继续执行
+			logrus.Warn("Invalid token in optional auth:", err)
+			c.Set("is_authenticated", false)
+			c.Next()
+			return
+		}
+
+		// token验证成功，设置用户信息
+		c.Set("user_id", claims.UserID)
+		c.Set("is_authenticated", true)
+		c.Next()
+	}
+}
+
 // AdminRequired 管理员权限中间件
 func AdminRequired(authService *auth.AuthService, userService *services.UserService) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {

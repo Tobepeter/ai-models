@@ -24,7 +24,7 @@ func NewFeedHandler(feedService *services.FeedService) *FeedHandler {
 }
 
 // @Summary 获取信息流帖子列表
-// @Description 支持多种排序方式和cursor分页
+// @Description 支持多种排序方式和cursor分页，游客和登录用户都可访问
 // @ID getFeedPosts
 // @Tags Feed
 // @Param params query models.FeedQueryParams true "查询参数"
@@ -45,7 +45,15 @@ func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 		params.Limit = 20
 	}
 
-	resp, err := h.feedService.GetFeedPosts(params)
+	// 获取用户ID（可能为空，游客访问）
+	var userID *uint64
+	if id, exists := c.Get("user_id"); exists {
+		if uid, ok := id.(uint64); ok {
+			userID = &uid
+		}
+	}
+
+	resp, err := h.feedService.GetFeedPosts(params, userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "获取信息流失败")
 		return

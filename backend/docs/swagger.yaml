@@ -238,6 +238,9 @@ definitions:
       image_url:
         description: 图片URL（可选）
         type: string
+      is_liked:
+        description: 当前用户是否点赞（游客时为nil）
+        type: boolean
       like_count:
         type: integer
       preloaded_comments:
@@ -443,6 +446,14 @@ definitions:
       pagination:
         $ref: '#/definitions/ai-models-backend_internal_models.Pagination'
     type: object
+  ai-models-backend_internal_models.RefreshTokenResponse:
+    properties:
+      refresh_token:
+        description: 可选的新刷新token
+        type: string
+      token:
+        type: string
+    type: object
   ai-models-backend_internal_models.STSCredentials:
     properties:
       AccessKeyId:
@@ -609,6 +620,9 @@ definitions:
     type: object
   ai-models-backend_internal_models.UserCreateResponse:
     properties:
+      refresh_token:
+        description: 可选的刷新token，用于长期认证
+        type: string
       token:
         type: string
       user:
@@ -626,6 +640,9 @@ definitions:
     type: object
   ai-models-backend_internal_models.UserLoginResponse:
     properties:
+      refresh_token:
+        description: 可选的刷新token，用于长期认证
+        type: string
       token:
         type: string
       user:
@@ -868,6 +885,7 @@ paths:
   /admin/users/{id}/deactivate:
     post:
       description: 管理员停用指定用户账户，停用后用户无法登录和使用系统功能
+      operationId: deactivateUser
       parameters:
       - description: 用户ID
         in: path
@@ -1239,7 +1257,7 @@ paths:
       - Feed
   /feed/posts:
     get:
-      description: 支持多种排序方式和cursor分页
+      description: 支持多种排序方式和cursor分页，游客和登录用户都可访问
       operationId: getFeedPosts
       parameters:
       - description: cursor分页的after_id
@@ -2030,6 +2048,7 @@ paths:
   /users/change-password:
     post:
       description: 用户修改自己的登录密码，需要提供旧密码进行验证
+      operationId: changePassword
       parameters:
       - description: 修改密码请求
         in: body
@@ -2054,6 +2073,7 @@ paths:
   /users/check-field:
     get:
       description: 检查用户对应的字段是否存在（通常是email和username）
+      operationId: checkUserField
       parameters:
       - description: 字段名
         in: query
@@ -2105,6 +2125,7 @@ paths:
   /users/logout:
     post:
       description: 用户主动退出登录，清除服务端的登录状态和token
+      operationId: logout
       responses:
         "200":
           description: OK
@@ -2167,6 +2188,23 @@ paths:
       summary: 更新用户信息
       tags:
       - User
+  /users/refresh-token:
+    post:
+      description: 使用当前有效的token获取新的token，延长登录状态
+      operationId: refreshToken
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.RefreshTokenResponse'
+              type: object
+      summary: 刷新token
+      tags:
+      - Auth
   /users/register:
     post:
       description: 新用户注册账号，创建用户账户并返回JWT token，用于后续身份认证

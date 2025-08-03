@@ -1,89 +1,65 @@
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { FeedDetailContent } from './components/detail/feed-detail-content'
-import { useFeedStore } from './feed-store'
-import { feedUtil } from './core/feed-util'
-import { feedMgr } from './core/feed-mgr'
+import { useFeedDetailStore } from './feed-detail-store'
+import { feedDetailMgr } from './core/feed-detail-mgr'
+import { Empty } from '@/components/common/empty'
+import { FeedSkeleton } from './components/feed-skeleton'
+import { FileQuestion, WifiOff } from 'lucide-react'
 
 /**
  * Feed详情组件
  */
 export const FeedDetail = () => {
 	const { postId } = useParams<{ postId: string }>()
+	const navigate = useNavigate()
 
-	const { posts, loading, error, addComment } = useFeedStore()
-
-	// 获取当前帖子
-	const currentPost = postId ? posts.find((p) => p.id === postId) : null
+	const { currentPost, loading, error } = useFeedDetailStore()
 
 	// 处理添加评论
-	const handleAddComment = (postId: string, content: string, replyTo?: string) => {
-		const newComment = feedUtil.createComment(postId, content, replyTo)
-		addComment(postId, newComment)
+	const handleAddComment = (content: string, replyTo?: string) => {
+		feedDetailMgr.addComment(content, replyTo)
 	}
 
 	// 处理回复
-	const handleReply = (postId: string, username: string) => {
+	const handleReply = (username: string) => {
 		// TODO: 实现回复逻辑
-		console.log('回复用户:', username, '在帖子:', postId)
+		console.log('回复用户:', username)
 	}
+
+	// 导航函数
+	const handleNavigateToFeed = () => navigate('/feed')
 
 	// 初始化数据
 	useEffect(() => {
-		if (postId && !currentPost) {
-			// 如果没有找到帖子数据，尝试加载
-			feedMgr.refresh()
+		if (postId) {
+			feedDetailMgr.enterPage(postId)
 		}
-	}, [postId, currentPost])
+
+		// 组件卸载时清理
+		return () => {
+			feedDetailMgr.closeDetail()
+		}
+	}, [postId])
 
 	// 如果没有 postId，返回 404
 	if (!postId) {
+		return <Empty icon={<FileQuestion className="h-16 w-16 text-muted-foreground" />} title="页面不存在" buttonText="返回Feed页" onClickButton={handleNavigateToFeed} />
+	}
+
+	// 加载中状态
+	if (loading) {
 		return (
-			<div className="h-screen flex items-center justify-center">
-				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">页面不存在</h1>
-					<p className="text-muted-foreground">请使用导航栏返回</p>
-				</div>
+			<div className="container max-w-4xl mx-auto py-6">
+				<FeedSkeleton count={1} />
 			</div>
 		)
 	}
 
-	// 加载中状态 - 只有在初次加载且没有任何 post 数据时才显示
-	if (loading && !currentPost && posts.length === 0) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-					<p className="text-muted-foreground">加载中...</p>
-				</div>
-			</div>
-		)
-	}
-
-	// 错误状态 - 只有在没有任何 post 数据时才显示错误
-	if (error && !currentPost && posts.length === 0) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<div className="text-center">
-					<h1 className="text-xl font-semibold mb-4">加载失败</h1>
-					<p className="text-muted-foreground mb-4">{error}</p>
-					<Button onClick={() => feedMgr.refresh()}>重试</Button>
-				</div>
-			</div>
-		)
-	}
-
-	// 帖子不存在
-	if (!currentPost) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<div className="text-center">
-					<h1 className="text-xl font-semibold mb-4">帖子不存在</h1>
-					<p className="text-muted-foreground">该帖子可能已被删除或不存在，请使用导航栏返回</p>
-				</div>
-			</div>
-		)
+	// 错误状态
+	if (error) {
+		return <Empty icon={<WifiOff className="h-16 w-16 text-muted-foreground" />} title="加载失败" desc={error} buttonText="重试" onClickButton={() => postId && feedDetailMgr.enterPage(postId)} />
 	}
 
 	return (

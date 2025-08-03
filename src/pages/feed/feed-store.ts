@@ -2,11 +2,11 @@ import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
 import { produce } from 'immer'
-import { feedConfig } from './feed-config'
-import type { AppFeedComment, AppFeedPost, DetailComments } from './feed-types'
+import { feedConfig } from './core/feed-config'
+import type { AppFeedComment, AppFeedPost } from './feed-types'
 
 // 重新导出类型
-export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost, DetailComments }
+export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost }
 
 const { commentPageSize } = feedConfig
 
@@ -115,11 +115,6 @@ const stateCreator = () => {
 						post.preloaded_comments = post.preloaded_comments || []
 						post.preloaded_comments.unshift(comment)
 
-						// 更新详情页评论（如果存在）
-						if (post.detail_comments) {
-							post.detail_comments.loaded_comments.unshift(comment)
-						}
-
 						// 更新评论数量
 						post.comment_count = (post.comment_count || 0) + 1
 					}
@@ -137,71 +132,6 @@ const stateCreator = () => {
 			}
 		},
 
-		// 设置帖子详情页评论数据
-		setPostDetailComments: (postId: string, detailComments: DetailComments) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						post.detail_comments = detailComments
-					}
-				})
-			)
-		},
-
-		// 追加帖子评论
-		appendPostComments: (postId: string, newComments: AppFeedComment[], nextCursor?: string, hasMore?: boolean) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post?.detail_comments) {
-						post.detail_comments.loaded_comments.push(...newComments)
-						post.detail_comments.next_cursor = nextCursor
-						post.detail_comments.has_more = hasMore
-						post.detail_comments.loading = false
-						post.detail_comments.error = undefined
-					}
-				})
-			)
-		},
-
-		// 设置帖子评论加载状态
-		setPostCommentsLoading: (postId: string, loading: boolean) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post?.detail_comments) {
-						post.detail_comments.loading = loading
-					}
-				})
-			)
-		},
-
-		// 设置帖子评论错误状态
-		setPostCommentsError: (postId: string, error?: string) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post?.detail_comments) {
-						post.detail_comments.loading = false
-						post.detail_comments.error = error
-					}
-				})
-			)
-		},
-
-		// 清除帖子详情页评论数据
-		clearPostDetailComments: (postId: string) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						delete post.detail_comments
-					}
-				})
-			)
-		},
-
 		// 重置为初始状态
 		reset: () => set(feedState),
 		// 清除错误状态
@@ -216,7 +146,6 @@ export const useFeedStore = create(
 			posts: state.posts.slice(0, 50).map((post) => ({
 				...post,
 				isExpanded: false, // 不持久化内容展开状态
-				detail_comments: undefined, // 不持久化详情页评论状态
 			})),
 			cursor: state.cursor,
 			// 不持久化弹窗状态

@@ -239,6 +239,7 @@ func (h *UserHandler) ActivateUser(c *gin.Context) {
 
 // @Summary 停用用户
 // @Description 管理员停用指定用户账户，停用后用户无法登录和使用系统功能
+// @ID deactivateUser
 // @Tags Admin
 // @Param id path string true "用户ID"
 // @Success 200 {object} response.Response{data=map[string]any}
@@ -262,6 +263,7 @@ func (h *UserHandler) DeactivateUser(c *gin.Context) {
 
 // @Summary 修改密码
 // @Description 用户修改自己的登录密码，需要提供旧密码进行验证
+// @ID changePassword
 // @Tags User
 // @Param request body models.ChangePasswordRequest true "修改密码请求"
 // @Success 200 {object} response.Response{data=map[string]any}
@@ -296,6 +298,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 
 // @Summary 检查用户字段是否存在
 // @Description 检查用户对应的字段是否存在（通常是email和username）
+// @ID checkUserField
 // @Tags Auth
 // @Param field query string true "字段名"
 // @Param value query string true "字段值"
@@ -316,6 +319,7 @@ func (h *UserHandler) CheckUserField(c *gin.Context) {
 
 // @Summary 用户退出登录
 // @Description 用户主动退出登录，清除服务端的登录状态和token
+// @ID logout
 // @Tags Auth
 // @Success 200 {object} response.Response{data=map[string]any}
 // @Router /users/logout [post]
@@ -337,4 +341,42 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	h.authService.Logout(token)
 
 	response.SuccessMsg(c, "退出登录成功")
+}
+
+// @Summary 刷新token
+// @Description 使用当前有效的token获取新的token，延长登录状态
+// @ID refreshToken
+// @Tags Auth
+// @Success 200 {object} response.Response{data=models.RefreshTokenResponse}
+// @Router /users/refresh-token [post]
+func (h *UserHandler) RefreshToken(c *gin.Context) {
+	// 从请求头中提取token
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		response.Error(c, http.StatusUnauthorized, "缺少认证头")
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		response.Error(c, http.StatusUnauthorized, "无效的token格式")
+		return
+	}
+
+	// 刷新token
+	newToken, err := h.authService.RefreshToken(token)
+	if err != nil {
+		logrus.Error("Failed to refresh token:", err)
+		response.Error(c, http.StatusUnauthorized, "token刷新失败")
+		return
+	}
+
+	// 将旧token添加到黑名单
+	h.authService.Logout(token)
+
+	data := models.RefreshTokenResponse{
+		Token: newToken,
+	}
+
+	response.Success(c, data)
 }

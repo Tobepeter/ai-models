@@ -5,3 +5,4 @@
 - current -> curr
 - genreate -> gen
 - manager -> mgr
+- message -> msg

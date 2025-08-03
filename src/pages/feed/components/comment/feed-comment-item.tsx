@@ -3,7 +3,7 @@ import { UserCardPopup } from '@/components/common/user-card-popup'
 import { memo } from 'react'
 import { type AppFeedComment } from '../../feed-types'
 import { feedUtil } from '../../core/feed-util'
-import { feedMgr } from '../../core/feed-mgr'
+import { feedCommentMgr } from '../../core/feed-comment-mgr'
 import { cn } from '@/lib/utils'
 import { CommentInputPopup } from './feed-comment-input-popup'
 import { useFeedStore } from '../../feed-store'
@@ -17,7 +17,7 @@ export const FeedCommentItem = memo((props: FeedCommentItemProps) => {
 	const { username, avatar, reply_to: originalReplyTo, post_id, content, created_at } = comment
 
 	const handleAddComment = (content: string, replyTo?: string) => {
-		feedMgr.addComment(post_id, content, replyTo)
+		feedCommentMgr.addComment(post_id, content, replyTo)
 	}
 
 	// 构造用户卡片需要的数据

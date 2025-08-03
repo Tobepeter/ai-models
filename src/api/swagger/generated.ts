@@ -161,6 +161,8 @@ export interface FeedPostResponseItem {
   id?: string;
   /** 图片URL（可选） */
   image_url?: string;
+  /** 当前用户是否点赞（游客时为nil） */
+  is_liked?: boolean;
   like_count?: number;
   /** 预载评论列表 */
   preloaded_comments?: FeedComment[];
@@ -283,6 +285,12 @@ export interface PaginationResponse {
   pagination?: Pagination;
 }
 
+export interface RefreshTokenResponse {
+  /** 可选的新刷新token */
+  refresh_token?: string;
+  token?: string;
+}
+
 export interface STSCredentials {
   /** NOTE：注意官方的字段是大写开头的 */
   AccessKeyId?: string;
@@ -391,6 +399,8 @@ export interface UserCreateRequest {
 }
 
 export interface UserCreateResponse {
+  /** 可选的刷新token，用于长期认证 */
+  refresh_token?: string;
   token?: string;
   user?: UserResponse;
 }
@@ -401,6 +411,8 @@ export interface UserLoginRequest {
 }
 
 export interface UserLoginResponse {
+  /** 可选的刷新token，用于长期认证 */
+  refresh_token?: string;
   token?: string;
   user?: UserResponse;
 }
@@ -495,7 +507,7 @@ export type DeleteUserData = Response<Record<string, any>>;
 
 export type ActivateUserData = Response<Record<string, any>>;
 
-export type UsersDeactivateCreateData = Response<Record<string, any>>;
+export type DeactivateUserData = Response<Record<string, any>>;
 
 /** 新密码 */
 export interface UsersResetPasswordCreatePayload {
@@ -710,24 +722,26 @@ export type DeleteTodoData = Response<Record<string, any>>;
 
 export type ToggleTodoCompleteData = Response<TodoResponse>;
 
-export type ChangePasswordCreateData = Response<Record<string, any>>;
+export type ChangePasswordData = Response<Record<string, any>>;
 
-export interface CheckFieldListParams {
+export interface CheckUserFieldParams {
   /** 字段名 */
   field: string;
   /** 字段值 */
   value: string;
 }
 
-export type CheckFieldListData = Response<boolean>;
+export type CheckUserFieldData = Response<boolean>;
 
 export type LoginData = Response<UserLoginResponse>;
 
-export type LogoutCreateData = Response<Record<string, any>>;
+export type LogoutData = Response<Record<string, any>>;
 
 export type GetProfileData = Response<UserResponse>;
 
 export type UpdateProfileData = Response<UserResponse>;
+
+export type RefreshTokenData = Response<RefreshTokenResponse>;
 
 export type RegisterData = Response<UserCreateResponse>;
 
@@ -1001,12 +1015,12 @@ export class Api<
      * @description 管理员停用指定用户账户，停用后用户无法登录和使用系统功能
      *
      * @tags Admin
-     * @name UsersDeactivateCreate
+     * @name DeactivateUser
      * @summary 停用用户
      * @request POST:/admin/users/{id}/deactivate
      */
-    usersDeactivateCreate: (id: string, params: RequestParams = {}) =>
-      this.request<UsersDeactivateCreateData, any>({
+    deactivateUser: (id: string, params: RequestParams = {}) =>
+      this.request<DeactivateUserData, any>({
         path: `/admin/users/${id}/deactivate`,
         method: "POST",
         ...params,
@@ -1273,7 +1287,7 @@ export class Api<
       }),
 
     /**
-     * @description 支持多种排序方式和cursor分页
+     * @description 支持多种排序方式和cursor分页，游客和登录用户都可访问
      *
      * @tags Feed
      * @name GetFeedPosts
@@ -1804,15 +1818,15 @@ export class Api<
      * @description 用户修改自己的登录密码，需要提供旧密码进行验证
      *
      * @tags User
-     * @name ChangePasswordCreate
+     * @name ChangePassword
      * @summary 修改密码
      * @request POST:/users/change-password
      */
-    changePasswordCreate: (
+    changePassword: (
       request: ChangePasswordRequest,
       params: RequestParams = {},
     ) =>
-      this.request<ChangePasswordCreateData, any>({
+      this.request<ChangePasswordData, any>({
         path: `/users/change-password`,
         method: "POST",
         body: request,
@@ -1824,12 +1838,12 @@ export class Api<
      * @description 检查用户对应的字段是否存在（通常是email和username）
      *
      * @tags Auth
-     * @name CheckFieldList
+     * @name CheckUserField
      * @summary 检查用户字段是否存在
      * @request GET:/users/check-field
      */
-    checkFieldList: (query: CheckFieldListParams, params: RequestParams = {}) =>
-      this.request<CheckFieldListData, any>({
+    checkUserField: (query: CheckUserFieldParams, params: RequestParams = {}) =>
+      this.request<CheckUserFieldData, any>({
         path: `/users/check-field`,
         method: "GET",
         query: query,
@@ -1857,12 +1871,12 @@ export class Api<
      * @description 用户主动退出登录，清除服务端的登录状态和token
      *
      * @tags Auth
-     * @name LogoutCreate
+     * @name Logout
      * @summary 用户退出登录
      * @request POST:/users/logout
      */
-    logoutCreate: (params: RequestParams = {}) =>
-      this.request<LogoutCreateData, any>({
+    logout: (params: RequestParams = {}) =>
+      this.request<LogoutData, any>({
         path: `/users/logout`,
         method: "POST",
         ...params,
@@ -1897,6 +1911,21 @@ export class Api<
         method: "PUT",
         body: request,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 使用当前有效的token获取新的token，延长登录状态
+     *
+     * @tags Auth
+     * @name RefreshToken
+     * @summary 刷新token
+     * @request POST:/users/refresh-token
+     */
+    refreshToken: (params: RequestParams = {}) =>
+      this.request<RefreshTokenData, any>({
+        path: `/users/refresh-token`,
+        method: "POST",
         ...params,
       }),
 

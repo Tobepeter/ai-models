@@ -5,7 +5,7 @@ import { FeedText } from '../feed-text'
 import { FeedItemImage } from './feed-item-image'
 import { FeedItemActions } from './feed-item-actions'
 import { FeedCommentList } from '../comment/feed-comment-list'
-import { useFeedStore } from '../../feed-store'
+import { feedDetailMgr } from '../../core/feed-detail-mgr'
 import { type AppFeedPost } from '../../feed-types'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -15,8 +15,7 @@ import { cn } from '@/lib/utils'
  */
 export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, className } = props
-	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, isLiked, preloaded_comments } = post
-	const { setData } = useFeedStore()
+	const { id, user_id, username, avatar, status, created_at, content, is_expanded: isExpanded, image_url, like_count, comment_count, is_liked: isLiked, preloaded_comments } = post
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
 
@@ -28,7 +27,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 			navigate(`/feed/${id}`)
 		} else {
 			// PC端打开弹窗
-			setData({ isDetailDialogOpen: true, detailDialogPostId: id })
+			feedDetailMgr.openDialog(id)
 		}
 	}
 
@@ -38,7 +37,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 		if (isMobile) {
 			navigate(`/feed/${id}`) // 移动端直接跳转详情页
 		} else {
-			setData({ isDetailDialogOpen: true, detailDialogPostId: id }) // PC端打开弹窗
+			feedDetailMgr.openDialog(id) // PC端打开弹窗
 		}
 	}
 

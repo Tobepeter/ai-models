@@ -224,6 +224,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "停用用户",
+                "operationId": "deactivateUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -840,7 +841,7 @@ const docTemplate = `{
         },
         "/feed/posts": {
             "get": {
-                "description": "支持多种排序方式和cursor分页",
+                "description": "支持多种排序方式和cursor分页，游客和登录用户都可访问",
                 "tags": [
                     "Feed"
                 ],
@@ -2149,6 +2150,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "修改密码",
+                "operationId": "changePassword",
                 "parameters": [
                     {
                         "description": "修改密码请求",
@@ -2190,6 +2192,7 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "检查用户字段是否存在",
+                "operationId": "checkUserField",
                 "parameters": [
                     {
                         "type": "string",
@@ -2276,6 +2279,7 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "用户退出登录",
+                "operationId": "logout",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2371,6 +2375,36 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/users/refresh-token": {
+            "post": {
+                "description": "使用当前有效的token获取新的token，延长登录状态",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "刷新token",
+                "operationId": "refreshToken",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/ai-models-backend_internal_models.RefreshTokenResponse"
                                         }
                                     }
                                 }
@@ -2774,6 +2808,10 @@ const docTemplate = `{
                     "description": "图片URL（可选）",
                     "type": "string"
                 },
+                "is_liked": {
+                    "description": "当前用户是否点赞（游客时为nil）",
+                    "type": "boolean"
+                },
                 "like_count": {
                     "type": "integer"
                 },
@@ -3085,6 +3123,18 @@ const docTemplate = `{
                 }
             }
         },
+        "ai-models-backend_internal_models.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "description": "可选的新刷新token",
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "ai-models-backend_internal_models.STSCredentials": {
             "type": "object",
             "properties": {
@@ -3327,6 +3377,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.UserCreateResponse": {
             "type": "object",
             "properties": {
+                "refresh_token": {
+                    "description": "可选的刷新token，用于长期认证",
+                    "type": "string"
+                },
                 "token": {
                     "type": "string"
                 },
@@ -3353,6 +3407,10 @@ const docTemplate = `{
         "ai-models-backend_internal_models.UserLoginResponse": {
             "type": "object",
             "properties": {
+                "refresh_token": {
+                    "description": "可选的刷新token，用于长期认证",
+                    "type": "string"
+                },
                 "token": {
                     "type": "string"
                 },

@@ -2,7 +2,7 @@ import { useFeedStore } from '../feed-store'
 import { type AppFeedPost } from '../feed-types'
 import { feedUtil } from './feed-util'
 import { feedMock } from './feed-mock'
-import { feedConfig } from '../feed-config'
+import { feedConfig } from './feed-config'
 import { feedCommentMgr } from './feed-comment-mgr'
 import { delayC } from '../../../utils/common'
 import { CancelablePromise } from '../../../utils/cancelable-promise'
@@ -19,22 +19,6 @@ class FeedMgr {
 
 	private getStore() {
 		return useFeedStore.getState()
-	}
-
-	// 清除数据加载计时器
-	private clearLoadTimer() {
-		if (this.loadTimer) {
-			this.loadTimer.cancel()
-			this.loadTimer = null
-		}
-	}
-
-	// 清除点赞计时器
-	private clearLikeTimer() {
-		if (this.likeTimer) {
-			this.likeTimer.cancel()
-			this.likeTimer = null
-		}
 	}
 
 	// 清除所有计时器
@@ -70,7 +54,7 @@ class FeedMgr {
 			// 转换后端数据为前端格式
 			const posts = response.data.posts.map((item) => ({
 				...item,
-				isLiked: false, // TODO: 从后端获取用户点赞状态
+				isLiked: item.is_liked ?? false, // 使用后端返回的状态，游客时默认false
 				isExpanded: false,
 			}))
 
@@ -174,7 +158,7 @@ class FeedMgr {
 				} else {
 					// 调用真实API
 					const post = store.posts.find((p) => p.id === postId)
-					const currentLiked = post?.isLiked || false
+					const currentLiked = post?.is_liked || false
 					await api.feed.setFeedPostLike(postId, { is_like: !currentLiked })
 					console.log(`[feedMgr] 切换点赞状态: ${postId}`)
 				}
@@ -197,23 +181,6 @@ class FeedMgr {
 	setMockMode(enabled: boolean) {
 		this.mockMode = enabled
 		feedCommentMgr.mockMode = enabled // 同步评论管理器的mock模式
-	}
-
-	// 代理评论相关方法到评论管理器
-	async addComment(postId: string, content: string, replyTo?: string) {
-		return feedCommentMgr.addComment(postId, content, replyTo)
-	}
-
-	async loadPostComments(postId: string) {
-		return feedCommentMgr.loadPostComments(postId)
-	}
-
-	async loadMoreComments(postId: string) {
-		return feedCommentMgr.loadMoreComments(postId)
-	}
-
-	clearPostComments(postId: string) {
-		return feedCommentMgr.clearPostComments(postId)
 	}
 
 	// 创建新的feed
@@ -244,7 +211,7 @@ class FeedMgr {
 					// 转换后端数据为前端格式
 					const newPost = {
 						...response.data,
-						isLiked: false,
+						isLiked: (response.data as any).is_liked ?? false, // 使用后端返回的状态，创建时通常为false
 						isExpanded: false,
 						preloaded_comments: [],
 						comment_preview_count: 0,
@@ -263,6 +230,22 @@ class FeedMgr {
 		} finally {
 			store.setLoading(false)
 			this.loadTimer = null
+		}
+	}
+
+	// 清除数据加载计时器
+	private clearLoadTimer() {
+		if (this.loadTimer) {
+			this.loadTimer.cancel()
+			this.loadTimer = null
+		}
+	}
+
+	// 清除点赞计时器
+	private clearLikeTimer() {
+		if (this.likeTimer) {
+			this.likeTimer.cancel()
+			this.likeTimer = null
 		}
 	}
 }

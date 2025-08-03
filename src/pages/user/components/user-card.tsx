@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import { FileUpload } from '@/components/common/file-upload'
 import { AppEmojiPicker } from '@/components/common/app-emoji-picker'
 import { QuickEdit } from '@/components/common/quick-edit'
-import { useUserStore } from '@/store/user-store'
+import { useUserStore, userState } from '@/store/user-store'
 import { userUtil, parseUserExtra } from '../user-util'
 import { userApi } from '@/api/user/user-api'
 import { notify } from '@/components/common/notify'
@@ -15,35 +15,13 @@ import { PropsWithChildren } from 'react'
 /** 用户信息卡片组件，支持编辑和只读模式 */
 export const UserCard = (props: PropsWithChildren<UserCardProps>) => {
 	const { readonly = false, userData, className } = props
-	const { info: user, token, goLogin } = useUserStore()
+	const { info: user, goLogin } = useUserStore()
 	const [avatarLoading, setAvatarLoading] = useState(false)
 
-	const isLoggedIn = token && user && user.username !== 'anonymous'
-
-	// 只读模式下使用外部数据，否则使用当前用户数据
-	const currentUser = readonly ? userData : user
-	const userExtra = parseUserExtra(currentUser?.extra)
-
-	const displayUser = readonly
-		? userData || {
-				username: 'unknown',
-				email: 'unknown@example.com',
-				avatar: '',
-				created_at: '',
-				updated_at: '',
-			}
-		: isLoggedIn
-			? user
-			: {
-					username: 'anonymous',
-					email: 'anonymous@example.com',
-					avatar: '',
-					created_at: '',
-					updated_at: '',
-				}
-
-	// 只读模式下不允许编辑
-	const canEdit = !readonly && isLoggedIn
+	const isLoggedIn = userUtil.isLogin()
+	const displayUser = isLoggedIn && user ? user : userState.info // 默认使用 userState.info，如果已登录且有用户信息则使用 user
+	const userExtra = parseUserExtra(displayUser?.extra)
+	const canEdit = !readonly && isLoggedIn // 只读模式下不允许编辑
 
 	const handleAvatarUpload = async (file: File) => {
 		setAvatarLoading(true)

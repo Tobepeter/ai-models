@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { useCallback } from 'react'
 import { type AppFeedComment } from '../../feed-types'
 import { FeedCommentItem } from './feed-comment-item'
-import { feedConfig } from '../../feed-config'
+import { feedConfig } from '../../core/feed-config'
 
 /**
  * 评论区组件

@@ -6,9 +6,9 @@ import { combine } from 'zustand/middleware'
 import type { UserResponse } from '@/api/swagger/generated'
 
 // Initial user state
-const userState = {
+export const userState = {
 	info: {
-		id: '0',
+		id: '',
 		username: 'anonymous',
 		email: 'anonymous@example.com',
 		avatar: '',
@@ -18,7 +18,8 @@ const userState = {
 		created_at: '',
 		updated_at: '',
 	} as UserResponse,
-	token: '',
+	token: '', // Access token (短期有效)
+	refreshToken: '', // Refresh token (长期有效，用于刷新access token)
 	tokenPayload: null as Nullable<JwtPayloadApp>,
 }
 
@@ -30,6 +31,7 @@ const persistData = (state: UserState) => {
 		const dataToPersist = {
 			info: state.info,
 			token: state.token,
+			refreshToken: state.refreshToken, // 持久化refreshToken
 		}
 		localStorage.setItem(storageKeys.user, JSON.stringify(dataToPersist))
 	} catch (error) {
@@ -54,6 +56,11 @@ const stateCreator = () => {
 						newState.tokenPayload = payload
 					}
 				}
+			}
+
+			// 如果清空token，同时清空refreshToken
+			if (data.token === '') {
+				newState.refreshToken = ''
 			}
 
 			set(newState)
@@ -106,6 +113,24 @@ const stateCreator = () => {
 		// Manually trigger persistence
 		persist: () => {
 			persistData(get())
+		},
+		// 处理登录响应，自动设置token和refreshToken
+		handleAuthResponse: (authData: { user: UserResponse; token: string; refresh_token?: string }) => {
+			const newState = {
+				info: authData.user,
+				token: authData.token,
+				refreshToken: authData.refresh_token || '', // 设置refreshToken，如果没有则为空
+				tokenPayload: null as Nullable<JwtPayloadApp>,
+			}
+
+			// 解析token payload
+			const payload = jwt.parse(authData.token)
+			if (payload && jwt.isValid(payload)) {
+				newState.tokenPayload = payload
+			}
+
+			set(newState)
+			persistData(newState)
 		},
 	}))
 }

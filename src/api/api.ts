@@ -60,12 +60,74 @@ api.instance.interceptors.response.use(
 
 		return response
 	},
-	(error) => {
-		// 如果error，且自动处理，那么resolve null
-
+	async (error) => {
 		const response = error.response
 		const config = error.config || {}
-		const { noErrorToast, silent } = config
+		const { noErrorToast, silent, skipAuthRefresh } = config
+
+		// 处理401错误 - 自动刷新token
+		if (response?.status === 401 && !config._retry && !skipAuthRefresh && !config.url?.includes('/auth/refresh-token')) {
+			config._retry = true
+
+			try {
+				const { token, refreshToken } = useUserStore.getState()
+
+				// 优先使用refreshToken，如果没有则使用当前token
+				const tokenForRefresh = refreshToken || token
+				if (!tokenForRefresh) {
+					// 没有可用的token，直接跳转登录
+					useUserStore.getState().goLogin()
+					return Promise.reject(error)
+				}
+
+				if (verbose) {
+					console.log('[api] attempting to refresh token...', refreshToken ? 'using refreshToken' : 'using current token')
+				}
+
+				// 调用刷新token接口，使用特殊标记避免循环
+				const refreshResponse = await api.instance.post(
+					'/users/refresh-token',
+					{},
+					{
+						skipAuthRefresh: true, // 关键：避免刷新接口触发循环
+						headers: {
+							Authorization: `Bearer ${tokenForRefresh}`,
+						},
+					}
+				)
+
+				if (refreshResponse.data?.data?.token) {
+					const newToken = refreshResponse.data.data.token
+					const newRefreshToken = refreshResponse.data.data.refresh_token
+
+					// 更新store中的token和refreshToken
+					const updateData: { token: string; refreshToken?: string } = { token: newToken }
+					if (newRefreshToken) {
+						updateData.refreshToken = newRefreshToken
+					}
+					useUserStore.getState().setData(updateData)
+
+					// 更新原请求的Authorization头
+					config.headers.Authorization = `Bearer ${newToken}`
+
+					if (verbose) {
+						console.log('[api] token refreshed successfully, retrying original request')
+					}
+
+					// 重试原请求
+					return api.instance.request(config)
+				}
+			} catch (refreshError) {
+				if (verbose) {
+					console.log('[api] token refresh failed:', refreshError)
+				}
+				// 刷新失败，清除用户数据并跳转登录
+				useUserStore.getState().clear()
+				useUserStore.getState().goLogin()
+				return Promise.reject(refreshError)
+			}
+		}
+
 		// 错误优先级 业务错误 -> 响应码错误 -> 请求失败
 		const errMsg = response?.data?.msg || response?.data?.message || response?.statusText || response?.status || error.message || '请求失败'
 
@@ -94,6 +156,8 @@ declare module 'axios' {
 		noAuth?: boolean // 是否跳过认证header
 		noErrorToast?: boolean // 是否不需要内部自动处理错误提示，并且返回 null
 		silent?: boolean // 彻底静音，此时错误静默返回 null
+		skipAuthRefresh?: boolean // 是否跳过自动token刷新（避免死循环）
+		_retry?: boolean // 内部标记，表示是否已经重试过
 	}
 }
 

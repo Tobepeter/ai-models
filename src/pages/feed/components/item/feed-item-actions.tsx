@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CommentInputPopup } from '../comment/feed-comment-input-popup'
 import { feedUtil } from '../../core/feed-util'
 import { feedMgr } from '../../core/feed-mgr'
+import { feedCommentMgr } from '../../core/feed-comment-mgr'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
 import { useMemo } from 'react'
@@ -25,8 +26,8 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 
 	// 处理添加评论
 	const handleAddComment = useMemoizedFn((content: string, replyTo?: string) => {
-		// 直接调用 feedMgr 添加评论
-		feedMgr.addComment(postId, content, replyTo)
+		// 直接调用 feedCommentMgr 添加评论
+		feedCommentMgr.addComment(postId, content, replyTo)
 	})
 
 	// 处理分享操作

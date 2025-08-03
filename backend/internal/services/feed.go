@@ -31,8 +31,8 @@ func NewFeedService(db *gorm.DB, userService *UserService) *FeedService {
 	}
 }
 
-// GetFeedPosts 获取信息流帖子列表（支持评论预载）
-func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) (*models.FeedPostResponse, error) {
+// GetFeedPosts 获取信息流帖子列表（支持评论预载和用户状态）
+func (s *FeedService) GetFeedPosts(params models.FeedQueryParams, userID *uint64) (*models.FeedPostResponse, error) {
 	var posts []models.FeedPost
 
 	query := s.DB.Model(&models.FeedPost{})
@@ -90,10 +90,24 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams) (*models.FeedP
 
 	// 构建响应项目列表
 	responseItems := make([]models.FeedPostResponseItem, len(posts))
+	
+	// 批量查询用户点赞状态（如果有登录用户）
+	var userLikes map[uint64]bool
+	if userID != nil {
+		userLikes = s.getUserLikesForPosts(posts, *userID)
+	}
+	
 	for i, post := range posts {
 		item := models.FeedPostResponseItem{
 			FeedPost: post,
 		}
+		
+		// 设置用户点赞状态
+		if userID != nil {
+			liked := userLikes[post.ID]
+			item.IsLiked = &liked
+		}
+		// 游客时 IsLiked 为 nil
 
 		// 根据参数决定是否预载评论
 		if params.CommentCount > 0 {
@@ -564,4 +578,36 @@ func (s *FeedService) invalidateCommentCache(postID string) {
 	
 	// 删除缓存，忽略错误
 	s.Redis.Del(ctx, key)
+}
+
+// getUserLikesForPosts 批量查询用户对帖子的点赞状态
+func (s *FeedService) getUserLikesForPosts(posts []models.FeedPost, userID uint64) map[uint64]bool {
+	if len(posts) == 0 {
+		return make(map[uint64]bool)
+	}
+
+	// 提取帖子ID列表
+	postIDs := make([]uint64, len(posts))
+	for i, post := range posts {
+		postIDs[i] = post.ID
+	}
+
+	// 批量查询用户点赞记录
+	var likes []models.PostLike
+	s.DB.Where("user_id = ? AND post_id IN ?", userID, postIDs).Find(&likes)
+
+	// 构建点赞状态映射
+	likeMap := make(map[uint64]bool)
+	
+	// 初始化所有帖子为未点赞
+	for _, postID := range postIDs {
+		likeMap[postID] = false
+	}
+	
+	// 标记已点赞的帖子
+	for _, like := range likes {
+		likeMap[like.PostID] = true
+	}
+
+	return likeMap
 }
