@@ -27,82 +27,82 @@ func (s *SeedManager) RunAllSeeds() error {
 		return nil
 	}
 
-	logrus.Info("开始生成种子数据...")
+	logrus.Info("开始检查并生成种子数据...")
 
-	// 清理现有数据
-	if err := s.clearExistingData(); err != nil {
+	// 检查用户数量，只有<=1个用户时才创建测试用户（保留管理员）
+	var userCount int64
+	if err := DB.Model(&models.User{}).Count(&userCount).Error; err != nil {
 		return err
 	}
 
-	// 固定用户
-	coreUsers, err := s.seedCoreUsers()
-	if err != nil {
-		return err
-	}
+	var allUsers []models.User
+	if userCount <= 1 {
+		// 创建测试用户
+		testUsers, err := s.seedTestUsers()
+		if err != nil {
+			return err
+		}
+		allUsers = append(allUsers, testUsers...)
 
-	// 随机用户
-	randomUsers, err := s.seedRandomUsers(20)
-	if err != nil {
-		return err
-	}
-
-	allUsers := append(coreUsers, randomUsers...)
-
-	// 固定post
-	corePosts, err := s.seedCorePosts(coreUsers)
-	if err != nil {
-		return err
-	}
-
-	// 随机post
-	randomPosts, err := s.seedRandomPosts(randomUsers, 100)
-	if err != nil {
-		return err
-	}
-
-	allPosts := append(corePosts, randomPosts...)
-
-	// 评论
-	if err := s.seedComments(allUsers, allPosts, 300); err != nil {
-		return err
-	}
-
-	// 随机点赞
-	if err := s.seedInteractions(allUsers, allPosts); err != nil {
-		return err
-	}
-
-	logrus.Info("种子数据生成完成")
-	return nil
-}
-
-// clearExistingData 清理现有数据（开发环境安全操作）
-func (s *SeedManager) clearExistingData() error {
-	if s.cfg.IsProd {
-		return nil // 生产环境不清理
-	}
-
-	logrus.Info("清理现有数据...")
-
-	// 按外键依赖关系逆序删除
-	tables := []any{
-		&models.FeedCommentLike{},
-		&models.PostLike{},
-		&models.FeedComment{},
-		&models.FeedPost{},
-	}
-
-	for _, table := range tables {
-		if err := DB.Unscoped().Where("1 = 1").Delete(table).Error; err != nil {
+		// 创建随机用户
+		randomUsers, err := s.seedRandomUsers(20)
+		if err != nil {
+			return err
+		}
+		allUsers = append(allUsers, randomUsers...)
+	} else {
+		// 获取现有用户用于其他数据生成
+		if err := DB.Find(&allUsers).Error; err != nil {
 			return err
 		}
 	}
 
-	// User 表单独处理：只删除非管理员用户，保护所有管理员角色账户
-	if err := DB.Unscoped().Where("role != ?", models.RoleAdmin).Delete(&models.User{}).Error; err != nil {
+	// 检查posts数量，为空才创建
+	var postCount int64
+	if err := DB.Model(&models.FeedPost{}).Count(&postCount).Error; err != nil {
 		return err
 	}
 
-	logrus.Info("数据清理完成")
+	var allPosts []models.FeedPost
+	if postCount == 0 && len(allUsers) > 0 {
+		// 只生成随机posts
+		randomPosts, err := s.seedRandomPosts(allUsers, 100)
+		if err != nil {
+			return err
+		}
+		allPosts = append(allPosts, randomPosts...)
+	} else {
+		// 获取现有posts
+		if err := DB.Find(&allPosts).Error; err != nil {
+			return err
+		}
+	}
+
+	// 检查评论数量，为空才创建
+	var commentCount int64
+	if err := DB.Model(&models.FeedComment{}).Count(&commentCount).Error; err != nil {
+		return err
+	}
+
+	if commentCount == 0 && len(allUsers) > 0 && len(allPosts) > 0 {
+		if err := s.seedComments(allUsers, allPosts, 300); err != nil {
+			return err
+		}
+	}
+
+	// 检查点赞数量，为空才创建
+	var likeCount int64
+	if err := DB.Model(&models.PostLike{}).Count(&likeCount).Error; err != nil {
+		return err
+	}
+
+	if likeCount == 0 && len(allUsers) > 0 && len(allPosts) > 0 {
+		if err := s.seedInteractions(allUsers, allPosts); err != nil {
+			return err
+		}
+	}
+
+	logrus.Info("种子数据检查完成")
 	return nil
 }
+

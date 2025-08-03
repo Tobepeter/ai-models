@@ -34,7 +34,7 @@ export const FeedNavHeader = () => {
 
 	return (
 		<div className="flex items-center gap-2" data-slot="feed-nav-header">
-			信息流(WIP，还不是服务器同步的)
+			信息流(WIP)
 			<Button variant="ghost" size="sm" onClick={handleCreate} disabled={!addEnable} className="h-8 w-8 p-0">
 				<Plus className="h-4 w-4" />
 			</Button>

@@ -14,10 +14,10 @@
 					var theme = storedTheme === 'system' ? systemTheme : storedTheme || 'light'
 
 					// 应用主题到文档根元素
-					document.documentElement.setAttribute('data-theme', theme)
+					// document.documentElement.setAttribute('data-theme', theme)
 
 					// 如果使用 class 而非 data-theme 属性（如与 Tailwind 集成时）
-					// document.documentElement.classList.toggle('dark', theme === 'dark');
+					document.documentElement.classList.toggle('dark', theme === 'dark');
 				} catch (e) {
 					console.error('主题初始化失败:', e)
 				}

@@ -1,33 +1,22 @@
 import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine, persist } from 'zustand/middleware'
-import { produce } from 'immer'
-import { feedConfig } from './core/feed-config'
 import type { AppFeedComment, AppFeedPost } from './feed-types'
 
-// 重新导出类型
-export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost }
+export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost } // 重新导出类型
 
-const { commentPageSize } = feedConfig
-
-// 信息流状态
-const feedState = {
-	// Feed 流数据
-	posts: [] as AppFeedPost[],
+const feedState = { // 信息流状态
+	posts: [] as AppFeedPost[], // Feed 流数据
 	loading: false,
 	refreshing: false, // loading 的子状态，表示是刷新类型的加载
 	hasMore: true,
 	cursor: '', // 分页游标
 	refreshError: '', // 刷新(初始加载)错误
 	loadMoreError: '', // 加载更多错误
-
-	// 弹窗状态 - 直接定义简单状态
-	isDetailDialogOpen: false,
+	isDetailDialogOpen: false, // 弹窗状态 - 直接定义简单状态
 	detailDialogPostId: '',
 	isCreateDialogOpen: false,
-
-	// 控制打开评论时候，防止误触继续二次打开其他评论
-	isCommentInputOpen: false, // 评论输入弹窗状态
+	isCommentInputOpen: false, // 控制打开评论时候，防止误触继续二次打开其他评论
 	lastCommentCloseTime: -1, // 最后关闭评论弹窗的时间戳，用于防止快速切换
 }
 
@@ -45,91 +34,65 @@ const stateCreator = () => {
 		setLoadMoreError: (loadMoreError: string) => set({ loadMoreError }),
 
 		// 在列表前面添加新帖子
-		prependPosts: (newPosts: AppFeedPost[]) => {
-			set(
-				produce((draft) => {
-					draft.posts.unshift(...newPosts) // 刷新时新数据加在前面
-				})
-			)
-		},
+		prependPosts: (newPosts: AppFeedPost[]) => set((state) => ({
+			posts: newPosts.concat(state.posts) // 刷新时新数据加在前面
+		})),
 
 		// 在列表后面添加新帖子
-		appendPosts: (newPosts: AppFeedPost[]) => {
-			set(
-				produce((draft) => {
-					draft.posts.push(...newPosts) // 加载更多时新数据加在后面
-				})
-			)
-		},
+		appendPosts: (newPosts: AppFeedPost[]) => set((state) => ({
+			posts: state.posts.concat(newPosts) // 加载更多时新数据加在后面
+		})),
 
 		// 添加新创建的帖子
-		addNewPost: (newPost: AppFeedPost) => {
-			set(
-				produce((draft) => {
-					draft.posts.unshift(newPost) // 新创建的post加在最前面
-				})
-			)
-		},
+		addNewPost: (newPost: AppFeedPost) => set((state) => ({
+			posts: [newPost].concat(state.posts) // 新创建的post加在最前面
+		})),
 
 		// 更新指定帖子
-		updatePost: (postId: string, updates: Partial<AppFeedPost>) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						Object.assign(post, updates)
-					}
-				})
+		updatePost: (postId: string, updates: Partial<AppFeedPost>) => set((state) => ({
+			posts: state.posts.map(post => 
+				post.id === postId ? { ...post, ...updates } : post
 			)
-		},
+		})),
 
 		// 切换帖子点赞状态
-		toggleLike: (postId: string) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						post.isLiked = !post.isLiked
-						post.like_count += post.isLiked ? 1 : -1 // 同步更新点赞数
-					}
-				})
+		toggleLike: (postId: string) => set((state) => ({
+			posts: state.posts.map(post => 
+				post.id === postId ? {
+					...post,
+					isLiked: !post.isLiked,
+					like_count: post.like_count + (post.isLiked ? -1 : 1)
+				} : post
 			)
-		},
+		})),
 
 		// 切换帖子展开状态
-		toggleExpand: (postId: string) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						post.isExpanded = !post.isExpanded
-					}
-				})
+		toggleExpand: (postId: string) => set((state) => ({
+			posts: state.posts.map(post => 
+				post.id === postId ? { ...post, isExpanded: !post.isExpanded } : post
 			)
-		},
+		})),
 
 		// 添加评论到帖子
-		addComment: (postId: string, comment: AppFeedComment) => {
-			set(
-				produce((draft) => {
-					const post = draft.posts.find((p: AppFeedPost) => p.id === postId)
-					if (post) {
-						// 更新预加载评论
-						post.preloaded_comments = post.preloaded_comments || []
-						post.preloaded_comments.unshift(comment)
-
-						// 更新评论数量
-						post.comment_count = (post.comment_count || 0) + 1
-					}
-				})
+		addComment: (postId: string, comment: AppFeedComment) => set((state) => ({
+			posts: state.posts.map(post => 
+				post.id === postId ? {
+					...post,
+					preloaded_comments: [comment].concat(post.preloaded_comments || []),
+					comment_count: (post.comment_count || 0) + 1
+				} : post
 			)
-		},
+		})),
+
+		// 删除帖子
+		deletePost: (postId: string) => set((state) => ({
+			posts: state.posts.filter(post => post.id !== postId)
+		})),
 
 		// 设置评论输入弹窗状态
 		setCommentInputOpen: (isOpen: boolean) => {
 			if (!isOpen) {
-				// 关闭时记录时间戳
-				set({ isCommentInputOpen: isOpen, lastCommentCloseTime: Date.now() })
+				set({ isCommentInputOpen: isOpen, lastCommentCloseTime: Date.now() }) // 关闭时记录时间戳
 			} else {
 				set({ isCommentInputOpen: isOpen })
 			}
@@ -154,8 +117,7 @@ export const useFeedStore = create(
 				...post,
 				isExpanded: false, // 不持久化内容展开状态
 			})),
-			cursor: state.cursor,
-			// 不持久化弹窗状态
+			cursor: state.cursor, // 不持久化弹窗状态
 		}),
 	})
 )

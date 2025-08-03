@@ -14,14 +14,15 @@ interface FriendItemProps {
 /**
  * 好友项组件
  */
-export const FriendItem = ({ friend, isSelected, onClick }: FriendItemProps) => {
+export const FriendItem = (props: FriendItemProps) => {
+  const { friend, isSelected, onClick } = props
   // 格式化最后消息时间
   const formatLastMessageTime = (date: string) => {
     return formatDistanceToNow(new Date(date), { locale: zhCN, addSuffix: true })
   }
 
   return (
-    <div
+    <div data-slot="friend-item"
       className={cn(
         'flex items-center p-3 rounded-lg cursor-pointer transition-colors hover:bg-accent/50',
         isSelected && 'bg-accent'

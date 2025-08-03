@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CommentInputPopup } from '../comment/feed-comment-input-popup'
 import { feedUtil } from '../../core/feed-util'
 import { feedMgr } from '../../core/feed-mgr'
-import { feedCommentMgr } from '../../core/feed-comment-mgr'
 import { cn } from '@/lib/utils'
 import { useMemoizedFn } from 'ahooks'
 import { useMemo } from 'react'
@@ -22,12 +21,6 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 	const handleLike = useMemoizedFn((e: React.MouseEvent) => {
 		e.stopPropagation()
 		feedMgr.toggleLike(postId)
-	})
-
-	// 处理添加评论
-	const handleAddComment = useMemoizedFn((content: string, replyTo?: string) => {
-		// 直接调用 feedCommentMgr 添加评论
-		feedCommentMgr.addComment(postId, content, replyTo)
 	})
 
 	// 处理分享操作
@@ -68,7 +61,7 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 			</Button>
 
 			{/* 评论输入popover */}
-			<CommentInputPopup postId={postId} onAddComment={handleAddComment} replyTo={replyTo}>
+			<CommentInputPopup postId={postId} replyTo={replyTo}>
 				<Button variant="ghost" size="sm" className="h-8 px-2">
 					<MessageCircle className="h-4 w-4 mr-1" />
 					<span className="text-xs">{feedUtil.formatCount(commentCount)}</span>

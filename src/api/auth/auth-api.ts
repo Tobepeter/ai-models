@@ -28,7 +28,7 @@ class AuthApi {
 	// 退出登录
 	async logout() {
 		try {
-			await api.users.logoutCreate()
+			await api.users.logout()
 		} catch (e) {
 			console.error('Logout API call failed:', e)
 		} finally {

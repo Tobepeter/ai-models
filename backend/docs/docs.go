@@ -37,7 +37,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -84,13 +84,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.PaginationResponse"
+                                            "$ref": "#/definitions/models.PaginationResponse"
                                         }
                                     }
                                 }
@@ -123,13 +123,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                            "$ref": "#/definitions/models.UserResponse"
                                         }
                                     }
                                 }
@@ -160,7 +160,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -200,7 +200,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -240,7 +240,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -293,7 +293,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -324,7 +324,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.ChatRequest"
+                            "$ref": "#/definitions/models.ChatRequest"
                         }
                     }
                 ],
@@ -334,13 +334,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.ChatResponse"
+                                            "$ref": "#/definitions/models.ChatResponse"
                                         }
                                     }
                                 }
@@ -372,7 +372,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -380,7 +380,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/ai-models-backend_internal_models.ChatMessage"
+                                                "$ref": "#/definitions/models.ChatMessage"
                                             }
                                         }
                                     }
@@ -409,7 +409,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -429,7 +429,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.GenerateRequest"
+                            "$ref": "#/definitions/models.GenerateRequest"
                         }
                     }
                 ],
@@ -439,13 +439,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.GenerateResponse"
+                                            "$ref": "#/definitions/models.GenerateResponse"
                                         }
                                     }
                                 }
@@ -468,7 +468,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -476,7 +476,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/ai-models-backend_internal_models.AIModel"
+                                                "$ref": "#/definitions/models.AIModel"
                                             }
                                         }
                                     }
@@ -507,7 +507,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionRequest"
+                            "$ref": "#/definitions/models.OpenAIChatCompletionRequest"
                         }
                     }
                 ],
@@ -515,7 +515,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionResponse"
+                            "$ref": "#/definitions/models.OpenAIChatCompletionResponse"
                         }
                     }
                 }
@@ -559,7 +559,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -612,7 +612,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -642,7 +642,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudCreateRequest"
+                            "$ref": "#/definitions/models.CrudCreateRequest"
                         }
                     }
                 ],
@@ -652,13 +652,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                            "$ref": "#/definitions/models.CrudResponse"
                                         }
                                     }
                                 }
@@ -691,13 +691,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                            "$ref": "#/definitions/models.CrudResponse"
                                         }
                                     }
                                 }
@@ -727,7 +727,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudUpdateRequest"
+                            "$ref": "#/definitions/models.CrudUpdateRequest"
                         }
                     }
                 ],
@@ -737,13 +737,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.CrudResponse"
+                                            "$ref": "#/definitions/models.CrudResponse"
                                         }
                                     }
                                 }
@@ -774,7 +774,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -813,7 +813,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest"
+                            "$ref": "#/definitions/models.SetFeedCommentLikeRequest"
                         }
                     }
                 ],
@@ -823,13 +823,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.LikeResult"
+                                            "$ref": "#/definitions/models.LikeResult"
                                         }
                                     }
                                 }
@@ -888,13 +888,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPostResponse"
+                                            "$ref": "#/definitions/models.FeedPostResponse"
                                         }
                                     }
                                 }
@@ -917,7 +917,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.CreateFeedPostRequest"
+                            "$ref": "#/definitions/models.CreateFeedPostRequest"
                         }
                     }
                 ],
@@ -927,13 +927,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
+                                            "$ref": "#/definitions/models.FeedPost"
                                         }
                                     }
                                 }
@@ -966,17 +966,42 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedPost"
+                                            "$ref": "#/definitions/models.FeedPost"
                                         }
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除指定的帖子，需要登录且只能删除自己的帖子",
+                "tags": [
+                    "Feed"
+                ],
+                "summary": "删除帖子",
+                "operationId": "deleteFeedPost",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "帖子ID",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1025,13 +1050,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedCommentResponse"
+                                            "$ref": "#/definitions/models.FeedCommentResponse"
                                         }
                                     }
                                 }
@@ -1061,7 +1086,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.CreateFeedCommentRequest"
+                            "$ref": "#/definitions/models.CreateFeedCommentRequest"
                         }
                     }
                 ],
@@ -1071,13 +1096,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
+                                            "$ref": "#/definitions/models.FeedComment"
                                         }
                                     }
                                 }
@@ -1109,7 +1134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest"
+                            "$ref": "#/definitions/models.SetFeedPostLikeRequest"
                         }
                     }
                 ],
@@ -1119,13 +1144,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.LikeResult"
+                                            "$ref": "#/definitions/models.LikeResult"
                                         }
                                     }
                                 }
@@ -1154,13 +1179,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_handlers.RedisMetricsResponse"
+                                            "$ref": "#/definitions/handlers.RedisMetricsResponse"
                                         }
                                     }
                                 }
@@ -1185,7 +1210,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.DeleteFileRequest"
+                            "$ref": "#/definitions/models.DeleteFileRequest"
                         }
                     }
                 ],
@@ -1195,7 +1220,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1240,13 +1265,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FileListResponse"
+                                            "$ref": "#/definitions/models.FileListResponse"
                                         }
                                     }
                                 }
@@ -1271,7 +1296,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.HashifyNameRequest"
+                            "$ref": "#/definitions/models.HashifyNameRequest"
                         }
                     }
                 ],
@@ -1281,13 +1306,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.HashifyNameResponse"
+                                            "$ref": "#/definitions/models.HashifyNameResponse"
                                         }
                                     }
                                 }
@@ -1312,7 +1337,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.SignRequest"
+                            "$ref": "#/definitions/models.SignRequest"
                         }
                     }
                 ],
@@ -1322,13 +1347,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.SignResponse"
+                                            "$ref": "#/definitions/models.SignResponse"
                                         }
                                     }
                                 }
@@ -1353,7 +1378,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.SignRequest"
+                            "$ref": "#/definitions/models.SignRequest"
                         }
                     }
                 ],
@@ -1363,13 +1388,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.SignResponse"
+                                            "$ref": "#/definitions/models.SignResponse"
                                         }
                                     }
                                 }
@@ -1393,13 +1418,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.STSResponse"
+                                            "$ref": "#/definitions/models.STSResponse"
                                         }
                                     }
                                 }
@@ -1453,13 +1478,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.FileUploadResponse"
+                                            "$ref": "#/definitions/models.FileUploadResponse"
                                         }
                                     }
                                 }
@@ -1483,7 +1508,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.GetURLRequest"
+                            "$ref": "#/definitions/models.GetURLRequest"
                         }
                     }
                 ],
@@ -1493,13 +1518,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.GetURLResponse"
+                                            "$ref": "#/definitions/models.GetURLResponse"
                                         }
                                     }
                                 }
@@ -1550,7 +1575,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1589,7 +1614,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1635,7 +1660,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1686,7 +1711,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1731,7 +1756,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1770,7 +1795,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1821,7 +1846,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1851,7 +1876,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoCreateRequest"
+                            "$ref": "#/definitions/models.TodoCreateRequest"
                         }
                     }
                 ],
@@ -1861,13 +1886,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                            "$ref": "#/definitions/models.TodoResponse"
                                         }
                                     }
                                 }
@@ -1892,7 +1917,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoPositionUpdateRequest"
+                            "$ref": "#/definitions/models.TodoPositionUpdateRequest"
                         }
                     }
                 ],
@@ -1902,7 +1927,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1933,7 +1958,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -1964,7 +1989,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2004,13 +2029,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                            "$ref": "#/definitions/models.TodoResponse"
                                         }
                                     }
                                 }
@@ -2040,7 +2065,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoUpdateRequest"
+                            "$ref": "#/definitions/models.TodoUpdateRequest"
                         }
                     }
                 ],
@@ -2050,13 +2075,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                            "$ref": "#/definitions/models.TodoResponse"
                                         }
                                     }
                                 }
@@ -2087,7 +2112,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2127,13 +2152,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.TodoResponse"
+                                            "$ref": "#/definitions/models.TodoResponse"
                                         }
                                     }
                                 }
@@ -2158,7 +2183,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.ChangePasswordRequest"
+                            "$ref": "#/definitions/models.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -2168,7 +2193,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2215,7 +2240,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2246,7 +2271,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.UserLoginRequest"
+                            "$ref": "#/definitions/models.UserLoginRequest"
                         }
                     }
                 ],
@@ -2256,13 +2281,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserLoginResponse"
+                                            "$ref": "#/definitions/models.UserLoginResponse"
                                         }
                                     }
                                 }
@@ -2286,7 +2311,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -2317,13 +2342,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                            "$ref": "#/definitions/models.UserResponse"
                                         }
                                     }
                                 }
@@ -2333,13 +2358,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -2358,7 +2383,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.UserUpdateRequest"
+                            "$ref": "#/definitions/models.UserUpdateRequest"
                         }
                     }
                 ],
@@ -2368,13 +2393,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                                            "$ref": "#/definitions/models.UserResponse"
                                         }
                                     }
                                 }
@@ -2398,13 +2423,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.RefreshTokenResponse"
+                                            "$ref": "#/definitions/models.RefreshTokenResponse"
                                         }
                                     }
                                 }
@@ -2429,7 +2454,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ai-models-backend_internal_models.UserCreateRequest"
+                            "$ref": "#/definitions/models.UserCreateRequest"
                         }
                     }
                 ],
@@ -2439,13 +2464,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/ai-models-backend_pkg_response.Response"
+                                    "$ref": "#/definitions/response.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/ai-models-backend_internal_models.UserCreateResponse"
+                                            "$ref": "#/definitions/models.UserCreateResponse"
                                         }
                                     }
                                 }
@@ -2457,7 +2482,84 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "ai-models-backend_internal_models.AIModel": {
+        "handlers.RedisKeysInfo": {
+            "type": "object",
+            "properties": {
+                "comment_cache_keys": {
+                    "description": "评论缓存键数量",
+                    "type": "integer"
+                },
+                "expired_keys": {
+                    "description": "过期键数量",
+                    "type": "integer"
+                },
+                "total_keys": {
+                    "description": "总键数量",
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.RedisMemoryInfo": {
+            "type": "object",
+            "properties": {
+                "fragment_ratio": {
+                    "description": "内存碎片率",
+                    "type": "number"
+                },
+                "max_memory": {
+                    "description": "最大内存（字节）",
+                    "type": "integer"
+                },
+                "usage_percent": {
+                    "description": "使用百分比",
+                    "type": "number"
+                },
+                "used_memory": {
+                    "description": "已使用内存（字节）",
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.RedisMetricsResponse": {
+            "type": "object",
+            "properties": {
+                "keys": {
+                    "$ref": "#/definitions/handlers.RedisKeysInfo"
+                },
+                "memory": {
+                    "$ref": "#/definitions/handlers.RedisMemoryInfo"
+                },
+                "stats": {
+                    "$ref": "#/definitions/handlers.RedisStatsInfo"
+                }
+            }
+        },
+        "handlers.RedisStatsInfo": {
+            "type": "object",
+            "properties": {
+                "connected_clients": {
+                    "description": "连接的客户端数量",
+                    "type": "integer"
+                },
+                "hit_rate": {
+                    "description": "缓存命中率",
+                    "type": "number"
+                },
+                "keyspace_hits": {
+                    "description": "缓存命中次数",
+                    "type": "integer"
+                },
+                "keyspace_misses": {
+                    "description": "缓存未命中次数",
+                    "type": "integer"
+                },
+                "miss_rate": {
+                    "description": "缓存未命中率",
+                    "type": "number"
+                }
+            }
+        },
+        "models.AIModel": {
             "type": "object",
             "properties": {
                 "capabilities": {
@@ -2489,7 +2591,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.ChangePasswordRequest": {
+        "models.ChangePasswordRequest": {
             "type": "object",
             "required": [
                 "new_password",
@@ -2505,7 +2607,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.ChatMessage": {
+        "models.ChatMessage": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2522,7 +2624,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.ChatRequest": {
+        "models.ChatRequest": {
             "type": "object",
             "required": [
                 "message"
@@ -2539,7 +2641,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.ChatResponse": {
+        "models.ChatResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -2555,11 +2657,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "usage": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.Usage"
+                    "$ref": "#/definitions/models.Usage"
                 }
             }
         },
-        "ai-models-backend_internal_models.CreateFeedCommentRequest": {
+        "models.CreateFeedCommentRequest": {
             "type": "object",
             "required": [
                 "content"
@@ -2577,7 +2679,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.CreateFeedPostRequest": {
+        "models.CreateFeedPostRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2591,7 +2693,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.CrudCreateRequest": {
+        "models.CrudCreateRequest": {
             "type": "object",
             "required": [
                 "data"
@@ -2606,7 +2708,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.CrudResponse": {
+        "models.CrudResponse": {
             "type": "object",
             "properties": {
                 "category": {
@@ -2626,7 +2728,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.CrudUpdateRequest": {
+        "models.CrudUpdateRequest": {
             "type": "object",
             "required": [
                 "data"
@@ -2641,7 +2743,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.DeleteFileRequest": {
+        "models.DeleteFileRequest": {
             "type": "object",
             "required": [
                 "object_key"
@@ -2652,7 +2754,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FeedComment": {
+        "models.FeedComment": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -2694,13 +2796,13 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FeedCommentResponse": {
+        "models.FeedCommentResponse": {
             "type": "object",
             "properties": {
                 "comments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
+                        "$ref": "#/definitions/models.FeedComment"
                     }
                 },
                 "has_more": {
@@ -2714,7 +2816,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FeedPost": {
+        "models.FeedPost": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -2762,7 +2864,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FeedPostResponse": {
+        "models.FeedPostResponse": {
             "type": "object",
             "properties": {
                 "has_more": {
@@ -2774,12 +2876,12 @@ const docTemplate = `{
                 "posts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedPostResponseItem"
+                        "$ref": "#/definitions/models.FeedPostResponseItem"
                     }
                 }
             }
         },
-        "ai-models-backend_internal_models.FeedPostResponseItem": {
+        "models.FeedPostResponseItem": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -2815,7 +2917,7 @@ const docTemplate = `{
                     "description": "预载评论列表",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
+                        "$ref": "#/definitions/models.FeedComment"
                     }
                 },
                 "preloaded_comments_next_cursor": {
@@ -2842,7 +2944,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FileInfo": {
+        "models.FileInfo": {
             "type": "object",
             "properties": {
                 "last_modified": {
@@ -2862,13 +2964,13 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FileListResponse": {
+        "models.FileListResponse": {
             "type": "object",
             "properties": {
                 "files": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.FileInfo"
+                        "$ref": "#/definitions/models.FileInfo"
                     }
                 },
                 "is_truncated": {
@@ -2879,7 +2981,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.FileUploadResponse": {
+        "models.FileUploadResponse": {
             "type": "object",
             "properties": {
                 "hashify_name": {
@@ -2903,7 +3005,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.GenerateRequest": {
+        "models.GenerateRequest": {
             "type": "object",
             "required": [
                 "prompt"
@@ -2921,7 +3023,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.GenerateResponse": {
+        "models.GenerateResponse": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2937,11 +3039,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "usage": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.Usage"
+                    "$ref": "#/definitions/models.Usage"
                 }
             }
         },
-        "ai-models-backend_internal_models.GetURLRequest": {
+        "models.GetURLRequest": {
             "type": "object",
             "required": [
                 "object_key"
@@ -2952,7 +3054,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.GetURLResponse": {
+        "models.GetURLResponse": {
             "type": "object",
             "properties": {
                 "object_key": {
@@ -2963,7 +3065,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.HashifyNameRequest": {
+        "models.HashifyNameRequest": {
             "type": "object",
             "required": [
                 "file_name"
@@ -2974,7 +3076,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.HashifyNameResponse": {
+        "models.HashifyNameResponse": {
             "type": "object",
             "properties": {
                 "hashify_name": {
@@ -2982,7 +3084,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.LikeResult": {
+        "models.LikeResult": {
             "type": "object",
             "properties": {
                 "changed": {
@@ -2995,7 +3097,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.OpenAIChatCompletionRequest": {
+        "models.OpenAIChatCompletionRequest": {
             "type": "object",
             "required": [
                 "messages",
@@ -3008,7 +3110,7 @@ const docTemplate = `{
                 "messages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIMessage"
+                        "$ref": "#/definitions/models.OpenAIMessage"
                     }
                 },
                 "model": {
@@ -3028,13 +3130,13 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.OpenAIChatCompletionResponse": {
+        "models.OpenAIChatCompletionResponse": {
             "type": "object",
             "properties": {
                 "choices": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIChoice"
+                        "$ref": "#/definitions/models.OpenAIChoice"
                     }
                 },
                 "created": {
@@ -3050,11 +3152,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "usage": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIUsage"
+                    "$ref": "#/definitions/models.OpenAIUsage"
                 }
             }
         },
-        "ai-models-backend_internal_models.OpenAIChoice": {
+        "models.OpenAIChoice": {
             "type": "object",
             "properties": {
                 "finish_reason": {
@@ -3064,11 +3166,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "message": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.OpenAIMessage"
+                    "$ref": "#/definitions/models.OpenAIMessage"
                 }
             }
         },
-        "ai-models-backend_internal_models.OpenAIMessage": {
+        "models.OpenAIMessage": {
             "type": "object",
             "required": [
                 "content",
@@ -3083,7 +3185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.OpenAIUsage": {
+        "models.OpenAIUsage": {
             "type": "object",
             "properties": {
                 "completion_tokens": {
@@ -3097,7 +3199,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.Pagination": {
+        "models.Pagination": {
             "type": "object",
             "properties": {
                 "current": {
@@ -3111,7 +3213,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.PaginationResponse": {
+        "models.PaginationResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3119,11 +3221,11 @@ const docTemplate = `{
                     "items": {}
                 },
                 "pagination": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.Pagination"
+                    "$ref": "#/definitions/models.Pagination"
                 }
             }
         },
-        "ai-models-backend_internal_models.RefreshTokenResponse": {
+        "models.RefreshTokenResponse": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -3135,7 +3237,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.STSCredentials": {
+        "models.STSCredentials": {
             "type": "object",
             "properties": {
                 "AccessKeyId": {
@@ -3153,15 +3255,15 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.STSResponse": {
+        "models.STSResponse": {
             "type": "object",
             "properties": {
                 "credentials": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.STSCredentials"
+                    "$ref": "#/definitions/models.STSCredentials"
                 }
             }
         },
-        "ai-models-backend_internal_models.SetFeedCommentLikeRequest": {
+        "models.SetFeedCommentLikeRequest": {
             "type": "object",
             "required": [
                 "is_like"
@@ -3173,7 +3275,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.SetFeedPostLikeRequest": {
+        "models.SetFeedPostLikeRequest": {
             "type": "object",
             "required": [
                 "is_like"
@@ -3185,7 +3287,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.SignRequest": {
+        "models.SignRequest": {
             "type": "object",
             "properties": {
                 "file_name": {
@@ -3206,7 +3308,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.SignResponse": {
+        "models.SignResponse": {
             "type": "object",
             "properties": {
                 "object_key": {
@@ -3217,7 +3319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.TodoCreateRequest": {
+        "models.TodoCreateRequest": {
             "type": "object",
             "required": [
                 "title"
@@ -3245,7 +3347,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.TodoPositionItem": {
+        "models.TodoPositionItem": {
             "type": "object",
             "required": [
                 "id",
@@ -3262,7 +3364,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.TodoPositionUpdateRequest": {
+        "models.TodoPositionUpdateRequest": {
             "type": "object",
             "required": [
                 "items"
@@ -3272,12 +3374,12 @@ const docTemplate = `{
                     "description": "必填，dive验证数组元素",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ai-models-backend_internal_models.TodoPositionItem"
+                        "$ref": "#/definitions/models.TodoPositionItem"
                     }
                 }
             }
         },
-        "ai-models-backend_internal_models.TodoResponse": {
+        "models.TodoResponse": {
             "type": "object",
             "properties": {
                 "completed": {
@@ -3309,7 +3411,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.TodoUpdateRequest": {
+        "models.TodoUpdateRequest": {
             "type": "object",
             "properties": {
                 "completed": {
@@ -3338,7 +3440,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.Usage": {
+        "models.Usage": {
             "type": "object",
             "properties": {
                 "completion_tokens": {
@@ -3352,7 +3454,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.UserCreateRequest": {
+        "models.UserCreateRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -3374,7 +3476,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.UserCreateResponse": {
+        "models.UserCreateResponse": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -3385,11 +3487,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                    "$ref": "#/definitions/models.UserResponse"
                 }
             }
         },
-        "ai-models-backend_internal_models.UserLoginRequest": {
+        "models.UserLoginRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -3404,7 +3506,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.UserLoginResponse": {
+        "models.UserLoginResponse": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -3415,11 +3517,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/ai-models-backend_internal_models.UserResponse"
+                    "$ref": "#/definitions/models.UserResponse"
                 }
             }
         },
-        "ai-models-backend_internal_models.UserResponse": {
+        "models.UserResponse": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -3460,7 +3562,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_internal_models.UserUpdateRequest": {
+        "models.UserUpdateRequest": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -3485,7 +3587,7 @@ const docTemplate = `{
                 }
             }
         },
-        "ai-models-backend_pkg_response.Response": {
+        "response.Response": {
             "type": "object",
             "properties": {
                 "code": {
@@ -3494,83 +3596,6 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "internal_handlers.RedisKeysInfo": {
-            "type": "object",
-            "properties": {
-                "comment_cache_keys": {
-                    "description": "评论缓存键数量",
-                    "type": "integer"
-                },
-                "expired_keys": {
-                    "description": "过期键数量",
-                    "type": "integer"
-                },
-                "total_keys": {
-                    "description": "总键数量",
-                    "type": "integer"
-                }
-            }
-        },
-        "internal_handlers.RedisMemoryInfo": {
-            "type": "object",
-            "properties": {
-                "fragment_ratio": {
-                    "description": "内存碎片率",
-                    "type": "number"
-                },
-                "max_memory": {
-                    "description": "最大内存（字节）",
-                    "type": "integer"
-                },
-                "usage_percent": {
-                    "description": "使用百分比",
-                    "type": "number"
-                },
-                "used_memory": {
-                    "description": "已使用内存（字节）",
-                    "type": "integer"
-                }
-            }
-        },
-        "internal_handlers.RedisMetricsResponse": {
-            "type": "object",
-            "properties": {
-                "keys": {
-                    "$ref": "#/definitions/internal_handlers.RedisKeysInfo"
-                },
-                "memory": {
-                    "$ref": "#/definitions/internal_handlers.RedisMemoryInfo"
-                },
-                "stats": {
-                    "$ref": "#/definitions/internal_handlers.RedisStatsInfo"
-                }
-            }
-        },
-        "internal_handlers.RedisStatsInfo": {
-            "type": "object",
-            "properties": {
-                "connected_clients": {
-                    "description": "连接的客户端数量",
-                    "type": "integer"
-                },
-                "hit_rate": {
-                    "description": "缓存命中率",
-                    "type": "number"
-                },
-                "keyspace_hits": {
-                    "description": "缓存命中次数",
-                    "type": "integer"
-                },
-                "keyspace_misses": {
-                    "description": "缓存未命中次数",
-                    "type": "integer"
-                },
-                "miss_rate": {
-                    "description": "缓存未命中率",
-                    "type": "number"
                 }
             }
         }

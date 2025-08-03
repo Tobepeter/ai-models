@@ -203,6 +203,54 @@ func (s *FeedService) GetFeedPostByID(postID string) (*models.FeedPost, error) {
 	return &post, nil
 }
 
+// DeleteFeedPost 删除帖子
+func (s *FeedService) DeleteFeedPost(userID uint64, postID string) error {
+	postIDUint, err := s.ParseStringToUint64(postID)
+	if err != nil {
+		return err
+	}
+
+	// 检查帖子是否存在并且是否属于当前用户
+	var post models.FeedPost
+	if err := s.DB.Where("id = ?", postIDUint).First(&post).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("post not found")
+		}
+		return err
+	}
+
+	// 检查权限 - 只能删除自己的帖子
+	if post.UserID != userID {
+		return errors.New("permission denied")
+	}
+
+	// 使用事务删除帖子及其相关数据
+	return s.DB.Transaction(func(tx *gorm.DB) error {
+		// 删除相关的评论点赞记录
+		if err := tx.Where("comment_id IN (SELECT id FROM feed_comments WHERE post_id = ?)", postIDUint).
+			Delete(&models.FeedCommentLike{}).Error; err != nil {
+			return err
+		}
+
+		// 删除相关的评论
+		if err := tx.Where("post_id = ?", postIDUint).Delete(&models.FeedComment{}).Error; err != nil {
+			return err
+		}
+
+		// 删除相关的点赞记录
+		if err := tx.Where("post_id = ?", postIDUint).Delete(&models.PostLike{}).Error; err != nil {
+			return err
+		}
+
+		// 删除帖子本身
+		if err := tx.Delete(&post).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 // SetFeedPostLike 设置信息流帖子点赞状态
 func (s *FeedService) SetFeedPostLike(userID uint64, postID string, isLike bool) (*models.LikeResult, error) {
 	postIDUint, err := s.ParseStringToUint64(postID)

@@ -3,7 +3,7 @@ import { JwtPayloadApp, jwt } from '@/utils/jwt'
 import { storageKeys } from '@/utils/storage'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import type { UserResponse } from '@/api/swagger/generated'
+import type { UserCreateResponse, UserResponse } from '@/api/swagger/generated'
 
 export const userState = {
 	info: {
@@ -134,7 +134,7 @@ const stateCreator = () => {
 			persistData(get())
 		},
 		// 处理登录响应，自动设置token和refreshToken
-		handleAuthResponse: (authData: { user: UserResponse; token: string; refresh_token?: string }) => {
+		handleAuthResponse: (authData: UserCreateResponse) => {
 			const newState = {
 				info: authData.user,
 				token: authData.token,

@@ -5,28 +5,27 @@ import { Flag, Trash2, MoreHorizontal, ExternalLink } from 'lucide-react'
 import { feedUtil } from '../../core/feed-util'
 import { cn } from '@/lib/utils'
 import { notify } from '@/components/common/notify'
+import { feedMgr } from '../../core/feed-mgr'
 
 /**
  * 信息流头部组件 - 显示用户头像、用户名、状态和时间
  */
 export const FeedItemHeader = (props: FeedItemHeaderProps) => {
-	const { userId, username, avatar, status, createdAt, showNavigateButton, onNavigateToPage, className } = props
+	const { postId, userId, username, avatar, status, createdAt, showNavigateButton, onNavigateToPage, className } = props
 
 	// 删除操作处理
-	const handleDelete = () => {
-		notify.confirm({
-			title: '确认删除',
-			description: '此操作将永久删除该帖子，是否继续？',
-			confirmText: '删除',
-			cancelText: '取消',
-			onConfirm: () => {
-				console.log('删除帖子:', userId)
-				notify.success('帖子已删除')
-			},
-			onCancel: () => {
-				console.log('取消删除操作')
-			},
-		})
+	const handleDelete = async () => {
+		try {
+			await feedMgr.deletePost(postId)
+			notify.success('帖子已删除')
+		} catch (error) {
+			console.error('删除帖子失败:', error)
+		}
+	}
+
+	// 举报操作处理
+	const handleReport = () => {
+		notify.info('暂无举报功能，你可以直接删除帖子')
 	}
 
 	// 更多操作配置
@@ -35,7 +34,7 @@ export const FeedItemHeader = (props: FeedItemHeaderProps) => {
 			key: 'report',
 			label: '举报',
 			icon: Flag,
-			onClick: () => console.log('举报用户:', userId),
+			onClick: handleReport,
 		},
 		{
 			key: 'delete',
@@ -111,6 +110,7 @@ export const FeedItemHeader = (props: FeedItemHeaderProps) => {
 }
 
 export interface FeedItemHeaderProps {
+	postId: string
 	userId: string
 	username: string
 	avatar: string

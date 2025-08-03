@@ -602,6 +602,8 @@ export type CreateFeedPostData = Response<FeedPost>;
 
 export type GetFeedPostDetailData = Response<FeedPost>;
 
+export type DeleteFeedPostData = Response;
+
 export interface GetFeedCommentsParams {
   /** cursor分页的after_id */
   after_id?: string;
@@ -1334,6 +1336,21 @@ export class Api<
       this.request<GetFeedPostDetailData, any>({
         path: `/feed/posts/${postId}`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * @description 删除指定的帖子，需要登录且只能删除自己的帖子
+     *
+     * @tags Feed
+     * @name DeleteFeedPost
+     * @summary 删除帖子
+     * @request DELETE:/feed/posts/{post_id}
+     */
+    deleteFeedPost: (postId: string, params: RequestParams = {}) =>
+      this.request<DeleteFeedPostData, any>({
+        path: `/feed/posts/${postId}`,
+        method: "DELETE",
         ...params,
       }),
 

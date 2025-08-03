@@ -15,39 +15,25 @@ import { cn } from '@/lib/utils'
  */
 export const FeedItem = memo((props: FeedItemProps) => {
 	const { post, className } = props
-	const { id, user_id, username, avatar, status, created_at, content, is_expanded: isExpanded, image_url, like_count, comment_count, is_liked: isLiked, preloaded_comments } = post
+	const { id, user_id, username, avatar, status, created_at, content, isExpanded, image_url, like_count, comment_count, is_liked: isLiked, preloaded_comments } = post
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
 
-	// 处理查看更多评论
-	const handleViewMore = () => {
-		// 处理查看更多
-		if (isMobile) {
-			// 移动端直接跳转详情页
-			navigate(`/feed/${id}`)
-		} else {
-			// PC端打开弹窗
-			feedDetailMgr.openDialog(id)
-		}
-	}
-
-	// 点击内容区域打开详情
-	const handleContentClick = () => {
-		// 点击内容区域打开详情
+	const navDetail = () => {
 		if (isMobile) {
 			navigate(`/feed/${id}`) // 移动端直接跳转详情页
 		} else {
-			feedDetailMgr.openDialog(id) // PC端打开弹窗
+			feedDetailMgr.openDialog(id)
 		}
 	}
 
 	return (
 		<article className={cn('bg-card', className)} data-slot="feed-item">
 			{/* 整个帖子区域都可点击 */}
-			<div className="relative rounded-lg border border-transparent cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50" onClick={handleContentClick}>
+			<div className="relative rounded-lg border border-transparent cursor-pointer hover:bg-accent/50 hover:shadow-sm transition-all duration-200 hover:border-border/50" onClick={navDetail}>
 				{/* post内容 */}
 				<div className="p-4">
-					<FeedItemHeader userId={user_id} username={username} avatar={avatar} status={status} createdAt={created_at} className="mb-3" />
+					<FeedItemHeader postId={id} userId={user_id} username={username} avatar={avatar} status={status} createdAt={created_at} className="mb-3" />
 					{content && <FeedText postId={id} content={content} isExpanded={isExpanded} className="mb-3" />}
 					{image_url && <FeedItemImage src={image_url} className="mb-3" />}
 				</div>
@@ -60,7 +46,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 
 			{/* 评论列表 - 独立区域，不触发弹窗 */}
 			<div className="px-4 pb-4">
-				<FeedCommentList postId={id} comments={preloaded_comments} onViewMore={handleViewMore} />
+				<FeedCommentList postId={id} comments={preloaded_comments} onViewMore={navDetail} />
 			</div>
 		</article>
 	)

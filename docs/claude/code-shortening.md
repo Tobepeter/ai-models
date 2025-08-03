@@ -6,3 +6,4 @@
 - genreate -> gen
 - manager -> mgr
 - message -> msg
+- navigate -> nav

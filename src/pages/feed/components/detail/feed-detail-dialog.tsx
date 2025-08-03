@@ -14,12 +14,7 @@ export const FeedDetailDialog = () => {
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
 
-	const {
-		isDialogOpen,
-		dialogPostId,
-		currentPost,
-		closeDialog,
-	} = useFeedDetailStore()
+	const { isDialogOpen, dialogPostId, closeDialog } = useFeedDetailStore()
 
 	// 处理弹窗关闭
 	const handleClose = () => {
@@ -31,7 +26,6 @@ export const FeedDetailDialog = () => {
 		handleClose()
 		navigate(`/feed/${postId}`)
 	}
-
 
 	// 键盘事件处理
 	useEffect(() => {
@@ -69,12 +63,7 @@ export const FeedDetailDialog = () => {
 					<DialogDescription>查看帖子详情和评论</DialogDescription>
 				</DialogHeader>
 
-				<FeedDetailContent 
-					post={currentPost} 
-					showNavigateButton={true} 
-					onNavigateToPage={handleNavigateToPage} 
-					className={detailContentClass} 
-				/>
+				<FeedDetailContent postId={dialogPostId} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} className={detailContentClass} />
 			</DialogContent>
 		</Dialog>
 	)

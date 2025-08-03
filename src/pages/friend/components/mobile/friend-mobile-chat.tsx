@@ -13,7 +13,8 @@ interface FriendMobileChatPageProps {
 /**
  * 移动端聊天页面
  */
-export const FriendMobileChatPage = ({ friendId }: FriendMobileChatPageProps) => {
+export const FriendMobileChatPage = (props: FriendMobileChatPageProps) => {
+  const { friendId } = props
   const currentFriend = friendMgr.getCurrentFriend()
 
   const handleBack = () => {
@@ -35,7 +36,7 @@ export const FriendMobileChatPage = ({ friendId }: FriendMobileChatPageProps) =>
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div data-slot="friend-mobile-chat-page" className="h-full flex flex-col">
       {/* 移动端头部（包含返回按钮） */}
       <div className="flex items-center p-4 border-b bg-background">
         <Button variant="ghost" size="sm" onClick={handleBack} className="mr-2">

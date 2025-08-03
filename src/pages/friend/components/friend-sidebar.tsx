@@ -14,14 +14,15 @@ interface FriendSidebarProps {
 /**
  * 好友侧边栏组件
  */
-export const FriendSidebar = ({ className }: FriendSidebarProps) => {
+export const FriendSidebar = (props: FriendSidebarProps) => {
+  const { className } = props
   const store = useFriendStore()
-  
+
   // 未读总数
   const totalUnread = store.friends.reduce((sum, friend) => sum + friend.unread_count, 0)
 
   return (
-    <div className={cn('w-60 border-r bg-background flex flex-col', className)}>
+    <div data-slot="friend-sidebar" className={cn('w-60 border-r bg-background flex flex-col', className)}>
       {/* 头部 */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">

@@ -73,7 +73,7 @@ class FeedMock {
 			comment_count: totalComments,
 			preloaded_comments: preloadedComments,
 			is_liked: datatype.boolean({ probability: 0.3 }),
-			is_expanded: false,
+			isExpanded: false,
 		} as AppFeedPost & { preloaded_comments_cursor?: string } // 临时类型扩展
 
 		// 添加mock字段
@@ -100,7 +100,7 @@ class FeedMock {
 			comment_count: 0,
 			preloaded_comments: [],
 			is_liked: false,
-			is_expanded: false,
+			isExpanded: false,
 		}
 	}
 

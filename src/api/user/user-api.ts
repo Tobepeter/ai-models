@@ -24,7 +24,7 @@ class UserApi {
 
 	// 更新密码
 	async updatePassword(data: ChangePasswordRequest) {
-		const res = await api.users.changePasswordCreate(data)
+		const res = await api.users.changePassword(data)
 		if (!res) return false
 		return true
 	}

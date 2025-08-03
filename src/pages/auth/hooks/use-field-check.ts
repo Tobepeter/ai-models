@@ -28,7 +28,7 @@ export const useFieldCheck = () => {
 		stateRef.current.isChecking = true
 
 		try {
-			const result = await api.users.checkFieldList(
+			const result = await api.users.checkUserField(
 				{ field, value },
 				{ silent: true } // 静默模式，不显示错误toast
 			)

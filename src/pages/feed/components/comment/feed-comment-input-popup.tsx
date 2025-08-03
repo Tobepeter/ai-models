@@ -2,16 +2,17 @@ import { UserAvatar } from '@/components/common/user-avatar'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
-import { Send, X } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { useState, useEffect, useRef, type PropsWithChildren } from 'react'
 import { useFeedStore } from '../../feed-store'
 import { useUserStore } from '@/store/user-store'
+import { feedCommentMgr } from '../../core/feed-comment-mgr'
 
 /**
  * 评论输入弹窗组件 - 使用 Popover
  */
 export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProps>) => {
-	const { onAddComment, replyTo, className, children } = props
+	const { postId, replyTo, className, children } = props
 	const { setCommentInputOpen } = useFeedStore()
 	const { info: userInfo } = useUserStore() // 获取当前用户信息
 	const [isOpen, setIsOpen] = useState(false)
@@ -20,18 +21,19 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
 	// 获取保护区域长度
-	// 获取保护区域长度
 	const getProtectedLength = () => (replyTo ? `@${replyTo} `.length : 0)
 
 	// 监听内容变化，确保回复模式下光标位置正确
 	useEffect(() => {
-		if (isOpen && replyTo && textareaRef.current) {
-			const textarea = textareaRef.current
+		if (isOpen && replyTo) {
 			const atMention = `@${replyTo} `
 
 			// 如果内容刚刚设置为@username，将光标移动到末尾
 			if (content === atMention) {
 				setTimeout(() => {
+					// NOTE: 取巧办法，因为 textarea 也是延迟一个tick获取的，或限制性 useEffect
+					const textarea = textareaRef.current
+					if (!textarea) return
 					textarea.setSelectionRange(atMention.length, atMention.length)
 					textarea.focus()
 				}, 0)
@@ -92,7 +94,16 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 
 		setIsSubmitting(true)
 		try {
-			onAddComment(content.trim(), replyTo)
+			// 如果是回复模式，移除内容开头的@用户名前缀，避免双重艾特
+			let cleanContent = content.trim()
+			if (replyTo) {
+				const atMention = `@${replyTo} `
+				if (cleanContent.startsWith(atMention)) {
+					cleanContent = cleanContent.substring(atMention.length)
+				}
+			}
+
+			feedCommentMgr.addComment(postId, cleanContent, replyTo)
 			changeIsOpen(false)
 		} finally {
 			setIsSubmitting(false)
@@ -164,10 +175,15 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 
 	const displayPlaceholder = replyTo ? `回复 ${replyTo}...` : '写下你的想法...'
 
+	// 阻止事件冒泡，防止触发父级的详情页跳转
+	const handleTriggerClick = (e: React.MouseEvent) => {
+		e.stopPropagation()
+	}
+
 	return (
 		<Popover open={isOpen} onOpenChange={changeIsOpen}>
 			<PopoverTrigger asChild>
-				<div className={className}>{children}</div>
+				<div className={className} onClick={handleTriggerClick}>{children}</div>
 			</PopoverTrigger>
 
 			{/* 弹窗内容 */}
@@ -216,7 +232,6 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 
 export interface CommentInputPopupProps {
 	postId: string
-	onAddComment: (content: string, replyTo?: string) => void
 	replyTo?: string
 	className?: string
 }

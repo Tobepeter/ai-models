@@ -5,5 +5,6 @@ export interface AppFeedComment extends FeedComment {
 }
 
 export interface AppFeedPost extends FeedPostResponseItem {
-	is_expanded?: boolean // 前端特有：长内容展开状态
+	isExpanded?: boolean // 前端特有：长内容展开状态
+	isLiked?: boolean // 前端特有：是否已点赞
 }

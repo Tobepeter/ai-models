@@ -10,63 +10,63 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// seedCoreUsers 创建核心测试用户（固定数据，方便测试）
-func (s *SeedManager) seedCoreUsers() ([]models.User, error) {
+// seedTestUsers 创建测试用户（明确标记的测试数据）
+func (s *SeedManager) seedTestUsers() ([]models.User, error) {
 	// 生成固定的测试密码
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	coreUsers := []models.User{
+	testUsers := []models.User{
 		{
-			Username:      "张三",
-			Email:         "zhangsan@test.com",
+			Username:      "test_user1",
+			Email:         "test_user1@test.com",
 			Password:      string(hashedPassword),
 			PlainPassword: "123456",
-			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangsan",
-			Status:        "😊 今天心情不错",
+			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=test_user1",
+			Status:        "😊 测试用户1",
 			Role:          models.RoleUser,
 			IsActive:      true,
 		},
 		{
-			Username:      "李四",
-			Email:         "lisi@test.com",
+			Username:      "test_user2",
+			Email:         "test_user2@test.com",
 			Password:      string(hashedPassword),
 			PlainPassword: "123456",
-			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=lisi",
-			Status:        "🎉 在学习新技术",
+			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=test_user2",
+			Status:        "🎉 测试用户2",
 			Role:          models.RoleUser,
 			IsActive:      true,
 		},
 		{
-			Username:      "王五",
-			Email:         "wangwu@test.com",
+			Username:      "test_user3",
+			Email:         "test_user3@test.com",
 			Password:      string(hashedPassword),
 			PlainPassword: "123456",
-			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=wangwu",
-			Status:        "💼 专注工作中",
+			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=test_user3",
+			Status:        "💼 测试用户3",
 			Role:          models.RoleUser,
 			IsActive:      true,
 		},
 		{
-			Username:      "赵六",
-			Email:         "zhaoliu@test.com",
+			Username:      "test_user4",
+			Email:         "test_user4@test.com",
 			Password:      string(hashedPassword),
 			PlainPassword: "123456",
-			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=zhaoliu",
-			Status:        "🚀 追求进步",
-			Role:          models.RoleUser, // 普通用户
+			Avatar:        "https://api.dicebear.com/7.x/avataaars/svg?seed=test_user4",
+			Status:        "🚀 测试用户4",
+			Role:          models.RoleUser,
 			IsActive:      true,
 		},
 	}
 
 	// 批量创建用户
-	if err := DB.Create(&coreUsers).Error; err != nil {
+	if err := DB.Create(&testUsers).Error; err != nil {
 		return nil, err
 	}
 
-	return coreUsers, nil
+	return testUsers, nil
 }
 
 // seedRandomUsers 创建随机用户（模拟真实环境）

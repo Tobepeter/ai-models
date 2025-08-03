@@ -11,9 +11,10 @@ interface FriendChatHeaderProps {
 /**
  * 聊天头部组件
  */
-export const FriendChatHeader = ({ friend }: FriendChatHeaderProps) => {
+export const FriendChatHeader = (props: FriendChatHeaderProps) => {
+  const { friend } = props
   return (
-    <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div data-slot="friend-chat-header" className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center space-x-3">
         <div className="relative">
           <Avatar className="w-10 h-10">

@@ -13,7 +13,8 @@ interface FriendMessageItemProps {
 /**
  * 消息项组件
  */
-export const FriendMessageItem = ({ message }: FriendMessageItemProps) => {
+export const FriendMessageItem = (props: FriendMessageItemProps) => {
+  const { message } = props
   const isOwn = message.sender_id === 'current_user' // 临时判断，实际应该用真实用户ID
   
   // 消息状态图标
@@ -47,7 +48,7 @@ export const FriendMessageItem = ({ message }: FriendMessageItemProps) => {
   }
 
   return (
-    <div className={cn('flex gap-3', isOwn && 'flex-row-reverse')}>
+    <div data-slot="friend-message-item" className={cn('flex gap-3', isOwn && 'flex-row-reverse')}>
       {/* 头像 */}
       {!isOwn && (
         <UserAvatar 

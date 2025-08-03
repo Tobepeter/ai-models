@@ -147,8 +147,8 @@ class FeedMgr {
 
 			// 同步更新详情页（如果当前详情页是这个post）
 			const detailStore = useFeedDetailStore.getState()
-			if (detailStore.currentPost?.id === postId) {
-				detailStore.toggleCurrentPostLike()
+			if (detailStore.currPost?.id === postId) {
+				detailStore.toggleCurrPostLike()
 			}
 
 			if (this.mockMode) {
@@ -225,6 +225,30 @@ class FeedMgr {
 		} finally {
 			store.setLoading(false)
 			this.loadTimer = null
+		}
+	}
+
+	// 删除帖子
+	async deletePost(postId: string) {
+		const store = useFeedStore.getState()
+
+		// 乐观删除
+		store.deletePost(postId)
+
+		// 同步删除详情页（如果当前详情页是这个post）
+		const detailStore = useFeedDetailStore.getState()
+		if (detailStore.currPost?.id === postId) {
+			detailStore.closeDialog()
+		}
+
+		if (this.mockMode) {
+			// Mock模式延迟
+			await delayC(feedMock.getLoadMoreDelay())
+			console.log(`[feedMgr] Mock删除feed成功: ${postId}`)
+		} else {
+			// 调用真实API删除
+			await api.feed.deleteFeedPost(postId)
+			console.log(`[feedMgr] 删除feed成功: ${postId}`)
 		}
 	}
 

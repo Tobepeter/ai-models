@@ -1,6 +1,60 @@
 basePath: /
 definitions:
-  ai-models-backend_internal_models.AIModel:
+  handlers.RedisKeysInfo:
+    properties:
+      comment_cache_keys:
+        description: 评论缓存键数量
+        type: integer
+      expired_keys:
+        description: 过期键数量
+        type: integer
+      total_keys:
+        description: 总键数量
+        type: integer
+    type: object
+  handlers.RedisMemoryInfo:
+    properties:
+      fragment_ratio:
+        description: 内存碎片率
+        type: number
+      max_memory:
+        description: 最大内存（字节）
+        type: integer
+      usage_percent:
+        description: 使用百分比
+        type: number
+      used_memory:
+        description: 已使用内存（字节）
+        type: integer
+    type: object
+  handlers.RedisMetricsResponse:
+    properties:
+      keys:
+        $ref: '#/definitions/handlers.RedisKeysInfo'
+      memory:
+        $ref: '#/definitions/handlers.RedisMemoryInfo'
+      stats:
+        $ref: '#/definitions/handlers.RedisStatsInfo'
+    type: object
+  handlers.RedisStatsInfo:
+    properties:
+      connected_clients:
+        description: 连接的客户端数量
+        type: integer
+      hit_rate:
+        description: 缓存命中率
+        type: number
+      keyspace_hits:
+        description: 缓存命中次数
+        type: integer
+      keyspace_misses:
+        description: 缓存未命中次数
+        type: integer
+      miss_rate:
+        description: 缓存未命中率
+        type: number
+    type: object
+  models.AIModel:
     properties:
       capabilities:
         items:
@@ -21,7 +75,7 @@ definitions:
       type:
         type: string
     type: object
-  ai-models-backend_internal_models.ChangePasswordRequest:
+  models.ChangePasswordRequest:
     properties:
       new_password:
         minLength: 6
@@ -32,7 +86,7 @@ definitions:
     - new_password
     - old_password
     type: object
-  ai-models-backend_internal_models.ChatMessage:
+  models.ChatMessage:
     properties:
       content:
         type: string
@@ -43,7 +97,7 @@ definitions:
       role:
         type: string
     type: object
-  ai-models-backend_internal_models.ChatRequest:
+  models.ChatRequest:
     properties:
       message:
         type: string
@@ -54,7 +108,7 @@ definitions:
     required:
     - message
     type: object
-  ai-models-backend_internal_models.ChatResponse:
+  models.ChatResponse:
     properties:
       created_at:
         type: string
@@ -65,9 +119,9 @@ definitions:
       model:
         type: string
       usage:
-        $ref: '#/definitions/ai-models-backend_internal_models.Usage'
+        $ref: '#/definitions/models.Usage'
     type: object
-  ai-models-backend_internal_models.CreateFeedCommentRequest:
+  models.CreateFeedCommentRequest:
     properties:
       content:
         description: 评论内容，最多500字符
@@ -80,7 +134,7 @@ definitions:
     required:
     - content
     type: object
-  ai-models-backend_internal_models.CreateFeedPostRequest:
+  models.CreateFeedPostRequest:
     properties:
       content:
         description: 最多2000字符
@@ -90,7 +144,7 @@ definitions:
         description: 图片URL
         type: string
     type: object
-  ai-models-backend_internal_models.CrudCreateRequest:
+  models.CrudCreateRequest:
     properties:
       category:
         description: 业务分类，默认为general
@@ -100,7 +154,7 @@ definitions:
     required:
     - data
     type: object
-  ai-models-backend_internal_models.CrudResponse:
+  models.CrudResponse:
     properties:
       category:
         type: string
@@ -113,7 +167,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  ai-models-backend_internal_models.CrudUpdateRequest:
+  models.CrudUpdateRequest:
     properties:
       category:
         description: 业务分类
@@ -123,14 +177,14 @@ definitions:
     required:
     - data
     type: object
-  ai-models-backend_internal_models.DeleteFileRequest:
+  models.DeleteFileRequest:
     properties:
       object_key:
         type: string
     required:
     - object_key
     type: object
-  ai-models-backend_internal_models.FeedComment:
+  models.FeedComment:
     properties:
       avatar:
         description: 冗余头像
@@ -159,11 +213,11 @@ definitions:
         description: 冗余字段
         type: string
     type: object
-  ai-models-backend_internal_models.FeedCommentResponse:
+  models.FeedCommentResponse:
     properties:
       comments:
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
+          $ref: '#/definitions/models.FeedComment'
         type: array
       has_more:
         type: boolean
@@ -172,7 +226,7 @@ definitions:
       total:
         type: integer
     type: object
-  ai-models-backend_internal_models.FeedPost:
+  models.FeedPost:
     properties:
       avatar:
         description: 冗余头像
@@ -206,7 +260,7 @@ definitions:
         description: 冗余字段
         type: string
     type: object
-  ai-models-backend_internal_models.FeedPostResponse:
+  models.FeedPostResponse:
     properties:
       has_more:
         type: boolean
@@ -214,10 +268,10 @@ definitions:
         type: string
       posts:
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponseItem'
+          $ref: '#/definitions/models.FeedPostResponseItem'
         type: array
     type: object
-  ai-models-backend_internal_models.FeedPostResponseItem:
+  models.FeedPostResponseItem:
     properties:
       avatar:
         description: 冗余头像
@@ -243,7 +297,7 @@ definitions:
       preloaded_comments:
         description: 预载评论列表
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
+          $ref: '#/definitions/models.FeedComment'
         type: array
       preloaded_comments_next_cursor:
         description: 预载评论的下一页cursor
@@ -262,7 +316,7 @@ definitions:
         description: 冗余字段
         type: string
     type: object
-  ai-models-backend_internal_models.FileInfo:
+  models.FileInfo:
     properties:
       last_modified:
         type: string
@@ -275,18 +329,18 @@ definitions:
       url:
         type: string
     type: object
-  ai-models-backend_internal_models.FileListResponse:
+  models.FileListResponse:
     properties:
       files:
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.FileInfo'
+          $ref: '#/definitions/models.FileInfo'
         type: array
       is_truncated:
         type: boolean
       next_marker:
         type: string
     type: object
-  ai-models-backend_internal_models.FileUploadResponse:
+  models.FileUploadResponse:
     properties:
       hashify_name:
         description: 哈希化文件名
@@ -302,7 +356,7 @@ definitions:
       url:
         type: string
     type: object
-  ai-models-backend_internal_models.GenerateRequest:
+  models.GenerateRequest:
     properties:
       model:
         type: string
@@ -314,7 +368,7 @@ definitions:
     required:
     - prompt
     type: object
-  ai-models-backend_internal_models.GenerateResponse:
+  models.GenerateResponse:
     properties:
       content:
         type: string
@@ -325,35 +379,35 @@ definitions:
       model:
         type: string
       usage:
-        $ref: '#/definitions/ai-models-backend_internal_models.Usage'
+        $ref: '#/definitions/models.Usage'
     type: object
-  ai-models-backend_internal_models.GetURLRequest:
+  models.GetURLRequest:
     properties:
       object_key:
         type: string
     required:
     - object_key
     type: object
-  ai-models-backend_internal_models.GetURLResponse:
+  models.GetURLResponse:
     properties:
       object_key:
         type: string
       url:
         type: string
     type: object
-  ai-models-backend_internal_models.HashifyNameRequest:
+  models.HashifyNameRequest:
     properties:
       file_name:
         type: string
     required:
     - file_name
     type: object
-  ai-models-backend_internal_models.HashifyNameResponse:
+  models.HashifyNameResponse:
     properties:
       hashify_name:
         type: string
     type: object
-  ai-models-backend_internal_models.LikeResult:
+  models.LikeResult:
     properties:
       changed:
         description: 状态是否改变
@@ -362,13 +416,13 @@ definitions:
         description: 当前点赞状态
         type: boolean
     type: object
-  ai-models-backend_internal_models.OpenAIChatCompletionRequest:
+  models.OpenAIChatCompletionRequest:
     properties:
       max_tokens:
         type: integer
       messages:
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIMessage'
+          $ref: '#/definitions/models.OpenAIMessage'
         type: array
       model:
         type: string
@@ -384,11 +438,11 @@ definitions:
     - messages
     - model
     type: object
-  ai-models-backend_internal_models.OpenAIChatCompletionResponse:
+  models.OpenAIChatCompletionResponse:
     properties:
       choices:
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChoice'
+          $ref: '#/definitions/models.OpenAIChoice'
         type: array
       created:
         type: integer
@@ -399,18 +453,18 @@ definitions:
       object:
         type: string
       usage:
-        $ref: '#/definitions/ai-models-backend_internal_models.OpenAIUsage'
+        $ref: '#/definitions/models.OpenAIUsage'
     type: object
-  ai-models-backend_internal_models.OpenAIChoice:
+  models.OpenAIChoice:
     properties:
       finish_reason:
         type: string
       index:
         type: integer
       message:
-        $ref: '#/definitions/ai-models-backend_internal_models.OpenAIMessage'
+        $ref: '#/definitions/models.OpenAIMessage'
     type: object
-  ai-models-backend_internal_models.OpenAIMessage:
+  models.OpenAIMessage:
     properties:
       content:
         type: string
@@ -420,7 +474,7 @@ definitions:
     - content
     - role
     type: object
-  ai-models-backend_internal_models.OpenAIUsage:
+  models.OpenAIUsage:
     properties:
       completion_tokens:
         type: integer
@@ -429,7 +483,7 @@ definitions:
       total_tokens:
         type: integer
     type: object
-  ai-models-backend_internal_models.Pagination:
+  models.Pagination:
     properties:
       current:
         type: integer
@@ -438,15 +492,15 @@ definitions:
       total:
         type: integer
     type: object
-  ai-models-backend_internal_models.PaginationResponse:
+  models.PaginationResponse:
     properties:
       data:
         items: {}
         type: array
       pagination:
-        $ref: '#/definitions/ai-models-backend_internal_models.Pagination'
+        $ref: '#/definitions/models.Pagination'
     type: object
-  ai-models-backend_internal_models.RefreshTokenResponse:
+  models.RefreshTokenResponse:
     properties:
       refresh_token:
         description: 可选的新刷新token
@@ -454,7 +508,7 @@ definitions:
       token:
         type: string
     type: object
-  ai-models-backend_internal_models.STSCredentials:
+  models.STSCredentials:
     properties:
       AccessKeyId:
         description: NOTE：注意官方的字段是大写开头的
@@ -466,12 +520,12 @@ definitions:
       SecurityToken:
         type: string
     type: object
-  ai-models-backend_internal_models.STSResponse:
+  models.STSResponse:
     properties:
       credentials:
-        $ref: '#/definitions/ai-models-backend_internal_models.STSCredentials'
+        $ref: '#/definitions/models.STSCredentials'
     type: object
-  ai-models-backend_internal_models.SetFeedCommentLikeRequest:
+  models.SetFeedCommentLikeRequest:
     properties:
       is_like:
         description: 是否点赞
@@ -479,7 +533,7 @@ definitions:
     required:
     - is_like
     type: object
-  ai-models-backend_internal_models.SetFeedPostLikeRequest:
+  models.SetFeedPostLikeRequest:
     properties:
       is_like:
         description: 是否点赞
@@ -487,7 +541,7 @@ definitions:
     required:
     - is_like
     type: object
-  ai-models-backend_internal_models.SignRequest:
+  models.SignRequest:
     properties:
       file_name:
         description: 文件名
@@ -502,14 +556,14 @@ definitions:
         description: 路径前缀
         type: string
     type: object
-  ai-models-backend_internal_models.SignResponse:
+  models.SignResponse:
     properties:
       object_key:
         type: string
       signed_url:
         type: string
     type: object
-  ai-models-backend_internal_models.TodoCreateRequest:
+  models.TodoCreateRequest:
     properties:
       description:
         description: 可选
@@ -529,7 +583,7 @@ definitions:
     required:
     - title
     type: object
-  ai-models-backend_internal_models.TodoPositionItem:
+  models.TodoPositionItem:
     properties:
       id:
         description: 必填
@@ -541,17 +595,17 @@ definitions:
     - id
     - position
     type: object
-  ai-models-backend_internal_models.TodoPositionUpdateRequest:
+  models.TodoPositionUpdateRequest:
     properties:
       items:
         description: 必填，dive验证数组元素
         items:
-          $ref: '#/definitions/ai-models-backend_internal_models.TodoPositionItem'
+          $ref: '#/definitions/models.TodoPositionItem'
         type: array
     required:
     - items
     type: object
-  ai-models-backend_internal_models.TodoResponse:
+  models.TodoResponse:
     properties:
       completed:
         type: boolean
@@ -572,7 +626,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  ai-models-backend_internal_models.TodoUpdateRequest:
+  models.TodoUpdateRequest:
     properties:
       completed:
         description: 可选，使用指针区分false和未设置
@@ -593,7 +647,7 @@ definitions:
         description: 可选，不传不更新
         type: string
     type: object
-  ai-models-backend_internal_models.Usage:
+  models.Usage:
     properties:
       completion_tokens:
         type: integer
@@ -602,7 +656,7 @@ definitions:
       total_tokens:
         type: integer
     type: object
-  ai-models-backend_internal_models.UserCreateRequest:
+  models.UserCreateRequest:
     properties:
       email:
         type: string
@@ -618,7 +672,7 @@ definitions:
     - password
     - username
     type: object
-  ai-models-backend_internal_models.UserCreateResponse:
+  models.UserCreateResponse:
     properties:
       refresh_token:
         description: 可选的刷新token，用于长期认证
@@ -626,9 +680,9 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+        $ref: '#/definitions/models.UserResponse'
     type: object
-  ai-models-backend_internal_models.UserLoginRequest:
+  models.UserLoginRequest:
     properties:
       password:
         type: string
@@ -638,7 +692,7 @@ definitions:
     - password
     - username
     type: object
-  ai-models-backend_internal_models.UserLoginResponse:
+  models.UserLoginResponse:
     properties:
       refresh_token:
         description: 可选的刷新token，用于长期认证
@@ -646,9 +700,9 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+        $ref: '#/definitions/models.UserResponse'
     type: object
-  ai-models-backend_internal_models.UserResponse:
+  models.UserResponse:
     properties:
       avatar:
         type: string
@@ -675,7 +729,7 @@ definitions:
       username:
         type: string
     type: object
-  ai-models-backend_internal_models.UserUpdateRequest:
+  models.UserUpdateRequest:
     properties:
       avatar:
         type: string
@@ -692,67 +746,13 @@ definitions:
         minLength: 3
         type: string
     type: object
-  ai-models-backend_pkg_response.Response:
+  response.Response:
     properties:
       code:
         type: integer
       data: {}
       message:
         type: string
-    type: object
-  internal_handlers.RedisKeysInfo:
-    properties:
-      comment_cache_keys:
-        description: 评论缓存键数量
-        type: integer
-      expired_keys:
-        description: 过期键数量
-        type: integer
-      total_keys:
-        description: 总键数量
-        type: integer
-    type: object
-  internal_handlers.RedisMemoryInfo:
-    properties:
-      fragment_ratio:
-        description: 内存碎片率
-        type: number
-      max_memory:
-        description: 最大内存（字节）
-        type: integer
-      usage_percent:
-        description: 使用百分比
-        type: number
-      used_memory:
-        description: 已使用内存（字节）
-        type: integer
-    type: object
-  internal_handlers.RedisMetricsResponse:
-    properties:
-      keys:
-        $ref: '#/definitions/internal_handlers.RedisKeysInfo'
-      memory:
-        $ref: '#/definitions/internal_handlers.RedisMemoryInfo'
-      stats:
-        $ref: '#/definitions/internal_handlers.RedisStatsInfo'
-    type: object
-  internal_handlers.RedisStatsInfo:
-    properties:
-      connected_clients:
-        description: 连接的客户端数量
-        type: integer
-      hit_rate:
-        description: 缓存命中率
-        type: number
-      keyspace_hits:
-        description: 缓存命中次数
-        type: integer
-      keyspace_misses:
-        description: 缓存未命中次数
-        type: integer
-      miss_rate:
-        description: 缓存未命中率
-        type: number
     type: object
 host: localhost:8080
 info:
@@ -775,7 +775,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -804,10 +804,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.PaginationResponse'
+                  $ref: '#/definitions/models.PaginationResponse'
               type: object
       summary: 获取用户列表
       tags:
@@ -827,7 +827,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -850,10 +850,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
       summary: 根据ID获取用户信息
       tags:
@@ -873,7 +873,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -897,7 +897,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -929,7 +929,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -947,16 +947,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.ChatRequest'
+          $ref: '#/definitions/models.ChatRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.ChatResponse'
+                  $ref: '#/definitions/models.ChatResponse'
               type: object
       summary: AI聊天
       tags:
@@ -974,7 +974,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: 清除聊天历史
       tags:
       - AI
@@ -991,11 +991,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/ai-models-backend_internal_models.ChatMessage'
+                    $ref: '#/definitions/models.ChatMessage'
                   type: array
               type: object
       summary: 获取聊天历史
@@ -1010,16 +1010,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.GenerateRequest'
+          $ref: '#/definitions/models.GenerateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.GenerateResponse'
+                  $ref: '#/definitions/models.GenerateResponse'
               type: object
       summary: 文本生成
       tags:
@@ -1032,11 +1032,11 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/ai-models-backend_internal_models.AIModel'
+                    $ref: '#/definitions/models.AIModel'
                   type: array
               type: object
       summary: 获取模型列表
@@ -1055,12 +1055,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionRequest'
+          $ref: '#/definitions/models.OpenAIChatCompletionRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/ai-models-backend_internal_models.OpenAIChatCompletionResponse'
+            $ref: '#/definitions/models.OpenAIChatCompletionResponse'
       summary: OpenAI兼容聊天接口
       tags:
       - AI
@@ -1088,7 +1088,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   items:
@@ -1120,7 +1120,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1138,16 +1138,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CrudCreateRequest'
+          $ref: '#/definitions/models.CrudCreateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+                  $ref: '#/definitions/models.CrudResponse'
               type: object
       summary: 创建记录
       tags:
@@ -1167,7 +1167,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1190,10 +1190,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+                  $ref: '#/definitions/models.CrudResponse'
               type: object
       summary: 根据ID获取记录
       tags:
@@ -1212,16 +1212,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CrudUpdateRequest'
+          $ref: '#/definitions/models.CrudUpdateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.CrudResponse'
+                  $ref: '#/definitions/models.CrudResponse'
               type: object
       summary: 更新记录
       tags:
@@ -1241,16 +1241,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest'
+          $ref: '#/definitions/models.SetFeedCommentLikeRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+                  $ref: '#/definitions/models.LikeResult'
               type: object
       summary: 设置评论点赞状态
       tags:
@@ -1289,10 +1289,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponse'
+                  $ref: '#/definitions/models.FeedPostResponse'
               type: object
       summary: 获取信息流帖子列表
       tags:
@@ -1306,21 +1306,38 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedPostRequest'
+          $ref: '#/definitions/models.CreateFeedPostRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+                  $ref: '#/definitions/models.FeedPost'
               type: object
       summary: 创建信息流帖子
       tags:
       - Feed
   /feed/posts/{post_id}:
+    delete:
+      description: 删除指定的帖子，需要登录且只能删除自己的帖子
+      operationId: deleteFeedPost
+      parameters:
+      - description: 帖子ID
+        in: path
+        name: post_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除帖子
+      tags:
+      - Feed
     get:
       description: 获取指定帖子的详细信息
       operationId: getFeedPostDetail
@@ -1335,10 +1352,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+                  $ref: '#/definitions/models.FeedPost'
               type: object
       summary: 获取帖子详情
       tags:
@@ -1372,10 +1389,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedCommentResponse'
+                  $ref: '#/definitions/models.FeedCommentResponse'
               type: object
       summary: 获取帖子评论列表
       tags:
@@ -1394,16 +1411,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedCommentRequest'
+          $ref: '#/definitions/models.CreateFeedCommentRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
+                  $ref: '#/definitions/models.FeedComment'
               type: object
       summary: 创建帖子评论
       tags:
@@ -1423,16 +1440,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest'
+          $ref: '#/definitions/models.SetFeedPostLikeRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+                  $ref: '#/definitions/models.LikeResult'
               type: object
       summary: 设置帖子点赞状态
       tags:
@@ -1449,10 +1466,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_handlers.RedisMetricsResponse'
+                  $ref: '#/definitions/handlers.RedisMetricsResponse'
               type: object
       summary: 获取Redis监控指标
       tags:
@@ -1467,13 +1484,13 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.DeleteFileRequest'
+          $ref: '#/definitions/models.DeleteFileRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1500,10 +1517,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FileListResponse'
+                  $ref: '#/definitions/models.FileListResponse'
               type: object
       summary: 获取文件列表
       tags:
@@ -1518,16 +1535,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.HashifyNameRequest'
+          $ref: '#/definitions/models.HashifyNameRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.HashifyNameResponse'
+                  $ref: '#/definitions/models.HashifyNameResponse'
               type: object
       summary: 生成哈希文件名
       tags:
@@ -1542,16 +1559,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SignRequest'
+          $ref: '#/definitions/models.SignRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.SignResponse'
+                  $ref: '#/definitions/models.SignResponse'
               type: object
       summary: 生成获取签名
       tags:
@@ -1566,16 +1583,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SignRequest'
+          $ref: '#/definitions/models.SignRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.SignResponse'
+                  $ref: '#/definitions/models.SignResponse'
               type: object
       summary: 生成上传签名
       tags:
@@ -1589,10 +1606,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.STSResponse'
+                  $ref: '#/definitions/models.STSResponse'
               type: object
       summary: STS临时凭证
       tags:
@@ -1626,10 +1643,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FileUploadResponse'
+                  $ref: '#/definitions/models.FileUploadResponse'
               type: object
       summary: 直接上传文件
       tags:
@@ -1643,16 +1660,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.GetURLRequest'
+          $ref: '#/definitions/models.GetURLRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.GetURLResponse'
+                  $ref: '#/definitions/models.GetURLResponse'
               type: object
       summary: 获取文件URL
       tags:
@@ -1687,7 +1704,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1710,7 +1727,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1739,7 +1756,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1773,7 +1790,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1801,7 +1818,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1824,7 +1841,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1855,7 +1872,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1873,16 +1890,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.TodoCreateRequest'
+          $ref: '#/definitions/models.TodoCreateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+                  $ref: '#/definitions/models.TodoResponse'
               type: object
       summary: 创建TODO
       tags:
@@ -1902,7 +1919,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -1925,10 +1942,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+                  $ref: '#/definitions/models.TodoResponse'
               type: object
       summary: 根据ID获取TODO
       tags:
@@ -1947,16 +1964,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.TodoUpdateRequest'
+          $ref: '#/definitions/models.TodoUpdateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+                  $ref: '#/definitions/models.TodoResponse'
               type: object
       summary: 更新TODO
       tags:
@@ -1976,10 +1993,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.TodoResponse'
+                  $ref: '#/definitions/models.TodoResponse'
               type: object
       summary: 切换TODO完成状态
       tags:
@@ -1994,13 +2011,13 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.TodoPositionUpdateRequest'
+          $ref: '#/definitions/models.TodoPositionUpdateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -2018,7 +2035,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -2036,7 +2053,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -2055,13 +2072,13 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.ChangePasswordRequest'
+          $ref: '#/definitions/models.ChangePasswordRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -2090,7 +2107,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   type: boolean
@@ -2108,16 +2125,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.UserLoginRequest'
+          $ref: '#/definitions/models.UserLoginRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.UserLoginResponse'
+                  $ref: '#/definitions/models.UserLoginResponse'
               type: object
       summary: 用户登录
       tags:
@@ -2131,7 +2148,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
                   additionalProperties: true
@@ -2149,19 +2166,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            $ref: '#/definitions/response.Response'
       summary: 获取用户信息
       tags:
       - User
@@ -2174,16 +2191,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.UserUpdateRequest'
+          $ref: '#/definitions/models.UserUpdateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.UserResponse'
+                  $ref: '#/definitions/models.UserResponse'
               type: object
       summary: 更新用户信息
       tags:
@@ -2197,10 +2214,10 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.RefreshTokenResponse'
+                  $ref: '#/definitions/models.RefreshTokenResponse'
               type: object
       summary: 刷新token
       tags:
@@ -2215,16 +2232,16 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.UserCreateRequest'
+          $ref: '#/definitions/models.UserCreateRequest'
       responses:
         "200":
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.UserCreateResponse'
+                  $ref: '#/definitions/models.UserCreateResponse'
               type: object
       summary: 用户注册
       tags:

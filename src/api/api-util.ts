@@ -7,7 +7,7 @@ import type { AxiosRequestConfig } from 'axios'
  * API工具类 - 封装认证和token刷新逻辑
  */
 class ApiUtil {
-	verbose = isDev && true // 调制开关
+	verbose = isDev && false // 调制开关
 
 	// 设置认证头
 	setAuthHeader(config: AxiosRequestConfig, token: string) {

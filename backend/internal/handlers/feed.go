@@ -275,3 +275,39 @@ func (h *FeedHandler) GetFeedPostDetail(c *gin.Context) {
 
 	response.Success(c, post)
 }
+
+// @Summary 删除帖子
+// @Description 删除指定的帖子，需要登录且只能删除自己的帖子
+// @ID deleteFeedPost
+// @Tags Feed
+// @Param post_id path string true "帖子ID"
+// @Success 200 {object} response.Response
+// @Router /feed/posts/{post_id} [delete]
+func (h *FeedHandler) DeleteFeedPost(c *gin.Context) {
+	userID, ok := h.GetUserID(c)
+	if !ok {
+		return
+	}
+
+	postID := c.Param("post_id")
+	if postID == "" {
+		response.Error(c, http.StatusBadRequest, "帖子ID不能为空")
+		return
+	}
+
+	err := h.feedService.DeleteFeedPost(userID, postID)
+	if err != nil {
+		if err.Error() == "post not found" {
+			response.Error(c, http.StatusNotFound, "帖子不存在")
+			return
+		}
+		if err.Error() == "permission denied" {
+			response.Error(c, http.StatusForbidden, "只能删除自己的帖子")
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "删除帖子失败")
+		return
+	}
+
+	response.Success(c, nil)
+}

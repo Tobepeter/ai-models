@@ -17,14 +17,6 @@ class FeedDetailMgr {
 	private commentTimer: Nullable<CancelablePromise> = null
 	mockMode = false
 
-	private getDetailStore() {
-		return useFeedDetailStore.getState()
-	}
-
-	private getFeedStore() {
-		return useFeedStore.getState()
-	}
-
 	// 清除所有计时器
 	clearAllTimers() {
 		if (this.loadTimer) {
@@ -46,57 +38,50 @@ class FeedDetailMgr {
 		}
 	}
 
-	// 打开弹窗详情页
-	async openDialog(postId: string) {
-		const detailStore = this.getDetailStore()
-		const feedStore = this.getFeedStore()
-
-		// 从feed流中获取post数据作为初始数据
-		const feedPost = feedStore.posts.find((p) => p.id === postId)
-
-		// 打开弹窗并设置初始数据
-		detailStore.openDialog(postId, feedPost || null)
-
-		// 初始化评论数据
-		if (feedPost) {
-			await this.initComments(postId, feedPost)
-		} else {
-			// 如果feed流中没有数据，加载完整post数据
-			await this.loadPostDetail(postId)
-		}
-	}
-
-	// 进入详情页（独立页面）
-	async enterPage(postId: string) {
-		const detailStore = this.getDetailStore()
-		const feedStore = this.getFeedStore()
-
-		detailStore.setLoading(true)
-		detailStore.clearError()
+	// 统一的数据加载方法 - 供组件直接调用
+	async loadPostData(postId: string) {
+		const detailStore = useFeedDetailStore.getState()
+		const feedStore = useFeedStore.getState()
 
 		try {
-			// 从feed流中获取post数据作为初始数据
+			detailStore.setLoading(true)
+			detailStore.clearError()
+
+			// 检查 feedStore 中是否有缓存
 			const feedPost = feedStore.posts.find((p) => p.id === postId)
 
 			if (feedPost) {
-				// 使用feed流中的数据初始化
-				detailStore.setCurrentPost(feedPost)
+				// 有缓存，使用缓存数据并初始化评论
+				detailStore.setCurrPost(feedPost)
 				await this.initComments(postId, feedPost)
 			} else {
-				// 加载完整post数据
+				// 没有缓存，加载完整 post 数据
 				await this.loadPostDetail(postId)
 			}
 		} catch (error) {
-			console.error('[FeedDetailMgr] 进入详情页失败:', error)
-			detailStore.setError('加载详情页失败')
+			console.error('[FeedDetailMgr] 加载post数据失败:', error)
+			detailStore.setError('加载详情失败')
 		} finally {
 			detailStore.setLoading(false)
 		}
 	}
 
+	// 打开弹窗详情页 - 简化版
+	async openDialog(postId: string) {
+		const detailStore = useFeedDetailStore.getState()
+
+		// 直接打开弹窗，数据加载由 FeedDetailContent 组件处理
+		detailStore.openDialog(postId, null)
+	}
+
+	// 进入详情页（独立页面） - 简化版
+	async enterPage(postId: string) {
+		await this.loadPostData(postId)
+	}
+
 	// 加载单个post详情
 	async loadPostDetail(postId: string) {
-		const detailStore = this.getDetailStore()
+		const detailStore = useFeedDetailStore.getState()
 
 		try {
 			if (this.mockMode) {
@@ -104,17 +89,14 @@ class FeedDetailMgr {
 				this.loadTimer = delayC(feedMock.getRefreshDelay())
 				await this.loadTimer
 
-				// Mock模式：生成post详情
-				const mockPost = feedMock.genSinglePost()
-				detailStore.setCurrentPost(mockPost)
+				const mockPost = feedMock.genSinglePost() // Mock模式：生成post详情
+				detailStore.setCurrPost(mockPost)
 				await this.initComments(postId, mockPost)
 			} else {
-				// 调用真实API获取post详情
-				const response = await api.feed.getFeedPostDetail(postId)
+				const response = await api.feed.getFeedPostDetail(postId) // 调用真实API获取post详情
 				if (response?.data) {
-					// 转换FeedPost为AppFeedPost (FeedPostResponseItem)
-					const feedPost = this.convertFeedPostToAppFeedPost(response.data)
-					detailStore.setCurrentPost(feedPost)
+					const feedPost = this.convertFeedPostToAppFeedPost(response.data) // 转换FeedPost为AppFeedPost (FeedPostResponseItem)
+					detailStore.setCurrPost(feedPost)
 					await this.initComments(postId, feedPost)
 				} else {
 					detailStore.setError('无法加载帖子详情')
@@ -130,7 +112,7 @@ class FeedDetailMgr {
 
 	// 初始化评论数据
 	async initComments(postId: string, post: AppFeedPost) {
-		const detailStore = this.getDetailStore()
+		const detailStore = useFeedDetailStore.getState()
 
 		try {
 			detailStore.setCommentsLoading(true)
@@ -140,30 +122,27 @@ class FeedDetailMgr {
 				this.commentTimer = delayC(feedMock.getCommentDelay())
 				await this.commentTimer
 
-				// Mock模式：基于预加载评论初始化
-				const preloadedComments = post.preloaded_comments || []
+				const preloadedComments = post.preloaded_comments || [] // Mock模式：基于预加载评论初始化
 				const hasMore = (post.comment_count || 0) > preloadedComments.length
 
 				detailStore.initComments(preloadedComments, (post as any).preloaded_comments_cursor, hasMore)
 			} else {
-				// 真实API：检查是否有预加载数据
-				const preloadedComments = post.preloaded_comments || []
+				const preloadedComments = post.preloaded_comments || [] // 真实API：检查是否有预加载数据
 
 				if (preloadedComments.length > 0) {
-					// 有预加载数据，基于预加载初始化
-					const hasMore = (post.comment_count || 0) > preloadedComments.length
-					detailStore.initComments(preloadedComments, preloadedComments.length > 0 ? preloadedComments[preloadedComments.length - 1].id?.toString() : undefined, hasMore)
+					const hasMore = (post.comment_count || 0) > preloadedComments.length // 有预加载数据，基于预加载初始化
+					detailStore.initComments(preloadedComments, post.preloaded_comments_next_cursor, hasMore)
 				} else {
-					// 无预加载数据，全量加载评论
-					const response = await api.feed.getFeedComments({
+					const resp = await api.feed.getFeedComments({
+						// 无预加载数据，全量加载评论
 						postId: postId,
 						post_id: postId,
 						limit: feedConfig.commentPageSize,
 					})
 
-					if (response?.data) {
-						const comments = (response.data.comments || []).map((c) => ({ ...c, isLiked: false }))
-						detailStore.initComments(comments, response.data.next_cursor, response.data.has_more || false)
+					if (resp?.data) {
+						const comments = (resp.data.comments || []).map((c) => ({ ...c, isLiked: false }))
+						detailStore.initComments(comments, resp.data.next_cursor, resp.data.has_more || false)
 					}
 				}
 			}
@@ -179,12 +158,10 @@ class FeedDetailMgr {
 
 	// 加载更多评论
 	async loadMoreComments() {
-		const detailStore = this.getDetailStore()
-		const { currentPost, comments, commentsCursor, commentsHasMore, commentsLoading } = detailStore
+		const detailStore = useFeedDetailStore.getState()
+		const { currPost, commentsCursor, commentsHasMore, commentsLoading } = detailStore
 
-		if (!currentPost || commentsLoading || !commentsHasMore) {
-			return
-		}
+		if (!currPost || commentsLoading || !commentsHasMore) return
 
 		try {
 			detailStore.setCommentsLoading(true)
@@ -194,14 +171,13 @@ class FeedDetailMgr {
 				this.commentTimer = delayC(feedMock.getCommentDelay())
 				await this.commentTimer
 
-				// Mock模式：生成分页数据
-				const result = feedMock.genCommentPage(currentPost.id!, commentsCursor)
+				const result = feedMock.genCommentPage(currPost.id!, commentsCursor) // Mock模式：生成分页数据
 				detailStore.appendComments(result.comments, result.next_cursor, result.has_more)
 			} else {
-				// 调用真实API加载更多评论
 				const response = await api.feed.getFeedComments({
-					postId: currentPost.id!,
-					post_id: currentPost.id!,
+					// 调用真实API加载更多评论
+					postId: currPost.id!,
+					post_id: currPost.id!,
 					after_id: commentsCursor,
 					limit: feedConfig.commentPageSize,
 				})
@@ -209,7 +185,7 @@ class FeedDetailMgr {
 				if (response?.data) {
 					const comments = (response.data.comments || []).map((c) => ({ ...c, isLiked: false }))
 					detailStore.appendComments(comments, response.data.next_cursor, response.data.has_more || false)
-					console.log(`[FeedDetailMgr] 加载更多评论成功: ${currentPost.id}, 新增${comments.length}条`)
+					console.log(`[FeedDetailMgr] 加载更多评论成功: ${currPost.id}, 新增${comments.length}条`)
 				}
 			}
 		} catch (error) {
@@ -222,11 +198,11 @@ class FeedDetailMgr {
 
 	// 添加评论 - 乐观更新 + 同步到主页
 	async addComment(content: string, replyTo?: string) {
-		const detailStore = this.getDetailStore()
-		const feedStore = this.getFeedStore()
-		const { currentPost } = detailStore
+		const detailStore = useFeedDetailStore.getState()
+		const feedStore = useFeedStore.getState()
+		const { currPost } = detailStore
 
-		if (!currentPost?.id) {
+		if (!currPost?.id) {
 			console.error('[FeedDetailMgr] 当前post不存在，无法添加评论')
 			return
 		}
@@ -237,18 +213,15 @@ class FeedDetailMgr {
 				this.commentTimer = delayC(feedMock.getCommentDelay())
 				await this.commentTimer
 
-				const comment = feedMock.genComment(currentPost.id, content, replyTo)
+				const comment = feedMock.genComment(currPost.id, content, replyTo)
 
-				// 乐观更新详情页
-				detailStore.addComment(comment)
+				detailStore.addComment(comment) // 乐观更新详情页
+				feedStore.addComment(currPost.id, comment) // 同步到主页feed流
 
-				// 同步到主页feed流
-				feedStore.addComment(currentPost.id, comment)
-
-				console.log(`[FeedDetailMgr] Mock添加评论成功: ${currentPost.id}`)
+				console.log(`[FeedDetailMgr] Mock添加评论成功: ${currPost.id}`)
 			} else {
-				// 调用真实API创建评论
-				const response = await api.feed.createFeedComment(currentPost.id, {
+				const response = await api.feed.createFeedComment(currPost.id, {
+					// 调用真实API创建评论
 					content,
 					reply_to: replyTo,
 				})
@@ -259,13 +232,10 @@ class FeedDetailMgr {
 						isLiked: false,
 					}
 
-					// 乐观更新详情页
-					detailStore.addComment(comment)
+					detailStore.addComment(comment) // 乐观更新详情页
+					feedStore.addComment(currPost.id, comment) // 同步到主页feed流
 
-					// 同步到主页feed流
-					feedStore.addComment(currentPost.id, comment)
-
-					console.log(`[FeedDetailMgr] 添加评论成功: ${currentPost.id}`)
+					console.log(`[FeedDetailMgr] 添加评论成功: ${currPost.id}`)
 				}
 			}
 		} catch (error) {
@@ -277,21 +247,20 @@ class FeedDetailMgr {
 
 	// 切换点赞状态 - 委托给feedMgr统一处理
 	async toggleLike() {
-		const { currentPost } = this.getDetailStore()
+		const { currPost } = useFeedDetailStore.getState()
 
-		if (!currentPost?.id) {
+		if (!currPost?.id) {
 			console.error('[FeedDetailMgr] 当前post不存在，无法点赞')
 			return
 		}
 
-		// 委托给feedMgr统一处理，会自动同步feed流和详情页
-		const { feedMgr } = await import('./feed-mgr')
-		feedMgr.toggleLike(currentPost.id)
+		const { feedMgr } = await import('./feed-mgr') // 委托给feedMgr统一处理，会自动同步feed流和详情页
+		feedMgr.toggleLike(currPost.id)
 	}
 
 	// 关闭详情页
 	closeDetail() {
-		const detailStore = this.getDetailStore()
+		const detailStore = useFeedDetailStore.getState()
 		this.clearAllTimers()
 		detailStore.reset()
 	}

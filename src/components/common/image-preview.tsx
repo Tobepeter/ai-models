@@ -59,6 +59,7 @@ export const ImagePreview = (props: PropsWithChildren<ImagePreviewProps>) => {
 		}
 	}
 
+	// TODO: 这个不是很优雅，其实可以获取ref来用的
 	const loadImgDimension = useMemoizedFn((imgUrl: string) => {
 		if (!imgUrl) {
 			setImgDimension(null)
@@ -217,7 +218,7 @@ export const ImagePreview = (props: PropsWithChildren<ImagePreviewProps>) => {
 						</div>
 					) : (
 						<div
-							className={cn('relative overflow-hidden rounded-lg', canHover && 'cursor-pointer', className)}
+							className={cn('relative overflow-hidden rounded-lg bg-muted', canHover && 'cursor-pointer', className)}
 							style={cardStyle}
 							onMouseEnter={canHover ? () => setHover(true) : undefined}
 							onMouseLeave={canHover ? () => setHover(false) : undefined}
