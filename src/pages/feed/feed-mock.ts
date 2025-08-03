@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker/locale/zh_CN'
 const { number, datatype } = faker
 const { arrayElement } = faker.helpers
 
-/* Mock评论分页结果 */
+// Mock评论分页结果
 export interface MockCommentPageResult {
 	comments: AppFeedComment[]
 	next_cursor?: string
@@ -15,7 +15,7 @@ export interface MockCommentPageResult {
 	total: number
 }
 
-/* 内容生成模板类型 */
+// 内容生成模板类型
 // prettier-ignore
 const CONTENT_TYPES = [
 	'weather', 'movie', 'travel', 'learning', 'food', 'work', 
@@ -24,7 +24,7 @@ const CONTENT_TYPES = [
 	'discovery', 'gift', 'mood', 'tech', 'music', 'art'
 ] as const
 
-/* 评论情感类型 */
+// 评论情感类型
 // prettier-ignore
 const COMMENT_SENTIMENTS = [
 	'positive', 'supportive', 'funny', 'grateful', 'agree',
@@ -33,10 +33,9 @@ const COMMENT_SENTIMENTS = [
 
 /**
  * 信息流Mock管理器
- * 处理Mock数据生成相关的工作
  */
 class FeedMock {
-	/* 生成模拟数据 - 可配置时间基准点 */
+	// 生成模拟数据 - 可配置时间基准点
 	genPosts(count: number, beforeTimestamp?: number): AppFeedPost[] {
 		const posts: AppFeedPost[] = []
 		const now = beforeTimestamp || Date.now()
@@ -50,7 +49,7 @@ class FeedMock {
 		return posts
 	}
 
-	/* 生成单个帖子 */
+	// 生成单个帖子
 	genSinglePost(timestamp?: number): AppFeedPost {
 		const now = timestamp || Date.now()
 		const postId = feedUtil.generatePostId()
@@ -83,7 +82,7 @@ class FeedMock {
 		return post
 	}
 
-	/* 创建用户自定义的帖子 */
+	// 创建用户自定义的帖子
 	createUserPost(content: string, image?: string): AppFeedPost {
 		const postId = feedUtil.generatePostId()
 		const now = Date.now()
@@ -105,7 +104,7 @@ class FeedMock {
 		}
 	}
 
-	/* 生成模拟评论 */
+	// 生成模拟评论
 	genComments(postId: string, count: number, baseTimestamp?: number): AppFeedComment[] {
 		const comments: AppFeedComment[] = []
 		const now = baseTimestamp || Date.now()
@@ -133,7 +132,7 @@ class FeedMock {
 		return comments.reverse() // 最早的评论在前
 	}
 
-	/* 生成单个评论 - 用于添加新评论 */
+	// 生成单个评论 - 用于添加新评论
 	genComment(postId: string, content: string, replyTo?: string): AppFeedComment {
 		return {
 			id: feedUtil.generatePostId(),
@@ -149,13 +148,13 @@ class FeedMock {
 		}
 	}
 
-	/* 生成评论cursor */
+	// 生成评论cursor
 	genCommentCursor(comment: AppFeedComment) {
 		const timestamp = new Date(comment.created_at).getTime()
 		return `comment_${comment.id}_${timestamp}`
 	}
 
-	/* 解析评论cursor */
+	// 解析评论cursor
 	parseCommentCursor(cursor: string): { commentId: string; timestamp: number } | null {
 		const match = cursor.match(/^comment_(.+)_(\d+)$/)
 		if (!match) return null
@@ -165,7 +164,7 @@ class FeedMock {
 		}
 	}
 
-	/* 生成评论分页数据 */
+	// 生成评论分页数据
 	genCommentPage(postId: string, cursor?: string, limit = 20): MockCommentPageResult {
 		const totalComments = number.int({ min: 20, max: 150 })
 		let startTimestamp = Date.now() - 1000 * 60 * 60 * 24 // 1天前开始
@@ -190,12 +189,14 @@ class FeedMock {
 		}
 	}
 
+	// 随机生成头像URL
 	private randomAvatar() {
 		const staticAvatars = [dummy.images.avatar, dummy.images.avatarFemale, dummy.images.avatarMale]
 		const dynamicAvatar = `https://i.pravatar.cc/150?img=${number.int({ min: 1, max: 70 })}`
 		return arrayElement([...staticAvatars, dynamicAvatar])
 	}
 
+	// 随机生成帖子内容
 	private randomContent() {
 		const contentType = arrayElement(CONTENT_TYPES)
 		const result = this.genContentByType(contentType)
@@ -209,6 +210,7 @@ class FeedMock {
 		return result
 	}
 
+	// 根据类型生成特定内容
 	private genContentByType(type: (typeof CONTENT_TYPES)[number]) {
 		switch (type) {
 			case 'weather':
@@ -232,17 +234,20 @@ class FeedMock {
 		}
 	}
 
+	// 随机生成图片URL
 	private randomImage() {
 		const staticImages = [dummy.images.landscape, dummy.images.portrait, dummy.images.square]
 		const dynamicImages = [dummy.getImage('landscape'), dummy.getImage('portrait'), dummy.getImage('square')]
 		return arrayElement([...staticImages, ...dynamicImages])
 	}
 
+	// 随机生成评论内容
 	private randomCommentContent(isReply = false) {
 		const sentiment = arrayElement(COMMENT_SENTIMENTS)
 		return this.genCommentContent(sentiment, isReply)
 	}
 
+	// 根据情感类型生成评论内容
 	private genCommentContent(sentiment: (typeof COMMENT_SENTIMENTS)[number], isReply = false) {
 		if (isReply) {
 			switch (sentiment) {
@@ -285,18 +290,22 @@ class FeedMock {
 		}
 	}
 
+	// 获取初始加载延迟
 	getInitDelay() {
 		return number.int({ min: 800, max: 1200 })
 	}
 
+	// 获取加载更多延迟
 	getLoadMoreDelay() {
 		return number.int({ min: 500, max: 1000 })
 	}
 
+	// 获取点赞操作延迟
 	getLikeDelay() {
 		return number.int({ min: 200, max: 500 })
 	}
 
+	// 获取评论操作延迟
 	getCommentDelay() {
 		return number.int({ min: 300, max: 800 })
 	}

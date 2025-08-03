@@ -5,3 +5,4 @@
 - 代码风格规范 @docs/claude/code-style.md
 - 工作流规范 @docs/claude/workflow.md
 - api设计 @docs/claude/api.md
+- 代码缩写表 @docs/claude/code-shortening.md

@@ -29,7 +29,7 @@ func NewFeedHandler(feedService *services.FeedService) *FeedHandler {
 // @Tags Feed
 // @Param params query models.FeedQueryParams true "查询参数"
 // @Success 200 {object} response.Response{data=models.FeedPostResponse}
-// @Router /api/feed/posts [get]
+// @Router /feed/posts [get]
 func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 	var params models.FeedQueryParams
 	if err := c.ShouldBindQuery(&params); err != nil {
@@ -60,7 +60,7 @@ func (h *FeedHandler) GetFeedPosts(c *gin.Context) {
 // @Tags Feed
 // @Param request body models.CreateFeedPostRequest true "帖子内容"
 // @Success 200 {object} response.Response{data=models.FeedPost}
-// @Router /api/feed/posts [post]
+// @Router /feed/posts [post]
 func (h *FeedHandler) CreateFeedPost(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
@@ -95,7 +95,7 @@ func (h *FeedHandler) CreateFeedPost(c *gin.Context) {
 // @Param post_id path string true "帖子ID"
 // @Param request body models.SetFeedPostLikeRequest true "点赞状态"
 // @Success 200 {object} response.Response{data=models.LikeResult}
-// @Router /api/feed/posts/{post_id}/like [post]
+// @Router /feed/posts/{post_id}/like [post]
 func (h *FeedHandler) SetLikePost(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
@@ -134,7 +134,7 @@ func (h *FeedHandler) SetLikePost(c *gin.Context) {
 // @Param post_id path string true "帖子ID"
 // @Param params query models.CommentQueryParams true "查询参数"
 // @Success 200 {object} response.Response{data=models.FeedCommentResponse}
-// @Router /api/feed/posts/{post_id}/comments [get]
+// @Router /feed/posts/{post_id}/comments [get]
 func (h *FeedHandler) GetFeedComments(c *gin.Context) {
 	postID := c.Param("post_id")
 	if postID == "" {
@@ -170,7 +170,7 @@ func (h *FeedHandler) GetFeedComments(c *gin.Context) {
 // @Param post_id path string true "帖子ID"
 // @Param request body models.CreateFeedCommentRequest true "评论内容"
 // @Success 200 {object} response.Response{data=models.FeedComment}
-// @Router /api/feed/posts/{post_id}/comments [post]
+// @Router /feed/posts/{post_id}/comments [post]
 func (h *FeedHandler) CreateFeedComment(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
@@ -209,7 +209,7 @@ func (h *FeedHandler) CreateFeedComment(c *gin.Context) {
 // @Param comment_id path string true "评论ID"
 // @Param request body models.SetFeedCommentLikeRequest true "点赞状态"
 // @Success 200 {object} response.Response{data=models.LikeResult}
-// @Router /api/feed/comments/{comment_id}/like [post]
+// @Router /feed/comments/{comment_id}/like [post]
 func (h *FeedHandler) SetCommentLike(c *gin.Context) {
 	userID, ok := h.GetUserID(c)
 	if !ok {
@@ -247,7 +247,7 @@ func (h *FeedHandler) SetCommentLike(c *gin.Context) {
 // @Tags Feed
 // @Param post_id path string true "帖子ID"
 // @Success 200 {object} response.Response{data=models.FeedPost}
-// @Router /api/feed/posts/{post_id} [get]
+// @Router /feed/posts/{post_id} [get]
 func (h *FeedHandler) GetFeedPostDetail(c *gin.Context) {
 	postID := c.Param("post_id")
 	if postID == "" {

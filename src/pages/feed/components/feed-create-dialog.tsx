@@ -28,7 +28,7 @@ const createFeedSchema = z.object({
 
 type CreateFeedForm = z.infer<typeof createFeedSchema>
 
-/* 新建Feed弹窗组件 */
+// 新建Feed弹窗组件
 export const FeedCreateDialog = () => {
 	const { loading, isCreateDialogOpen, setData } = useFeedStore()
 	const [imageUrl, setImageUrl] = useState('')
@@ -43,6 +43,7 @@ export const FeedCreateDialog = () => {
 		},
 	})
 
+	// 提交表单
 	const onSubmit = async (data: CreateFeedForm) => {
 		try {
 			hasSubmittedRef.current = true // 标记已提交，防止关闭时删除OSS文件

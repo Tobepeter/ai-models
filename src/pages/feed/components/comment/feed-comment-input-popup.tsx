@@ -18,6 +18,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
 	// 获取保护区域长度
+	// 获取保护区域长度
 	const getProtectedLength = () => (replyTo ? `@${replyTo} `.length : 0)
 
 	// 监听内容变化，确保回复模式下光标位置正确
@@ -38,6 +39,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 
 	// NOTE: 这个逻辑很别扭，不过能工作，唯一的缺点点击时候会闪烁一下
 	// 处理选择变化，阻止选择保护区域
+	// 处理选择变化，阻止选择保护区域
 	const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
 		if (!replyTo) return
 
@@ -52,6 +54,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 		}
 	}
 
+	// 统一管理弹窗开关状态
 	// 统一管理弹窗开关状态
 	const changeIsOpen = (newIsOpen: boolean) => {
 		// 如果要打开弹窗，检查是否有其他弹窗已打开
@@ -81,6 +84,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	}
 
 	// 提交评论
+	// 提交评论
 	const handleSubmit = () => {
 		if (!content.trim() || isSubmitting) return
 
@@ -94,10 +98,12 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 	}
 
 	// 取消评论
+	// 取消评论
 	const handleCancel = () => {
 		changeIsOpen(false)
 	}
 
+	// 处理键盘事件
 	// 处理键盘事件
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		const textarea = e.currentTarget
@@ -131,6 +137,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 		}
 	}
 
+	// 监听内容变化
 	// 监听内容变化
 	const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const newContent = e.target.value

@@ -7,7 +7,7 @@ import { userUtil } from '@/pages/user/user-util'
 import { notify } from '@/components/common/notify'
 import { useUserStore } from '@/store/user-store'
 
-/* Feed 导航标题组件 */
+// Feed 导航标题组件
 export const FeedNavHeader = () => {
 	const { loading, refreshing, error, clearError, setData } = useFeedStore()
 	const { goLogin } = useUserStore()

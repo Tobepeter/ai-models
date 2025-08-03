@@ -1080,217 +1080,6 @@ paths:
       summary: 图片生成
       tags:
       - AI
-  /api/feed/comments/{comment_id}/like:
-    post:
-      description: 设置评论点赞或取消点赞状态，需要登录
-      operationId: setFeedCommentLike
-      parameters:
-      - description: 评论ID
-        in: path
-        name: comment_id
-        required: true
-        type: string
-      - description: 点赞状态
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
-              type: object
-      summary: 设置评论点赞状态
-      tags:
-      - Feed
-  /api/feed/posts:
-    get:
-      description: 支持多种排序方式和cursor分页
-      operationId: getFeedPosts
-      parameters:
-      - description: cursor分页的after_id
-        in: query
-        name: after_id
-        type: string
-      - description: 预载评论数量，0表示不预载，最多20条
-        in: query
-        maximum: 20
-        minimum: 0
-        name: comment_count
-        type: integer
-      - description: 每页数量，最多50
-        in: query
-        maximum: 50
-        minimum: 1
-        name: limit
-        type: integer
-      - description: 排序类型：time, like, comment
-        enum:
-        - time
-        - like
-        - comment
-        in: query
-        name: sort
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponse'
-              type: object
-      summary: 获取信息流帖子列表
-      tags:
-      - Feed
-    post:
-      description: 创建新的信息流帖子，需要登录
-      operationId: createFeedPost
-      parameters:
-      - description: 帖子内容
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedPostRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
-              type: object
-      summary: 创建信息流帖子
-      tags:
-      - Feed
-  /api/feed/posts/{post_id}:
-    get:
-      description: 获取指定帖子的详细信息
-      operationId: getFeedPostDetail
-      parameters:
-      - description: 帖子ID
-        in: path
-        name: post_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
-              type: object
-      summary: 获取帖子详情
-      tags:
-      - Feed
-  /api/feed/posts/{post_id}/comments:
-    get:
-      description: 获取指定帖子的评论列表，支持cursor分页
-      operationId: getFeedComments
-      parameters:
-      - description: 帖子ID
-        in: path
-        name: post_id
-        required: true
-        type: string
-      - description: cursor分页的after_id
-        in: query
-        name: after_id
-        type: string
-      - description: 每页数量，最多50
-        in: query
-        maximum: 50
-        minimum: 1
-        name: limit
-        type: integer
-      - in: query
-        name: post_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedCommentResponse'
-              type: object
-      summary: 获取帖子评论列表
-      tags:
-      - Feed
-    post:
-      description: 为指定帖子创建评论，需要登录
-      operationId: createFeedComment
-      parameters:
-      - description: 帖子ID
-        in: path
-        name: post_id
-        required: true
-        type: string
-      - description: 评论内容
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedCommentRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
-              type: object
-      summary: 创建帖子评论
-      tags:
-      - Feed
-  /api/feed/posts/{post_id}/like:
-    post:
-      description: 设置帖子点赞或取消点赞状态，需要登录
-      operationId: setFeedPostLike
-      parameters:
-      - description: 帖子ID
-        in: path
-        name: post_id
-        required: true
-        type: string
-      - description: 点赞状态
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
-              type: object
-      summary: 设置帖子点赞状态
-      tags:
-      - Feed
   /crud:
     get:
       description: 分页获取数据记录列表，支持按分类筛选，返回分页信息和记录数据
@@ -1419,6 +1208,217 @@ paths:
       summary: 更新记录
       tags:
       - CRUD
+  /feed/comments/{comment_id}/like:
+    post:
+      description: 设置评论点赞或取消点赞状态，需要登录
+      operationId: setFeedCommentLike
+      parameters:
+      - description: 评论ID
+        in: path
+        name: comment_id
+        required: true
+        type: string
+      - description: 点赞状态
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedCommentLikeRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+              type: object
+      summary: 设置评论点赞状态
+      tags:
+      - Feed
+  /feed/posts:
+    get:
+      description: 支持多种排序方式和cursor分页
+      operationId: getFeedPosts
+      parameters:
+      - description: cursor分页的after_id
+        in: query
+        name: after_id
+        type: string
+      - description: 预载评论数量，0表示不预载，最多20条
+        in: query
+        maximum: 20
+        minimum: 0
+        name: comment_count
+        type: integer
+      - description: 每页数量，最多50
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        type: integer
+      - description: 排序类型：time, like, comment
+        enum:
+        - time
+        - like
+        - comment
+        in: query
+        name: sort
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPostResponse'
+              type: object
+      summary: 获取信息流帖子列表
+      tags:
+      - Feed
+    post:
+      description: 创建新的信息流帖子，需要登录
+      operationId: createFeedPost
+      parameters:
+      - description: 帖子内容
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedPostRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+              type: object
+      summary: 创建信息流帖子
+      tags:
+      - Feed
+  /feed/posts/{post_id}:
+    get:
+      description: 获取指定帖子的详细信息
+      operationId: getFeedPostDetail
+      parameters:
+      - description: 帖子ID
+        in: path
+        name: post_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedPost'
+              type: object
+      summary: 获取帖子详情
+      tags:
+      - Feed
+  /feed/posts/{post_id}/comments:
+    get:
+      description: 获取指定帖子的评论列表，支持cursor分页
+      operationId: getFeedComments
+      parameters:
+      - description: 帖子ID
+        in: path
+        name: post_id
+        required: true
+        type: string
+      - description: cursor分页的after_id
+        in: query
+        name: after_id
+        type: string
+      - description: 每页数量，最多50
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        name: post_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedCommentResponse'
+              type: object
+      summary: 获取帖子评论列表
+      tags:
+      - Feed
+    post:
+      description: 为指定帖子创建评论，需要登录
+      operationId: createFeedComment
+      parameters:
+      - description: 帖子ID
+        in: path
+        name: post_id
+        required: true
+        type: string
+      - description: 评论内容
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.CreateFeedCommentRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.FeedComment'
+              type: object
+      summary: 创建帖子评论
+      tags:
+      - Feed
+  /feed/posts/{post_id}/like:
+    post:
+      description: 设置帖子点赞或取消点赞状态，需要登录
+      operationId: setFeedPostLike
+      parameters:
+      - description: 帖子ID
+        in: path
+        name: post_id
+        required: true
+        type: string
+      - description: 点赞状态
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ai-models-backend_internal_models.SetFeedPostLikeRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/ai-models-backend_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/ai-models-backend_internal_models.LikeResult'
+              type: object
+      summary: 设置帖子点赞状态
+      tags:
+      - Feed
   /metrics/redis:
     get:
       consumes:

@@ -544,6 +544,25 @@ export interface V1ImagesGenerationsCreateParams {
 
 export type V1ImagesGenerationsCreateData = Response<string[]>;
 
+export interface GetListParams {
+  /** 页码 */
+  page?: number;
+  /** 每页数量 */
+  limit?: number;
+  /** 分类 */
+  category?: string;
+}
+
+export type GetListData = Response<Record<string, any>>;
+
+export type CreateData = Response<CrudResponse>;
+
+export type GetByIdData = Response<CrudResponse>;
+
+export type UpdateData = Response<CrudResponse>;
+
+export type DeleteData = Response<Record<string, any>>;
+
 export type SetFeedCommentLikeData = Response<LikeResult>;
 
 export interface GetFeedPostsParams {
@@ -590,25 +609,6 @@ export type GetFeedCommentsData = Response<FeedCommentResponse>;
 export type CreateFeedCommentData = Response<FeedComment>;
 
 export type SetFeedPostLikeData = Response<LikeResult>;
-
-export interface GetListParams {
-  /** 页码 */
-  page?: number;
-  /** 每页数量 */
-  limit?: number;
-  /** 分类 */
-  category?: string;
-}
-
-export type GetListData = Response<Record<string, any>>;
-
-export type CreateData = Response<CrudResponse>;
-
-export type GetByIdData = Response<CrudResponse>;
-
-export type UpdateData = Response<CrudResponse>;
-
-export type DeleteData = Response<Record<string, any>>;
 
 export type RedisListData = Response<InternalHandlersRedisMetricsResponse>;
 
@@ -1165,140 +1165,6 @@ export class Api<
         ...params,
       }),
   };
-  api = {
-    /**
-     * @description 设置评论点赞或取消点赞状态，需要登录
-     *
-     * @tags Feed
-     * @name SetFeedCommentLike
-     * @summary 设置评论点赞状态
-     * @request POST:/api/feed/comments/{comment_id}/like
-     */
-    setFeedCommentLike: (
-      commentId: string,
-      request: SetFeedCommentLikeRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<SetFeedCommentLikeData, any>({
-        path: `/api/feed/comments/${commentId}/like`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 支持多种排序方式和cursor分页
-     *
-     * @tags Feed
-     * @name GetFeedPosts
-     * @summary 获取信息流帖子列表
-     * @request GET:/api/feed/posts
-     */
-    getFeedPosts: (query: GetFeedPostsParams, params: RequestParams = {}) =>
-      this.request<GetFeedPostsData, any>({
-        path: `/api/feed/posts`,
-        method: "GET",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * @description 创建新的信息流帖子，需要登录
-     *
-     * @tags Feed
-     * @name CreateFeedPost
-     * @summary 创建信息流帖子
-     * @request POST:/api/feed/posts
-     */
-    createFeedPost: (
-      request: CreateFeedPostRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<CreateFeedPostData, any>({
-        path: `/api/feed/posts`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 获取指定帖子的详细信息
-     *
-     * @tags Feed
-     * @name GetFeedPostDetail
-     * @summary 获取帖子详情
-     * @request GET:/api/feed/posts/{post_id}
-     */
-    getFeedPostDetail: (postId: string, params: RequestParams = {}) =>
-      this.request<GetFeedPostDetailData, any>({
-        path: `/api/feed/posts/${postId}`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * @description 获取指定帖子的评论列表，支持cursor分页
-     *
-     * @tags Feed
-     * @name GetFeedComments
-     * @summary 获取帖子评论列表
-     * @request GET:/api/feed/posts/{post_id}/comments
-     */
-    getFeedComments: (
-      { postId, ...query }: GetFeedCommentsParams,
-      params: RequestParams = {},
-    ) =>
-      this.request<GetFeedCommentsData, any>({
-        path: `/api/feed/posts/${postId}/comments`,
-        method: "GET",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * @description 为指定帖子创建评论，需要登录
-     *
-     * @tags Feed
-     * @name CreateFeedComment
-     * @summary 创建帖子评论
-     * @request POST:/api/feed/posts/{post_id}/comments
-     */
-    createFeedComment: (
-      postId: string,
-      request: CreateFeedCommentRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<CreateFeedCommentData, any>({
-        path: `/api/feed/posts/${postId}/comments`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 设置帖子点赞或取消点赞状态，需要登录
-     *
-     * @tags Feed
-     * @name SetFeedPostLike
-     * @summary 设置帖子点赞状态
-     * @request POST:/api/feed/posts/{post_id}/like
-     */
-    setFeedPostLike: (
-      postId: string,
-      request: SetFeedPostLikeRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<SetFeedPostLikeData, any>({
-        path: `/api/feed/posts/${postId}/like`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        ...params,
-      }),
-  };
   crud = {
     /**
      * @description 分页获取数据记录列表，支持按分类筛选，返回分页信息和记录数据
@@ -1381,6 +1247,140 @@ export class Api<
       this.request<DeleteData, any>({
         path: `/crud/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+  };
+  feed = {
+    /**
+     * @description 设置评论点赞或取消点赞状态，需要登录
+     *
+     * @tags Feed
+     * @name SetFeedCommentLike
+     * @summary 设置评论点赞状态
+     * @request POST:/feed/comments/{comment_id}/like
+     */
+    setFeedCommentLike: (
+      commentId: string,
+      request: SetFeedCommentLikeRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<SetFeedCommentLikeData, any>({
+        path: `/feed/comments/${commentId}/like`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 支持多种排序方式和cursor分页
+     *
+     * @tags Feed
+     * @name GetFeedPosts
+     * @summary 获取信息流帖子列表
+     * @request GET:/feed/posts
+     */
+    getFeedPosts: (query: GetFeedPostsParams, params: RequestParams = {}) =>
+      this.request<GetFeedPostsData, any>({
+        path: `/feed/posts`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description 创建新的信息流帖子，需要登录
+     *
+     * @tags Feed
+     * @name CreateFeedPost
+     * @summary 创建信息流帖子
+     * @request POST:/feed/posts
+     */
+    createFeedPost: (
+      request: CreateFeedPostRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreateFeedPostData, any>({
+        path: `/feed/posts`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 获取指定帖子的详细信息
+     *
+     * @tags Feed
+     * @name GetFeedPostDetail
+     * @summary 获取帖子详情
+     * @request GET:/feed/posts/{post_id}
+     */
+    getFeedPostDetail: (postId: string, params: RequestParams = {}) =>
+      this.request<GetFeedPostDetailData, any>({
+        path: `/feed/posts/${postId}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * @description 获取指定帖子的评论列表，支持cursor分页
+     *
+     * @tags Feed
+     * @name GetFeedComments
+     * @summary 获取帖子评论列表
+     * @request GET:/feed/posts/{post_id}/comments
+     */
+    getFeedComments: (
+      { postId, ...query }: GetFeedCommentsParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<GetFeedCommentsData, any>({
+        path: `/feed/posts/${postId}/comments`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description 为指定帖子创建评论，需要登录
+     *
+     * @tags Feed
+     * @name CreateFeedComment
+     * @summary 创建帖子评论
+     * @request POST:/feed/posts/{post_id}/comments
+     */
+    createFeedComment: (
+      postId: string,
+      request: CreateFeedCommentRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<CreateFeedCommentData, any>({
+        path: `/feed/posts/${postId}/comments`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 设置帖子点赞或取消点赞状态，需要登录
+     *
+     * @tags Feed
+     * @name SetFeedPostLike
+     * @summary 设置帖子点赞状态
+     * @request POST:/feed/posts/{post_id}/like
+     */
+    setFeedPostLike: (
+      postId: string,
+      request: SetFeedPostLikeRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<SetFeedPostLikeData, any>({
+        path: `/feed/posts/${postId}/like`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
         ...params,
       }),
   };

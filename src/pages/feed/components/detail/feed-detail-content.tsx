@@ -14,7 +14,7 @@ import { FileX } from 'lucide-react'
  * Feed详情内容组件 - 弹窗和详情页共用
  */
 export const FeedDetailContent = (props: FeedDetailContentProps) => {
-	const { post, showNavigateButton = false, onNavigateToPage, onAddComment, onReply, className } = props
+	const { post, showNavigateButton = false, onNavigateToPage, className } = props
 
 	const { toggleLike, toggleExpand } = useFeedStore()
 

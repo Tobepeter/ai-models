@@ -27,26 +27,16 @@ export const FeedDetailDialog = () => {
 	const currPost = detailDialogPostId ? posts.find((p) => p.id === detailDialogPostId) : null
 
 	// 处理弹窗关闭
+	// 处理弹窗关闭
 	const handleClose = () => {
 		setData({ isDetailDialogOpen: false, detailDialogPostId: '' })
 	}
 
 	// 处理跳转到详情页
+	// 处理跳转到详情页
 	const handleNavigateToPage = (postId: string) => {
 		handleClose()
 		navigate(`/feed/${postId}`)
-	}
-
-	// 处理添加评论
-	const handleAddComment = (postId: string, content: string, replyTo?: string) => {
-		const newComment = feedUtil.createComment(postId, content, replyTo)
-		addComment(postId, newComment)
-	}
-
-	// 处理回复
-	const handleReply = (postId: string, username: string) => {
-		// TODO: 实现回复逻辑
-		console.log('回复用户:', username, '在帖子:', postId)
 	}
 
 	// 键盘事件处理
@@ -87,7 +77,7 @@ export const FeedDetailDialog = () => {
 					<DialogDescription>查看帖子详情和评论</DialogDescription>
 				</DialogHeader>
 
-				<FeedDetailContent post={currPost} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} onAddComment={handleAddComment} onReply={handleReply} className={detailContentClass} />
+				<FeedDetailContent post={currPost} showNavigateButton={true} onNavigateToPage={handleNavigateToPage} className={detailContentClass} />
 			</DialogContent>
 		</Dialog>
 	)

@@ -3,13 +3,12 @@ import { truncate } from 'lodash-es'
 import { type AppFeedComment } from './feed-types'
 
 /**
- * 信息流工具类 - 提供时间格式化、内容处理、分页游标等功能
- * 使用 date-fns 处理时间，lodash 处理字符串和防抖
+ * 信息流工具类 - 提供时间格式化、内容处理等功能
  */
 class FeedUtil {
 	readonly MAX_CONTENT_LENGTH = 200 // 内容最大长度
 
-	/* 格式化时间为中文相对时间 */
+	// 格式化时间为中文相对时间
 	formatTime(timestamp: string) {
 		const now = new Date()
 		const time = parseISO(timestamp)
@@ -38,22 +37,9 @@ class FeedUtil {
 		return content.match(hashtagRegex) || []
 	}
 
-	// 生成分页游标
-	genCursor(timestamp: number, postId: string) {
-		return `${timestamp}_${postId}` // 格式: timestamp_postId
-	}
-
-	// 解析分页游标
-	parseCursor(cursor: string): { timestamp: number; id: string } | null {
-		try {
-			const [timestampStr, id] = cursor.split('_')
-			const timestamp = parseInt(timestampStr, 10)
-
-			if (isNaN(timestamp) || !id) return null
-			return { timestamp, id }
-		} catch {
-			return null
-		}
+	// 生成简单游标（仅用于mock模式）
+	genMockCursor() {
+		return Math.floor(Math.random() * 1000000).toString()
 	}
 
 	// 生成用户ID
@@ -72,7 +58,7 @@ class FeedUtil {
 		return new Promise((resolve) => setTimeout(resolve, delay))
 	}
 
-	/* 格式化数字显示 - 类似 numeral.js: 1000->1k, 1000000->1M, >999M显示999M+ */
+	// 格式化数字显示 - 类似 numeral.js
 	formatCount(count: number) {
 		if (count < 1000) return count.toString()
 

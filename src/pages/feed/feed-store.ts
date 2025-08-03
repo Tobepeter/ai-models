@@ -10,7 +10,7 @@ export type { AppFeedComment as FeedComment, AppFeedPost as FeedPost, DetailComm
 
 const { commentPageSize } = feedConfig
 
-/* 信息流状态 */
+// 信息流状态
 const feedState = {
 	// Feed 流数据
 	posts: [] as AppFeedPost[],

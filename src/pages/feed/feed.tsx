@@ -10,7 +10,7 @@ import { WifiOff, RefreshCw } from 'lucide-react'
 import { useHeader } from '@/hooks/use-header'
 import { Empty } from '@/components/common/empty'
 
-/* 信息流主页面 - 支持无限滚动和下拉刷新 */
+// 信息流主页面 - 支持无限滚动和下拉刷新
 export const Feed = () => {
 	const { posts, loading, hasMore, error, clearError } = useFeedStore()
 	const { setTitle } = useHeader() // 使用hook，自动处理unmount reset

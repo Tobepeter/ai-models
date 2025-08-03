@@ -17,16 +17,19 @@ export const FeedItemActions = (props: FeedItemActionsProps) => {
 	// 缓存格式化后的数字，避免重复计算
 	const formattedLikeCount = useMemo(() => feedUtil.formatCount(likeCount), [likeCount])
 
+	// 处理点赞操作
 	const handleLike = useMemoizedFn((e: React.MouseEvent) => {
 		e.stopPropagation()
 		feedMgr.toggleLike(postId)
 	})
 
+	// 处理添加评论
 	const handleAddComment = useMemoizedFn((content: string, replyTo?: string) => {
 		// 直接调用 feedMgr 添加评论
 		feedMgr.addComment(postId, content, replyTo)
 	})
 
+	// 处理分享操作
 	const handleShare = useMemoizedFn((e: React.MouseEvent) => {
 		e.stopPropagation()
 		console.log('分享:', postId) // TODO: 实现分享功能

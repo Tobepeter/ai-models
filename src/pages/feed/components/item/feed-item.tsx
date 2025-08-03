@@ -20,6 +20,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 	const navigate = useNavigate()
 	const isMobile = useIsMobile()
 
+	// 处理查看更多评论
 	const handleViewMore = () => {
 		// 处理查看更多
 		if (isMobile) {
@@ -31,6 +32,7 @@ export const FeedItem = memo((props: FeedItemProps) => {
 		}
 	}
 
+	// 点击内容区域打开详情
 	const handleContentClick = () => {
 		// 点击内容区域打开详情
 		if (isMobile) {

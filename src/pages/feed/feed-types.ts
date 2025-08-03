@@ -4,7 +4,7 @@ export interface AppFeedComment extends FeedComment {
 	isLiked?: boolean // 前端特有：是否已点赞
 }
 
-/* 详情页评论分页管理 */
+// 详情页评论分页管理
 export interface DetailComments {
 	loaded_comments: AppFeedComment[] // 完整评论列表（preloaded + 详情页加载）
 	next_cursor?: string // 下一页cursor
