@@ -35,10 +35,10 @@ type FeedComment struct {
 
 // FeedPostResponseItem 帖子响应项目
 type FeedPostResponseItem struct {
-	FeedPost                                     // 内嵌原始Post
-	PreloadedComments   []FeedComment `json:"preloaded_comments"`   // 预载评论列表
-	CommentPreviewCount int           `json:"comment_preview_count"` // 预载评论数量
-	IsLiked             *bool         `json:"is_liked,omitempty"`    // 当前用户是否点赞（游客时为nil）
+	FeedPost                                               // 内嵌原始Post
+	PreloadedComments           []FeedComment `json:"preloaded_comments"`                     // 预载评论列表
+	PreloadedCommentsNextCursor string        `json:"preloaded_comments_next_cursor,omitempty"` // 预载评论的下一页cursor
+	IsLiked                     *bool         `json:"is_liked,omitempty"`                     // 当前用户是否点赞（游客时为nil）
 }
 
 // FeedPostResponse 帖子响应结构

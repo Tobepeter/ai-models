@@ -7,6 +7,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
 	"ai-models-backend/internal/models"
 
@@ -39,17 +42,35 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams, userID *uint64
 
 	// 计算排序方式
 	if params.AfterID != "" {
+		// 解析cursor: timestamp:id
+		parts := strings.Split(params.AfterID, ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid cursor format: %s", params.AfterID)
+		}
+		
+		timestamp, err := strconv.ParseInt(parts[0], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid timestamp in cursor: %s", parts[0])
+		}
+		
+		id, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid id in cursor: %s", parts[1])
+		}
+		
+		cursorTime := time.Unix(timestamp, 0)
+		
 		// 有cursor分页，设置排序和cursor条件
 		switch params.Sort {
 		case "like":
 			query = query.Order("like_count DESC, id DESC").Where("(like_count < (SELECT like_count FROM feed_posts WHERE id = ?) OR (like_count = (SELECT like_count FROM feed_posts WHERE id = ?) AND id < ?))",
-				params.AfterID, params.AfterID, params.AfterID)
+				id, id, id)
 		case "comment":
 			query = query.Order("comment_count DESC, id DESC").Where("(comment_count < (SELECT comment_count FROM feed_posts WHERE id = ?) OR (comment_count = (SELECT comment_count FROM feed_posts WHERE id = ?) AND id < ?))",
-				params.AfterID, params.AfterID, params.AfterID)
+				id, id, id)
 		default: // "time"
-			query = query.Order("created_at DESC, id DESC").Where("(created_at < (SELECT created_at FROM feed_posts WHERE id = ?) OR (created_at = (SELECT created_at FROM feed_posts WHERE id = ?) AND id < ?))",
-				params.AfterID, params.AfterID, params.AfterID)
+			query = query.Order("created_at DESC, id DESC").Where("(created_at < ? OR (created_at = ? AND id < ?))",
+				cursorTime, cursorTime, id)
 		}
 	} else {
 		// 无cursor分页，只设置排序
@@ -85,7 +106,8 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams, userID *uint64
 	// 生成下一页游标
 	var nextCursor string
 	if hasMore && len(posts) > 0 {
-		nextCursor = fmt.Sprintf("%d", posts[len(posts)-1].ID)
+		lastPost := posts[len(posts)-1]
+		nextCursor = fmt.Sprintf("%d:%d", lastPost.CreatedAt.Unix(), lastPost.ID)
 	}
 
 	// 构建响应项目列表
@@ -111,19 +133,19 @@ func (s *FeedService) GetFeedPosts(params models.FeedQueryParams, userID *uint64
 
 		// 根据参数决定是否预载评论
 		if params.CommentCount > 0 {
-			comments, err := s.getCommentsFromCache(fmt.Sprintf("%d", post.ID), params.CommentCount)
+			comments, cursor, err := s.getCommentsFromCache(fmt.Sprintf("%d", post.ID), params.CommentCount)
 			if err == nil && len(comments) > 0 {
 				item.PreloadedComments = comments
-				item.CommentPreviewCount = len(comments)
+				item.PreloadedCommentsNextCursor = cursor
 			} else {
 				// 即使获取评论失败，也要确保字段存在（空数组）
 				item.PreloadedComments = []models.FeedComment{}
-				item.CommentPreviewCount = 0
+				item.PreloadedCommentsNextCursor = ""
 			}
 		} else {
 			// 不预载评论，设置为空数组
 			item.PreloadedComments = []models.FeedComment{}
-			item.CommentPreviewCount = 0
+			item.PreloadedCommentsNextCursor = ""
 		}
 
 		responseItems[i] = item
@@ -252,13 +274,25 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) (*models
 
 	// Cursor分页处理
 	if params.AfterID != "" {
-		var lastComment models.FeedComment
-		if err := s.DB.Where("id = ?", params.AfterID).First(&lastComment).Error; err != nil {
-			return nil, fmt.Errorf("invalid cursor: %w", err)
+		// 解析cursor: timestamp:id
+		parts := strings.Split(params.AfterID, ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid cursor format: %s", params.AfterID)
 		}
-
+		
+		timestamp, err := strconv.ParseInt(parts[0], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid timestamp in cursor: %s", parts[0])
+		}
+		
+		id, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid id in cursor: %s", parts[1])
+		}
+		
+		cursorTime := time.Unix(timestamp, 0)
 		query = query.Where("(created_at < ? OR (created_at = ? AND id < ?))",
-			lastComment.CreatedAt, lastComment.CreatedAt, lastComment.ID)
+			cursorTime, cursorTime, id)
 	}
 
 	// 查询数据，多查一条判断是否还有更多
@@ -275,7 +309,8 @@ func (s *FeedService) GetFeedComments(params models.CommentQueryParams) (*models
 	// 生成下一页游标
 	var nextCursor string
 	if hasMore && len(comments) > 0 {
-		nextCursor = fmt.Sprintf("%d", comments[len(comments)-1].ID)
+		lastComment := comments[len(comments)-1]
+		nextCursor = fmt.Sprintf("%d:%d", lastComment.CreatedAt.Unix(), lastComment.ID)
 	}
 
 	return &models.FeedCommentResponse{
@@ -506,7 +541,8 @@ func (s *FeedService) CleanFeedOrphanData() error {
 // ==== 评论缓存相关方法 ====
 
 // getCommentsFromCache 从缓存获取评论，如果缓存未命中或数量不够则从数据库获取并缓存
-func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.FeedComment, error) {
+// 返回评论列表和下一页cursor
+func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.FeedComment, string, error) {
 	ctx := context.Background()
 	key := config.FeedCommentCacheKeyPrefix + postID
 
@@ -518,16 +554,18 @@ func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.F
 		if err := json.Unmarshal([]byte(cached), &cachedComments); err == nil {
 			// 如果缓存数量足够，直接返回
 			if len(cachedComments) >= count {
-				return cachedComments[:count], nil
+				comments := cachedComments[:count]
+				cursor := s.generateCommentCursor(comments)
+				return comments, cursor, nil
 			}
 			// 缓存数量不够，需要从数据库补充
 		}
 	}
 
 	// 缓存未命中或数量不够，从数据库获取
-	comments, err := s.getTopCommentsFromDB(postID, count)
+	comments, cursor, err := s.getTopCommentsFromDBWithCursor(postID, count)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// 如果获取到的评论比当前缓存多，异步更新缓存
@@ -535,7 +573,47 @@ func (s *FeedService) getCommentsFromCache(postID string, count int) ([]models.F
 		go s.cacheComments(postID, comments)
 	}
 
-	return comments, nil
+	return comments, cursor, nil
+}
+
+// getTopCommentsFromDBWithCursor 从数据库获取指定数量的最新评论，并生成cursor
+func (s *FeedService) getTopCommentsFromDBWithCursor(postID string, count int) ([]models.FeedComment, string, error) {
+	var comments []models.FeedComment
+	
+	// 多查一条来判断是否还有更多
+	err := s.DB.Model(&models.FeedComment{}).
+		Where("post_id = ?", postID).
+		Order("created_at DESC, id DESC").
+		Limit(count + 1).
+		Find(&comments).Error
+	
+	if err != nil {
+		return nil, "", err
+	}
+	
+	// 判断是否还有更多数据
+	hasMore := len(comments) > count
+	if hasMore {
+		comments = comments[:count] // 移除多查的那一条
+	}
+	
+	// 生成cursor
+	var cursor string
+	if hasMore && len(comments) > 0 {
+		lastComment := comments[len(comments)-1]
+		cursor = fmt.Sprintf("%d:%d", lastComment.CreatedAt.Unix(), lastComment.ID)
+	}
+	
+	return comments, cursor, nil
+}
+
+// generateCommentCursor 为评论列表生成cursor
+func (s *FeedService) generateCommentCursor(comments []models.FeedComment) string {
+	if len(comments) == 0 {
+		return ""
+	}
+	lastComment := comments[len(comments)-1]
+	return fmt.Sprintf("%d:%d", lastComment.CreatedAt.Unix(), lastComment.ID)
 }
 
 // getTopCommentsFromDB 从数据库获取指定数量的最新评论

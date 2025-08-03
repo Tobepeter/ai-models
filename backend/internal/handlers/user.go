@@ -42,7 +42,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	user, token, err := h.authService.Register(req)
+	user, token, refreshToken, err := h.authService.Register(req)
 	if err != nil {
 		logrus.Error("Failed to register user:", err)
 		response.Error(c, http.StatusInternalServerError, err.Error())
@@ -50,8 +50,9 @@ func (h *UserHandler) Register(c *gin.Context) {
 	}
 
 	data := models.UserCreateResponse{
-		User:  user.ToResponse(),
-		Token: token,
+		User:         user.ToResponse(),
+		Token:        token,
+		RefreshToken: refreshToken,
 	}
 
 	response.Success(c, data)
@@ -72,7 +73,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, token, err := h.authService.Login(req.Username, req.Password)
+	user, token, refreshToken, err := h.authService.Login(req.Username, req.Password)
 	if err != nil {
 		logrus.Error("Authentication failed:", err)
 		response.Error(c, http.StatusUnauthorized, err.Error())
@@ -80,8 +81,9 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	data := models.UserLoginResponse{
-		User:  user.ToResponse(),
-		Token: token,
+		User:         user.ToResponse(),
+		Token:        token,
+		RefreshToken: refreshToken,
 	}
 
 	response.Success(c, data)
@@ -364,7 +366,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	}
 
 	// 刷新token
-	newToken, err := h.authService.RefreshToken(token)
+	newToken, newRefreshToken, err := h.authService.RefreshToken(token)
 	if err != nil {
 		logrus.Error("Failed to refresh token:", err)
 		response.Error(c, http.StatusUnauthorized, "token刷新失败")
@@ -375,7 +377,8 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	h.authService.Logout(token)
 
 	data := models.RefreshTokenResponse{
-		Token: newToken,
+		Token:        newToken,
+		RefreshToken: newRefreshToken,
 	}
 
 	response.Success(c, data)

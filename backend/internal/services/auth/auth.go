@@ -11,52 +11,52 @@ import (
 )
 
 // Login 用户登录认证
-func (s *AuthService) Login(username, password string) (*models.User, string, error) {
+func (s *AuthService) Login(username, password string) (*models.User, string, string, error) {
 	var user models.User
 
 	// 根据用户名或邮箱查找用户
 	if err := s.DB.Where("username = ? OR email = ?", username, username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, "", errors.New("用户不存在")
+			return nil, "", "", errors.New("用户不存在")
 		}
-		return nil, "", err
+		return nil, "", "", err
 	}
 
 	// 检查用户是否激活
 	if !user.IsActive {
-		return nil, "", errors.New("用户已被禁用")
+		return nil, "", "", errors.New("用户已被禁用")
 	}
 
 	// 验证密码
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return nil, "", errors.New("密码错误")
+		return nil, "", "", errors.New("密码错误")
 	}
 
-	// 生成token
-	token, err := s.GenerateToken(user.ID)
+	// 生成token对
+	token, refreshToken, err := s.GenerateTokenPair(user.ID)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 
-	return &user, token, nil
+	return &user, token, refreshToken, nil
 }
 
 // Register 用户注册
-func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, string, error) {
+func (s *AuthService) Register(req models.UserCreateRequest) (*models.User, string, string, error) {
 	// 调用用户服务创建用户
 	userService := services.NewUserService(s.config)
 	user, err := userService.CreateUser(req)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 
-	// 生成token
-	token, err := s.GenerateToken(user.ID)
+	// 生成token对
+	token, refreshToken, err := s.GenerateTokenPair(user.ID)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 
-	return user, token, nil
+	return user, token, refreshToken, nil
 }
 
 // Logout 退出登录 (将token添加到黑名单)

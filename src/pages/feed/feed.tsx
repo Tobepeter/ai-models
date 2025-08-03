@@ -12,8 +12,8 @@ import { Empty } from '@/components/common/empty'
 
 // 信息流主页面 - 支持无限滚动和下拉刷新
 export const Feed = () => {
-	const { posts, loading, hasMore, error, clearError } = useFeedStore()
-	const { setTitle } = useHeader() // 使用hook，自动处理unmount reset
+	const { posts, loading, hasMore, refreshError, clearRefreshError } = useFeedStore()
+	const { setTitle } = useHeader()
 
 	// 初始化数据加载和header设置
 	useMount(() => {
@@ -26,21 +26,17 @@ export const Feed = () => {
 	})
 
 	const handleRetry = () => {
-		clearError()
-		if (posts.length === 0) {
-			feedMgr.refresh()
-		} else {
-			feedMgr.loadMore()
-		}
+		clearRefreshError()
+		feedMgr.refresh()
 	}
 
-	// 错误状态
-	if (error) {
+	// 刷新错误状态
+	if (refreshError) {
 		return (
 			<Empty
 				icon={<WifiOff className="h-16 w-16 text-muted-foreground" />}
 				title="加载失败"
-				desc={`${error}\n请检查网络连接后重试`}
+				desc={`${refreshError}\n请检查网络连接后重试`}
 				buttonText={
 					<>
 						<RefreshCw className="h-4 w-4 mr-2" />

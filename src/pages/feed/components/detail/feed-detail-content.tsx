@@ -17,21 +17,14 @@ import { FileX } from 'lucide-react'
 export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	const { post, showNavigateButton = false, onNavigateToPage, className } = props
 
-	const { commentState } = useFeedDetailStore()
-
-	// 获取评论数据
-	const comments = useMemo(() => {
-		return commentState.comments || []
-	}, [commentState.comments])
-
-	const { hasMore: hasMoreComments, loading = false, error } = commentState
+	const { comments, commentsHasMore, commentsLoading = false, commentsError } = useFeedDetailStore()
 
 	// 处理函数
 	const handleNavigateToPage = () => onNavigateToPage?.(post!.id)
 
 	// 加载更多评论
 	const handleLoadMore = async () => {
-		if (loading) return
+		if (commentsLoading) return
 		await feedDetailMgr.loadMoreComments()
 	}
 
@@ -77,12 +70,12 @@ export const FeedDetailContent = (props: FeedDetailContentProps) => {
 	)
 
 	const renderCommentList = () => {
-		return <FeedDetailCommentList comments={comments} hasMore={hasMoreComments} loading={loading} error={error} onLoadMore={handleLoadMore} onRetry={handleRetry} />
+		return <FeedDetailCommentList comments={comments} hasMore={commentsHasMore} loading={commentsLoading} error={commentsError} onLoadMore={handleLoadMore} onRetry={handleRetry} />
 	}
 
 	// 主要状态判断
 	if (!post) return renderEmptyPost()
-	if (error && comments.length === 0) return renderError()
+	if (commentsError && comments.length === 0) return renderError()
 
 	// 解构 post 的常用属性
 	const { id, user_id, username, avatar, status, created_at, content, image_url, like_count, comment_count, is_liked, is_expanded } = post
@@ -129,7 +122,5 @@ export interface FeedDetailContentProps {
 	post: AppFeedPost | null // 支持 null，用于显示帖子不存在状态
 	showNavigateButton?: boolean // 是否显示跳转按钮
 	onNavigateToPage?: (postId: string) => void
-	onAddComment?: (content: string, replyTo?: string) => void
-	onReply?: (username: string) => void
 	className?: string
 }

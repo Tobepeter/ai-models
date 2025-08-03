@@ -3,20 +3,30 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { FeedItem } from './item/feed-item'
 import { FeedSkeleton, FeedLoadMoreSkeleton } from './feed-skeleton'
 import { feedMgr } from '../core/feed-mgr'
+import { useFeedStore } from '../feed-store'
 import { type AppFeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
+import { RefreshCw, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 /**
  * 虚拟滚动信息流列表组件
  */
 export const FeedList = (props: FeedListProps) => {
 	const { posts, loading, hasMore, className } = props
+	const { loadMoreError, clearLoadMoreError } = useFeedStore()
 
 	const parentRef = useRef<HTMLDivElement>(null)
 
 	const postsLength = posts.length // 提取常用计算值
 	const estimateSize = 600 // 预估的单个项目高度
 	const overscan = 5 // 虚拟滚动的预渲染数量
+
+	// 处理加载更多重试
+	const handleLoadMoreRetry = () => {
+		clearLoadMoreError()
+		feedMgr.loadMore()
+	}
 
 	// TanStack Virtual 配置
 	const virtualizer = useVirtualizer({
@@ -85,8 +95,25 @@ export const FeedList = (props: FeedListProps) => {
 					{/* 底部加载状态 */}
 					{postsLength > 0 && (
 						<div style={loadMoreStyle} className="py-4">
-							{loading && hasMore && <FeedLoadMoreSkeleton />}
-							{!hasMore && <div className="text-center text-muted-foreground text-sm py-8">没有更多内容了</div>}
+							{loadMoreError ? (
+								// 加载更多错误状态
+								<div className="text-center">
+									<div className="flex items-center justify-center text-destructive text-sm mb-3">
+										<AlertCircle className="h-4 w-4 mr-2" />
+										{loadMoreError}
+									</div>
+									<Button variant="outline" size="sm" onClick={handleLoadMoreRetry}>
+										<RefreshCw className="h-4 w-4 mr-2" />
+										重试
+									</Button>
+								</div>
+							) : loading && hasMore ? (
+								// 正在加载更多
+								<FeedLoadMoreSkeleton />
+							) : !hasMore ? (
+								// 没有更多内容
+								<div className="text-center text-muted-foreground text-sm py-8">没有更多内容了</div>
+							) : null}
 						</div>
 					)}
 				</div>

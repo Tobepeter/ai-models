@@ -32,16 +32,6 @@ export const FeedDetailDialog = () => {
 		navigate(`/feed/${postId}`)
 	}
 
-	// 处理添加评论
-	const handleAddComment = (content: string, replyTo?: string) => {
-		feedDetailMgr.addComment(content, replyTo)
-	}
-
-	// 处理回复
-	const handleReply = (username: string) => {
-		// TODO: 实现回复逻辑
-		console.log('回复用户:', username)
-	}
 
 	// 键盘事件处理
 	useEffect(() => {
@@ -83,8 +73,6 @@ export const FeedDetailDialog = () => {
 					post={currentPost} 
 					showNavigateButton={true} 
 					onNavigateToPage={handleNavigateToPage} 
-					onAddComment={handleAddComment}
-					onReply={handleReply}
 					className={detailContentClass} 
 				/>
 			</DialogContent>

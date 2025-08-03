@@ -152,8 +152,6 @@ export interface FeedPostResponseItem {
   /** 冗余头像 */
   avatar?: string;
   comment_count?: number;
-  /** 预载评论数量 */
-  comment_preview_count?: number;
   /** 文字内容（可选） */
   content?: string;
   created_at?: string;
@@ -166,6 +164,8 @@ export interface FeedPostResponseItem {
   like_count?: number;
   /** 预载评论列表 */
   preloaded_comments?: FeedComment[];
+  /** 预载评论的下一页cursor */
+  preloaded_comments_next_cursor?: string;
   /** 用户状态emoji */
   status?: string;
   updated_at?: string;

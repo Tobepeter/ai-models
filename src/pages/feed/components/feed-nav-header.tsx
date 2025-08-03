@@ -9,12 +9,12 @@ import { useUserStore } from '@/store/user-store'
 
 // Feed 导航标题组件
 export const FeedNavHeader = () => {
-	const { loading, refreshing, error, clearError, setData } = useFeedStore()
+	const { loading, refreshing, refreshError, clearRefreshError, setData } = useFeedStore()
 	const { goLogin } = useUserStore()
 
 	const handleRefresh = () => {
-		clearError()
-		feedMgr.refresh(true)
+		clearRefreshError()
+		feedMgr.refresh()
 	}
 
 	const handleCreate = () => {
@@ -30,7 +30,7 @@ export const FeedNavHeader = () => {
 		setData({ isCreateDialogOpen: true })
 	}
 
-	const addEnable = !error && !loading
+	const addEnable = !refreshError && !loading
 
 	return (
 		<div className="flex items-center gap-2" data-slot="feed-nav-header">

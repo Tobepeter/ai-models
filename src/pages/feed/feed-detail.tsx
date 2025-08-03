@@ -17,17 +17,6 @@ export const FeedDetail = () => {
 
 	const { currentPost, loading, error } = useFeedDetailStore()
 
-	// 处理添加评论
-	const handleAddComment = (content: string, replyTo?: string) => {
-		feedDetailMgr.addComment(content, replyTo)
-	}
-
-	// 处理回复
-	const handleReply = (username: string) => {
-		// TODO: 实现回复逻辑
-		console.log('回复用户:', username)
-	}
-
 	// 导航函数
 	const handleNavigateToFeed = () => navigate('/feed')
 
@@ -69,8 +58,6 @@ export const FeedDetail = () => {
 				<FeedDetailContent
 					post={currentPost}
 					showNavigateButton={false} // 详情页不需要跳转按钮
-					onAddComment={handleAddComment}
-					onReply={handleReply}
 					className="h-full"
 				/>
 			</div>

@@ -18,7 +18,8 @@ const feedState = {
 	refreshing: false, // loading 的子状态，表示是刷新类型的加载
 	hasMore: true,
 	cursor: '', // 分页游标
-	error: '',
+	refreshError: '', // 刷新(初始加载)错误
+	loadMoreError: '', // 加载更多错误
 
 	// 弹窗状态 - 直接定义简单状态
 	isDetailDialogOpen: false,
@@ -38,8 +39,10 @@ const stateCreator = () => {
 		setData: (data: Partial<FeedState>) => set(data),
 		// 设置加载状态
 		setLoading: (loading: boolean) => set({ loading }),
-		// 设置错误信息
-		setError: (error: string) => set({ error }),
+		// 设置刷新错误
+		setRefreshError: (refreshError: string) => set({ refreshError }),
+		// 设置加载更多错误
+		setLoadMoreError: (loadMoreError: string) => set({ loadMoreError }),
 
 		// 在列表前面添加新帖子
 		prependPosts: (newPosts: AppFeedPost[]) => {
@@ -134,8 +137,12 @@ const stateCreator = () => {
 
 		// 重置为初始状态
 		reset: () => set(feedState),
-		// 清除错误状态
-		clearError: () => set({ error: '' }),
+		// 清除刷新错误
+		clearRefreshError: () => set({ refreshError: '' }),
+		// 清除加载更多错误
+		clearLoadMoreError: () => set({ loadMoreError: '' }),
+		// 清除所有错误
+		clearAllErrors: () => set({ refreshError: '', loadMoreError: '' }),
 	}))
 }
 

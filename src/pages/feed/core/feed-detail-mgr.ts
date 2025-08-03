@@ -42,7 +42,6 @@ class FeedDetailMgr {
 		return {
 			...feedPost,
 			preloaded_comments: [], // FeedPost没有预载评论，设为空数组
-			comment_preview_count: 0, // 预载评论数量设为0
 			is_liked: undefined, // 详情API可能不返回用户点赞状态
 		}
 	}
@@ -53,8 +52,8 @@ class FeedDetailMgr {
 		const feedStore = this.getFeedStore()
 
 		// 从feed流中获取post数据作为初始数据
-		const feedPost = feedStore.posts.find(p => p.id === postId)
-		
+		const feedPost = feedStore.posts.find((p) => p.id === postId)
+
 		// 打开弹窗并设置初始数据
 		detailStore.openDialog(postId, feedPost || null)
 
@@ -77,8 +76,8 @@ class FeedDetailMgr {
 
 		try {
 			// 从feed流中获取post数据作为初始数据
-			const feedPost = feedStore.posts.find(p => p.id === postId)
-			
+			const feedPost = feedStore.posts.find((p) => p.id === postId)
+
 			if (feedPost) {
 				// 使用feed流中的数据初始化
 				detailStore.setCurrentPost(feedPost)
@@ -132,7 +131,7 @@ class FeedDetailMgr {
 	// 初始化评论数据
 	async initComments(postId: string, post: AppFeedPost) {
 		const detailStore = this.getDetailStore()
-		
+
 		try {
 			detailStore.setCommentsLoading(true)
 
@@ -145,38 +144,26 @@ class FeedDetailMgr {
 				const preloadedComments = post.preloaded_comments || []
 				const hasMore = (post.comment_count || 0) > preloadedComments.length
 
-				detailStore.initComments(
-					preloadedComments,
-					(post as any).preloaded_comments_cursor,
-					hasMore
-				)
+				detailStore.initComments(preloadedComments, (post as any).preloaded_comments_cursor, hasMore)
 			} else {
 				// 真实API：检查是否有预加载数据
 				const preloadedComments = post.preloaded_comments || []
-				
+
 				if (preloadedComments.length > 0) {
 					// 有预加载数据，基于预加载初始化
 					const hasMore = (post.comment_count || 0) > preloadedComments.length
-					detailStore.initComments(
-						preloadedComments,
-						preloadedComments.length > 0 ? preloadedComments[preloadedComments.length - 1].id?.toString() : undefined,
-						hasMore
-					)
+					detailStore.initComments(preloadedComments, preloadedComments.length > 0 ? preloadedComments[preloadedComments.length - 1].id?.toString() : undefined, hasMore)
 				} else {
 					// 无预加载数据，全量加载评论
-					const response = await api.feed.getFeedComments({ 
+					const response = await api.feed.getFeedComments({
 						postId: postId,
 						post_id: postId,
-						limit: feedConfig.commentPageSize 
+						limit: feedConfig.commentPageSize,
 					})
-					
+
 					if (response?.data) {
-						const comments = (response.data.comments || []).map(c => ({ ...c, isLiked: false }))
-						detailStore.initComments(
-							comments,
-							response.data.next_cursor,
-							response.data.has_more || false
-						)
+						const comments = (response.data.comments || []).map((c) => ({ ...c, isLiked: false }))
+						detailStore.initComments(comments, response.data.next_cursor, response.data.has_more || false)
 					}
 				}
 			}
@@ -193,39 +180,35 @@ class FeedDetailMgr {
 	// 加载更多评论
 	async loadMoreComments() {
 		const detailStore = this.getDetailStore()
-		const { currentPost, commentState } = detailStore
-		
-		if (!currentPost || commentState.loading || !commentState.hasMore) {
+		const { currentPost, comments, commentsCursor, commentsHasMore, commentsLoading } = detailStore
+
+		if (!currentPost || commentsLoading || !commentsHasMore) {
 			return
 		}
 
 		try {
 			detailStore.setCommentsLoading(true)
-			
+
 			if (this.mockMode) {
 				this.clearCommentTimer()
 				this.commentTimer = delayC(feedMock.getCommentDelay())
 				await this.commentTimer
 
 				// Mock模式：生成分页数据
-				const result = feedMock.genCommentPage(currentPost.id!, commentState.cursor)
+				const result = feedMock.genCommentPage(currentPost.id!, commentsCursor)
 				detailStore.appendComments(result.comments, result.next_cursor, result.has_more)
 			} else {
 				// 调用真实API加载更多评论
 				const response = await api.feed.getFeedComments({
 					postId: currentPost.id!,
 					post_id: currentPost.id!,
-					after_id: commentState.cursor,
+					after_id: commentsCursor,
 					limit: feedConfig.commentPageSize,
 				})
 
 				if (response?.data) {
-					const comments = (response.data.comments || []).map(c => ({ ...c, isLiked: false }))
-					detailStore.appendComments(
-						comments, 
-						response.data.next_cursor, 
-						response.data.has_more || false
-					)
+					const comments = (response.data.comments || []).map((c) => ({ ...c, isLiked: false }))
+					detailStore.appendComments(comments, response.data.next_cursor, response.data.has_more || false)
 					console.log(`[FeedDetailMgr] 加载更多评论成功: ${currentPost.id}, 新增${comments.length}条`)
 				}
 			}
@@ -255,13 +238,13 @@ class FeedDetailMgr {
 				await this.commentTimer
 
 				const comment = feedMock.genComment(currentPost.id, content, replyTo)
-				
+
 				// 乐观更新详情页
 				detailStore.addComment(comment)
-				
+
 				// 同步到主页feed流
 				feedStore.addComment(currentPost.id, comment)
-				
+
 				console.log(`[FeedDetailMgr] Mock添加评论成功: ${currentPost.id}`)
 			} else {
 				// 调用真实API创建评论
@@ -275,13 +258,13 @@ class FeedDetailMgr {
 						...response.data,
 						isLiked: false,
 					}
-					
+
 					// 乐观更新详情页
 					detailStore.addComment(comment)
-					
+
 					// 同步到主页feed流
 					feedStore.addComment(currentPost.id, comment)
-					
+
 					console.log(`[FeedDetailMgr] 添加评论成功: ${currentPost.id}`)
 				}
 			}
@@ -292,36 +275,18 @@ class FeedDetailMgr {
 		}
 	}
 
-	// 切换点赞状态 - 同步到主页
+	// 切换点赞状态 - 委托给feedMgr统一处理
 	async toggleLike() {
-		const detailStore = this.getDetailStore()
-		const feedStore = this.getFeedStore()
-		const { currentPost } = detailStore
+		const { currentPost } = this.getDetailStore()
 
 		if (!currentPost?.id) {
 			console.error('[FeedDetailMgr] 当前post不存在，无法点赞')
 			return
 		}
 
-		try {
-			// 乐观更新详情页
-			detailStore.toggleCurrentPostLike()
-			
-			// 同步到主页feed流
-			feedStore.toggleLike(currentPost.id)
-
-			// TODO: 调用真实API
-			// if (!this.mockMode) {
-			//   await api.feed.toggleLike(currentPost.id)
-			// }
-
-			console.log(`[FeedDetailMgr] 切换点赞状态: ${currentPost.id}`)
-		} catch (error) {
-			console.error('[FeedDetailMgr] 切换点赞失败:', error)
-			// 回滚操作
-			detailStore.toggleCurrentPostLike()
-			feedStore.toggleLike(currentPost.id!)
-		}
+		// 委托给feedMgr统一处理，会自动同步feed流和详情页
+		const { feedMgr } = await import('./feed-mgr')
+		feedMgr.toggleLike(currentPost.id)
 	}
 
 	// 关闭详情页

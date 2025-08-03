@@ -35,14 +35,17 @@
 - 组件必须有jsDoc (三行)，不用太详细，就一个标题也行，除非复杂可以加点描述
 - jsx片区不要大面积无注释，某个特定区块标注一下
 
-## shadcn/ui 使用规范
+### shadcn/ui 使用规范
 - 不要修改 shadcn 原始代码（`src/components/ui/`, `src/lib/utils.ts`, `src/hooks/use-mobile.ts`）
 - 使用 `cn` 工具函数合并类名，避免手动条件语法
 
-## Hooks 使用规范
+### Hooks 使用规范
 - 优先使用 ahooks 框架
 - 挂载/卸载使用 `useMount` 和 `useUnmount`
 - 如果一个函数可能被间接延迟调用，请考虑使用 `useMemoizedFn`，防止闭包访问旧数据的问题
+
+### store规范
+- store 我喜欢使用一个通用的`setData`，这样不为每个字段提供set方法
 
 ## nodejs规范
 - 如果fsextra更加优雅，可以代替fs->fse
@@ -62,7 +65,7 @@
 
 ### 注释规范  
 - 简短不啰嗦，内容要精简，避免冗长描述
-- 优先使用行尾注释 `// comment`，而不是独立行注释，函数类型除外
+- 优先使用行尾注释 `// comment`，而不是独立行注释，多行函数类型除外
 - 函数注释如果只有一行，使用单行注释 `// 功能描述`，复杂注释使用三行 `jsDoc`
 - class 必须是三行 jsDoc
 - 函数内不要大面积无注释，尽量分一分区块加一个注释性的描述

@@ -51,6 +51,12 @@ func main() {
 	}
 	defer database.Close()
 
+	// 初始化种子数据（仅开发环境）
+	seedManager := database.NewSeedManager(cfg)
+	if err := seedManager.RunAllSeeds(); err != nil {
+		logrus.Warn("种子数据生成失败:", err)
+	}
+
 	// 初始化Redis
 	if err := database.InitializeRedis(cfg); err != nil {
 		log.Fatal("Redis初始化失败:", err)

@@ -36,3 +36,7 @@
 - 后端提供完整的Swagger API文档
 - 前端代码生成基于Swagger规范
 - 确保API文档与实际实现保持同步
+
+### go新语法
+- 使用 `any` 代替 `interface{}`
+- 使用 `range` 代替 `for`

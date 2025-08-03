@@ -2789,10 +2789,6 @@ const docTemplate = `{
                 "comment_count": {
                     "type": "integer"
                 },
-                "comment_preview_count": {
-                    "description": "预载评论数量",
-                    "type": "integer"
-                },
                 "content": {
                     "description": "文字内容（可选）",
                     "type": "string"
@@ -2821,6 +2817,10 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ai-models-backend_internal_models.FeedComment"
                     }
+                },
+                "preloaded_comments_next_cursor": {
+                    "description": "预载评论的下一页cursor",
+                    "type": "string"
                 },
                 "status": {
                     "description": "用户状态emoji",

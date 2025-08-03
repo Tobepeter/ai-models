@@ -3,28 +3,17 @@ import { combine } from 'zustand/middleware'
 import { produce } from 'immer'
 import type { AppFeedComment, AppFeedPost } from './feed-types'
 
-// 详情页评论状态
-interface DetailCommentState {
-	comments: AppFeedComment[] // 评论列表
-	cursor?: string // 下一页cursor
-	hasMore?: boolean // 是否有更多
-	loading?: boolean // 加载状态
-	error?: string // 错误信息
-}
-
 // 详情页状态
 const feedDetailState = {
 	// 当前详情页数据
-	currentPost: null as AppFeedPost | null,
+	currentPost: null as Nullable<AppFeedPost>,
 	
-	// 评论状态
-	commentState: {
-		comments: [],
-		cursor: undefined,
-		hasMore: false,
-		loading: false,
-		error: undefined,
-	} as DetailCommentState,
+	// 评论相关状态
+	comments: [] as AppFeedComment[], // 评论列表
+	commentsCursor: '', // 下一页cursor
+	commentsHasMore: false, // 是否有更多
+	commentsLoading: false, // 评论加载状态
+	commentsError: '', // 评论错误信息
 	
 	// UI状态
 	isDialogOpen: false, // 弹窗是否打开
@@ -67,56 +56,50 @@ const stateCreator = () => {
 		
 		// 初始化评论数据（用于进入详情页时）
 		initComments: (comments: AppFeedComment[], cursor?: string, hasMore?: boolean) => {
-			set(
-				produce((draft) => {
-					draft.commentState = {
-						comments: [...comments],
-						cursor,
-						hasMore: hasMore ?? false,
-						loading: false,
-						error: undefined,
-					}
-				})
-			)
+			set({
+				comments: [...comments],
+				commentsCursor: cursor || '',
+				commentsHasMore: hasMore ?? false,
+				commentsLoading: false,
+				commentsError: '',
+			})
 		},
 		
 		// 设置评论加载状态
 		setCommentsLoading: (loading: boolean) => {
-			set(
-				produce((draft) => {
-					draft.commentState.loading = loading
-				})
-			)
+			set({ commentsLoading: loading })
 		},
 		
 		// 设置评论错误状态
 		setCommentsError: (error?: string) => {
-			set(
-				produce((draft) => {
-					draft.commentState.loading = false
-					draft.commentState.error = error
-				})
-			)
+			set({
+				commentsLoading: false,
+				commentsError: error || '',
+			})
 		},
 		
 		// 追加评论（分页加载）
 		appendComments: (newComments: AppFeedComment[], nextCursor?: string, hasMore?: boolean) => {
+			const state = get()
 			set(
-				produce((draft) => {
-					draft.commentState.comments.push(...newComments)
-					draft.commentState.cursor = nextCursor
-					draft.commentState.hasMore = hasMore ?? false
-					draft.commentState.loading = false
-					draft.commentState.error = undefined
+				produce(state, (draft) => {
+					draft.comments.push(...newComments)
 				})
 			)
+			set({
+				commentsCursor: nextCursor || '',
+				commentsHasMore: hasMore ?? false,
+				commentsLoading: false,
+				commentsError: '',
+			})
 		},
 		
 		// 添加新评论（乐观更新）
 		addComment: (comment: AppFeedComment) => {
+			const state = get()
 			set(
-				produce((draft) => {
-					draft.commentState.comments.unshift(comment)
+				produce(state, (draft) => {
+					draft.comments.unshift(comment)
 					// 同时更新当前post的评论数量
 					if (draft.currentPost) {
 						draft.currentPost.comment_count = (draft.currentPost.comment_count || 0) + 1
@@ -127,25 +110,28 @@ const stateCreator = () => {
 		
 		// 更新当前post的部分数据
 		updateCurrentPost: (updates: Partial<AppFeedPost>) => {
-			set(
-				produce((draft) => {
-					if (draft.currentPost) {
-						Object.assign(draft.currentPost, updates)
-					}
+			const state = get()
+			if (state.currentPost) {
+				set({
+					currentPost: { ...state.currentPost, ...updates }
 				})
-			)
+			}
 		},
 		
 		// 切换当前post的点赞状态
 		toggleCurrentPostLike: () => {
-			set(
-				produce((draft) => {
-					if (draft.currentPost) {
-						draft.currentPost.is_liked = !draft.currentPost.is_liked
-						draft.currentPost.like_count += draft.currentPost.is_liked ? 1 : -1
+			const state = get()
+			if (state.currentPost) {
+				const newLiked = !state.currentPost.is_liked
+				const newCount = state.currentPost.like_count + (newLiked ? 1 : -1)
+				set({
+					currentPost: {
+						...state.currentPost,
+						is_liked: newLiked,
+						like_count: newCount,
 					}
 				})
-			)
+			}
 		},
 		
 		// 重置为初始状态
