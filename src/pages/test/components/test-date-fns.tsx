@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { feedUtil } from '@/pages/feed/feed-util'
 
 /**
  * date-fns 测试组件
@@ -83,22 +82,20 @@ export default function TestDateFns() {
 			<Card>
 				<CardHeader>
 					<CardTitle>相对时间格式化测试</CardTitle>
-					<CardDescription>对比 feedUtil.formatTime 和自定义实现的相对时间格式化效果</CardDescription>
+					<CardDescription>自定义实现的相对时间格式化效果</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						<div className="grid grid-cols-4 gap-2 text-sm font-medium text-muted-foreground border-b pb-2">
+						<div className="grid grid-cols-3 gap-2 text-sm font-medium text-muted-foreground border-b pb-2">
 							<div>时间描述</div>
 							<div>实际时间</div>
-							<div>feedUtil 结果</div>
-							<div>自定义结果</div>
+							<div>格式化结果</div>
 						</div>
 
 						{testTimes.map((item, index) => (
-							<div key={index} className="grid grid-cols-4 gap-2 text-sm">
+							<div key={index} className="grid grid-cols-3 gap-2 text-sm">
 								<div className="font-medium">{item.label}</div>
 								<div className="font-mono text-muted-foreground">{format(item.time, 'MM-dd HH:mm')}</div>
-								<div className="p-1 bg-blue-50 rounded font-medium text-blue-700">{feedUtil.formatTime(item.time.toISOString())}</div>
 								<div className="p-1 bg-green-50 rounded font-medium text-green-700">{formatRelativeTime(item.time)}</div>
 							</div>
 						))}
@@ -122,30 +119,16 @@ export default function TestDateFns() {
 									<div className="text-sm text-muted-foreground mb-1">输入时间:</div>
 									<div className="font-mono text-sm">{customTime}</div>
 								</div>
-								<div className="grid grid-cols-2 gap-2">
-									<div className="p-3 bg-blue-50 rounded">
-										<div className="text-sm text-blue-600 mb-1">feedUtil 结果:</div>
-										<div className="font-medium text-blue-700">
-											{(() => {
-												try {
-													return feedUtil.formatTime(customTime)
-												} catch (error) {
-													return '格式错误'
-												}
-											})()}
-										</div>
-									</div>
-									<div className="p-3 bg-green-50 rounded">
-										<div className="text-sm text-green-600 mb-1">自定义结果:</div>
-										<div className="font-medium text-green-700">
-											{(() => {
-												try {
-													return formatRelativeTime(customTime)
-												} catch (error) {
-													return '格式错误'
-												}
-											})()}
-										</div>
+								<div className="p-3 bg-green-50 rounded">
+									<div className="text-sm text-green-600 mb-1">格式化结果:</div>
+									<div className="font-medium text-green-700">
+										{(() => {
+											try {
+												return formatRelativeTime(customTime)
+											} catch (error) {
+												return '格式错误'
+											}
+										})()}
 									</div>
 								</div>
 							</div>

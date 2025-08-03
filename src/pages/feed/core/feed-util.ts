@@ -1,6 +1,6 @@
 import { differenceInMinutes, format, parseISO } from 'date-fns'
 import { truncate } from 'lodash-es'
-import { type AppFeedComment } from './feed-types'
+import { type AppFeedComment } from '../feed-types'
 
 /**
  * 信息流工具类 - 提供时间格式化、内容处理等功能

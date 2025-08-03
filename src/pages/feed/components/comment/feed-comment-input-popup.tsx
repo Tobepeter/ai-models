@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Send, X } from 'lucide-react'
 import { useState, useEffect, useRef, type PropsWithChildren } from 'react'
 import { useFeedStore } from '../../feed-store'
+import { useUserStore } from '@/store/user-store'
 
 /**
  * 评论输入弹窗组件 - 使用 Popover
@@ -12,6 +13,7 @@ import { useFeedStore } from '../../feed-store'
 export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProps>) => {
 	const { onAddComment, replyTo, className, children } = props
 	const { setCommentInputOpen } = useFeedStore()
+	const { info: userInfo } = useUserStore() // 获取当前用户信息
 	const [isOpen, setIsOpen] = useState(false)
 	const [content, setContent] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -166,7 +168,7 @@ export const CommentInputPopup = (props: PropsWithChildren<CommentInputPopupProp
 			<PopoverContent className="w-[420px] p-0">
 				<div className="p-4">
 					<div className="flex space-x-3">
-						<UserAvatar src="https://i.pravatar.cc/150?img=1" size={36} className="flex-shrink-0" fallbackText="我" />
+						<UserAvatar src={userInfo.avatar} size={36} className="flex-shrink-0" fallbackText={userInfo.username.charAt(0)} />
 
 						<div className="flex-1 space-y-3">
 							<Textarea

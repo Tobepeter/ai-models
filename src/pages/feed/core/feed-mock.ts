@@ -1,5 +1,5 @@
 import { feedUtil } from './feed-util'
-import type { AppFeedPost, AppFeedComment } from './feed-types'
+import type { AppFeedPost, AppFeedComment } from '../feed-types'
 import { dummy } from '@/utils/dummy'
 import { random } from 'node-emoji'
 import { faker } from '@faker-js/faker/locale/zh_CN'
@@ -290,8 +290,8 @@ class FeedMock {
 		}
 	}
 
-	// 获取初始加载延迟
-	getInitDelay() {
+	// 获取刷新延迟
+	getRefreshDelay() {
 		return number.int({ min: 800, max: 1200 })
 	}
 

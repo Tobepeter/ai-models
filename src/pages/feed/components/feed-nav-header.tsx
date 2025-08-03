@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { RefreshCw, Plus } from 'lucide-react'
-import { feedMgr } from '../feed-mgr'
+import { feedMgr } from '../core/feed-mgr'
 import { useFeedStore } from '../feed-store'
 import { userUtil } from '@/pages/user/user-util'
 import { notify } from '@/components/common/notify'
@@ -14,7 +14,7 @@ export const FeedNavHeader = () => {
 
 	const handleRefresh = () => {
 		clearError()
-		feedMgr.refresh()
+		feedMgr.refresh(true)
 	}
 
 	const handleCreate = () => {

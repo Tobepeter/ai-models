@@ -102,7 +102,6 @@ export const Register = () => {
 			if (result) {
 				// 显示成功提示
 				notify.success('注册成功！', {
-					description: '欢迎加入AI智能体验',
 					duration: 3000,
 				})
 

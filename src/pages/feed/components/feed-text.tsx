@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { feedUtil } from '../feed-util'
-import { feedMgr } from '../feed-mgr'
+import { feedUtil } from '../core/feed-util'
+import { feedMgr } from '../core/feed-mgr'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 

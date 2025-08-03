@@ -1,6 +1,6 @@
 import { useMount, useUnmount } from 'ahooks'
 import { useFeedStore } from './feed-store'
-import { feedMgr } from './feed-mgr'
+import { feedMgr } from './core/feed-mgr'
 import { FeedList } from './components/feed-list'
 import { FeedSkeleton } from './components/feed-skeleton'
 import { FeedDetailDialog } from './components/detail/feed-detail-dialog'
@@ -17,7 +17,7 @@ export const Feed = () => {
 
 	// 初始化数据加载和header设置
 	useMount(() => {
-		feedMgr.loadInitial()
+		feedMgr.refresh()
 		setTitle(<FeedNavHeader />)
 	})
 
@@ -28,7 +28,7 @@ export const Feed = () => {
 	const handleRetry = () => {
 		clearError()
 		if (posts.length === 0) {
-			feedMgr.loadInitial()
+			feedMgr.refresh()
 		} else {
 			feedMgr.loadMore()
 		}
@@ -59,7 +59,7 @@ export const Feed = () => {
 				<FeedList posts={posts} loading={loading} hasMore={hasMore} />
 			) : (
 				<div className="flex-1 flex items-center justify-center">
-					{loading ? <FeedSkeleton count={5} /> : <Empty title="暂无内容" buttonText="刷新试试" onClickButton={() => feedMgr.loadInitial()} />}
+					{loading ? <FeedSkeleton count={5} /> : <Empty title="暂无内容" buttonText="刷新试试" onClickButton={() => feedMgr.refresh()} />}
 				</div>
 			)}
 

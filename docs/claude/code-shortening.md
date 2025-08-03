@@ -4,3 +4,4 @@
 - request -> req
 - current -> curr
 - genreate -> gen
+- manager -> mgr

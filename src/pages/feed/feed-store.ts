@@ -17,8 +17,8 @@ const feedState = {
 	loading: false,
 	refreshing: false, // loading 的子状态，表示是刷新类型的加载
 	hasMore: true,
-	cursor: null as string | null, // 分页游标
-	error: null as string | null,
+	cursor: '', // 分页游标
+	error: '',
 
 	// 弹窗状态 - 直接定义简单状态
 	isDetailDialogOpen: false,
@@ -34,10 +34,14 @@ type FeedState = typeof feedState
 
 const stateCreator = () => {
 	return combine(feedState, (set) => ({
-		setData: (data: Partial<FeedState>) => set(data), // 更新部分状态
+		// 更新部分状态
+		setData: (data: Partial<FeedState>) => set(data),
+		// 设置加载状态
 		setLoading: (loading: boolean) => set({ loading }),
-		setError: (error: string | null) => set({ error }),
+		// 设置错误信息
+		setError: (error: string) => set({ error }),
 
+		// 在列表前面添加新帖子
 		prependPosts: (newPosts: AppFeedPost[]) => {
 			set(
 				produce((draft) => {
@@ -46,6 +50,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 在列表后面添加新帖子
 		appendPosts: (newPosts: AppFeedPost[]) => {
 			set(
 				produce((draft) => {
@@ -54,6 +59,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 添加新创建的帖子
 		addNewPost: (newPost: AppFeedPost) => {
 			set(
 				produce((draft) => {
@@ -62,6 +68,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 更新指定帖子
 		updatePost: (postId: string, updates: Partial<AppFeedPost>) => {
 			set(
 				produce((draft) => {
@@ -73,6 +80,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 切换帖子点赞状态
 		toggleLike: (postId: string) => {
 			set(
 				produce((draft) => {
@@ -85,6 +93,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 切换帖子展开状态
 		toggleExpand: (postId: string) => {
 			set(
 				produce((draft) => {
@@ -96,6 +105,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 添加评论到帖子
 		addComment: (postId: string, comment: AppFeedComment) => {
 			set(
 				produce((draft) => {
@@ -117,7 +127,7 @@ const stateCreator = () => {
 			)
 		},
 
-		// 评论输入弹窗管理
+		// 设置评论输入弹窗状态
 		setCommentInputOpen: (isOpen: boolean) => {
 			if (!isOpen) {
 				// 关闭时记录时间戳
@@ -127,7 +137,7 @@ const stateCreator = () => {
 			}
 		},
 
-		// 详情页评论管理
+		// 设置帖子详情页评论数据
 		setPostDetailComments: (postId: string, detailComments: DetailComments) => {
 			set(
 				produce((draft) => {
@@ -139,6 +149,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 追加帖子评论
 		appendPostComments: (postId: string, newComments: AppFeedComment[], nextCursor?: string, hasMore?: boolean) => {
 			set(
 				produce((draft) => {
@@ -154,6 +165,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 设置帖子评论加载状态
 		setPostCommentsLoading: (postId: string, loading: boolean) => {
 			set(
 				produce((draft) => {
@@ -165,6 +177,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 设置帖子评论错误状态
 		setPostCommentsError: (postId: string, error?: string) => {
 			set(
 				produce((draft) => {
@@ -177,6 +190,7 @@ const stateCreator = () => {
 			)
 		},
 
+		// 清除帖子详情页评论数据
 		clearPostDetailComments: (postId: string) => {
 			set(
 				produce((draft) => {
@@ -188,14 +202,16 @@ const stateCreator = () => {
 			)
 		},
 
-		reset: () => set(feedState), // 重置为初始状态
-		clearError: () => set({ error: null }),
+		// 重置为初始状态
+		reset: () => set(feedState),
+		// 清除错误状态
+		clearError: () => set({ error: '' }),
 	}))
 }
 
 export const useFeedStore = create(
 	persist(stateCreator(), {
-		name: storageKeys.feed || 'feed-storage',
+		name: storageKeys.feed,
 		partialize: (state) => ({
 			posts: state.posts.slice(0, 50).map((post) => ({
 				...post,

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { FeedItem } from './item/feed-item'
 import { FeedSkeleton, FeedLoadMoreSkeleton } from './feed-skeleton'
-import { feedMgr } from '../feed-mgr'
+import { feedMgr } from '../core/feed-mgr'
 import { type AppFeedPost } from '../feed-types'
 import { cn } from '@/lib/utils'
 

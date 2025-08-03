@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { FeedDetailContent } from './components/detail/feed-detail-content'
 import { useFeedStore } from './feed-store'
-import { feedUtil } from './feed-util'
-import { feedMgr } from './feed-mgr'
+import { feedUtil } from './core/feed-util'
+import { feedMgr } from './core/feed-mgr'
 
 /**
  * Feed详情组件
@@ -33,7 +33,7 @@ export const FeedDetail = () => {
 	useEffect(() => {
 		if (postId && !currentPost) {
 			// 如果没有找到帖子数据，尝试加载
-			feedMgr.loadInitial()
+			feedMgr.refresh()
 		}
 	}, [postId, currentPost])
 
@@ -68,7 +68,7 @@ export const FeedDetail = () => {
 				<div className="text-center">
 					<h1 className="text-xl font-semibold mb-4">加载失败</h1>
 					<p className="text-muted-foreground mb-4">{error}</p>
-					<Button onClick={() => feedMgr.loadInitial()}>重试</Button>
+					<Button onClick={() => feedMgr.refresh()}>重试</Button>
 				</div>
 			</div>
 		)

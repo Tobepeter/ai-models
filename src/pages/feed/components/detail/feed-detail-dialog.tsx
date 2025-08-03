@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FeedDetailContent } from './feed-detail-content'
 import { useFeedStore } from '../../feed-store'
-import { feedUtil } from '../../feed-util'
+import { feedUtil } from '../../core/feed-util'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 

@@ -62,7 +62,7 @@
 
 ### 注释规范  
 - 简短不啰嗦，内容要精简，避免冗长描述
-- 优先使用行尾注释 `// comment`，而不是独立行注释  
+- 优先使用行尾注释 `// comment`，而不是独立行注释，函数类型除外
 - 函数注释如果只有一行，使用单行注释 `// 功能描述`，复杂注释使用三行 `jsDoc`
 - class 必须是三行 jsDoc
 - 函数内不要大面积无注释，尽量分一分区块加一个注释性的描述
@@ -78,6 +78,8 @@
 - 使用 `Record` 代替 `Map`
 - 禁用严格的 lint 规则（`noUnusedImports`, `noUnusedVariables` 等）
 - 尽量使用 `interface` 代替 `type`
+- `src/global.ts` 定义一些辅助类型，如 `Nullable`
+- 我其实不喜欢类型多变，比如 `cursor: null as string | null` 我宁愿空是空字符串
 
 ## 命名规范
 
