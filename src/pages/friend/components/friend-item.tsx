@@ -16,8 +16,8 @@ interface FriendItemProps {
  */
 export const FriendItem = ({ friend, isSelected, onClick }: FriendItemProps) => {
   // 格式化最后消息时间
-  const formatLastMessageTime = (date: Date) => {
-    return formatDistanceToNow(date, { locale: zhCN, addSuffix: true })
+  const formatLastMessageTime = (date: string) => {
+    return formatDistanceToNow(new Date(date), { locale: zhCN, addSuffix: true })
   }
 
   return (

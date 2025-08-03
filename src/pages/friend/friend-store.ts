@@ -122,7 +122,7 @@ export const friendStoreActions = {
       if (friend) {
         friend.is_online = isOnline
         if (!isOnline) {
-          friend.last_seen = new Date()
+          friend.last_seen = new Date().toISOString()
         }
       }
     })

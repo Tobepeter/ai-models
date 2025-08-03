@@ -6,6 +6,8 @@ import { ChatHub } from '@/pages/chat-hub/chat-hub'
 import { Chat } from '@/pages/chat/chat'
 import { Crud } from '@/pages/crud/crud'
 import { Doc } from '@/pages/docs/doc'
+import { NotFound } from '@/pages/errors/not-found'
+import { ErrorBoundary } from '@/pages/errors/error-boundary'
 import { Feed } from '@/pages/feed/feed'
 import { FeedDetail } from '@/pages/feed/feed-detail'
 import { Friend } from '@/pages/friend/friend'
@@ -85,6 +87,12 @@ export const routes: CustomRouteObject[] = [
 		element: <Doc />,
 		handle: { title: '文档' },
 	},
+	// 404兜底路由 - 必须放在最后
+	{
+		path: '*',
+		element: <NotFound />,
+		handle: { title: '页面未找到' },
+	},
 ]
 
 const getBasename = () => {
@@ -130,6 +138,7 @@ export const router = createBrowserRouter(
 				{
 					path: '/',
 					element: <AppLayout />,
+					errorElement: <ErrorBoundary />,
 					children: routes,
 				},
 			],

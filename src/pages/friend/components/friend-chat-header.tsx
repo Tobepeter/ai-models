@@ -42,7 +42,7 @@ export const FriendChatHeader = ({ friend }: FriendChatHeaderProps) => {
               </Badge>
             ) : friend.last_seen ? (
               <span className="text-xs text-muted-foreground">
-                最后在线: {friend.last_seen.toLocaleTimeString()}
+                最后在线: {new Date(friend.last_seen).toLocaleTimeString()}
               </span>
             ) : (
               <span className="text-xs text-muted-foreground">离线</span>

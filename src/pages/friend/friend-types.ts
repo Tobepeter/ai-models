@@ -17,8 +17,8 @@ export interface FriendChatMsg {
   msg_type: 'text' | 'image' | 'file' | 'system'
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed'
   reply_to?: string
-  created_at: Date
-  updated_at?: Date
+  created_at: string
+  updated_at?: string
 }
 
 export interface FriendRequest {
@@ -28,15 +28,15 @@ export interface FriendRequest {
   from_user: FriendChatUser
   message?: string
   status: 'pending' | 'accepted' | 'rejected'
-  created_at: Date
-  handled_at?: Date
+  created_at: string
+  handled_at?: string
 }
 
 export interface FriendChatSession {
   id: string
   participants: string[]
   last_message?: FriendChatMsg
-  last_activity: Date
+  last_activity: string
   unread_count: number
   typing_status: Record<string, boolean>
 }
@@ -46,7 +46,7 @@ export interface AppFriend extends FriendChatUser {
   last_message?: FriendChatMsg
   unread_count: number
   is_online: boolean
-  last_seen?: Date
+  last_seen?: string
   is_typing?: boolean
 }
 

@@ -5,7 +5,6 @@ import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 import type { UserResponse } from '@/api/swagger/generated'
 
-// Initial user state
 export const userState = {
 	info: {
 		id: '',
@@ -18,9 +17,10 @@ export const userState = {
 		created_at: '',
 		updated_at: '',
 	} as UserResponse,
-	token: '', // Access token (短期有效)
-	refreshToken: '', // Refresh token (长期有效，用于刷新access token)
+	token: '',
+	refreshToken: '',
 	tokenPayload: null as Nullable<JwtPayloadApp>,
+	refreshTokenPayload: null as Nullable<JwtPayloadApp>,
 }
 
 type UserState = typeof userState
@@ -31,7 +31,7 @@ const persistData = (state: UserState) => {
 		const dataToPersist = {
 			info: state.info,
 			token: state.token,
-			refreshToken: state.refreshToken, // 持久化refreshToken
+			refreshToken: state.refreshToken,
 		}
 		localStorage.setItem(storageKeys.user, JSON.stringify(dataToPersist))
 	} catch (error) {
@@ -58,9 +58,22 @@ const stateCreator = () => {
 				}
 			}
 
+			// If refreshToken is being set, also update refreshTokenPayload
+			if (data.refreshToken !== undefined) {
+				if (!data.refreshToken) {
+					newState.refreshTokenPayload = null
+				} else {
+					const payload = jwt.parse(data.refreshToken)
+					if (payload && jwt.isValid(payload)) {
+						newState.refreshTokenPayload = payload
+					}
+				}
+			}
+
 			// 如果清空token，同时清空refreshToken
 			if (data.token === '') {
 				newState.refreshToken = ''
+				newState.refreshTokenPayload = null
 			}
 
 			set(newState)
@@ -70,10 +83,8 @@ const stateCreator = () => {
 		// Clear user data
 		clear: () => {
 			set(userState)
-			// Also clear persisted data
 			localStorage.removeItem(storageKeys.user)
 		},
-		// Navigate to login page with optional redirect
 		goLogin: (redirectTo?: string) => {
 			// Get current path as default redirect address
 			const currentPath = redirectTo || window.location.pathname
@@ -101,6 +112,14 @@ const stateCreator = () => {
 						}
 					}
 
+					// Parse refreshToken payload if refreshToken exists
+					if (restored.refreshToken) {
+						const payload = jwt.parse(restored.refreshToken)
+						if (payload && jwt.isValid(payload)) {
+							restored.refreshTokenPayload = payload
+						}
+					}
+
 					set(restored)
 					return
 				}
@@ -121,12 +140,21 @@ const stateCreator = () => {
 				token: authData.token,
 				refreshToken: authData.refresh_token || '', // 设置refreshToken，如果没有则为空
 				tokenPayload: null as Nullable<JwtPayloadApp>,
+				refreshTokenPayload: null as Nullable<JwtPayloadApp>,
 			}
 
 			// 解析token payload
 			const payload = jwt.parse(authData.token)
 			if (payload && jwt.isValid(payload)) {
 				newState.tokenPayload = payload
+			}
+
+			// 解析refreshToken payload
+			if (authData.refresh_token) {
+				const refreshPayload = jwt.parse(authData.refresh_token)
+				if (refreshPayload && jwt.isValid(refreshPayload)) {
+					newState.refreshTokenPayload = refreshPayload
+				}
 			}
 
 			set(newState)

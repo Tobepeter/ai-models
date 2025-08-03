@@ -4,7 +4,7 @@ import { FileUpload } from '@/components/common/file-upload'
 import { AppEmojiPicker } from '@/components/common/app-emoji-picker'
 import { QuickEdit } from '@/components/common/quick-edit'
 import { useUserStore, userState } from '@/store/user-store'
-import { userUtil, parseUserExtra } from '../user-util'
+import { userUtil } from '../user-util'
 import { userApi } from '@/api/user/user-api'
 import { notify } from '@/components/common/notify'
 import { LogIn, Upload, Smile } from 'lucide-react'
@@ -20,7 +20,7 @@ export const UserCard = (props: PropsWithChildren<UserCardProps>) => {
 
 	const isLoggedIn = userUtil.isLogin()
 	const displayUser = isLoggedIn && user ? user : userState.info // 默认使用 userState.info，如果已登录且有用户信息则使用 user
-	const userExtra = parseUserExtra(displayUser?.extra)
+	const userExtra = userUtil.parseUserExtra(displayUser?.extra)
 	const canEdit = !readonly && isLoggedIn // 只读模式下不允许编辑
 
 	const handleAvatarUpload = async (file: File) => {

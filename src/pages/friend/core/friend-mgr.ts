@@ -33,7 +33,7 @@ class FriendMgr {
               content: '今天天气不错呢',
               msg_type: 'text',
               status: 'read',
-              created_at: new Date(Date.now() - 1000 * 60 * 30), // 30分钟前
+              created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分钟前
             },
             unread_count: 0,
             is_online: true,
@@ -52,11 +52,11 @@ class FriendMgr {
               content: '一起打游戏吗？',
               msg_type: 'text',
               status: 'delivered',
-              created_at: new Date(Date.now() - 1000 * 60 * 10), // 10分钟前
+              created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // 10分钟前
             },
             unread_count: 2,
             is_online: false,
-            last_seen: new Date(Date.now() - 1000 * 60 * 5), // 5分钟前离线
+            last_seen: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5分钟前离线
           },
           {
             id: '3',
@@ -98,7 +98,7 @@ class FriendMgr {
       content: content.trim(),
       msg_type: 'text',
       status: 'sending',
-      created_at: new Date(),
+      created_at: new Date().toISOString(),
     }
 
     // 乐观更新

@@ -10,22 +10,16 @@ export interface UserExtra {
 	status?: string // 状态表情，限制1个emoji
 }
 
-/* 解析用户扩展字段 */
-export const parseUserExtra = (extra?: string): UserExtra => {
-	if (!extra) return {}
-	try {
-		return JSON.parse(extra) as UserExtra
-	} catch {
-		return {}
-	}
-}
-
-/* 序列化用户扩展字段 */
-export const stringifyUserExtra = (extra: UserExtra) => {
-	return JSON.stringify(extra)
-}
-
 class UserUtil {
+	/* 解析用户扩展字段 */
+	parseUserExtra(extra?: string): UserExtra {
+		if (!extra) return {}
+		try {
+			return JSON.parse(extra) as UserExtra
+		} catch {
+			return {}
+		}
+	}
 	// 上传用户头像
 	async uploadAvatar(file: File) {
 		const { info: user } = useUserStore.getState()
@@ -55,7 +49,7 @@ class UserUtil {
 	// 更新用户个人简介
 	async updateBio(bio: string) {
 		const { info: user } = useUserStore.getState()
-		const currentExtra = parseUserExtra(user?.extra)
+		const currentExtra = this.parseUserExtra(user?.extra)
 
 		// 限制为20个词
 		const trimmedBio = bio.trim()
@@ -68,14 +62,14 @@ class UserUtil {
 		}
 
 		return await userApi.updateProfile({
-			extra: stringifyUserExtra(newExtra),
+			extra: JSON.stringify(newExtra),
 		})
 	}
 
 	// 更新用户状态表情
 	async updateStatus(status: string) {
 		const { info: user } = useUserStore.getState()
-		const currentExtra = parseUserExtra(user?.extra)
+		const currentExtra = this.parseUserExtra(user?.extra)
 
 		// 限制为1个emoji
 		const trimmedStatus = status.trim()
@@ -87,7 +81,7 @@ class UserUtil {
 		}
 
 		return await userApi.updateProfile({
-			extra: stringifyUserExtra(newExtra),
+			extra: JSON.stringify(newExtra),
 		})
 	}
 

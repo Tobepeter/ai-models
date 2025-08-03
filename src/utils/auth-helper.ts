@@ -13,9 +13,13 @@ export class AuthHelper {
 	 */
 	static async login(credentials: UserLoginRequest) {
 		const response = await api.users.login(credentials)
-		if (response?.data) {
+		if (response?.data?.user && response.data.token) {
 			// 使用新的handleAuthResponse方法自动处理token和refreshToken
-			useUserStore.getState().handleAuthResponse(response.data)
+			useUserStore.getState().handleAuthResponse({
+				user: response.data.user,
+				token: response.data.token,
+				refresh_token: response.data.refresh_token
+			})
 			return response.data
 		}
 		return null
@@ -27,9 +31,13 @@ export class AuthHelper {
 	 */
 	static async register(userData: UserCreateRequest) {
 		const response = await api.users.register(userData)
-		if (response?.data) {
+		if (response?.data?.user && response.data.token) {
 			// 使用新的handleAuthResponse方法自动处理token和refreshToken
-			useUserStore.getState().handleAuthResponse(response.data)
+			useUserStore.getState().handleAuthResponse({
+				user: response.data.user,
+				token: response.data.token,
+				refresh_token: response.data.refresh_token
+			})
 			return response.data
 		}
 		return null
@@ -72,7 +80,7 @@ export class AuthHelper {
 	/**
 	 * 检查用户是否已登录
 	 */
-	static isLoggedIn(): boolean {
+	static isLoggedIn() {
 		const { token } = useUserStore.getState()
 		return !!token
 	}
